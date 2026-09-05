@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using multifarious.Icu.BatchTasks.Services;
 using multifarious.Icu.Expansion;
-using Sdl.FileTypeSupport.Framework.Core.Utilities.IntegrationApi;
 using Sdl.FileTypeSupport.Framework.IntegrationApi;
 using Sdl.ProjectAutomation.AutomaticTasks;
 using Sdl.ProjectAutomation.Core;
@@ -98,70 +96,10 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             var processor = new IcuExpandProcessor(_sourceLanguage, targetLanguage, _options, AppVersion);
             _processors.Add(processor);
 
-            UpdateBilingualFile(projectFile, processor);
-        }
-
-        private static void UpdateBilingualFile(ProjectFile projectFile, IcuExpandProcessor processor)
-        {
-            var input = projectFile.LocalFilePath;
-            if (string.IsNullOrEmpty(input) || !File.Exists(input))
+            if (BilingualFileUpdater.Update(projectFile.LocalFilePath, processor, "expand"))
             {
-                Diagnostics.Write("expand: no bilingual file at " + (input ?? "<null>"));
-                return;
-            }
-
-            // The extension matters: the file type manager picks the filter by it, and a temp file
-            // called .tmp is not a bilingual document as far as Studio is concerned.
-            var output = Path.GetTempFileName();
-            var outputSdlxliff = output + ".sdlxliff";
-            File.Move(output, outputSdlxliff);
-
-            try
-            {
-                var manager = DefaultFileTypeManager.CreateInstance(true);
-                var converter = manager.GetConverterToDefaultBilingual(input, outputSdlxliff, null);
-
-                converter.AddBilingualProcessor(processor);
-                converter.SynchronizeDocumentProperties();
-                converter.Parse();
-
-                // Only once the conversion has produced something. Replacing a project's bilingual
-                // file with a half-written one would lose the translator's work outright.
-                if (new FileInfo(outputSdlxliff).Length == 0)
-                {
-                    Diagnostics.Write("expand: conversion produced nothing, leaving " + input + " alone");
-                    return;
-                }
-
-                // And only a file the next task can read. A failed check keeps the original, keeps
-                // the rejected output beside it for inspection, and fails the task loudly rather
-                // than handing Studio a document that crashes Analyse.
-                var undefined = SdlxliffChecks.UndefinedContextReferences(outputSdlxliff);
-                if (undefined.Count > 0)
-                {
-                    var rejected = input + ".rejected.sdlxliff";
-                    File.Copy(outputSdlxliff, rejected, true);
-                    Diagnostics.Write("expand: self-check failed for " + input + ": context references without "
-                        + "definitions: " + string.Join(",", undefined) + "; output kept at " + rejected);
-                    throw new InvalidOperationException(
-                        "The expanded bilingual file failed its self-check (context references "
-                        + string.Join(", ", undefined) + " have no definition); the original was kept and the "
-                        + "rejected output saved as " + Path.GetFileName(rejected) + ".");
-                }
-
-                File.Delete(input);
-                File.Move(outputSdlxliff, input);
-                Diagnostics.Write("expand: updated " + input + " units=" + processor.Units
+                Diagnostics.Write("expand: " + projectFile.Name + " units=" + processor.Units
                     + " expanded=" + processor.Expanded + " warnings=" + processor.Warnings.Count);
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Write("expand FAILED for " + input + ": " + ex.GetType().Name + ": " + ex.Message);
-                throw;
-            }
-            finally
-            {
-                if (File.Exists(outputSdlxliff)) File.Delete(outputSdlxliff);
             }
         }
 

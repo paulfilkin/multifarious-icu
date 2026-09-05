@@ -13,13 +13,27 @@ public class MessageClassifierTests
 
     [Theory]
     [InlineData("Message Centre")]
-    [InlineData("Hello {name}, welcome back!")]
-    [InlineData("Your balance is {amount, number, ::currency/EUR} as of {when, date, short}.")]
     [InlineData("Type '{' to insert a placeholder, and don''t forget to close it.")]
     [InlineData("Use # to comment out a line.")]
-    public void AValueWithNoSelectorIsNoIcu(string raw)
+    public void AValueWithNeitherSelectorNorArgumentIsNoIcu(string raw)
     {
         Assert.Equal(MessageKind.NoIcu, Classify(raw).Kind);
+    }
+
+    /// <summary>
+    /// Arguments without a selector are protected in a single segment (Studio decision,
+    /// 5 September 2026); the cloud design left these values to the filter.
+    /// </summary>
+    [Theory]
+    [InlineData("Hello {name}, welcome back!")]
+    [InlineData("Your balance is {amount, number, ::currency/EUR} as of {when, date, short}.")]
+    public void AValueWithArgumentsAndNoSelectorIsProtected(string raw)
+    {
+        var classification = Classify(raw);
+
+        Assert.Equal(MessageKind.Protect, classification.Kind);
+        Assert.NotNull(classification.Message);
+        Assert.Equal(raw, classification.RawValue);
     }
 
     /// <summary>

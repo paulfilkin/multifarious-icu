@@ -19,19 +19,29 @@ public enum MessageKind
     /// reported (D10); under <see cref="ParseErrorBehaviour.FailTask"/> the task
     /// orchestrator fails the job instead.
     /// </summary>
-    PassThrough
+    PassThrough,
+
+    /// <summary>
+    /// No selector, but arguments: the message is laid out as one segment with the
+    /// arguments protected, so a translator cannot damage them. Added for Studio (5
+    /// September 2026) after pseudo-translation garbled the arguments of every
+    /// argument-only value; the cloud design left these to the filter.
+    /// </summary>
+    Protect
 }
 
 /// <summary>What one reconstructed value is, and everything later stages need of it.</summary>
 public sealed class MessageClassification
 {
-    private MessageClassification(MessageKind kind, string rawValue, IcuMessage? hoisted, string? reason, int? errorOffset)
+    private MessageClassification(MessageKind kind, string rawValue, IcuMessage? hoisted, string? reason, int? errorOffset,
+        IcuMessage? message = null)
     {
         Kind = kind;
         RawValue = rawValue;
         Hoisted = hoisted;
         Reason = reason;
         ErrorOffset = errorOffset;
+        Message = message;
     }
 
     public MessageKind Kind { get; }
@@ -40,6 +50,9 @@ public sealed class MessageClassification
 
     /// <summary>The hoisted message, present only for <see cref="MessageKind.Expand"/>.</summary>
     public IcuMessage? Hoisted { get; }
+
+    /// <summary>The parsed message as written, present only for <see cref="MessageKind.Protect"/>.</summary>
+    public IcuMessage? Message { get; }
 
     /// <summary>Why the message passes through, for the warning and the manifest.</summary>
     public string? Reason { get; }
@@ -55,6 +68,9 @@ public sealed class MessageClassification
 
     public static MessageClassification PassThrough(string rawValue, string reason, int? errorOffset = null) =>
         new(MessageKind.PassThrough, rawValue, null, reason, errorOffset);
+
+    public static MessageClassification Protect(string rawValue, IcuMessage message) =>
+        new(MessageKind.Protect, rawValue, null, null, null, message);
 }
 
 /// <summary>
@@ -83,6 +99,14 @@ public static class MessageClassifier
         // and invite corruption).
         if (!ContainsEnabledPluralKind(message!.Nodes, options) && !ContainsSelect(message.Nodes))
         {
+            // No selector at all but at least one argument: protect the arguments in a
+            // single segment. A message whose only selectors are disabled plural kinds
+            // stays untouched, as does one with no braces at all.
+            if (!ContainsSelector(message.Nodes) && ContainsArgument(message.Nodes))
+            {
+                return MessageClassification.Protect(rawValue, message);
+            }
+
             return MessageClassification.NoIcu(rawValue);
         }
 
@@ -125,6 +149,12 @@ public static class MessageClassifier
 
         return false;
     }
+
+    private static bool ContainsSelector(IReadOnlyList<MessageNode> nodes) =>
+        nodes.Any(node => node is SelectorNode);
+
+    private static bool ContainsArgument(IReadOnlyList<MessageNode> nodes) =>
+        nodes.Any(node => node is ArgumentNode or TypedArgumentNode);
 
     private static bool ContainsSelect(IReadOnlyList<MessageNode> nodes)
     {

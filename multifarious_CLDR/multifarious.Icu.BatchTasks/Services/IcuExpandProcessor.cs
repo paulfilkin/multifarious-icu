@@ -130,6 +130,12 @@ namespace multifarious.Icu.BatchTasks.Services
                     Warn(unit, unitId, classification.Reason);
                     return;
 
+                case MessageKind.Protect:
+                    Writer.Write(unit, _planner.PlanProtected(classification), ResourceKey.Of(unit));
+                    Expanded++;
+                    Diagnostics.Write("  unit " + unitId + ": arguments protected");
+                    return;
+
                 case MessageKind.Expand:
                     var targetLanguage = _targetLanguageTag ?? _fileTargetLanguage;
                     var sourceLanguage = _sourceLanguageTag ?? _fileSourceLanguage ?? "en";

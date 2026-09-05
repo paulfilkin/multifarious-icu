@@ -327,6 +327,13 @@ namespace multifarious.Icu.BatchTasks.Services
             context.SetMetaData("icu:appVersion", _appVersion);
             context.SetMetaData("icu:unitCount", plan.Segments.Count.ToString(CultureInfo.InvariantCulture));
 
+            // Which selectors were category expanded, by path. Locked content carries no
+            // metadata, so finalise learns from here which selectors it may prune; a walked
+            // select or a disabled plural kind keeps the developer's branches.
+            var expanded = new List<string>();
+            CollectExpanded(plan.Root, expanded);
+            context.SetMetaData("icu:expandedSelectors", string.Join(",", expanded));
+
             // The unit gets its own context properties, never an addition to the object it
             // arrived with. The SDLXLIFF reader hands every paragraph unit in a group the same
             // IContextProperties instance, and the Java Resources filter groups the value with
@@ -338,6 +345,18 @@ namespace multifarious.Icu.BatchTasks.Services
                 : (IContextProperties)unit.Properties.Contexts.Clone();
             contexts.Contexts.Add(context);
             unit.Properties.Contexts = contexts;
+        }
+
+        private static void CollectExpanded(PlannedNode node, List<string> paths)
+        {
+            var selector = node as PlannedSelector;
+            if (selector == null) return;
+
+            if (selector.IsExpanded) paths.Add(selector.Path);
+            foreach (var branch in selector.Branches)
+            {
+                CollectExpanded(branch.Content, paths);
+            }
         }
     }
 }

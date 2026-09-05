@@ -238,9 +238,9 @@ public class IcuExpandProcessorTests
     }
 
     [Fact]
-    public void A_value_without_icu_is_left_exactly_as_it_was()
+    public void A_value_without_braces_is_left_exactly_as_it_was()
     {
-        var unit = ParagraphUnits.Json("Hello {name}, welcome back!", "['app.greeting']");
+        var unit = ParagraphUnits.Json("Message Centre", "['app.title']");
         var processor = Processor("ru-RU");
 
         processor.ProcessParagraphUnit(unit);
@@ -248,9 +248,52 @@ public class IcuExpandProcessorTests
         Assert.Equal(1, processor.Units);
         Assert.Equal(0, processor.Expanded);
         Assert.Single(SegmentsOf(unit.Source));
-        Assert.Equal("Hello {name}, welcome back!", RawValueReconstruction.Reconstruct(unit.Source).RawValue);
+        Assert.Equal("Message Centre", RawValueReconstruction.Reconstruct(unit.Source).RawValue);
         Assert.Single(unit.Properties.Contexts.Contexts);
         Assert.False(ResourceKey.IsExpanded(unit));
+    }
+
+    /// <summary>
+    /// A message with arguments and no selector is laid out as one segment with the arguments
+    /// protected. Decided on 5 September 2026 after pseudo-translation garbled every such value.
+    /// </summary>
+    [Theory]
+    [InlineData("Hello {name}, welcome back!", "{name}")]
+    [InlineData("Your balance is {amount, number, ::currency/EUR} as of {when, date, short}.", "{amount, number, ::currency/EUR}")]
+    public void An_argument_only_message_is_protected_in_a_single_segment(string value, string firstArgument)
+    {
+        var unit = ParagraphUnits.Json(value, "['key']");
+        var processor = Processor("ru-RU");
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(1, processor.Expanded);
+        var segments = SegmentsOf(unit.Source);
+        Assert.Single(segments);
+        Assert.Empty(ParagraphUnits.ItemsOf(unit.Source).OfType<ILockedContent>());
+
+        var marker = (ICommentMarker)segments[0][0];
+        var spans = ParagraphUnits.ItemsOf(marker).OfType<ILockedContent>().Select(LockedText).ToList();
+        Assert.Equal(firstArgument, spans[0]);
+        Assert.Contains("protected", marker.Comments.GetItem(0).Text);
+
+        Assert.Equal(value, RawValueReconstruction.Reconstruct(unit.Source).RawValue);
+        Assert.True(ResourceKey.IsExpanded(unit));
+        Assert.Equal("1", unit.Properties.Contexts.Contexts[1].GetMetaData("icu:unitCount"));
+        Assert.Equal("", unit.Properties.Contexts.Contexts[1].GetMetaData("icu:expandedSelectors"));
+    }
+
+    [Fact]
+    public void The_unit_context_records_which_selectors_were_expanded()
+    {
+        const string nested =
+            "{gender, select, female {{count, plural, one {She has # item} other {She has # items}}} other {{count, plural, one {They have # item} other {They have # items}}}}";
+        var unit = ParagraphUnits.Json(nested, "['key']");
+
+        Processor("ru-RU").ProcessParagraphUnit(unit);
+
+        Assert.Equal("gender:female/count,gender:other/count",
+            unit.Properties.Contexts.Contexts[1].GetMetaData("icu:expandedSelectors"));
     }
 
     [Fact]

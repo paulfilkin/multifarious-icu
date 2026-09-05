@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using multifarious.Icu.BatchTasks.Services;
+using multifarious.Icu.Expansion;
 using Sdl.FileTypeSupport.Framework.IntegrationApi;
 using Sdl.ProjectAutomation.AutomaticTasks;
 using Sdl.ProjectAutomation.Core;
@@ -26,13 +29,19 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
     public class IcuFinaliseTask : AbstractFileContentProcessingAutomaticTask
     {
+        private readonly List<IcuFinaliseProcessor> _processors = new List<IcuFinaliseProcessor>();
+        private FinaliseOptions _options;
         private int _filesSeen;
         private int _filesProcessed;
 
         protected override void OnInitializeTask()
         {
+            // Settings pages arrive in a later slice; until then the design's defaults apply.
+            _options = FinaliseOptions.Default;
+
+            var info = Project != null ? Project.GetProjectInfo() : null;
             Diagnostics.Start("finalise task");
-            Diagnostics.Write("project=" + (Project != null ? Project.GetProjectInfo().Name : "<null>")
+            Diagnostics.Write("project=" + (info != null ? info.Name : "<null>")
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
         }
 
@@ -52,18 +61,47 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             return wanted;
         }
 
-        /// <summary>Spike stage: observes and changes nothing, as for the expand task.</summary>
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter converter)
         {
             if (projectFile == null) return;
             _filesProcessed++;
 
-            Diagnostics.Write("configure: " + projectFile.Name);
+            var targetLanguage = projectFile.Language != null && projectFile.Language.CultureInfo != null
+                ? projectFile.Language.CultureInfo.Name
+                : null;
+
+            var processor = new IcuFinaliseProcessor(targetLanguage, _options);
+            _processors.Add(processor);
+
+            if (BilingualFileUpdater.Update(projectFile.LocalFilePath, processor, "finalise"))
+            {
+                Diagnostics.Write("finalise: " + projectFile.Name + " units=" + processor.Units
+                    + " pruned=" + processor.Pruned + " filled=" + processor.Filled
+                    + " warnings=" + processor.Warnings.Count);
+            }
         }
 
         public override void TaskComplete()
         {
-            Diagnostics.Write("finalise task complete: seen=" + _filesSeen + " processed=" + _filesProcessed);
+            var units = 0;
+            var pruned = 0;
+            var filled = 0;
+            var warnings = 0;
+            foreach (var processor in _processors)
+            {
+                units += processor.Units;
+                pruned += processor.Pruned;
+                filled += processor.Filled;
+                warnings += processor.Warnings.Count;
+            }
+
+            Diagnostics.Write("finalise task complete: seen=" + _filesSeen + " processed=" + _filesProcessed
+                + " units=" + units + " pruned=" + pruned + " filled=" + filled + " warnings=" + warnings);
+
+            var summary = string.Format(CultureInfo.CurrentCulture,
+                "{0} ICU message(s) finalised in {1} file(s); {2} branch(es) pruned, {3} segment(s) filled from source, {4} warning(s).",
+                units, _filesProcessed, pruned, filled, warnings);
+            CreateReport("ICU Finalise Messages", summary, string.Empty, TaskId);
         }
     }
 }

@@ -74,6 +74,42 @@ public sealed class ExpansionPlanner
             options.MaxUnitsPerMessage);
     }
 
+    /// <summary>
+    /// The plan for a <see cref="MessageKind.Protect"/> message: one segment holding the
+    /// whole message with its arguments as protected syntax, no selector and no CLDR
+    /// annotation. The comment tells the translator what the protection means.
+    /// </summary>
+    public ExpansionPlan PlanProtected(MessageClassification classification)
+    {
+        if (classification is null) throw new ArgumentNullException(nameof(classification));
+
+        if (classification.Kind != MessageKind.Protect)
+        {
+            throw new ArgumentException(
+                $"Only a Protect classification can be planned this way; this one is {classification.Kind}.",
+                nameof(classification));
+        }
+
+        var message = classification.Message!;
+        var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["icu:path"] = "",
+            ["icu:selector"] = "none"
+        };
+        var segment = new PlannedSegment(
+            "",
+            message.Nodes,
+            "ICU message: the arguments in this segment are protected syntax and must be kept.",
+            metadata);
+
+        return new ExpansionPlan(
+            classification.RawValue,
+            IcuSerialiser.Serialise(message.Nodes),
+            segment,
+            [segment],
+            int.MaxValue);
+    }
+
     /// <summary>Everything one Plan call carries down the walk.</summary>
     private sealed class PlanningState
     {
