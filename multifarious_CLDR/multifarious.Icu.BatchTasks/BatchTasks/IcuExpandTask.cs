@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using multifarious.Icu.BatchTasks.Services;
+using multifarious.Icu.Expansion;
+using Sdl.FileTypeSupport.Framework.Core.Utilities.IntegrationApi;
 using Sdl.FileTypeSupport.Framework.IntegrationApi;
 using Sdl.ProjectAutomation.AutomaticTasks;
 using Sdl.ProjectAutomation.Core;
@@ -28,13 +33,25 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
     public class IcuExpandTask : AbstractFileContentProcessingAutomaticTask
     {
+        private readonly List<IcuExpandProcessor> _processors = new List<IcuExpandProcessor>();
+        private ExpansionOptions _options;
+        private string _sourceLanguage;
         private int _filesSeen;
         private int _filesProcessed;
 
         protected override void OnInitializeTask()
         {
+            // Settings pages arrive in a later slice; until then the design's defaults apply.
+            _options = ExpansionOptions.Default;
+
+            var info = Project != null ? Project.GetProjectInfo() : null;
+            _sourceLanguage = info != null && info.SourceLanguage != null && info.SourceLanguage.CultureInfo != null
+                ? info.SourceLanguage.CultureInfo.Name
+                : null;
+
             Diagnostics.Start("expand task");
-            Diagnostics.Write("project=" + (Project != null ? Project.GetProjectInfo().Name : "<null>")
+            Diagnostics.Write("project=" + (info != null ? info.Name : "<null>")
+                + " source=" + (_sourceLanguage ?? "<null>")
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
         }
 
@@ -53,36 +70,132 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             Diagnostics.Write("file: " + projectFile.Name
                 + " fileTypeId=" + (projectFile.FileTypeId ?? "<null>")
                 + " language=" + (projectFile.Language != null ? projectFile.Language.IsoAbbreviation : "<null>")
-                + " path=" + (projectFile.LocalFilePath ?? "<null>")
                 + " -> " + (wanted ? "process" : "skip"));
 
             return wanted;
         }
 
         /// <summary>
-        /// Spike stage: observes what Studio hands the task and changes nothing. The converter
-        /// Studio passes in runs its processors over the bilingual file but does not write it
-        /// back (established in the YAML plugin), which makes it exactly right for a read-only
-        /// probe. The expansion processor and the write-back arrive once the tasks are confirmed
-        /// to register and run in Studio and the probe has shown what the filters produce.
+        /// Updates the project's bilingual file, and deliberately ignores the converter handed in.
+        ///
+        /// A processor added to that converter runs over every unit and changes nothing on disk;
+        /// the YAML plugin established this. What works is a converter of our own from the
+        /// bilingual file to a new one with the processor in between, then the result put in
+        /// place of the original.
         /// </summary>
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter converter)
         {
             if (projectFile == null) return;
             _filesProcessed++;
 
-            Diagnostics.Write("configure: " + projectFile.Name
-                + " converter=" + (converter != null ? converter.GetType().Name : "<null>"));
+            // The language comes from the project file rather than the conversion properties. This
+            // file exists because the project has that target language, whereas the conversion
+            // properties have been observed to arrive empty.
+            var targetLanguage = projectFile.Language != null && projectFile.Language.CultureInfo != null
+                ? projectFile.Language.CultureInfo.Name
+                : null;
 
-            if (converter != null)
+            var processor = new IcuExpandProcessor(_sourceLanguage, targetLanguage, _options, AppVersion);
+            _processors.Add(processor);
+
+            UpdateBilingualFile(projectFile, processor);
+        }
+
+        private static void UpdateBilingualFile(ProjectFile projectFile, IcuExpandProcessor processor)
+        {
+            var input = projectFile.LocalFilePath;
+            if (string.IsNullOrEmpty(input) || !File.Exists(input))
             {
-                converter.AddBilingualProcessor(new ProbeProcessor());
+                Diagnostics.Write("expand: no bilingual file at " + (input ?? "<null>"));
+                return;
+            }
+
+            // The extension matters: the file type manager picks the filter by it, and a temp file
+            // called .tmp is not a bilingual document as far as Studio is concerned.
+            var output = Path.GetTempFileName();
+            var outputSdlxliff = output + ".sdlxliff";
+            File.Move(output, outputSdlxliff);
+
+            try
+            {
+                var manager = DefaultFileTypeManager.CreateInstance(true);
+                var converter = manager.GetConverterToDefaultBilingual(input, outputSdlxliff, null);
+
+                converter.AddBilingualProcessor(processor);
+                converter.SynchronizeDocumentProperties();
+                converter.Parse();
+
+                // Only once the conversion has produced something. Replacing a project's bilingual
+                // file with a half-written one would lose the translator's work outright.
+                if (new FileInfo(outputSdlxliff).Length == 0)
+                {
+                    Diagnostics.Write("expand: conversion produced nothing, leaving " + input + " alone");
+                    return;
+                }
+
+                // And only a file the next task can read. A failed check keeps the original, keeps
+                // the rejected output beside it for inspection, and fails the task loudly rather
+                // than handing Studio a document that crashes Analyse.
+                var undefined = SdlxliffChecks.UndefinedContextReferences(outputSdlxliff);
+                if (undefined.Count > 0)
+                {
+                    var rejected = input + ".rejected.sdlxliff";
+                    File.Copy(outputSdlxliff, rejected, true);
+                    Diagnostics.Write("expand: self-check failed for " + input + ": context references without "
+                        + "definitions: " + string.Join(",", undefined) + "; output kept at " + rejected);
+                    throw new InvalidOperationException(
+                        "The expanded bilingual file failed its self-check (context references "
+                        + string.Join(", ", undefined) + " have no definition); the original was kept and the "
+                        + "rejected output saved as " + Path.GetFileName(rejected) + ".");
+                }
+
+                File.Delete(input);
+                File.Move(outputSdlxliff, input);
+                Diagnostics.Write("expand: updated " + input + " units=" + processor.Units
+                    + " expanded=" + processor.Expanded + " warnings=" + processor.Warnings.Count);
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.Write("expand FAILED for " + input + ": " + ex.GetType().Name + ": " + ex.Message);
+                throw;
+            }
+            finally
+            {
+                if (File.Exists(outputSdlxliff)) File.Delete(outputSdlxliff);
             }
         }
 
         public override void TaskComplete()
         {
-            Diagnostics.Write("expand task complete: seen=" + _filesSeen + " processed=" + _filesProcessed);
+            var units = 0;
+            var expanded = 0;
+            var alreadyExpanded = 0;
+            var warnings = new List<ExpansionWarning>();
+            foreach (var processor in _processors)
+            {
+                units += processor.Units;
+                expanded += processor.Expanded;
+                alreadyExpanded += processor.AlreadyExpanded;
+                warnings.AddRange(processor.Warnings);
+            }
+
+            Diagnostics.Write("expand task complete: seen=" + _filesSeen + " processed=" + _filesProcessed
+                + " units=" + units + " expanded=" + expanded + " alreadyExpanded=" + alreadyExpanded
+                + " warnings=" + warnings.Count);
+
+            var summary = string.Format(CultureInfo.CurrentCulture,
+                "{0} ICU message(s) expanded in {1} file(s); {2} passed through with a warning.",
+                expanded, _filesProcessed, warnings.Count);
+            CreateReport("ICU Expand Plural Forms", summary, string.Empty, TaskId);
+        }
+
+        private static string AppVersion
+        {
+            get
+            {
+                var version = typeof(IcuExpandTask).Assembly.GetName().Version;
+                return version == null ? "0.0.0" : version.ToString(3);
+            }
         }
     }
 }

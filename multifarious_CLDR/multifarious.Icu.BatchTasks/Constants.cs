@@ -18,8 +18,7 @@ namespace multifarious.Icu.BatchTasks
         /// anything, and a brace in a Word document is not ICU, so the tasks work from an
         /// allowlist rather than from the classifier alone.
         ///
-        /// The strings are taken from the identical ids Trados Cloud reports for the same filters
-        /// and are confirmed against ProjectFile.FileTypeId in the diagnostics log.
+        /// Confirmed against ProjectFile.FileTypeId in the Phase 0 diagnostics log (5 Sep 2026).
         /// </summary>
         public static readonly string[] DefaultFileTypeIds =
         {
@@ -29,5 +28,17 @@ namespace multifarious.Icu.BatchTasks
 
         /// <summary>The author name on the comments the tasks write.</summary>
         public const string CommentAuthor = "multifariousICU Support";
+
+        /// <summary>
+        /// The context type of the one context this plugin adds to every paragraph unit it
+        /// expands. It carries the unit-level metadata (the original pattern, the hoisted form,
+        /// the resource key, the versions) and is how the finalise task finds the units it owns
+        /// and how a second expand run knows to leave a unit alone.
+        /// </summary>
+        public const string IcuContextType = "multifarious:icu";
+
+        public const string IcuContextDisplayName = "ICU message";
+
+        public const string IcuContextDisplayCode = "ICU";
     }
 }

@@ -18,17 +18,20 @@ public enum ParseErrorBehaviour
 }
 
 /// <summary>
-/// The BCM construct carrying non-translatable ICU syntax (D11). T4 showed the
-/// JSON filter's writer drops tags of every kind while both writers emit locked
-/// text verbatim, so locked content is the default and placeholder tags remain
-/// as the variant.
+/// The construct carrying non-translatable ICU syntax in the bilingual document. The
+/// cloud design settled on locked content (its D11) because the JSON writer dropped
+/// tags of every kind while both writers emit locked text verbatim. Studio evidence
+/// (5 September 2026, Project 39) repeated the finding exactly: the target paragraph
+/// carried every placeholder tag and the generated JSON carried none. The filters are
+/// the same code in both products. Locked content is therefore the default here as
+/// well, and placeholder tags remain the variant.
 /// </summary>
 public enum TagConstruct
 {
-    /// <summary>Locked text spans; the default (D11 as finally revised by T4).</summary>
+    /// <summary>Locked text spans; the default. They carry no metadata, so the segment's comment is the machine-readable carrier.</summary>
     LockedContent,
 
-    /// <summary>Placeholder tags with skeleton definitions; works for the properties writer, dropped by the JSON writer.</summary>
+    /// <summary>Placeholder tags carrying the branch path and role as metadata; dropped by the JSON writer.</summary>
     PlaceholderTags
 }
 

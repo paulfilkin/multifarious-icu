@@ -44,6 +44,18 @@
     <Reference Include="Sdl.FileTypeSupport.Framework.Core">
       <HintPath>$(TradosFolder)\Sdl.FileTypeSupport.Framework.Core.dll</HintPath>
     </Reference>
+    <!-- The default factories the framework itself uses, so the processor tests build real
+         paragraph units rather than mocks of them. Their implementation assembly is loaded by
+         name at run time, which StudioAssemblyResolver arranges. -->
+    <Reference Include="Sdl.FileTypeSupport.Framework.Core.Utilities">
+      <HintPath>$(TradosFolder)\Sdl.FileTypeSupport.Framework.Core.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.Core.Globalization">
+      <HintPath>$(TradosFolder)\Sdl.Core.Globalization.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.Core.Globalization.Async">
+      <HintPath>$(TradosFolder)\Sdl.Core.Globalization.Async.dll</HintPath>
+    </Reference>
     <!-- The plugin project is WPF; referencing it needs the desktop assemblies resolvable. -->
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
