@@ -1,0 +1,24 @@
+{
+  "_status": "stub",
+  "_note": [
+    "Curated grammatical hints, shown to the translator on the 'Grammar:' line of an",
+    "expanded segment's comment. CLDR does not publish anything of this kind: a plural",
+    "category is a selector, not a description of the grammar a form requires, so this",
+    "content is editorial and has to be written and reviewed by linguists.",
+    "",
+    "Who authors and reviews it is open question Q11 in the design document, and until",
+    "that is settled this file is deliberately close to empty. The single entry below is",
+    "the one the design document itself uses in its worked example; it is here so the",
+    "comment builder is exercised end to end, and it has not been through linguistic",
+    "review. Do not read the sparseness as a gap to be filled by guesswork.",
+    "",
+    "Keys are a CLDR locale key, then a CLDR plural category keyword. Lookup tries the",
+    "resolved key first and then the bare language, so an entry under 'pt' covers",
+    "'pt-PT' unless 'pt-PT' says otherwise."
+  ],
+  "hints": {
+    "ru": {
+      "many": "genitive plural agreement"
+    }
+  }
+}

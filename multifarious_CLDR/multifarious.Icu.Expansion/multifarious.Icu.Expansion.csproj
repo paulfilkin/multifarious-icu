@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The decision layer between the ICU tree and any bilingual document model: the message
+       classifier, the expansion planner and the plan it produces. Pure decision-making over
+       Icu.Core and Icu.Cldr; nothing here reads or writes SDLXLIFF, and the plan is executed
+       by a writer elsewhere.
+
+       These four files are the model-agnostic half of the Trados Cloud project's Icu.Bcm,
+       renamed out of that namespace because nothing in them is BCM. -->
+
+  <PropertyGroup>
+    <RootNamespace>multifarious.Icu.Expansion</RootNamespace>
+    <AssemblyName>multifarious.Icu.Expansion</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Icu.Core\Icu.Core.csproj" />
+    <ProjectReference Include="..\Icu.Cldr\Icu.Cldr.csproj" />
+  </ItemGroup>
+
+</Project>

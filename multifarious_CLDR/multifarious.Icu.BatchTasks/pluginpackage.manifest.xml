@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PluginPackage xmlns="http://www.sdl.com/Plugins/PluginPackage/1.0">
+  <!-- Must match the RWS AppStore listing name exactly: the store signs the upload and ties it to
+       the listing by this name. -->
+  <PlugInName>multifariousICU Support for Trados Studio</PlugInName>
+  <Version>1.0.0.0</Version>
+  <Description>Batch tasks for ICU MessageFormat messages in JSON and Java properties files: expand plural forms into one translatable segment per CLDR category the target language needs, and finalise the translated messages before target generation.</Description>
+  <Author>multifarious</Author>
+  <RequiredProduct name="TradosStudio" minversion="19.0" maxversion="19.9"/>
+  <!-- The ICU, CLDR and planning layers are separate assemblies, so they must be named here or
+       they will not reach the .sdlplugin and the tasks fail to load with "Could not load file or
+       assembly". Studio framework assemblies are not listed: they are present in the install and
+       must not be bundled. Newtonsoft.Json is not listed for the same reason: Studio ships
+       13.0.x itself and resolves it for every plugin. -->
+  <Include>
+    <File>Icu.Core.dll</File>
+    <File>Icu.Cldr.dll</File>
+    <File>multifarious.Icu.Expansion.dll</File>
+  </Include>
+</PluginPackage>

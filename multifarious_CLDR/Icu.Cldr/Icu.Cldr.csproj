@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- CLDR plural data: the embedded supplemental files, category lookup per selector kind,
+       the sample parser, the UTS #35 rule evaluator, locale fallback, Trados legacy code
+       mapping and the curated grammatical hints. No dependencies beyond the BCL and the JSON
+       reader.
+
+       Ported from the Trados Cloud project's Icu.Cldr with the namespace kept. The one
+       substantive difference is the JSON reader: Newtonsoft instead of System.Text.Json,
+       because Trados Studio ships Newtonsoft and resolves it for every plugin, whereas
+       System.Text.Json on .NET Framework drags in a chain of assemblies the plugin would have
+       to carry. -->
+
+  <PropertyGroup>
+    <RootNamespace>Icu.Cldr</RootNamespace>
+    <AssemblyName>Icu.Cldr</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Icu.Core\Icu.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Pinned to a CLDR release. The version is surfaced in the paragraph unit metadata, so
+         it must travel with the assembly rather than be fetched at run time. The resource
+         names are RootNamespace plus the folder path: Icu.Cldr.Data.plurals.json. -->
+    <EmbeddedResource Include="Data\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 13.0.x has assembly version 13.0.0.0 throughout, which is what Studio 2026 ships, so
+         the copy Studio already has satisfies the reference at run time and the DLL is not
+         named in the plugin manifest. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+</Project>

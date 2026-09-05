@@ -1,0 +1,41 @@
+<Project>
+
+  <!-- Settings shared by every project in the solution. Individual projects set only what
+       differs: their references, and whether they are the plugin or a test project.
+
+       net48 x64 throughout, because the plugin runs inside Trados Studio 2026 and every
+       library it carries has to load there. The libraries were ported from a .NET 8 code base
+       written in C# 12, so the language version stays at 12 and PolySharp supplies the
+       compiler-facing types (Index, Range, IsExternalInit, the nullable attributes) that the
+       .NET Framework BCL lacks. PolySharp is a source generator: nothing of it reaches the
+       built assemblies or the .sdlplugin. -->
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <Company>multifarious</Company>
+    <Product>multifariousICU Support for Trados Studio</Product>
+    <Copyright>Copyright (c) 2026 multifarious.</Copyright>
+  </PropertyGroup>
+
+  <!-- Strong naming is mandatory for the plugin: the SDL CreatePluginPackage target rejects
+       unsigned assemblies (PFE110), and a signed assembly may only depend on signed ones, so
+       every library it bundles is signed with the same key. The test project is left unsigned;
+       nothing loads it into Studio. -->
+  <PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)multifarious.Icu.BatchTasks\multifarious.Icu.BatchTasks.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

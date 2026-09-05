@@ -1,0 +1,81 @@
+# Project docs are kept locally, not in the repo.
+Documentation/
+
+# AppStore material (documentation, samples, images) is kept locally, not in the repo.
+appstore/
+
+# Claude Code session settings and the project instructions, which name local paths.
+.claude/
+/CLAUDE.md
+
+# Crash-dump folders Windows error reporting drops next to whatever crashed.
+ErrorReports/
+
+# Trados artefacts from smoke-testing against files in test-corpus. Studio writes its
+# project next to the source file, so these appear in the working tree unbidden.
+*.sdlproj
+*.sdlxliff
+*.sdlppx
+*.sdlrpx
+*_AutoSave/
+*.bak.sdlxliff
+multifarious_CLDR/test-corpus/*_??-??_??-??/
+
+# Local test-corpus scratch, not part of the tracked corpus.
+multifarious_CLDR/test-corpus/errors/
+multifarious_CLDR/test-corpus/**/* - Copy.*
+
+## Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+
+## Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.userprefs
+*.sln.docstates
+
+## NuGet
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+## Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+TestResults/
+
+## MSBuild / build intermediates
+*.tlog
+*.pdb
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+
+## Windows / OS cruft
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+## Backup & temp files
+*.bak
+*.orig
+*~
+~$*

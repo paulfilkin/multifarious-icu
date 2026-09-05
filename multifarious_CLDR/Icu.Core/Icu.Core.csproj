@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ICU MessageFormat itself: lexer, parser, the tree with source offsets, the serialiser,
+       hoisting and the escaping transform. No dependencies beyond the BCL, and no knowledge of
+       CLDR, SDLXLIFF or Trados Studio.
+
+       Ported from the Trados Cloud project's Icu.Core. The namespace is kept so that a fix
+       there is a file copy here; the only differences are the .NET Framework substitutions
+       in Compat\ and the few call sites they replace. -->
+
+  <PropertyGroup>
+    <RootNamespace>Icu.Core</RootNamespace>
+    <AssemblyName>Icu.Core</AssemblyName>
+  </PropertyGroup>
+
+</Project>

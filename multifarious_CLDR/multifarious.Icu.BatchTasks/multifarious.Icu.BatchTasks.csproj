@@ -1,0 +1,106 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+
+    <RootNamespace>multifarious.Icu.BatchTasks</RootNamespace>
+    <!-- The assembly name is what Studio shows in its unsigned-plugin warning at startup, as
+         "<AssemblyName>.plugin.xml", and it names the DLL and every satellite. Deliberately not
+         the same as the root namespace: the namespace identifies the code and stays as it is,
+         while this is a file name a user reads. -->
+    <AssemblyName>IcuSupport</AssemblyName>
+
+    <!-- We supply our own AssemblyInfo.cs / PluginProperties.cs -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+    <!-- The plugin code is written against Studio's unannotated API in the style of the sibling
+         plugins: explicit usings, no nullable annotations. The libraries it references keep the
+         solution-wide settings. -->
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+
+    <!-- Batch task settings pages are WPF; the framework base controls need WinForms -->
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+
+    <!-- Trados Studio 2026 (Studio19) GA install -->
+    <TradosFolder>$(ProgramW6432)\Trados\Trados Studio\Studio19</TradosFolder>
+
+    <!-- F5 launches Studio for interactive debugging -->
+    <StartAction>Program</StartAction>
+    <StartProgram>$(TradosFolder)\SDLTradosStudio.exe</StartProgram>
+
+    <!-- Deploy the built plugin and produce a .sdlplugin package. Studio locks the deployed DLLs
+         while it is running, so build with -p:DeployPluginPackage=false if it is open. -->
+    <PluginDeploymentPath>$(AppData)\Trados\Trados Studio\19\Plugins</PluginDeploymentPath>
+    <CreatePluginPackage>true</CreatePluginPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Embedded into the .sdlplugin; declares Studio 2026 compatibility (19.0-19.9) -->
+    <Content Include="pluginpackage.manifest.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The ICU, CLDR and planning layers, developed and tested without any Studio dependency.
+         The plugin is the Studio-facing shell over them. -->
+    <ProjectReference Include="..\Icu.Core\Icu.Core.csproj" />
+    <ProjectReference Include="..\Icu.Cldr\Icu.Cldr.csproj" />
+    <ProjectReference Include="..\multifarious.Icu.Expansion\multifarious.Icu.Expansion.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Trados Studio 2026 (Studio19) framework assemblies, resolved from the install rather than
+         from NuGet.
+
+         Do not add <Private>false</Private> to these. The packaging task reflects over the built
+         assembly to generate plugin.xml, so it needs the Studio assemblies resolvable beside it in
+         the output folder; without them the build stays green, the .sdlplugin still builds, and
+         plugin.xml is written with no extensions at all - the tasks simply never register. -->
+    <Reference Include="Sdl.Core.Globalization">
+      <HintPath>$(TradosFolder)\Sdl.Core.Globalization.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.Core.Globalization.Async">
+      <HintPath>$(TradosFolder)\Sdl.Core.Globalization.Async.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.Core.Settings">
+      <HintPath>$(TradosFolder)\Sdl.Core.Settings.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.Desktop.IntegrationApi">
+      <HintPath>$(TradosFolder)\Sdl.Desktop.IntegrationApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.Desktop.IntegrationApi.Extensions">
+      <HintPath>$(TradosFolder)\Sdl.Desktop.IntegrationApi.Extensions.dll</HintPath>
+    </Reference>
+    <!-- Studio's own WPF styles and theme brushes, so the settings pages match Studio's chrome
+         rather than being hand-styled. -->
+    <Reference Include="Sdl.Desktop.Platform.Styles">
+      <HintPath>$(TradosFolder)\Sdl.Desktop.Platform.Styles.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.FileTypeSupport.Framework.Core">
+      <HintPath>$(TradosFolder)\Sdl.FileTypeSupport.Framework.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.FileTypeSupport.Framework.Core.Settings">
+      <HintPath>$(TradosFolder)\Sdl.FileTypeSupport.Framework.Core.Settings.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.FileTypeSupport.Framework.Core.Utilities">
+      <HintPath>$(TradosFolder)\Sdl.FileTypeSupport.Framework.Core.Utilities.dll</HintPath>
+    </Reference>
+    <!-- The batch task base classes and the project model the tasks run against. -->
+    <Reference Include="Sdl.ProjectAutomation.AutomaticTasks">
+      <HintPath>$(TradosFolder)\Sdl.ProjectAutomation.AutomaticTasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.ProjectAutomation.Core">
+      <HintPath>$(TradosFolder)\Sdl.ProjectAutomation.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Plugin attribute plus the .sdlplugin packaging target. Build 18.0.1 is the latest published
+         version; it only drives packaging, and the manifest declares 19.0-19.9 compatibility. -->
+    <PackageReference Include="Sdl.Core.PluginFramework" Version="2.1.0" />
+    <PackageReference Include="Sdl.Core.PluginFramework.Build" Version="18.0.1" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Plugin_Name" xml:space="preserve">
+    <value>multifariousICU Support</value>
+  </data>
+  <data name="Plugin_Description" xml:space="preserve">
+    <value>Batch tasks for ICU MessageFormat messages in JSON and Java properties files: expand plural forms into one segment per CLDR category the target language needs, and finalise the translated messages before target generation.</value>
+  </data>
+  <data name="Task_Expand_Name" xml:space="preserve">
+    <value>ICU Expand Plural Forms</value>
+  </data>
+  <data name="Task_Expand_Description" xml:space="preserve">
+    <value>Expands ICU plural and selectordinal arguments into one translatable segment per CLDR category required by the target language, each a complete sentence with a comment naming the counts that select it.</value>
+  </data>
+  <data name="Task_Finalise_Name" xml:space="preserve">
+    <value>ICU Finalise Messages</value>
+  </data>
+  <data name="Task_Finalise_Description" xml:space="preserve">
+    <value>Prunes plural branches to the target language's CLDR set, escapes ICU special characters typed as text and checks placeholder parity, ready for target generation.</value>
+  </data>
+</root>

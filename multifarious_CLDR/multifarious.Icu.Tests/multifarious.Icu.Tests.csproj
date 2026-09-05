@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- One test project for the whole solution, in folders per library: Core\ and Cldr\ are
+       the Trados Cloud project's T1 suites carried over as they stand (parser round trips,
+       escaping, hoisting, the generated CLDR conformance suite), Expansion\ the planner and
+       classifier tests. Studio-boundary tests join later, which is why the project is x64 and
+       net48 like everything else rather than a portable test library. -->
+
+  <PropertyGroup>
+    <RootNamespace>multifarious.Icu.Tests</RootNamespace>
+    <AssemblyName>multifarious.Icu.Tests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+
+    <!-- Referencing the plugin pulls in Studio's Sdl.Desktop.Platform, which depends on the
+         System.Collections.Immutable build Studio ships (10.0.0.8), while the test platform
+         brings the 1.x package. MSBuild reports the clash as MSB3277 on every build. Neither
+         side is used by any test, and inside Studio the plugin sees Studio's copy, so the
+         report is noise here and is demoted to a message rather than left as a warning that
+         the build is expected to be free of. -->
+    <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Icu.Core\Icu.Core.csproj" />
+    <ProjectReference Include="..\Icu.Cldr\Icu.Cldr.csproj" />
+    <ProjectReference Include="..\multifarious.Icu.Expansion\multifarious.Icu.Expansion.csproj" />
+    <ProjectReference Include="..\multifarious.Icu.BatchTasks\multifarious.Icu.BatchTasks.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TradosFolder>$(ProgramW6432)\Trados\Trados Studio\Studio19</TradosFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The batch task contract tests read the attributes Studio reads. The Studio assemblies
+         are resolved from the install, as in the plugin project. -->
+    <Reference Include="Sdl.ProjectAutomation.AutomaticTasks">
+      <HintPath>$(TradosFolder)\Sdl.ProjectAutomation.AutomaticTasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.ProjectAutomation.Core">
+      <HintPath>$(TradosFolder)\Sdl.ProjectAutomation.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.FileTypeSupport.Framework.Core">
+      <HintPath>$(TradosFolder)\Sdl.FileTypeSupport.Framework.Core.dll</HintPath>
+    </Reference>
+    <!-- The plugin project is WPF; referencing it needs the desktop assemblies resolvable. -->
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+
+  <!-- The same stack as the reference project, so its tests compile unchanged: xunit with
+       FsCheck for the property-based suites. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="FsCheck.Xunit" Version="2.16.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
