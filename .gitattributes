@@ -1,0 +1,29 @@
+# Normalise line endings. Text files are stored with LF in the repository and
+# checked out with the platform's native endings, so history stays consistent
+# whatever OS or editor a contributor uses. core.autocrlf is true on the
+# development machine; without this file every commit warned about it.
+* text=auto
+
+# Source and configuration are text; C# gets language-aware diffs.
+*.cs       text diff=csharp
+*.xaml     text
+*.csproj   text
+*.props    text
+*.sln      text
+*.resx     text
+*.xml      text
+*.json     text
+*.properties text
+*.md       text
+
+# The test corpus reaches the working tree exactly as committed. These are the
+# fixture files Studio projects are built from, and the Java Resources filter
+# records the file's own line-break convention, so a checkout must not rewrite it.
+multifarious_CLDR/test-corpus/** -text
+
+# Binary files, never touched by line-ending conversion.
+*.snk       binary
+*.sdlplugin binary
+*.dll       binary
+*.ico       binary
+*.png       binary
