@@ -77,6 +77,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 WriteSetting(writer, UIStrings.Expand_Ordinal, OnOff(options.ExpandOrdinal));
                 WriteSetting(writer, UIStrings.Expand_SeedHeader,
                     options.SourceSeedStrategy == SourceSeedStrategy.AlwaysOther ? UIStrings.Expand_SeedAlwaysOther : UIStrings.Expand_SeedMatching);
+                WriteSetting(writer, UIStrings.Expand_Comments, OnOff(options.WriteSegmentComments));
                 WriteSetting(writer, UIStrings.Expand_Hints, OnOff(options.IncludeHints));
                 WriteSetting(writer, UIStrings.Expand_BudgetHeader, options.MaxUnitsPerMessage.ToString(CultureInfo.InvariantCulture));
                 WriteSetting(writer, UIStrings.Expand_ParseHeader,

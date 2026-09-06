@@ -16,6 +16,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         private bool _expandOrdinal;
         private SourceSeedStrategy _seedStrategy;
         private bool _includeHints;
+        private bool _writeSegmentComments;
         private string _budgetText = string.Empty;
         private ParseErrorBehaviour _onParseError;
 
@@ -53,6 +54,12 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         {
             get { return _includeHints; }
             set { Set(ref _includeHints, value); }
+        }
+
+        public bool WriteSegmentComments
+        {
+            get { return _writeSegmentComments; }
+            set { Set(ref _writeSegmentComments, value); }
         }
 
         public string BudgetText
@@ -115,6 +122,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             _settings.ExpandOrdinal = _expandOrdinal;
             _settings.SeedStrategy = _seedStrategy;
             _settings.IncludeHints = _includeHints;
+            _settings.WriteSegmentComments = _writeSegmentComments;
             _settings.MaxUnitsPerMessage = budget;
             _settings.OnParseError = _onParseError;
             return _settings;
@@ -157,6 +165,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             _expandOrdinal = settings.ExpandOrdinal;
             _seedStrategy = settings.SeedStrategy;
             _includeHints = settings.IncludeHints;
+            _writeSegmentComments = settings.WriteSegmentComments;
             _budgetText = settings.MaxUnitsPerMessage.ToString(CultureInfo.CurrentCulture);
             _onParseError = settings.OnParseError;
         }
@@ -168,6 +177,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             Raise(nameof(SeedIsMatchingElseOther));
             Raise(nameof(SeedIsAlwaysOther));
             Raise(nameof(IncludeHints));
+            Raise(nameof(WriteSegmentComments));
             Raise(nameof(BudgetText));
             Raise(nameof(IsBudgetValid));
             Raise(nameof(IsValid));

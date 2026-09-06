@@ -94,6 +94,18 @@
     <value>Segment comments</value>
     <comment>Group heading. What the task writes into the comment on each source segment.</comment>
   </data>
+  <data name="Expand_Comments" xml:space="preserve">
+    <value>Add a comment to each source segment naming its form and the counts that select it</value>
+    <comment>Tick box, on by default. The comment is what the translator sees on the source segment.</comment>
+  </data>
+  <data name="Expand_CommentsHint" xml:space="preserve">
+    <value>With the ICU Forms window open the comments can be noise; turn them off and the window still shows every form.</value>
+    <comment>Hint under the tick box. "ICU Forms" is the name of the plugin's window under the editor.</comment>
+  </data>
+  <data name="Expand_CommentsHelp1" xml:space="preserve">
+    <value>Each source segment can carry a comment naming its form, the counts that select it, and where its source text came from. The ICU Forms window shows the same facts from the message itself, so the comments are a convenience for translators who work without the window, not something the tasks depend on.</value>
+    <comment>Help paragraph.</comment>
+  </data>
   <data name="Expand_Hints" xml:space="preserve">
     <value>Add a grammar hint for the form where one is known</value>
     <comment>Tick box, on by default.</comment>
@@ -467,5 +479,55 @@
   <data name="Verifier_Invalid" xml:space="preserve">
     <value>The reassembled message is not valid ICU: {0}.</value>
     <comment>Error. {0} is the parser's description of the problem; keep the placeholder.</comment>
+  </data>
+
+  <!-- The ICU verifier's settings page under Verification. -->
+  <data name="VerifierPage_Intro" xml:space="preserve">
+    <value>The ICU verifier checks every form of an expanded ICU message when you press F8 and as segments are confirmed, and lists what it finds in the Messages window.</value>
+    <comment>Paragraph at the top of the verifier's settings page.</comment>
+  </data>
+  <data name="VerifierPage_Enabled" xml:space="preserve">
+    <value>Run the ICU verifier</value>
+    <comment>Tick box, on by default, as every Studio verifier's page offers.</comment>
+  </data>
+  <data name="VerifierPage_SeverityHeader" xml:space="preserve">
+    <value>Report each finding as</value>
+    <comment>Heading over the list of checks, each with a severity choice beside it.</comment>
+  </data>
+  <data name="VerifierPage_CheckEmptyForm" xml:space="preserve">
+    <value>A form with no translation</value>
+    <comment>One of the four checks. Its severity is chosen in a drop-down beside it.</comment>
+  </data>
+  <data name="VerifierPage_CheckPlaceholders" xml:space="preserve">
+    <value>Placeholders that differ from the source</value>
+    <comment>One of the four checks.</comment>
+  </data>
+  <data name="VerifierPage_CheckTypedPound" xml:space="preserve">
+    <value>A count marker typed as text</value>
+    <comment>One of the four checks. The count marker is the ICU '#'.</comment>
+  </data>
+  <data name="VerifierPage_CheckInvalid" xml:space="preserve">
+    <value>A reassembled message that will not parse</value>
+    <comment>One of the four checks.</comment>
+  </data>
+  <data name="VerifierPage_Hint" xml:space="preserve">
+    <value>Error, Warning and Note are Studio's message severities. "Do not report" drops the finding altogether.</value>
+    <comment>Hint under the checks. "Error", "Warning" and "Note" follow Studio's own translation of its message severities.</comment>
+  </data>
+  <data name="Severity_Error" xml:space="preserve">
+    <value>Error</value>
+    <comment>A severity choice; follow Studio's own translation.</comment>
+  </data>
+  <data name="Severity_Warning" xml:space="preserve">
+    <value>Warning</value>
+    <comment>A severity choice; follow Studio's own translation.</comment>
+  </data>
+  <data name="Severity_Note" xml:space="preserve">
+    <value>Note</value>
+    <comment>A severity choice; follow Studio's own translation.</comment>
+  </data>
+  <data name="Severity_Ignore" xml:space="preserve">
+    <value>Do not report</value>
+    <comment>A severity choice that drops the finding.</comment>
   </data>
 </root>

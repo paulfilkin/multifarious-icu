@@ -20,6 +20,7 @@ namespace multifarious.Icu.BatchTasks.Settings
         private const string ExpandOrdinalId = "ExpandOrdinal";
         private const string SeedStrategyId = "SeedStrategy";
         private const string IncludeHintsId = "IncludeHints";
+        private const string WriteSegmentCommentsId = "WriteSegmentComments";
         private const string MaxUnitsPerMessageId = "MaxUnitsPerMessage";
         private const string OnParseErrorId = "OnParseError";
 
@@ -50,6 +51,12 @@ namespace multifarious.Icu.BatchTasks.Settings
             set { GetSetting<bool>(IncludeHintsId).Value = value; }
         }
 
+        public bool WriteSegmentComments
+        {
+            get { return GetSetting<bool>(WriteSegmentCommentsId).Value; }
+            set { GetSetting<bool>(WriteSegmentCommentsId).Value = value; }
+        }
+
         public int MaxUnitsPerMessage
         {
             get { return GetSetting<int>(MaxUnitsPerMessageId).Value; }
@@ -78,6 +85,7 @@ namespace multifarious.Icu.BatchTasks.Settings
                 ExpandOrdinal = ExpandOrdinal,
                 SourceSeedStrategy = SeedStrategy,
                 IncludeHints = IncludeHints,
+                WriteSegmentComments = WriteSegmentComments,
                 MaxUnitsPerMessage = Math.Max(MinimumBudget, Math.Min(MaximumBudget, MaxUnitsPerMessage)),
                 OnParseError = OnParseError,
             };
@@ -91,6 +99,7 @@ namespace multifarious.Icu.BatchTasks.Settings
                 case ExpandOrdinalId: return ExpansionOptions.Default.ExpandOrdinal;
                 case SeedStrategyId: return ExpansionOptions.Default.SourceSeedStrategy.ToString();
                 case IncludeHintsId: return ExpansionOptions.Default.IncludeHints;
+                case WriteSegmentCommentsId: return ExpansionOptions.Default.WriteSegmentComments;
                 case MaxUnitsPerMessageId: return ExpansionOptions.Default.MaxUnitsPerMessage;
                 case OnParseErrorId: return ExpansionOptions.Default.OnParseError.ToString();
             }

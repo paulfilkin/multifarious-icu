@@ -54,6 +54,12 @@
   <data name="Verifier_Description" xml:space="preserve">
     <value>Checks every form of an expanded ICU message: untranslated forms, placeholders that differ from the source, a count marker typed as text, and a message that will not parse.</value>
   </data>
+  <data name="VerifierPage_Name" xml:space="preserve">
+    <value>ICU Verifier</value>
+  </data>
+  <data name="VerifierPage_Description" xml:space="preserve">
+    <value>Whether the ICU verifier runs, and how each of its checks is reported.</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="IcuForms_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\Images\icu-expansion-tile.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

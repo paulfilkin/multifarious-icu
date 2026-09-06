@@ -218,7 +218,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 if (_writer == null)
                 {
                     _writer = new ExpansionWriter(ItemFactory, PropertiesFactory, _options.TagConstruct,
-                        _plurals.CldrVersion, _appVersion);
+                        _plurals.CldrVersion, _appVersion, _options.WriteSegmentComments);
                 }
                 return _writer;
             }

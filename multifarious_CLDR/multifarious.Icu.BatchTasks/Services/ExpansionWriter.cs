@@ -36,9 +36,10 @@ namespace multifarious.Icu.BatchTasks.Services
         private readonly TagConstruct _tagConstruct;
         private readonly string _cldrVersion;
         private readonly string _appVersion;
+        private readonly bool _writeComments;
 
         public ExpansionWriter(IDocumentItemFactory itemFactory, IPropertiesFactory propertiesFactory,
-            TagConstruct tagConstruct, string cldrVersion, string appVersion)
+            TagConstruct tagConstruct, string cldrVersion, string appVersion, bool writeComments = true)
         {
             if (itemFactory == null) throw new ArgumentNullException(nameof(itemFactory));
             if (propertiesFactory == null) throw new ArgumentNullException(nameof(propertiesFactory));
@@ -48,6 +49,7 @@ namespace multifarious.Icu.BatchTasks.Services
             _tagConstruct = tagConstruct;
             _cldrVersion = cldrVersion ?? string.Empty;
             _appVersion = appVersion ?? string.Empty;
+            _writeComments = writeComments;
         }
 
         public void Write(IParagraphUnit unit, ExpansionPlan plan, string resourceKey)
@@ -135,13 +137,26 @@ namespace multifarious.Icu.BatchTasks.Services
             properties.Id = new SegmentId(state.NextSegmentNumber.ToString(CultureInfo.InvariantCulture));
             state.NextSegmentNumber++;
 
+            // The comment is the translator's note and, under locked content, the carrier of the
+            // segment's metadata. Without it the layout and the unit context still say everything
+            // the finalise task and the ICU Forms window need.
             var sourceSegment = _itemFactory.CreateSegment(properties);
-            var comment = _itemFactory.CreateCommentMarker(CommentProperties(planned));
-            foreach (var item in BuildContent(planned.Nodes))
+            if (_writeComments)
             {
-                comment.Add(item);
+                var comment = _itemFactory.CreateCommentMarker(CommentProperties(planned));
+                foreach (var item in BuildContent(planned.Nodes))
+                {
+                    comment.Add(item);
+                }
+                sourceSegment.Add(comment);
             }
-            sourceSegment.Add(comment);
+            else
+            {
+                foreach (var item in BuildContent(planned.Nodes))
+                {
+                    sourceSegment.Add(item);
+                }
+            }
 
             // The target segment is left empty for Copy Source to Target or pre-translation to
             // fill. It shares the pair properties with the source, which is how the framework

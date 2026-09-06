@@ -20,8 +20,8 @@ namespace multifarious.Icu.BatchTasks.Verification
     /// a reassembled message that will not parse. On the pattern of Studio's own tag verifier:
     /// a bilingual file type component that is also the global verifier Studio lists.
     ///
-    /// No settings page in this version: the verifier is on unless the "Enabled" setting Studio
-    /// keeps under its settings id says otherwise, and the severities are fixed.
+    /// Its page under Verification holds the Enabled flag and a severity per check; the
+    /// severities come from the settings bundle Studio shares with every verifier.
     /// </summary>
     [GlobalVerifier(Constants.VerifierId, "Verifier_Name", "Verifier_Description")]
     public class IcuVerifier : AbstractBilingualFileTypeComponent, IBilingualVerifier, ISharedObjectsAware, IGlobalVerifier
@@ -32,6 +32,10 @@ namespace multifarious.Icu.BatchTasks.Verification
         private readonly IcuFormsReader _reader = new IcuFormsReader();
         private SegmentId _currentSegmentId;
         private bool _enabled = true;
+        private CheckSeverity _emptyForm = CheckSeverity.Warning;
+        private CheckSeverity _placeholders = CheckSeverity.Error;
+        private CheckSeverity _typedPound = CheckSeverity.Warning;
+        private CheckSeverity _invalid = CheckSeverity.Error;
         private string _targetLanguage;
 
         // ---- IGlobalVerifier ----------------------------------------------------------------
@@ -48,7 +52,7 @@ namespace multifarious.Icu.BatchTasks.Verification
 
         public IList<string> GetSettingsPageExtensionIds()
         {
-            return new List<string>();
+            return new List<string> { Constants.VerifierSettingsPageId };
         }
 
         // ---- ISharedObjectsAware ------------------------------------------------------------
@@ -62,8 +66,12 @@ namespace multifarious.Icu.BatchTasks.Verification
             var bundle = sharedObjects.GetSharedObject<ISettingsBundle>("SettingsBundle");
             if (bundle != null)
             {
-                var group = bundle.GetSettingsGroup(SettingsId);
-                _enabled = group == null || group.GetSetting("Enabled", true).Value;
+                var settings = bundle.GetSettingsGroup<IcuVerifierSettings>();
+                _enabled = settings.Enabled;
+                _emptyForm = settings.EmptyForm;
+                _placeholders = settings.Placeholders;
+                _typedPound = settings.TypedPound;
+                _invalid = settings.Invalid;
             }
         }
 
@@ -109,17 +117,17 @@ namespace multifarious.Icu.BatchTasks.Verification
 
                 if (row.TargetEmpty)
                 {
-                    Report(ErrorLevel.Warning, string.Format(CultureInfo.CurrentCulture, UIStrings.Verifier_EmptyForm, FormName(row)), target);
+                    Report(_emptyForm, string.Format(CultureInfo.CurrentCulture, UIStrings.Verifier_EmptyForm, FormName(row)), target);
                 }
 
                 if (row.PlaceholderWarning != null)
                 {
-                    Report(ErrorLevel.Error, string.Format(CultureInfo.CurrentCulture, UIStrings.Verifier_Placeholders, row.PlaceholderWarning), target);
+                    Report(_placeholders, string.Format(CultureInfo.CurrentCulture, UIStrings.Verifier_Placeholders, row.PlaceholderWarning), target);
                 }
 
                 if (row.TypedPound)
                 {
-                    Report(ErrorLevel.Warning, UIStrings.Verifier_TypedPound, target);
+                    Report(_typedPound, UIStrings.Verifier_TypedPound, target);
                 }
 
                 if (reportedInvalidOn == null) reportedInvalidOn = target;
@@ -129,14 +137,17 @@ namespace multifarious.Icu.BatchTasks.Verification
             // first one, since the layout has no single owner of the syntax between segments.
             if (!model.TargetParses && reportedInvalidOn != null)
             {
-                Report(ErrorLevel.Error, string.Format(CultureInfo.CurrentCulture, UIStrings.Verifier_Invalid, model.ParseError), reportedInvalidOn);
+                Report(_invalid, string.Format(CultureInfo.CurrentCulture, UIStrings.Verifier_Invalid, model.ParseError), reportedInvalidOn);
             }
         }
 
-        private void Report(ErrorLevel level, string message, ISegment target)
+        private void Report(CheckSeverity severity, string message, ISegment target)
         {
+            var level = IcuVerifierSettings.LevelOf(severity);
+            if (level == null) return;
+
             var location = new TextLocation(target);
-            MessageReporter.ReportMessage(this, UIStrings.Verifier_Origin, level, message, location, location);
+            MessageReporter.ReportMessage(this, UIStrings.Verifier_Origin, level.Value, message, location, location);
         }
 
         private static string FormName(IcuFormRow row)

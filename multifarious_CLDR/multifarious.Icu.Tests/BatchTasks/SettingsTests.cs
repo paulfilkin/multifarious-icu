@@ -53,6 +53,7 @@ public class SettingsTests
         settings.ExpandOrdinal = false;
         settings.SeedStrategy = SourceSeedStrategy.AlwaysOther;
         settings.IncludeHints = false;
+        settings.WriteSegmentComments = false;
         settings.MaxUnitsPerMessage = 48;
         settings.OnParseError = ParseErrorBehaviour.FailTask;
 
@@ -65,10 +66,48 @@ public class SettingsTests
                 ExpandOrdinal = false,
                 SourceSeedStrategy = SourceSeedStrategy.AlwaysOther,
                 IncludeHints = false,
+                WriteSegmentComments = false,
                 MaxUnitsPerMessage = 48,
                 OnParseError = ParseErrorBehaviour.FailTask,
             },
             restored.ToOptions());
+    }
+
+    [Fact]
+    public void Verifier_settings_default_and_round_trip_under_the_verifiers_settings_id()
+    {
+        var bundle = Bundle();
+        var settings = bundle.GetSettingsGroup<multifarious.Icu.BatchTasks.Verification.IcuVerifierSettings>();
+
+        // The group's stored id is what the verifier reports as its settings id, which is where
+        // Studio's verification framework looks for the Enabled flag.
+        Assert.Equal(multifarious.Icu.BatchTasks.Constants.VerifierSettingsId, settings.Id);
+        Assert.True(settings.Enabled);
+        Assert.Equal(multifarious.Icu.BatchTasks.Verification.CheckSeverity.Warning, settings.EmptyForm);
+        Assert.Equal(multifarious.Icu.BatchTasks.Verification.CheckSeverity.Error, settings.Placeholders);
+        Assert.Equal(multifarious.Icu.BatchTasks.Verification.CheckSeverity.Warning, settings.TypedPound);
+        Assert.Equal(multifarious.Icu.BatchTasks.Verification.CheckSeverity.Error, settings.Invalid);
+
+        settings.Enabled = false;
+        settings.EmptyForm = multifarious.Icu.BatchTasks.Verification.CheckSeverity.Ignore;
+        settings.Invalid = multifarious.Icu.BatchTasks.Verification.CheckSeverity.Note;
+        var restored = RoundTrip(bundle).GetSettingsGroup<multifarious.Icu.BatchTasks.Verification.IcuVerifierSettings>();
+
+        Assert.False(restored.Enabled);
+        Assert.Equal(multifarious.Icu.BatchTasks.Verification.CheckSeverity.Ignore, restored.EmptyForm);
+        Assert.Equal(multifarious.Icu.BatchTasks.Verification.CheckSeverity.Note, restored.Invalid);
+        Assert.Equal(multifarious.Icu.BatchTasks.Verification.CheckSeverity.Error, restored.Placeholders);
+
+        var viewModel = new multifarious.Icu.BatchTasks.Verification.IcuVerifierSettingsViewModel(restored);
+        Assert.False(viewModel.Enabled);
+        Assert.Equal("Do not report", viewModel.EmptyForm.Label);
+        viewModel.Enabled = true;
+        viewModel.EmptyForm = viewModel.Severities.First(s => s.Label == "Note");
+        viewModel.Apply();
+        Assert.True(restored.Enabled);
+        Assert.Equal(multifarious.Icu.BatchTasks.Verification.CheckSeverity.Note, restored.EmptyForm);
+        viewModel.ResetToDefaults();
+        Assert.Equal("Warning", viewModel.EmptyForm.Label);
     }
 
     [Fact]

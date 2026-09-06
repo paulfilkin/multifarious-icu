@@ -337,4 +337,49 @@
   <data name="Verifier_Invalid" xml:space="preserve">
     <value>重新组合的消息不是有效的 ICU：{0}。</value>
   </data>
+  <data name="Expand_Comments" xml:space="preserve">
+    <value>为每个源文句段添加批注，说明其形式及选中该形式的数量</value>
+  </data>
+  <data name="Expand_CommentsHint" xml:space="preserve">
+    <value>打开 ICU Forms 窗口时，批注可能显得多余；关闭批注后，窗口仍会显示每种形式。</value>
+  </data>
+  <data name="Expand_CommentsHelp1" xml:space="preserve">
+    <value>每个源文句段都可以带有批注，说明其形式、选中该形式的数量以及源文的来源。ICU Forms 窗口直接从消息本身显示同样的信息，因此批注只是为不使用该窗口的译员提供的便利，任务并不依赖它。</value>
+  </data>
+  <data name="VerifierPage_Intro" xml:space="preserve">
+    <value>ICU Verifier 会在按 F8 和确认句段时检查重构后的 ICU 消息的每种形式，并在“消息”窗口中列出发现的问题。</value>
+  </data>
+  <data name="VerifierPage_Enabled" xml:space="preserve">
+    <value>运行 ICU Verifier</value>
+  </data>
+  <data name="VerifierPage_SeverityHeader" xml:space="preserve">
+    <value>每项发现的报告级别</value>
+  </data>
+  <data name="VerifierPage_CheckEmptyForm" xml:space="preserve">
+    <value>没有译文的形式</value>
+  </data>
+  <data name="VerifierPage_CheckPlaceholders" xml:space="preserve">
+    <value>与源文不一致的占位符</value>
+  </data>
+  <data name="VerifierPage_CheckTypedPound" xml:space="preserve">
+    <value>以文本形式输入的数量标记</value>
+  </data>
+  <data name="VerifierPage_CheckInvalid" xml:space="preserve">
+    <value>无法解析的重新组合消息</value>
+  </data>
+  <data name="VerifierPage_Hint" xml:space="preserve">
+    <value>错误、警告和备注是 Studio 的消息级别。“不报告”将完全忽略该发现。</value>
+  </data>
+  <data name="Severity_Error" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="Severity_Warning" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="Severity_Note" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="Severity_Ignore" xml:space="preserve">
+    <value>不报告</value>
+  </data>
 </root>

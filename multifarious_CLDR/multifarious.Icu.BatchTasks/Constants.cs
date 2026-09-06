@@ -19,10 +19,17 @@ namespace multifarious.Icu.BatchTasks
 
         public const string ShowFormsActionId = "multifarious_Icu_ShowFormsAction";
 
-        /// <summary>The ICU verifier Studio lists under Verification, and the settings group id Studio keeps its Enabled flag in.</summary>
+        /// <summary>The ICU verifier Studio lists under Verification.</summary>
         public const string VerifierId = "multifarious_Icu_Verifier";
 
-        public const string VerifierSettingsId = "multifarious_Icu_VerifierSettings";
+        /// <summary>
+        /// The verifier's settings group: the class name of IcuVerifierSettings, because Studio
+        /// keys a group on its class name and the verification framework reads the Enabled flag
+        /// from the group named by the verifier's settings id. The two must be the same string.
+        /// </summary>
+        public const string VerifierSettingsId = "IcuVerifierSettings";
+
+        public const string VerifierSettingsPageId = "multifarious_Icu_VerifierSettingsPage";
 
         /// <summary>
         /// The file type definition ids the tasks process: Studio's own JSON and Java Resources

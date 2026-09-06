@@ -118,7 +118,36 @@ public class IcuVerifierTests
         var verifier = new IcuVerifier();
         Assert.Equal("ICU Verifier", verifier.Name);
         Assert.IsType<Icon>(verifier.Icon);
-        Assert.Empty(verifier.GetSettingsPageExtensionIds());
+        Assert.Equal(Constants.VerifierSettingsId, verifier.SettingsId);
+        Assert.Equal([Constants.VerifierSettingsPageId], verifier.GetSettingsPageExtensionIds());
+
+        // The page Studio lists under Verification, found through the attribute and the id above.
+        var page = typeof(IcuVerifierSettingsPage).GetCustomAttributes(typeof(GlobalVerifierSettingsPageAttribute), false)
+            .Cast<GlobalVerifierSettingsPageAttribute>().Single();
+        Assert.Equal(Constants.VerifierSettingsPageId, page.Id);
+        Assert.False(string.IsNullOrEmpty(resources.GetString(page.Name)));
+        Assert.False(string.IsNullOrEmpty(resources.GetString(page.Description)));
+        Assert.NotNull(typeof(IcuVerifierSettingsPage).GetConstructor(Type.EmptyTypes));
+    }
+
+    [Fact]
+    public void The_severities_on_the_page_decide_what_is_reported_and_ignore_drops_a_check()
+    {
+        var bundle = Sdl.Core.Settings.SettingsUtil.CreateSettingsBundle(null);
+        var settings = bundle.GetSettingsGroup<IcuVerifierSettings>();
+        settings.EmptyForm = CheckSeverity.Note;
+        settings.Placeholders = CheckSeverity.Ignore;
+        var (verifier, reporter) = Verifier(new SharedObjects().With("SettingsBundle", bundle));
+
+        var unit = Expanded(UnreadCount);
+        var targets = TargetSegments(unit);
+        SetTarget(targets[0], "Привет, у вас ", Locked("#"), " сообщение!");
+        verifier.ProcessParagraphUnit(unit);
+
+        // The placeholder mismatch on the first form is dropped; the three empty forms are notes.
+        Assert.Equal(3, reporter.Messages.Count);
+        Assert.All(reporter.Messages, m => Assert.Equal(ErrorLevel.Note, m.Level));
+        Assert.All(reporter.Messages, m => Assert.Contains("no translation", m.Message));
     }
 
     [Fact]

@@ -390,6 +390,22 @@ public class IcuExpandProcessorTests
     }
 
     [Fact]
+    public void Segment_comments_can_be_left_out_and_the_layout_is_the_same()
+    {
+        var withComments = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
+        Processor("ru-RU").ProcessParagraphUnit(withComments);
+        var without = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
+        Processor("ru-RU", ExpansionOptions.Default with { WriteSegmentComments = false }).ProcessParagraphUnit(without);
+
+        Assert.All(SegmentsOf(withComments.Source), s => Assert.IsAssignableFrom<ICommentMarker>(s[0]));
+        Assert.All(SegmentsOf(without.Source), s => Assert.DoesNotContain(ParagraphUnits.ItemsOf(s), i => i is ICommentMarker));
+        Assert.Equal(4, SegmentsOf(without.Source).Count);
+        Assert.Equal(
+            RawValueReconstruction.Reconstruct(withComments.Source).RawValue,
+            RawValueReconstruction.Reconstruct(without.Source).RawValue);
+    }
+
+    [Fact]
     public void The_processor_records_an_outcome_per_unit_for_the_report()
     {
         var processor = Processor("ru-RU");

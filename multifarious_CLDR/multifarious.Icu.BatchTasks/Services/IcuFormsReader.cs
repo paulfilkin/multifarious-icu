@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using Icu.Cldr;
+using Icu.Cldr.Rules;
 using Icu.Core;
 using multifarious.Icu.Expansion;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
@@ -24,7 +27,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>The category keyword, explicit value or select key of the innermost branch.</summary>
         public string Category { get; set; }
 
-        /// <summary>The counts that select this form, as the comment records them.</summary>
+        /// <summary>The counts that select this form, from the CLDR rules for the target language.</summary>
         public IReadOnlyList<string> Counts { get; set; }
 
         public bool FractionalOnly { get; set; }
@@ -32,11 +35,12 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>The count substituted for '#' in the rendered text; empty where there is none.</summary>
         public string SampleCount { get; set; }
 
+        /// <summary>The source form this one was seeded from, where the expansion's comment says so; empty otherwise.</summary>
         public string SeededFrom { get; set; }
 
         public bool SyntheticSource { get; set; }
 
-        /// <summary>The comment text the expansion wrote, for a tooltip.</summary>
+        /// <summary>The expansion's comment where there is one, else the same facts composed from the layout and CLDR, for a tooltip.</summary>
         public string Comment { get; set; }
 
         public string SourceRendered { get; set; }
@@ -78,19 +82,33 @@ namespace multifarious.Icu.BatchTasks.Services
     }
 
     /// <summary>
-    /// Reads an expanded paragraph unit back into rows for the ICU Forms view: the unit
-    /// context for the message, each source segment's comment metadata for the form, and the
-    /// segment content for the text, with '#' and the arguments replaced by sample values so
-    /// the translator sees a sentence rather than syntax. Reads the editor's document model,
-    /// never the file on disk, and reads the layout the way Finalise does.
+    /// Reads an expanded paragraph unit back into rows for the ICU Forms view. The layout itself
+    /// says what each segment is: the selector opens and branch opens between the segments give
+    /// the path and the category, the way Finalise reads them, and the CLDR data for the target
+    /// language gives the counts. The segment's comment, where the expansion wrote one, is only
+    /// the tooltip, so a file expanded without comments shows the same rows. '#' and the
+    /// arguments are replaced by sample values so the translator sees a sentence rather than
+    /// syntax. Reads the editor's document model, never the file on disk.
     /// </summary>
     public sealed class IcuFormsReader
     {
-        private readonly PreviewForms _forms;
+        private const int ExampleCount = 6;
 
-        public IcuFormsReader(PreviewForms forms = null)
+        private static readonly Regex SelectorOpen =
+            new Regex(@"^\{(?<arg>[^,{}\s]+),\s*(?<kind>plural|selectordinal|select),", RegexOptions.CultureInvariant);
+
+        private static readonly Regex BranchOpen =
+            new Regex(@"^\s*(?<key>\S+)\s*\{$", RegexOptions.CultureInvariant);
+
+        private readonly PreviewForms _forms;
+        private readonly CldrPlurals _plurals;
+        private readonly GrammaticalHints _hints;
+
+        public IcuFormsReader(PreviewForms forms = null, CldrPlurals plurals = null, GrammaticalHints hints = null)
         {
             _forms = forms ?? new PreviewForms();
+            _plurals = plurals ?? CldrPlurals.Default;
+            _hints = hints ?? GrammaticalHints.Embedded;
         }
 
         /// <summary>
@@ -116,15 +134,15 @@ namespace multifarious.Icu.BatchTasks.Services
             var nameOrdinal = 0;
             var inPluralContext = ContainsPluralKindSyntax(unit.Target);
 
-            var sourceSegments = SegmentsOf(unit.Source);
+            var placed = PlaceSegments(unit.Source);
             var targetSegments = SegmentsOf(unit.Target);
             var rows = new List<IcuFormRow>();
-            for (var index = 0; index < sourceSegments.Count; index++)
+            for (var index = 0; index < placed.Count; index++)
             {
-                var source = sourceSegments[index];
+                var place = placed[index];
                 var target = index < targetSegments.Count ? targetSegments[index] : null;
                 if (target != null && activeId != null && target.Properties.Id.Id == activeId) target = activeTarget;
-                rows.Add(Row(source, target, samples, ref nameOrdinal, inPluralContext));
+                rows.Add(Row(place, target, targetLanguageTag, samples, ref nameOrdinal, inPluralContext));
             }
 
             var projection = EscapedProjection(unit.Target, inPluralContext, activeId, activeTarget);
@@ -166,39 +184,136 @@ namespace multifarious.Icu.BatchTasks.Services
                 .ToList();
         }
 
-        private static IcuFormRow Row(ISegment source, ISegment target, Dictionary<string, string> samples, ref int nameOrdinal, bool inPluralContext)
+        // ---- the layout -----------------------------------------------------------------
+
+        /// <summary>A segment and where it sits in the selector tree.</summary>
+        private sealed class PlacedSegment
         {
+            public ISegment Segment;
+            public string Path = string.Empty;
+            public string Selector = "none";
+            public string Key = string.Empty;
+        }
+
+        private sealed class Frame
+        {
+            public string Argument;
+            public string Kind;
+            public string Key;
+        }
+
+        /// <summary>
+        /// Walks the writer's layout: a selector open pushes a frame, a branch open names the
+        /// frame's current branch, a close brace ends the branch if one is open and the selector
+        /// otherwise, and a segment takes the path of the frames above it.
+        /// </summary>
+        private static List<PlacedSegment> PlaceSegments(IParagraph source)
+        {
+            var frames = new List<Frame>();
+            var placed = new List<PlacedSegment>();
+
+            for (var i = 0; i < source.Count; i++)
+            {
+                var item = source[i];
+                var syntax = SyntaxOf(item);
+                if (syntax != null)
+                {
+                    var open = SelectorOpen.Match(syntax);
+                    if (open.Success)
+                    {
+                        frames.Add(new Frame { Argument = open.Groups["arg"].Value, Kind = open.Groups["kind"].Value });
+                        continue;
+                    }
+
+                    if (syntax == "}")
+                    {
+                        if (frames.Count == 0) continue;
+                        var top = frames[frames.Count - 1];
+                        if (top.Key != null) top.Key = null;
+                        else frames.RemoveAt(frames.Count - 1);
+                        continue;
+                    }
+
+                    var branch = BranchOpen.Match(syntax);
+                    if (branch.Success && frames.Count > 0)
+                    {
+                        frames[frames.Count - 1].Key = branch.Groups["key"].Value;
+                    }
+                    continue;
+                }
+
+                var segment = item as ISegment;
+                if (segment == null) continue;
+
+                var place = new PlacedSegment { Segment = segment };
+                if (frames.Count > 0)
+                {
+                    var innermost = frames[frames.Count - 1];
+                    place.Path = string.Join("/", frames.Select(f => f.Argument + ":" + (f.Key ?? string.Empty)));
+                    place.Selector = innermost.Kind;
+                    place.Key = innermost.Key ?? string.Empty;
+                }
+                placed.Add(place);
+            }
+
+            return placed;
+        }
+
+        private IcuFormRow Row(PlacedSegment place, ISegment target, string language, Dictionary<string, string> samples,
+            ref int nameOrdinal, bool inPluralContext)
+        {
+            var source = place.Segment;
             var row = new IcuFormRow
             {
                 SegmentId = source.Properties.Id.Id,
-                Path = string.Empty,
-                Selector = "none",
-                Category = string.Empty,
-                Counts = new List<string>(),
-                SampleCount = string.Empty,
+                Path = place.Path,
+                Selector = place.Selector,
+                Category = place.Key,
                 SeededFrom = string.Empty,
                 Comment = string.Empty,
             };
 
+            // The counts from CLDR: the explicit value itself, the category's samples, nothing
+            // for a select key.
+            string hint = null;
+            var counts = new List<string>();
+            if (place.Key.StartsWith("=", StringComparison.Ordinal))
+            {
+                counts.Add(place.Key.Substring(1));
+            }
+            else if (place.Selector != "select" && place.Selector != "none" && !string.IsNullOrEmpty(language))
+            {
+                PluralCategory category;
+                if (PluralCategories.TryParse(place.Key, out category))
+                {
+                    var kind = place.Selector == "selectordinal" ? SelectorKind.Ordinal : SelectorKind.Cardinal;
+                    var resolution = _plurals.Resolve(language, kind);
+                    var rule = resolution.RuleSet != null ? resolution.RuleSet.GetRule(category) : null;
+                    var pluralSamples = rule != null ? rule.Samples : PluralSamples.Empty;
+                    row.FractionalOnly = pluralSamples.IsFractionalOnly;
+                    counts.AddRange(row.FractionalOnly
+                        ? pluralSamples.TakeDecimalExamples(ExampleCount)
+                        : pluralSamples.TakeIntegerExamples(ExampleCount));
+                    hint = _hints.Find(resolution.ResolvedKey, category);
+                }
+            }
+            row.Counts = counts;
+            row.SampleCount = counts.FirstOrDefault() ?? string.Empty;
+
+            // The expansion's comment, where there is one, is the tooltip and says which source
+            // form seeded this one; without it the tooltip is composed from the same facts.
             var comment = FirstComment(source);
             if (comment != null)
             {
-                row.Path = Metadata(comment, "icu:path");
-                row.Selector = Metadata(comment, "icu:selector");
-                row.Category = Metadata(comment, "icu:category");
                 row.SeededFrom = Metadata(comment, "icu:seededFrom");
                 row.SyntheticSource = Metadata(comment, "icu:syntheticSource") == "true";
                 row.Comment = comment.Text ?? string.Empty;
-
-                var integers = Split(Metadata(comment, "icu:exampleIntegers"));
-                var decimals = Split(Metadata(comment, "icu:exampleDecimals"));
-                row.FractionalOnly = integers.Count == 0 && decimals.Count > 0;
-                row.Counts = row.FractionalOnly ? decimals : integers;
-                row.SampleCount = row.Counts.FirstOrDefault() ?? string.Empty;
+            }
+            else
+            {
+                row.Comment = ComposedComment(place, counts, row.FractionalOnly, hint);
             }
 
-            // The comment's examples are the values '#' shows: the count after the selector's
-            // offset (design 5.5), which is what the CLDR rule was evaluated on.
             var pound = row.SampleCount.Length == 0 ? "#" : row.SampleCount;
 
             row.SourceRendered = Rendered(source, pound, samples, ref nameOrdinal, inPluralContext);
@@ -214,6 +329,34 @@ namespace multifarious.Icu.BatchTasks.Services
             }
 
             return row;
+        }
+
+        private static string ComposedComment(PlacedSegment place, List<string> counts, bool fractionalOnly, string hint)
+        {
+            if (place.Selector == "none") return string.Empty;
+
+            var builder = new StringBuilder();
+            if (place.Selector == "select")
+            {
+                builder.Append("Select branch: ").Append(place.Key);
+            }
+            else if (place.Key.StartsWith("=", StringComparison.Ordinal))
+            {
+                builder.Append("Exact match: ").Append(place.Key);
+            }
+            else
+            {
+                builder.Append("CLDR category: ").Append(place.Key);
+                if (counts.Count > 0)
+                {
+                    builder.Append('\n').Append(fractionalOnly
+                        ? "Used when the count is: fractional counts only, e.g. " + string.Join(", ", counts)
+                        : "Used when the count is: " + string.Join(", ", counts));
+                }
+            }
+
+            if (hint != null) builder.Append('\n').Append("Grammar: ").Append(hint);
+            return builder.ToString();
         }
 
         /// <summary>The target's text runs as the translator typed them, with ICU escapes undone.</summary>
@@ -246,11 +389,7 @@ namespace multifarious.Icu.BatchTasks.Services
                     return;
                 }
 
-                var locked = item as ILockedContent;
-                var tag = item as IPlaceholderTag;
-                var syntax = locked != null
-                    ? RawValueReconstruction.Reconstruct(locked.Content).RawValue
-                    : tag != null ? tag.Properties.TagContent : null;
+                var syntax = SyntaxOf(item);
                 if (syntax == null) return;
 
                 if (syntax == "#")
@@ -300,15 +439,8 @@ namespace multifarious.Icu.BatchTasks.Services
                     return;
                 }
 
-                var locked = item as ILockedContent;
-                if (locked != null)
-                {
-                    builder.Append(RawValueReconstruction.Reconstruct(locked.Content).RawValue);
-                    return;
-                }
-
-                var tag = item as IPlaceholderTag;
-                if (tag != null) builder.Append(tag.Properties.TagContent);
+                var syntax = SyntaxOf(item);
+                if (syntax != null) builder.Append(syntax);
             });
             return builder.ToString();
         }
@@ -318,12 +450,22 @@ namespace multifarious.Icu.BatchTasks.Services
             var found = false;
             Walk(paragraph, item =>
             {
-                var locked = item as ILockedContent;
-                var syntax = locked != null ? RawValueReconstruction.Reconstruct(locked.Content).RawValue
-                    : item is IPlaceholderTag ? ((IPlaceholderTag)item).Properties.TagContent : null;
+                var syntax = SyntaxOf(item);
                 if (syntax != null && (syntax.Contains(", plural,") || syntax.Contains(", selectordinal,"))) found = true;
             });
             return found;
+        }
+
+        /// <summary>The syntax text a marker carries, whichever construct wrote it; null for anything that is not a marker.</summary>
+        private static string SyntaxOf(IAbstractMarkupData item)
+        {
+            var locked = item as ILockedContent;
+            if (locked != null) return RawValueReconstruction.Reconstruct(locked.Content).RawValue;
+
+            var tag = item as IPlaceholderTag;
+            if (tag != null) return tag.Properties.TagContent;
+
+            return null;
         }
 
         private static string ParityProblem(ISegment source, ISegment target)
@@ -345,10 +487,8 @@ namespace multifarious.Icu.BatchTasks.Services
             var keys = new List<string>();
             Walk(segment, item =>
             {
-                var locked = item as ILockedContent;
-                if (locked != null) keys.Add(RawValueReconstruction.Reconstruct(locked.Content).RawValue);
-                var tag = item as IPlaceholderTag;
-                if (tag != null) keys.Add(tag.Properties.TagContent);
+                var syntax = SyntaxOf(item);
+                if (syntax != null) keys.Add(syntax);
             });
             return keys;
         }
@@ -362,11 +502,6 @@ namespace multifarious.Icu.BatchTasks.Services
         private static string Metadata(IMetaDataContainer container, string key)
         {
             return container != null && container.MetaDataContainsKey(key) ? container.GetMetaData(key) ?? string.Empty : string.Empty;
-        }
-
-        private static List<string> Split(string value)
-        {
-            return value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToList();
         }
 
         private static bool IsEmpty(ISegment segment)

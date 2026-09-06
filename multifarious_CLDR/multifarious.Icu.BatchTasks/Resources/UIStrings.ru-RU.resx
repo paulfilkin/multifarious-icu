@@ -337,4 +337,49 @@
   <data name="Verifier_Invalid" xml:space="preserve">
     <value>Собранное сообщение не является корректным ICU: {0}.</value>
   </data>
+  <data name="Expand_Comments" xml:space="preserve">
+    <value>Добавлять к каждому исходному сегменту комментарий с его формой и количествами, при которых она выбирается</value>
+  </data>
+  <data name="Expand_CommentsHint" xml:space="preserve">
+    <value>При открытом окне ICU Forms комментарии могут мешать; отключите их — окно по-прежнему показывает каждую форму.</value>
+  </data>
+  <data name="Expand_CommentsHelp1" xml:space="preserve">
+    <value>Каждый исходный сегмент может нести комментарий с его формой, количествами, при которых она выбирается, и происхождением исходного текста. Окно ICU Forms показывает те же сведения из самого сообщения, так что комментарии — удобство для переводчиков, работающих без окна, а не то, от чего зависят задачи.</value>
+  </data>
+  <data name="VerifierPage_Intro" xml:space="preserve">
+    <value>ICU Verifier проверяет каждую форму перестроенного ICU-сообщения при нажатии F8 и при подтверждении сегментов и выводит найденное в окне «Сообщения».</value>
+  </data>
+  <data name="VerifierPage_Enabled" xml:space="preserve">
+    <value>Запускать ICU Verifier</value>
+  </data>
+  <data name="VerifierPage_SeverityHeader" xml:space="preserve">
+    <value>Сообщать о каждой находке как</value>
+  </data>
+  <data name="VerifierPage_CheckEmptyForm" xml:space="preserve">
+    <value>Форма без перевода</value>
+  </data>
+  <data name="VerifierPage_CheckPlaceholders" xml:space="preserve">
+    <value>Заполнители, отличающиеся от исходного текста</value>
+  </data>
+  <data name="VerifierPage_CheckTypedPound" xml:space="preserve">
+    <value>Маркер количества, введённый как текст</value>
+  </data>
+  <data name="VerifierPage_CheckInvalid" xml:space="preserve">
+    <value>Собранное сообщение, которое не удаётся прочитать</value>
+  </data>
+  <data name="VerifierPage_Hint" xml:space="preserve">
+    <value>Ошибка, Предупреждение и Примечание — уровни сообщений Studio. «Не сообщать» отбрасывает находку.</value>
+  </data>
+  <data name="Severity_Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Severity_Warning" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="Severity_Note" xml:space="preserve">
+    <value>Примечание</value>
+  </data>
+  <data name="Severity_Ignore" xml:space="preserve">
+    <value>Не сообщать</value>
+  </data>
 </root>

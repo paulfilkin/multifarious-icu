@@ -15,14 +15,45 @@ public class IcuFormsReaderTests
     private const string UnreadCount =
         "Hello {name}, you have {count, plural, one {# unread message} other {# unread messages}}!";
 
-    private static IParagraphUnit Expanded(string value, string language = "ru-RU")
+    private static IParagraphUnit Expanded(string value, string language = "ru-RU", bool comments = true)
     {
         var unit = ParagraphUnits.Json(value, "['inbox.unreadCount']");
-        new IcuExpandProcessor("en-GB", language, ExpansionOptions.Default, "1.0.0")
+        new IcuExpandProcessor("en-GB", language, ExpansionOptions.Default with { WriteSegmentComments = comments }, "1.0.0")
         {
             ItemFactory = ParagraphUnits.ItemFactory,
         }.ProcessParagraphUnit(unit);
         return unit;
+    }
+
+    [Fact]
+    public void The_rows_come_from_the_layout_and_cldr_so_a_file_without_comments_reads_the_same()
+    {
+        var reader = new IcuFormsReader();
+        var withComments = reader.Read(Expanded(UnreadCount), "ru-RU")!;
+        var without = reader.Read(Expanded(UnreadCount, comments: false), "ru-RU")!;
+
+        Assert.Equal(withComments.Rows.Select(r => r.Path), without.Rows.Select(r => r.Path));
+        Assert.Equal(withComments.Rows.Select(r => r.Category), without.Rows.Select(r => r.Category));
+        Assert.Equal(withComments.Rows.Select(r => r.Selector), without.Rows.Select(r => r.Selector));
+        Assert.Equal(withComments.Rows.Select(r => string.Join(",", r.Counts)), without.Rows.Select(r => string.Join(",", r.Counts)));
+        Assert.Equal(withComments.Rows.Select(r => r.FractionalOnly), without.Rows.Select(r => r.FractionalOnly));
+        Assert.Equal(withComments.Rows.Select(r => r.SourceRendered), without.Rows.Select(r => r.SourceRendered));
+
+        // The comment is the tooltip where it exists; without one the same facts are composed.
+        Assert.Contains("CLDR category: few", withComments.Rows[1].Comment);
+        Assert.Contains("CLDR category: few", without.Rows[1].Comment);
+        Assert.Contains("Used when the count is: 2, 3, 4", without.Rows[1].Comment);
+        Assert.Equal("other", withComments.Rows[1].SeededFrom);
+        Assert.Equal("", without.Rows[1].SeededFrom);
+
+        // A nested select over plurals and a walked message place their segments the same way.
+        const string gendered =
+            "{gender, select, female {{count, plural, one {She has # item} other {She has # items}}} other {{count, plural, one {They have # item} other {They have # items}}}} in the basket.";
+        var nested = reader.Read(Expanded(gendered, comments: false), "ru-RU")!;
+        Assert.Equal("gender:female/count:one", nested.Rows[0].Path);
+        Assert.Equal("gender:other/count:other", nested.Rows[7].Path);
+        Assert.Equal("plural", nested.Rows[0].Selector);
+        Assert.Equal("one", nested.Rows[0].Category);
     }
 
     private static List<ISegment> TargetSegments(IParagraphUnit unit) =>

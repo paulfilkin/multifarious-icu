@@ -53,6 +53,14 @@ public sealed record ExpansionOptions
     public bool IncludeHints { get; init; } = true;
 
     /// <summary>
+    /// Whether each source segment gets a comment naming its form and the counts that select
+    /// it. Off, the segments carry no comment marker at all; the layout and the unit context
+    /// are the same, and the ICU Forms window reads those rather than the comment. Added in
+    /// Studio (Paul, 6 September 2026): with the window open the comments can be noise.
+    /// </summary>
+    public bool WriteSegmentComments { get; init; } = true;
+
+    /// <summary>
     /// The branch budget: the maximum number of segments one message may expand to.
     /// Over budget, the message passes through unexpanded and is flagged (design 5.7).
     /// </summary>

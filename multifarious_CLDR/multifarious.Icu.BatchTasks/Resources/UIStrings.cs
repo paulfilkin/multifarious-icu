@@ -76,6 +76,15 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Group heading. What the task writes into the comment on each source segment.</summary>
         public static string Expand_HintsHeader { get { return Manager.GetString("Expand_HintsHeader", Culture); } }
 
+        /// <summary>Tick box, on by default. The comment is what the translator sees on the source segment.</summary>
+        public static string Expand_Comments { get { return Manager.GetString("Expand_Comments", Culture); } }
+
+        /// <summary>Hint under the tick box. "ICU Forms" is the name of the plugin's window under the editor.</summary>
+        public static string Expand_CommentsHint { get { return Manager.GetString("Expand_CommentsHint", Culture); } }
+
+        /// <summary>Help paragraph.</summary>
+        public static string Expand_CommentsHelp1 { get { return Manager.GetString("Expand_CommentsHelp1", Culture); } }
+
         /// <summary>Tick box, on by default.</summary>
         public static string Expand_Hints { get { return Manager.GetString("Expand_Hints", Culture); } }
 
@@ -348,5 +357,41 @@ namespace multifarious.Icu.BatchTasks.Resources
 
         /// <summary>Error. {0} is the parser's description of the problem; keep the placeholder.</summary>
         public static string Verifier_Invalid { get { return Manager.GetString("Verifier_Invalid", Culture); } }
+
+        /// <summary>Paragraph at the top of the verifier's settings page.</summary>
+        public static string VerifierPage_Intro { get { return Manager.GetString("VerifierPage_Intro", Culture); } }
+
+        /// <summary>Tick box, on by default, as every Studio verifier's page offers.</summary>
+        public static string VerifierPage_Enabled { get { return Manager.GetString("VerifierPage_Enabled", Culture); } }
+
+        /// <summary>Heading over the list of checks, each with a severity choice beside it.</summary>
+        public static string VerifierPage_SeverityHeader { get { return Manager.GetString("VerifierPage_SeverityHeader", Culture); } }
+
+        /// <summary>One of the four checks. Its severity is chosen in a drop-down beside it.</summary>
+        public static string VerifierPage_CheckEmptyForm { get { return Manager.GetString("VerifierPage_CheckEmptyForm", Culture); } }
+
+        /// <summary>One of the four checks.</summary>
+        public static string VerifierPage_CheckPlaceholders { get { return Manager.GetString("VerifierPage_CheckPlaceholders", Culture); } }
+
+        /// <summary>One of the four checks. The count marker is the ICU '#'.</summary>
+        public static string VerifierPage_CheckTypedPound { get { return Manager.GetString("VerifierPage_CheckTypedPound", Culture); } }
+
+        /// <summary>One of the four checks.</summary>
+        public static string VerifierPage_CheckInvalid { get { return Manager.GetString("VerifierPage_CheckInvalid", Culture); } }
+
+        /// <summary>Hint under the checks. "Error", "Warning" and "Note" follow Studio's own translation of its message severities.</summary>
+        public static string VerifierPage_Hint { get { return Manager.GetString("VerifierPage_Hint", Culture); } }
+
+        /// <summary>A severity choice; follow Studio's own translation.</summary>
+        public static string Severity_Error { get { return Manager.GetString("Severity_Error", Culture); } }
+
+        /// <summary>A severity choice; follow Studio's own translation.</summary>
+        public static string Severity_Warning { get { return Manager.GetString("Severity_Warning", Culture); } }
+
+        /// <summary>A severity choice; follow Studio's own translation.</summary>
+        public static string Severity_Note { get { return Manager.GetString("Severity_Note", Culture); } }
+
+        /// <summary>A severity choice that drops the finding.</summary>
+        public static string Severity_Ignore { get { return Manager.GetString("Severity_Ignore", Culture); } }
     }
 }
