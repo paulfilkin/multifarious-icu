@@ -24,6 +24,21 @@
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="Margin" Value="0,0,0,12" />
       </Style>
+      <Style TargetType="Expander" x:Key="Help">
+        <Setter Property="Margin" Value="0,6,0,4" />
+        <Setter Property="Foreground" Value="#1A5FB4" />
+      </Style>
+      <Style TargetType="Border" x:Key="HelpBody">
+        <Setter Property="Background" Value="#F7F9FC" />
+        <Setter Property="BorderBrush" Value="#D6E0EC" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="Margin" Value="0,4,0,0" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="HelpText">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,0,0,6" />
+      </Style>
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -36,6 +51,14 @@
         <StackPanel>
           <RadioButton GroupName="Empty" TabIndex="10" Content="{x:Static res:UIStrings.Finalise_EmptyUseSource}" IsChecked="{Binding EmptyBranchUsesSource}" />
           <RadioButton GroupName="Empty" TabIndex="11" Content="{x:Static res:UIStrings.Finalise_EmptyFail}" IsChecked="{Binding EmptyBranchFailsTask}" />
+          <Expander Style="{StaticResource Help}" TabIndex="12" Header="{x:Static res:UIStrings.Finalise_EmptyHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Finalise_EmptyHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Finalise_EmptyHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
         </StackPanel>
       </GroupBox>
 
@@ -43,6 +66,14 @@
         <StackPanel>
           <RadioButton GroupName="Mismatch" TabIndex="20" Content="{x:Static res:UIStrings.Finalise_MismatchWarn}" IsChecked="{Binding MismatchWarns}" />
           <RadioButton GroupName="Mismatch" TabIndex="21" Content="{x:Static res:UIStrings.Finalise_MismatchFail}" IsChecked="{Binding MismatchFailsTask}" />
+          <Expander Style="{StaticResource Help}" TabIndex="22" Header="{x:Static res:UIStrings.Finalise_MismatchHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Finalise_MismatchHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Finalise_MismatchHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
         </StackPanel>
       </GroupBox>
 

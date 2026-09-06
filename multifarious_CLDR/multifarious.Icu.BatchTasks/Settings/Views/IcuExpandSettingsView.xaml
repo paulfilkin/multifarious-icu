@@ -39,17 +39,47 @@
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="Margin" Value="0,4,0,0" />
       </Style>
+      <Style TargetType="TextBlock" x:Key="Intro">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+      </Style>
+      <!-- The collapsible help under each group, as the sibling file types' pages have. -->
+      <Style TargetType="Expander" x:Key="Help">
+        <Setter Property="Margin" Value="0,6,0,4" />
+        <Setter Property="Foreground" Value="#1A5FB4" />
+      </Style>
+      <Style TargetType="Border" x:Key="HelpBody">
+        <Setter Property="Background" Value="#F7F9FC" />
+        <Setter Property="BorderBrush" Value="#D6E0EC" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="Margin" Value="0,4,0,0" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="HelpText">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,0,0,6" />
+      </Style>
     </ResourceDictionary>
   </UserControl.Resources>
 
   <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
     <StackPanel>
 
+      <TextBlock Style="{StaticResource Intro}" Text="{x:Static res:UIStrings.Expand_Intro}" />
+
       <GroupBox Header="{x:Static res:UIStrings.Expand_KindsHeader}">
         <StackPanel>
           <CheckBox TabIndex="10" Content="{x:Static res:UIStrings.Expand_Cardinal}" IsChecked="{Binding ExpandCardinal}" />
           <CheckBox TabIndex="11" Content="{x:Static res:UIStrings.Expand_Ordinal}" IsChecked="{Binding ExpandOrdinal}" />
           <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Expand_KindsHint}" />
+          <Expander Style="{StaticResource Help}" TabIndex="12" Header="{x:Static res:UIStrings.Expand_KindsHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_KindsHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_KindsHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
         </StackPanel>
       </GroupBox>
 
@@ -58,6 +88,14 @@
           <RadioButton GroupName="Seed" TabIndex="20" Content="{x:Static res:UIStrings.Expand_SeedMatching}" IsChecked="{Binding SeedIsMatchingElseOther}" />
           <RadioButton GroupName="Seed" TabIndex="21" Content="{x:Static res:UIStrings.Expand_SeedAlwaysOther}" IsChecked="{Binding SeedIsAlwaysOther}" />
           <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Expand_SeedHint}" />
+          <Expander Style="{StaticResource Help}" TabIndex="22" Header="{x:Static res:UIStrings.Expand_SeedHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_SeedHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_SeedHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
         </StackPanel>
       </GroupBox>
 
@@ -65,6 +103,14 @@
         <StackPanel>
           <CheckBox TabIndex="30" Content="{x:Static res:UIStrings.Expand_Hints}" IsChecked="{Binding IncludeHints}" />
           <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Expand_HintsHint}" />
+          <Expander Style="{StaticResource Help}" TabIndex="31" Header="{x:Static res:UIStrings.Expand_HintsHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_HintsHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_HintsHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
         </StackPanel>
       </GroupBox>
 
@@ -86,6 +132,14 @@
             </TextBlock.Visibility>
           </TextBlock>
           <TextBlock Style="{StaticResource Hint}" Margin="0,6,0,0" Text="{x:Static res:UIStrings.Expand_BudgetHint}" />
+          <Expander Style="{StaticResource Help}" TabIndex="41" Header="{x:Static res:UIStrings.Expand_BudgetHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_BudgetHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_BudgetHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
         </StackPanel>
       </GroupBox>
 
@@ -93,6 +147,14 @@
         <StackPanel>
           <RadioButton GroupName="Parse" TabIndex="50" Content="{x:Static res:UIStrings.Expand_ParsePassThrough}" IsChecked="{Binding ParseErrorPassesThrough}" />
           <RadioButton GroupName="Parse" TabIndex="51" Content="{x:Static res:UIStrings.Expand_ParseFail}" IsChecked="{Binding ParseErrorFailsTask}" />
+          <Expander Style="{StaticResource Help}" TabIndex="52" Header="{x:Static res:UIStrings.Expand_ParseHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_ParseHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_ParseHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
         </StackPanel>
       </GroupBox>
 
