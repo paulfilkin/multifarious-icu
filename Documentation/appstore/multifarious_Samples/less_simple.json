@@ -1,0 +1,15 @@
+{
+  "taunt": "Your mother was a {motherType}, and your father smelt of {fatherSmell}!",
+  "swallowQuestion": "What is the airspeed velocity of an unladen {swallowType} swallow?",
+  "knightCount": "{count, plural, =0 {There are no knights here.} =1 {There is # knight here.} other {There are # knights here.}}",
+  "knightsNi": "{count, plural, =1 {The knight says \"Ni!\"} other {The knights say \"Ni!\" # times.}}",
+  "blackKnightInjury": "{limbsLost, plural, =0 {I'm perfectly fine!} =1 {It's just a flesh wound!} =2 {I've had worse!} other {All right, we'll call it a draw.}}",
+  "witchTrial": "{weighsLikeDuck, select, true {If she weighs the same as a duck, then she is made of wood, and therefore she is a witch!} false {She does not weigh the same as a duck, so we must continue our very scientific investigation.} other {We require more evidence.}}",
+  "bridgekeeperQuestion": "{questionNumber, select, 1 {What is your name?} 2 {What is your quest?} 3 {What is your favorite colour?} other {That is not one of the three questions!}}",
+  "bridgekeeperAnswer": "{answerCorrect, select, true {{name}, you may cross the Bridge of Death.} false {{name}, you are cast into the Gorge of Eternal Peril!} other {The Bridgekeeper is confused.}}",
+  "rabbitWarning": "{rabbitCount, plural, =0 {There are no rabbits. We appear to be safe.} =1 {That's no ordinary rabbit!} other {Run away! There are # vicious rabbits!}}",
+  "shrubberyRequest": "We demand {count, plural, =1 {a shrubbery} other {# shrubberies}}!",
+  "shrubberyQuality": "{quality, select, nice {It must be a nice shrubbery.} expensive {It must not be too expensive.} tall {It should have a little path running down the middle.} other {Bring us a shrubbery!}}",
+  "questStatus": "{status, select, searching {{name} is searching for the Holy Grail.} found {{name} has found the Holy Grail!} failed {{name} has been launched into the Gorge of Eternal Peril.} other {{name}'s quest status is unknown.}}",
+  "castleApproach": "{knightCount, plural, =1 {{leader} approaches the castle with one knight.} other {{leader} approaches the castle with # knights.}}"
+}

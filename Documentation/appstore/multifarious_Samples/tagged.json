@@ -1,0 +1,6 @@
+{
+  "welcome.html": "Hello <b>{name}</b>, you have <i>new</i> messages.",
+  "count.html": "You have <b>{count, plural, one {# unread message} other {# unread messages}}</b> today.",
+  "link.html": "Visit <a href=\"https://example.com\">our site</a> for {count, plural, one {# update} other {# updates}}.",
+  "mixed.markup": "This value has {count, plural, one {# brace pair} other {# brace pairs}} and <span class=\"x\">markup</span>."
+}
