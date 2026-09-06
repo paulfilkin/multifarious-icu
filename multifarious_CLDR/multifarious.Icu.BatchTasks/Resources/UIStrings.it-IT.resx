@@ -322,6 +322,15 @@
   <data name="Forms_PlaceholderWarning" xml:space="preserve">
     <value>Segnaposto: {0}</value>
   </data>
+  <data name="Forms_ZoomIn" xml:space="preserve">
+    <value>Ingrandisci (Ctrl + rotellina)</value>
+  </data>
+  <data name="Forms_ZoomOut" xml:space="preserve">
+    <value>Riduci (Ctrl + rotellina)</value>
+  </data>
+  <data name="Forms_ZoomReset" xml:space="preserve">
+    <value>Riporta lo zoom al 100%</value>
+  </data>
   <data name="Verifier_Origin" xml:space="preserve">
     <value>ICU Verifier</value>
   </data>

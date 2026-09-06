@@ -322,6 +322,15 @@
   <data name="Forms_PlaceholderWarning" xml:space="preserve">
     <value>Marcadores de posición: {0}</value>
   </data>
+  <data name="Forms_ZoomIn" xml:space="preserve">
+    <value>Acercar (Ctrl + rueda del ratón)</value>
+  </data>
+  <data name="Forms_ZoomOut" xml:space="preserve">
+    <value>Alejar (Ctrl + rueda del ratón)</value>
+  </data>
+  <data name="Forms_ZoomReset" xml:space="preserve">
+    <value>Restablecer el zoom al 100 %</value>
+  </data>
   <data name="Verifier_Origin" xml:space="preserve">
     <value>ICU Verifier</value>
   </data>

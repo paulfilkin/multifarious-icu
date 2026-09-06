@@ -343,6 +343,15 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Tooltip on a target cell whose protected placeholders differ from the source. {0} lists what is missing or extra; keep the placeholder.</summary>
         public static string Forms_PlaceholderWarning { get { return Manager.GetString("Forms_PlaceholderWarning", Culture); } }
 
+        /// <summary>Tooltip of the plus button in the window's corner.</summary>
+        public static string Forms_ZoomIn { get { return Manager.GetString("Forms_ZoomIn", Culture); } }
+
+        /// <summary>Tooltip of the minus button in the window's corner.</summary>
+        public static string Forms_ZoomOut { get { return Manager.GetString("Forms_ZoomOut", Culture); } }
+
+        /// <summary>Tooltip of the button showing the current zoom, which resets it when clicked.</summary>
+        public static string Forms_ZoomReset { get { return Manager.GetString("Forms_ZoomReset", Culture); } }
+
         /// <summary>The Origin column of the Messages window. Same wording as the verifier's name in the Verification settings.</summary>
         public static string Verifier_Origin { get { return Manager.GetString("Verifier_Origin", Culture); } }
 

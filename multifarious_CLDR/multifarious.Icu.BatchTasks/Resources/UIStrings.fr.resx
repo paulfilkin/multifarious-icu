@@ -322,6 +322,15 @@
   <data name="Forms_PlaceholderWarning" xml:space="preserve">
     <value>Espaces réservés : {0}</value>
   </data>
+  <data name="Forms_ZoomIn" xml:space="preserve">
+    <value>Zoom avant (Ctrl + molette)</value>
+  </data>
+  <data name="Forms_ZoomOut" xml:space="preserve">
+    <value>Zoom arrière (Ctrl + molette)</value>
+  </data>
+  <data name="Forms_ZoomReset" xml:space="preserve">
+    <value>Rétablir le zoom à 100 %</value>
+  </data>
   <data name="Verifier_Origin" xml:space="preserve">
     <value>ICU Verifier</value>
   </data>

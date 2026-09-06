@@ -322,6 +322,15 @@
   <data name="Forms_PlaceholderWarning" xml:space="preserve">
     <value>プレースホルダー: {0}</value>
   </data>
+  <data name="Forms_ZoomIn" xml:space="preserve">
+    <value>拡大 (Ctrl + マウス ホイール)</value>
+  </data>
+  <data name="Forms_ZoomOut" xml:space="preserve">
+    <value>縮小 (Ctrl + マウス ホイール)</value>
+  </data>
+  <data name="Forms_ZoomReset" xml:space="preserve">
+    <value>ズームを 100% に戻す</value>
+  </data>
   <data name="Verifier_Origin" xml:space="preserve">
     <value>ICU Verifier</value>
   </data>

@@ -1,4 +1,6 @@
 using System.Windows.Controls;
+using System.Windows.Input;
+using multifarious.Icu.BatchTasks.Editor.ViewModels;
 using Sdl.Desktop.IntegrationApi.Interfaces;
 
 namespace multifarious.Icu.BatchTasks.Editor.Views
@@ -16,6 +18,19 @@ namespace multifarious.Icu.BatchTasks.Editor.Views
 
         public void Dispose()
         {
+        }
+
+        /// <summary>Ctrl and the mouse wheel zoom the window, as they do the editor; a plain wheel scrolls it.</summary>
+        private void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.Control) return;
+
+            var viewModel = DataContext as IcuFormsViewModel;
+            if (viewModel == null) return;
+
+            if (e.Delta > 0) viewModel.ZoomIn();
+            else if (e.Delta < 0) viewModel.ZoomOut();
+            e.Handled = true;
         }
     }
 }

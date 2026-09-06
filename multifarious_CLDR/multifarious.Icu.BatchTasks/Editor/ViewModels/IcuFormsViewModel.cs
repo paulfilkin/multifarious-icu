@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Windows.Input;
 using multifarious.Icu.BatchTasks.Resources;
 using multifarious.Icu.BatchTasks.Services;
 using multifarious.Icu.BatchTasks.Settings.ViewModels;
@@ -93,15 +94,57 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
         private string _projection = string.Empty;
         private string _parseStatus = string.Empty;
         private bool _parses;
+        private readonly ZoomState _zoom;
 
-        public IcuFormsViewModel(IcuFormsReader reader = null)
+        public IcuFormsViewModel(IcuFormsReader reader = null, ZoomState zoom = null)
         {
             _reader = reader ?? new IcuFormsReader();
+            _zoom = zoom ?? new ZoomState();
             Rows = new ObservableCollection<IcuFormRowViewModel>();
+            ZoomInCommand = new RelayCommand(_ => ZoomIn(), _ => _zoom.CanZoomIn);
+            ZoomOutCommand = new RelayCommand(_ => ZoomOut(), _ => _zoom.CanZoomOut);
+            ZoomResetCommand = new RelayCommand(_ => ZoomReset());
             ShowNoDocument();
         }
 
         public ObservableCollection<IcuFormRowViewModel> Rows { get; }
+
+        // ---- zoom ---------------------------------------------------------------------------
+
+        /// <summary>The scale applied to the whole window's content: 1.0 is 100%.</summary>
+        public double Zoom { get { return _zoom.Factor; } }
+
+        public string ZoomPercent { get { return string.Format(CultureInfo.CurrentCulture, "{0:0}%", _zoom.Factor * 100); } }
+
+        public ICommand ZoomInCommand { get; }
+
+        public ICommand ZoomOutCommand { get; }
+
+        public ICommand ZoomResetCommand { get; }
+
+        public void ZoomIn()
+        {
+            _zoom.ZoomIn();
+            RaiseZoom();
+        }
+
+        public void ZoomOut()
+        {
+            _zoom.ZoomOut();
+            RaiseZoom();
+        }
+
+        public void ZoomReset()
+        {
+            _zoom.Reset();
+            RaiseZoom();
+        }
+
+        private void RaiseZoom()
+        {
+            Raise(nameof(Zoom));
+            Raise(nameof(ZoomPercent));
+        }
 
         public bool HasMessage { get { return _model != null; } }
 

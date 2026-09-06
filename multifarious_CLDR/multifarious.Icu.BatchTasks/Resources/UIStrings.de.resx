@@ -322,6 +322,15 @@
   <data name="Forms_PlaceholderWarning" xml:space="preserve">
     <value>Platzhalter: {0}</value>
   </data>
+  <data name="Forms_ZoomIn" xml:space="preserve">
+    <value>Vergrößern (Strg + Mausrad)</value>
+  </data>
+  <data name="Forms_ZoomOut" xml:space="preserve">
+    <value>Verkleinern (Strg + Mausrad)</value>
+  </data>
+  <data name="Forms_ZoomReset" xml:space="preserve">
+    <value>Zoom auf 100 % zurücksetzen</value>
+  </data>
   <data name="Verifier_Origin" xml:space="preserve">
     <value>ICU Verifier</value>
   </data>

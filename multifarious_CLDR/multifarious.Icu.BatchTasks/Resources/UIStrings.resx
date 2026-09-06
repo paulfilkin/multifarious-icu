@@ -458,6 +458,18 @@
     <value>Placeholders: {0}</value>
     <comment>Tooltip on a target cell whose protected placeholders differ from the source. {0} lists what is missing or extra; keep the placeholder.</comment>
   </data>
+  <data name="Forms_ZoomIn" xml:space="preserve">
+    <value>Zoom in (Ctrl + mouse wheel)</value>
+    <comment>Tooltip of the plus button in the window's corner.</comment>
+  </data>
+  <data name="Forms_ZoomOut" xml:space="preserve">
+    <value>Zoom out (Ctrl + mouse wheel)</value>
+    <comment>Tooltip of the minus button in the window's corner.</comment>
+  </data>
+  <data name="Forms_ZoomReset" xml:space="preserve">
+    <value>Reset the zoom to 100%</value>
+    <comment>Tooltip of the button showing the current zoom, which resets it when clicked.</comment>
+  </data>
 
   <!-- The ICU verifier's messages, shown in Studio's Messages window. -->
   <data name="Verifier_Origin" xml:space="preserve">

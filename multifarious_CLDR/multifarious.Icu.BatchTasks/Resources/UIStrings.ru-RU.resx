@@ -322,6 +322,15 @@
   <data name="Forms_PlaceholderWarning" xml:space="preserve">
     <value>Заполнители: {0}</value>
   </data>
+  <data name="Forms_ZoomIn" xml:space="preserve">
+    <value>Увеличить (Ctrl + колесо мыши)</value>
+  </data>
+  <data name="Forms_ZoomOut" xml:space="preserve">
+    <value>Уменьшить (Ctrl + колесо мыши)</value>
+  </data>
+  <data name="Forms_ZoomReset" xml:space="preserve">
+    <value>Сбросить масштаб до 100 %</value>
+  </data>
   <data name="Verifier_Origin" xml:space="preserve">
     <value>ICU Verifier</value>
   </data>

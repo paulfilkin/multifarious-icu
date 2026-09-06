@@ -178,4 +178,70 @@ public class IcuFormsViewTests
         // The count box writes back on every keystroke, so the rows re-mark as the number is typed.
         Assert.Matches(@"\{Binding\s+CountText[^}]*UpdateSourceTrigger=PropertyChanged", Xaml());
     }
+
+    /// <summary>
+    /// The zoom steps by a tenth between 60% and 250%, comes back to 100% on reset, and is
+    /// remembered through the store file so a restart keeps it. A store holding rubbish or a
+    /// value outside the range reads as 100%.
+    /// </summary>
+    [Fact]
+    public void The_zoom_steps_within_its_range_and_is_remembered()
+    {
+        var store = Path.Combine(Path.GetTempPath(), "multifarious-icu-tests", Guid.NewGuid().ToString("N"), "zoom.txt");
+        try
+        {
+            var zoom = new ZoomState(store);
+            Assert.Equal(1.0, zoom.Factor);
+            Assert.Equal(1.1, zoom.ZoomIn(), 5);
+            Assert.Equal(1.0, zoom.ZoomOut(), 5);
+            for (var i = 0; i < 30; i++) zoom.ZoomIn();
+            Assert.Equal(ZoomState.Maximum, zoom.Factor, 5);
+            Assert.False(zoom.CanZoomIn);
+            for (var i = 0; i < 30; i++) zoom.ZoomOut();
+            Assert.Equal(ZoomState.Minimum, zoom.Factor, 5);
+            Assert.False(zoom.CanZoomOut);
+            Assert.Equal(1.0, zoom.Reset());
+
+            zoom.Set(1.5);
+            Assert.Equal(1.5, new ZoomState(store).Factor, 5);
+
+            File.WriteAllText(store, "nonsense");
+            Assert.Equal(1.0, new ZoomState(store).Factor);
+            File.WriteAllText(store, "9");
+            Assert.Equal(1.0, new ZoomState(store).Factor);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(store), true);
+        }
+    }
+
+    [Fact]
+    public void The_view_model_raises_the_zoom_and_shows_it_as_a_percentage()
+    {
+        var store = Path.Combine(Path.GetTempPath(), "multifarious-icu-tests", Guid.NewGuid().ToString("N"), "zoom.txt");
+        try
+        {
+            var model = new IcuFormsViewModel(zoom: new ZoomState(store));
+            var raised = new List<string>();
+            model.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+            model.ZoomInCommand.Execute(null);
+            Assert.Equal(1.1, model.Zoom, 5);
+            Assert.Equal("110%", model.ZoomPercent);
+            Assert.Contains(nameof(IcuFormsViewModel.Zoom), raised);
+            Assert.Contains(nameof(IcuFormsViewModel.ZoomPercent), raised);
+
+            model.ZoomResetCommand.Execute(null);
+            Assert.Equal("100%", model.ZoomPercent);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(store), true);
+        }
+
+        // The scale is applied as a layout transform, so the rows wrap to the zoomed width.
+        Assert.Matches(@"<ScaleTransform ScaleX=""\{Binding Zoom, Mode=OneWay\}"" ScaleY=""\{Binding Zoom, Mode=OneWay\}""", Xaml());
+        Assert.Contains("PreviewMouseWheel=\"OnPreviewMouseWheel\"", Xaml());
+    }
 }
