@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- zh-CN. Terminology follows Trados Studio's own UI in this language.
+       Translator comments live in the neutral UIStrings.resx and are not repeated here.
+       The report names stay as the task names appear in Studio's task list. -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Expand_Intro" xml:space="preserve">
+    <value>在“复制到目标语言”之后对目标文件运行，将每条 ICU 复数消息重构为目标语言所需的每种形式各一个句段。每个句段都是完整的句子，并附有批注说明哪些数量会选中该形式。消息的语法受到保护，译员无法破坏。</value>
+  </data>
+  <data name="Expand_KindsHeader" xml:space="preserve">
+    <value>要重构的消息</value>
+  </data>
+  <data name="Expand_KindsHelpHeader" xml:space="preserve">
+    <value>为什么要重构？</value>
+  </data>
+  <data name="Expand_KindsHelp1" xml:space="preserve">
+    <value>源文中的复数消息拥有源语言所需数量的形式：英语有两种，“one”和“other”。目标语言可能需要更多。俄语需要四种，阿拉伯语六种，日语一种。重构后，译员得到的正是目标语言所需的各种形式，每种都是一个完整的句子，而不是需要手工编辑的花括号表达式。</value>
+  </data>
+  <data name="Expand_KindsHelp2" xml:space="preserve">
+    <value>select 消息按性别之类的值而非数量来选择，因此从不展开：它们的分支属于开发者，而不属于语言。但仍会对其进行重构，使语法受到保护，并让每个分支成为一个句子。</value>
+  </data>
+  <data name="Expand_Cardinal" xml:space="preserve">
+    <value>复数消息 ({count, plural, ...})</value>
+  </data>
+  <data name="Expand_Ordinal" xml:space="preserve">
+    <value>序数消息 ({count, selectordinal, ...})</value>
+  </data>
+  <data name="Expand_KindsHint" xml:space="preserve">
+    <value>消息会被重构为目标语言所需的每种形式各一个句段，每个句段都是完整的句子。如果消息的选择器全都属于未勾选的类型，则保持原样。</value>
+  </data>
+  <data name="Expand_SeedHeader" xml:space="preserve">
+    <value>源语言没有的形式所用的源文</value>
+  </data>
+  <data name="Expand_SeedMatching" xml:space="preserve">
+    <value>有同名源文形式时使用该形式，否则使用“other”形式</value>
+  </data>
+  <data name="Expand_SeedAlwaysOther" xml:space="preserve">
+    <value>始终使用“other”形式</value>
+  </data>
+  <data name="Expand_SeedHint" xml:space="preserve">
+    <value>每个句段的批注都会说明它源自哪种源文形式，让译员知道何时源文只是一个起点。</value>
+  </data>
+  <data name="Expand_SeedHelpHeader" xml:space="preserve">
+    <value>额外形式的文本从哪里来？</value>
+  </data>
+  <data name="Expand_SeedHelp1" xml:space="preserve">
+    <value>英语有“one”形式和“other”形式。俄语的“few”形式在英语中没有对应形式，因此它的句段必须从某一种英语形式出发，而译员看到的源文就是这段文本。</value>
+  </data>
+  <data name="Expand_SeedHelp2" xml:space="preserve">
+    <value>选择第一项时，目标形式若有同名源文形式则从该形式出发，否则从“other”出发。选择第二项时，所有形式都从“other”出发；有些团队偏好这种方式，因为英语的“one”形式往往是针对恰好一个项目写的，用作其他形式的源文会显得别扭。</value>
+  </data>
+  <data name="Expand_HintsHeader" xml:space="preserve">
+    <value>句段批注</value>
+  </data>
+  <data name="Expand_Hints" xml:space="preserve">
+    <value>在已知的情况下为形式添加语法提示</value>
+  </data>
+  <data name="Expand_HintsHint" xml:space="preserve">
+    <value>每条批注都会指出形式以及选中它的示例数量。提示会补充一句说明该形式通常的要求，例如俄语中的属格单数。</value>
+  </data>
+  <data name="Expand_HintsHelpHeader" xml:space="preserve">
+    <value>什么是语法提示？</value>
+  </data>
+  <data name="Expand_HintsHelp1" xml:space="preserve">
+    <value>Unicode CLDR 数据列出了一种语言拥有的形式以及选中各形式的数量，但没有说明该语言如何使用这些形式。提示是来自插件自带表格的一句简短说明，例如俄语的“few”形式要求属格单数。</value>
+  </data>
+  <data name="Expand_HintsHelp2" xml:space="preserve">
+    <value>提示是给并非每天使用该语言工作的译员的建议，而不是规则。如果译员觉得它们碍事，可以关闭；无论如何，形式名称和示例数量都会保留在批注中。</value>
+  </data>
+  <data name="Expand_BudgetHeader" xml:space="preserve">
+    <value>分支上限</value>
+  </data>
+  <data name="Expand_BudgetLabel" xml:space="preserve">
+    <value>一条消息最多可展开为的句段数：</value>
+  </data>
+  <data name="Expand_BudgetHint" xml:space="preserve">
+    <value>两个独立的复数会相乘：对阿拉伯语而言，六种形式乘以六种形式就是 36 个句段。超出上限时，消息会在语法受保护的前提下布局，但不添加形式，报告中会予以说明。</value>
+  </data>
+  <data name="Expand_BudgetInvalid" xml:space="preserve">
+    <value>请输入 1 到 999 之间的整数。</value>
+  </data>
+  <data name="Expand_BudgetHelpHeader" xml:space="preserve">
+    <value>分支上限有什么用？</value>
+  </data>
+  <data name="Expand_BudgetHelp1" xml:space="preserve">
+    <value>含有两个独立复数的消息会相乘：一个的形式数乘以另一个的形式数。对阿拉伯语而言，六乘六就是一条消息产生 36 个句段，翻译量很大，通常也说明开发者应当拆分这条消息。</value>
+  </data>
+  <data name="Expand_BudgetHelp2" xml:space="preserve">
+    <value>超出上限时，消息仍会在语法受保护并保留原有分支的情况下重构，但不添加任何形式。段落会带有警告，报告也会列出，这样译员无法破坏消息，项目经理也知道该语言可能缺少所需的形式。</value>
+  </data>
+  <data name="Expand_ParseHeader" xml:space="preserve">
+    <value>当某个值无法作为 ICU 消息读取时</value>
+  </data>
+  <data name="Expand_ParsePassThrough" xml:space="preserve">
+    <value>保持原样并添加警告</value>
+  </data>
+  <data name="Expand_ParseFail" xml:space="preserve">
+    <value>停止任务</value>
+  </data>
+  <data name="Expand_ParseHelpHeader" xml:space="preserve">
+    <value>什么情况下值无法读取？</value>
+  </data>
+  <data name="Expand_ParseHelp1" xml:space="preserve">
+    <value>缺少配对的花括号、放在会被 ICU 当作带引号字面量起始位置的撇号、拼错的选择器关键字。这样的值结构未知，因此无法重构。</value>
+  </data>
+  <data name="Expand_ParseHelp2" xml:space="preserve">
+    <value>保持原样可让文件的其余部分继续处理，并在段落上添加指明问题位置的警告。停止任务适用于绝不能让损坏的消息在无人察觉的情况下到达译员手中的流程。</value>
+  </data>
+  <data name="Finalise_Intro" xml:space="preserve">
+    <value>完成处理会将每条消息裁剪为目标语言所需的形式，转义以文本形式输入的 ICU 特殊字符，并检查占位符。警告会写入源文句段的批注和任务报告；绝不会写入译文批注。</value>
+  </data>
+  <data name="Finalise_EmptyHeader" xml:space="preserve">
+    <value>当某种形式没有译文时</value>
+  </data>
+  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+    <value>使用源文并添加警告</value>
+  </data>
+  <data name="Finalise_EmptyFail" xml:space="preserve">
+    <value>停止任务</value>
+  </data>
+  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+    <value>没有人翻译的形式会怎样？</value>
+  </data>
+  <data name="Finalise_EmptyHelp1" xml:space="preserve">
+    <value>目标语言所需的每种形式都必须出现在生成的文件中，否则应用程序对选中该形式的数量将什么也不显示。使用源文可保持文件有效，并在源文句段的批注和报告中做出标记，以便之后找到缺口。</value>
+  </data>
+  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+    <value>停止任务适用于最终交付，此时不允许未翻译的形式以源语言的样子漏过去。</value>
+  </data>
+  <data name="Finalise_MismatchHeader" xml:space="preserve">
+    <value>当源文与译文中受保护的占位符不一致时</value>
+  </data>
+  <data name="Finalise_MismatchWarn" xml:space="preserve">
+    <value>添加警告并继续</value>
+  </data>
+  <data name="Finalise_MismatchFail" xml:space="preserve">
+    <value>停止任务</value>
+  </data>
+  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+    <value>什么是占位符不一致？</value>
+  </data>
+  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+    <value>句段中受保护的部分是消息的参数（如 {name}）和数量标记 #。如果译文丢失了其中一个，或多出了源文没有的一个，应用程序运行时就会出错或显示错误的文本。</value>
+  </data>
+  <data name="Finalise_MismatchHelp2" xml:space="preserve">
+    <value>警告会写入源文句段的批注和报告，文件仍会生成。停止任务则在译文修正之前拒绝生成。</value>
+  </data>
+  <data name="Report_ExpandName" xml:space="preserve">
+    <value>ICU Expand Plural Forms</value>
+  </data>
+  <data name="Report_ExpandDescription" xml:space="preserve">
+    <value>已在 {1} 个文件中展开 {0} 条 ICU 消息；{2} 条带有警告。</value>
+  </data>
+  <data name="Report_FinaliseName" xml:space="preserve">
+    <value>ICU Finalise Messages</value>
+  </data>
+  <data name="Report_FinaliseDescription" xml:space="preserve">
+    <value>已在 {1} 个文件中完成 {0} 条 ICU 消息；移除 {2} 种形式，从源文填充 {3} 个句段，{4} 条警告。</value>
+  </data>
+  <data name="Report_Summary" xml:space="preserve">
+    <value>摘要</value>
+  </data>
+  <data name="Report_Project" xml:space="preserve">
+    <value>项目</value>
+  </data>
+  <data name="Report_Languages" xml:space="preserve">
+    <value>语言对</value>
+  </data>
+  <data name="Report_Files" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="Report_CreatedAt" xml:space="preserve">
+    <value>创建时间</value>
+  </data>
+  <data name="Report_Cldr" xml:space="preserve">
+    <value>复数规则</value>
+  </data>
+  <data name="Report_Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="Report_Totals" xml:space="preserve">
+    <value>合计</value>
+  </data>
+  <data name="Report_File" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="Report_Messages" xml:space="preserve">
+    <value>消息</value>
+  </data>
+  <data name="Report_Segments" xml:space="preserve">
+    <value>句段</value>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="Report_Details" xml:space="preserve">
+    <value>详细信息</value>
+  </data>
+  <data name="Report_Key" xml:space="preserve">
+    <value>键</value>
+  </data>
+  <data name="Report_Total" xml:space="preserve">
+    <value>总计</value>
+  </data>
+  <data name="Report_Outcome" xml:space="preserve">
+    <value>结果</value>
+  </data>
+  <data name="Report_Note" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="Report_Expanded" xml:space="preserve">
+    <value>已展开</value>
+  </data>
+  <data name="Report_Protected" xml:space="preserve">
+    <value>已保护</value>
+  </data>
+  <data name="Report_Walked" xml:space="preserve">
+    <value>超出上限</value>
+  </data>
+  <data name="Report_PassedThrough" xml:space="preserve">
+    <value>保持原样</value>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>先前已展开</value>
+  </data>
+  <data name="Report_Pruned" xml:space="preserve">
+    <value>移除的形式</value>
+  </data>
+  <data name="Report_Filled" xml:space="preserve">
+    <value>从源文填充</value>
+  </data>
+  <data name="Report_NoWarnings" xml:space="preserve">
+    <value>没有警告。</value>
+  </data>
+  <data name="Report_On" xml:space="preserve">
+    <value>开</value>
+  </data>
+  <data name="Report_Off" xml:space="preserve">
+    <value>关</value>
+  </data>
+</root>

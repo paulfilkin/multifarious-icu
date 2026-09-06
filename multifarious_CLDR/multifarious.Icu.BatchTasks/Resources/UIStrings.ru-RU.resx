@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- ru-RU. Terminology follows Trados Studio's own UI in this language.
+       Translator comments live in the neutral UIStrings.resx and are not repeated here.
+       The report names stay as the task names appear in Studio's task list. -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Expand_Intro" xml:space="preserve">
+    <value>Выполняется для целевых файлов после операции «Копировать в целевые языки» и перестраивает каждое ICU-сообщение с множественным числом в отдельный сегмент для каждой формы, нужной целевому языку. Каждый сегмент — законченное предложение с комментарием, в котором указано, при каких количествах эта форма выбирается. Синтаксис сообщения защищён, поэтому переводчик не может его повредить.</value>
+  </data>
+  <data name="Expand_KindsHeader" xml:space="preserve">
+    <value>Перестраиваемые сообщения</value>
+  </data>
+  <data name="Expand_KindsHelpHeader" xml:space="preserve">
+    <value>Зачем вообще перестраивать?</value>
+  </data>
+  <data name="Expand_KindsHelp1" xml:space="preserve">
+    <value>В исходном сообщении столько форм множественного числа, сколько нужно исходному языку: в английском две, «one» и «other». Целевому языку может понадобиться больше. Русскому нужно четыре, арабскому шесть, японскому одна. Перестройка даёт переводчику ровно те формы, которые нужны целевому языку, каждую в виде законченного предложения, а не выражение в фигурных скобках, которое пришлось бы править вручную.</value>
+  </data>
+  <data name="Expand_KindsHelp2" xml:space="preserve">
+    <value>Сообщения select, в которых выбор делается по значению, например по роду, а не по количеству, никогда не разворачиваются: их ветви принадлежат разработчику, а не языку. Они всё же перестраиваются так, чтобы их синтаксис был защищён, а каждая ветвь была предложением.</value>
+  </data>
+  <data name="Expand_Cardinal" xml:space="preserve">
+    <value>Сообщения с множественным числом ({count, plural, ...})</value>
+  </data>
+  <data name="Expand_Ordinal" xml:space="preserve">
+    <value>Сообщения с порядковыми числительными ({count, selectordinal, ...})</value>
+  </data>
+  <data name="Expand_KindsHint" xml:space="preserve">
+    <value>Сообщение перестраивается в отдельный сегмент для каждой формы, нужной целевому языку, каждый — законченное предложение. Сообщение, единственные селекторы которого относятся к неотмеченному типу, остаётся без изменений.</value>
+  </data>
+  <data name="Expand_SeedHeader" xml:space="preserve">
+    <value>Исходный текст для форм, которых нет в исходном языке</value>
+  </data>
+  <data name="Expand_SeedMatching" xml:space="preserve">
+    <value>Исходная форма с тем же именем, если она есть, иначе форма «other»</value>
+  </data>
+  <data name="Expand_SeedAlwaysOther" xml:space="preserve">
+    <value>Всегда форма «other»</value>
+  </data>
+  <data name="Expand_SeedHint" xml:space="preserve">
+    <value>В комментарии к каждому сегменту указано, из какой исходной формы он взят, чтобы переводчик знал, когда исходный текст — лишь отправная точка.</value>
+  </data>
+  <data name="Expand_SeedHelpHeader" xml:space="preserve">
+    <value>Откуда берётся текст для дополнительной формы?</value>
+  </data>
+  <data name="Expand_SeedHelp1" xml:space="preserve">
+    <value>В английском есть форма «one» и форма «other». У русской формы «few» нет английского соответствия, поэтому её сегмент должен начинаться с одной из английских форм, и именно этот текст переводчик видит как исходный.</value>
+  </data>
+  <data name="Expand_SeedHelp2" xml:space="preserve">
+    <value>При первом варианте целевая форма берётся из исходной формы с тем же именем, если она есть, иначе из «other». При втором каждая форма берётся из «other»; некоторые команды предпочитают этот вариант, потому что английская форма «one» часто сформулирована ровно для одного элемента и странно выглядит как исходный текст для всего остального.</value>
+  </data>
+  <data name="Expand_HintsHeader" xml:space="preserve">
+    <value>Комментарии к сегментам</value>
+  </data>
+  <data name="Expand_Hints" xml:space="preserve">
+    <value>Добавлять грамматическую подсказку к форме, если она известна</value>
+  </data>
+  <data name="Expand_HintsHint" xml:space="preserve">
+    <value>В каждом комментарии названа форма и примеры количеств, при которых она выбирается. Подсказка добавляет предложение о том, чего обычно требует эта форма, например родительного падежа единственного числа в русском.</value>
+  </data>
+  <data name="Expand_HintsHelpHeader" xml:space="preserve">
+    <value>Что такое грамматические подсказки?</value>
+  </data>
+  <data name="Expand_HintsHelp1" xml:space="preserve">
+    <value>Данные Unicode CLDR называют формы, которые есть в языке, и количества, при которых выбирается каждая из них, но ничего не говорят о том, как язык с ними обращается. Подсказка — короткое предложение из собственной таблицы плагина, например о том, что русская форма «few» требует родительного падежа единственного числа.</value>
+  </data>
+  <data name="Expand_HintsHelp2" xml:space="preserve">
+    <value>Подсказки — это совет переводчику, который не работает с этим языком каждый день, а не правила. Отключите их, если ваши переводчики считают их лишними; название формы и примеры количеств в любом случае остаются в комментарии.</value>
+  </data>
+  <data name="Expand_BudgetHeader" xml:space="preserve">
+    <value>Предел ветвей</value>
+  </data>
+  <data name="Expand_BudgetLabel" xml:space="preserve">
+    <value>Наибольшее число сегментов, в которые может развернуться одно сообщение:</value>
+  </data>
+  <data name="Expand_BudgetHint" xml:space="preserve">
+    <value>Два независимых множественных числа перемножаются: шесть форм на шесть форм дают 36 сегментов для арабского. Сверх предела сообщение размечается с защищённым синтаксисом, но без добавления форм, и об этом сообщается в отчёте.</value>
+  </data>
+  <data name="Expand_BudgetInvalid" xml:space="preserve">
+    <value>Введите целое число от 1 до 999.</value>
+  </data>
+  <data name="Expand_BudgetHelpHeader" xml:space="preserve">
+    <value>Для чего нужен предел ветвей?</value>
+  </data>
+  <data name="Expand_BudgetHelp1" xml:space="preserve">
+    <value>Сообщение с двумя независимыми множественными числами перемножается: формы одного на формы другого. Шесть на шесть — это 36 сегментов для арабского из одного сообщения; переводить это долго, и обычно это признак того, что разработчику стоит разделить сообщение.</value>
+  </data>
+  <data name="Expand_BudgetHelp2" xml:space="preserve">
+    <value>Сверх предела сообщение всё равно перестраивается с защищённым синтаксисом и его исходными ветвями, но формы не добавляются. Абзац получает предупреждение, а отчёт его перечисляет, так что переводчик не может повредить сообщение, а руководитель проекта знает, что языку может не хватать нужных форм.</value>
+  </data>
+  <data name="Expand_ParseHeader" xml:space="preserve">
+    <value>Если значение не удаётся прочитать как ICU-сообщение</value>
+  </data>
+  <data name="Expand_ParsePassThrough" xml:space="preserve">
+    <value>Оставить без изменений и добавить предупреждение</value>
+  </data>
+  <data name="Expand_ParseFail" xml:space="preserve">
+    <value>Остановить задачу</value>
+  </data>
+  <data name="Expand_ParseHelpHeader" xml:space="preserve">
+    <value>Когда значение не удаётся прочитать?</value>
+  </data>
+  <data name="Expand_ParseHelp1" xml:space="preserve">
+    <value>Скобка без пары, апостроф в том месте, где ICU читает его как начало литерала в кавычках, ошибка в ключевом слове селектора. Такое значение нельзя перестроить, потому что его структура неизвестна.</value>
+  </data>
+  <data name="Expand_ParseHelp2" xml:space="preserve">
+    <value>Если оставить его без изменений, остальной файл обрабатывается дальше, а абзац получает предупреждение с указанием позиции ошибки. Остановка задачи нужна для конвейера, в котором повреждённое сообщение ни в коем случае не должно незаметно попасть к переводчику.</value>
+  </data>
+  <data name="Finalise_Intro" xml:space="preserve">
+    <value>Завершение сокращает каждое сообщение до форм, нужных целевому языку, экранирует специальные символы ICU, введённые как текст, и проверяет заполнители. Предупреждения записываются в комментарий исходного сегмента и в отчёт задачи; комментарии к целевым сегментам никогда не создаются.</value>
+  </data>
+  <data name="Finalise_EmptyHeader" xml:space="preserve">
+    <value>Если у формы нет перевода</value>
+  </data>
+  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+    <value>Использовать исходный текст и добавить предупреждение</value>
+  </data>
+  <data name="Finalise_EmptyFail" xml:space="preserve">
+    <value>Остановить задачу</value>
+  </data>
+  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+    <value>Что происходит с формой, которую никто не перевёл?</value>
+  </data>
+  <data name="Finalise_EmptyHelp1" xml:space="preserve">
+    <value>Каждая форма, нужная целевому языку, должна присутствовать в созданном файле, иначе приложение ничего не покажет для количеств, при которых она выбирается. Использование исходного текста сохраняет файл корректным и помечает комментарий исходного сегмента и отчёт, чтобы пропуск можно было найти позже.</value>
+  </data>
+  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+    <value>Остановка задачи нужна для окончательной сдачи, когда непереведённая форма не должна проскочить на исходном языке.</value>
+  </data>
+  <data name="Finalise_MismatchHeader" xml:space="preserve">
+    <value>Если защищённые заполнители в исходном и целевом тексте различаются</value>
+  </data>
+  <data name="Finalise_MismatchWarn" xml:space="preserve">
+    <value>Добавить предупреждение и продолжить</value>
+  </data>
+  <data name="Finalise_MismatchFail" xml:space="preserve">
+    <value>Остановить задачу</value>
+  </data>
+  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+    <value>Что такое несовпадение заполнителей?</value>
+  </data>
+  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+    <value>Защищённые участки сегмента — это аргументы сообщения, например {name}, и маркер количества #. Перевод, в котором один из них потерян или появился лишний, которого нет в исходном тексте, вызывает ошибку или показывает неверный текст при работе приложения.</value>
+  </data>
+  <data name="Finalise_MismatchHelp2" xml:space="preserve">
+    <value>Предупреждение записывается в комментарий исходного сегмента и в отчёт, а файл всё равно создаётся. Остановка задачи запрещает создание файла, пока перевод не будет исправлен.</value>
+  </data>
+  <data name="Report_ExpandName" xml:space="preserve">
+    <value>ICU Expand Plural Forms</value>
+  </data>
+  <data name="Report_ExpandDescription" xml:space="preserve">
+    <value>ICU-сообщений развёрнуто: {0} в файлах: {1}; с предупреждением: {2}.</value>
+  </data>
+  <data name="Report_FinaliseName" xml:space="preserve">
+    <value>ICU Finalise Messages</value>
+  </data>
+  <data name="Report_FinaliseDescription" xml:space="preserve">
+    <value>ICU-сообщений завершено: {0} в файлах: {1}; форм удалено: {2}, сегментов заполнено из исходного текста: {3}, предупреждений: {4}.</value>
+  </data>
+  <data name="Report_Summary" xml:space="preserve">
+    <value>Сводка</value>
+  </data>
+  <data name="Report_Project" xml:space="preserve">
+    <value>Проект</value>
+  </data>
+  <data name="Report_Languages" xml:space="preserve">
+    <value>Языковая пара</value>
+  </data>
+  <data name="Report_Files" xml:space="preserve">
+    <value>Файлы</value>
+  </data>
+  <data name="Report_CreatedAt" xml:space="preserve">
+    <value>Создано</value>
+  </data>
+  <data name="Report_Cldr" xml:space="preserve">
+    <value>Правила множественного числа</value>
+  </data>
+  <data name="Report_Settings" xml:space="preserve">
+    <value>Параметры</value>
+  </data>
+  <data name="Report_Totals" xml:space="preserve">
+    <value>Итоги</value>
+  </data>
+  <data name="Report_File" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="Report_Messages" xml:space="preserve">
+    <value>Сообщения</value>
+  </data>
+  <data name="Report_Segments" xml:space="preserve">
+    <value>Сегменты</value>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>Предупреждения</value>
+  </data>
+  <data name="Report_Details" xml:space="preserve">
+    <value>Подробности</value>
+  </data>
+  <data name="Report_Key" xml:space="preserve">
+    <value>Ключ</value>
+  </data>
+  <data name="Report_Total" xml:space="preserve">
+    <value>Всего</value>
+  </data>
+  <data name="Report_Outcome" xml:space="preserve">
+    <value>Результат</value>
+  </data>
+  <data name="Report_Note" xml:space="preserve">
+    <value>Примечание</value>
+  </data>
+  <data name="Report_Expanded" xml:space="preserve">
+    <value>Развёрнуто</value>
+  </data>
+  <data name="Report_Protected" xml:space="preserve">
+    <value>Защищено</value>
+  </data>
+  <data name="Report_Walked" xml:space="preserve">
+    <value>Сверх предела</value>
+  </data>
+  <data name="Report_PassedThrough" xml:space="preserve">
+    <value>Оставлено без изменений</value>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>Уже развёрнуто</value>
+  </data>
+  <data name="Report_Pruned" xml:space="preserve">
+    <value>Удалено форм</value>
+  </data>
+  <data name="Report_Filled" xml:space="preserve">
+    <value>Заполнено из исходного текста</value>
+  </data>
+  <data name="Report_NoWarnings" xml:space="preserve">
+    <value>Предупреждений нет.</value>
+  </data>
+  <data name="Report_On" xml:space="preserve">
+    <value>Вкл.</value>
+  </data>
+  <data name="Report_Off" xml:space="preserve">
+    <value>Выкл.</value>
+  </data>
+</root>

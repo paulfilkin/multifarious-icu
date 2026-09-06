@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- es. Terminology follows Trados Studio's own UI in this language.
+       Translator comments live in the neutral UIStrings.resx and are not repeated here.
+       The report names stay as the task names appear in Studio's task list. -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Expand_Intro" xml:space="preserve">
+    <value>Se ejecuta en los archivos de destino después de «Copiar a idiomas de destino» y reestructura cada mensaje plural ICU en un segmento por cada forma que necesita el idioma de destino, cada uno una frase completa con un comentario que indica qué cantidades la seleccionan. La sintaxis del mensaje está protegida, de modo que un traductor no puede dañarla.</value>
+  </data>
+  <data name="Expand_KindsHeader" xml:space="preserve">
+    <value>Mensajes que se reestructuran</value>
+  </data>
+  <data name="Expand_KindsHelpHeader" xml:space="preserve">
+    <value>¿Por qué reestructurar?</value>
+  </data>
+  <data name="Expand_KindsHelp1" xml:space="preserve">
+    <value>Un mensaje plural en el origen tiene tantas formas como necesita el idioma de origen: dos en inglés, «one» y «other». El idioma de destino puede necesitar más. El ruso necesita cuatro, el árabe seis, el japonés una. Al reestructurar, el traductor recibe exactamente las formas que necesita el destino, cada una como una frase completa, en lugar de una expresión entre llaves que editar a mano.</value>
+  </data>
+  <data name="Expand_KindsHelp2" xml:space="preserve">
+    <value>Los mensajes select, que eligen según un valor como el género y no según una cantidad, nunca se expanden: sus ramas pertenecen al desarrollador, no al idioma. Aun así se reestructuran para que su sintaxis quede protegida y cada rama sea una frase.</value>
+  </data>
+  <data name="Expand_Cardinal" xml:space="preserve">
+    <value>Mensajes plurales ({count, plural, ...})</value>
+  </data>
+  <data name="Expand_Ordinal" xml:space="preserve">
+    <value>Mensajes ordinales ({count, selectordinal, ...})</value>
+  </data>
+  <data name="Expand_KindsHint" xml:space="preserve">
+    <value>Un mensaje se reestructura en un segmento por cada forma que necesita el idioma de destino, cada uno una frase completa. Un mensaje cuyos únicos selectores son de un tipo sin marcar se deja tal cual.</value>
+  </data>
+  <data name="Expand_SeedHeader" xml:space="preserve">
+    <value>Texto de origen para las formas que el idioma de origen no tiene</value>
+  </data>
+  <data name="Expand_SeedMatching" xml:space="preserve">
+    <value>La forma de origen del mismo nombre cuando existe; si no, la forma «other»</value>
+  </data>
+  <data name="Expand_SeedAlwaysOther" xml:space="preserve">
+    <value>Siempre la forma «other»</value>
+  </data>
+  <data name="Expand_SeedHint" xml:space="preserve">
+    <value>El comentario de cada segmento indica de qué forma de origen partió, para que el traductor sepa cuándo el origen es solo un punto de partida.</value>
+  </data>
+  <data name="Expand_SeedHelpHeader" xml:space="preserve">
+    <value>¿De dónde sale el texto de una forma adicional?</value>
+  </data>
+  <data name="Expand_SeedHelp1" xml:space="preserve">
+    <value>El inglés tiene una forma «one» y una forma «other». Una forma rusa «few» no tiene equivalente en inglés, así que su segmento debe partir de una de las formas inglesas, y ese texto es lo que el traductor ve como origen.</value>
+  </data>
+  <data name="Expand_SeedHelp2" xml:space="preserve">
+    <value>Con la primera opción, una forma de destino parte de la forma de origen del mismo nombre cuando existe; si no, de «other». Con la segunda, todas las formas parten de «other», lo que algunos equipos prefieren porque la forma inglesa «one» suele estar redactada para exactamente un elemento y resulta extraña como origen de todo lo demás.</value>
+  </data>
+  <data name="Expand_HintsHeader" xml:space="preserve">
+    <value>Comentarios de segmento</value>
+  </data>
+  <data name="Expand_Hints" xml:space="preserve">
+    <value>Añadir una indicación gramatical para la forma cuando se conozca</value>
+  </data>
+  <data name="Expand_HintsHint" xml:space="preserve">
+    <value>Cada comentario nombra la forma y cantidades de ejemplo que la seleccionan. Una indicación añade una frase sobre lo que la forma suele exigir, por ejemplo el genitivo singular en ruso.</value>
+  </data>
+  <data name="Expand_HintsHelpHeader" xml:space="preserve">
+    <value>¿Qué son las indicaciones gramaticales?</value>
+  </data>
+  <data name="Expand_HintsHelp1" xml:space="preserve">
+    <value>Los datos CLDR de Unicode nombran las formas que tiene un idioma y qué cantidades seleccionan cada una, pero no dicen nada de lo que el idioma hace con ellas. Una indicación es una frase breve de la tabla propia del complemento, por ejemplo que la forma rusa «few» exige el genitivo singular.</value>
+  </data>
+  <data name="Expand_HintsHelp2" xml:space="preserve">
+    <value>Las indicaciones son consejos para un traductor que no trabaja en el idioma a diario, no reglas. Desactívelas si sus traductores las consideran ruido; el nombre de la forma y las cantidades de ejemplo permanecen en el comentario en cualquier caso.</value>
+  </data>
+  <data name="Expand_BudgetHeader" xml:space="preserve">
+    <value>Límite de ramas</value>
+  </data>
+  <data name="Expand_BudgetLabel" xml:space="preserve">
+    <value>Número máximo de segmentos en que puede expandirse un mensaje:</value>
+  </data>
+  <data name="Expand_BudgetHint" xml:space="preserve">
+    <value>Dos plurales independientes se multiplican: seis formas por seis formas son 36 segmentos para el árabe. Por encima del límite, el mensaje se dispone con la sintaxis protegida pero sin añadir formas, y el informe lo indica.</value>
+  </data>
+  <data name="Expand_BudgetInvalid" xml:space="preserve">
+    <value>Introduzca un número entero de 1 a 999.</value>
+  </data>
+  <data name="Expand_BudgetHelpHeader" xml:space="preserve">
+    <value>¿Para qué sirve el límite de ramas?</value>
+  </data>
+  <data name="Expand_BudgetHelp1" xml:space="preserve">
+    <value>Un mensaje con dos plurales independientes se multiplica: las formas de uno por las formas del otro. Seis por seis son 36 segmentos para el árabe a partir de un solo mensaje, que es mucho que traducir y normalmente una señal de que el desarrollador debería dividir el mensaje.</value>
+  </data>
+  <data name="Expand_BudgetHelp2" xml:space="preserve">
+    <value>Por encima del límite, el mensaje se reestructura de todos modos con la sintaxis protegida y sus ramas originales, pero no se añaden formas. El párrafo lleva una advertencia y el informe lo enumera, de modo que el traductor no puede dañar el mensaje y el gestor del proyecto sabe que al idioma pueden faltarle formas que necesita.</value>
+  </data>
+  <data name="Expand_ParseHeader" xml:space="preserve">
+    <value>Cuando un valor no puede leerse como mensaje ICU</value>
+  </data>
+  <data name="Expand_ParsePassThrough" xml:space="preserve">
+    <value>Dejarlo intacto y añadir una advertencia</value>
+  </data>
+  <data name="Expand_ParseFail" xml:space="preserve">
+    <value>Detener la tarea</value>
+  </data>
+  <data name="Expand_ParseHelpHeader" xml:space="preserve">
+    <value>¿Cuándo no puede leerse un valor?</value>
+  </data>
+  <data name="Expand_ParseHelp1" xml:space="preserve">
+    <value>Una llave sin su pareja, un apóstrofo colocado donde ICU lo lee como el inicio de un literal entrecomillado, una palabra clave de selector mal escrita. Un valor así no puede reestructurarse porque su estructura es desconocida.</value>
+  </data>
+  <data name="Expand_ParseHelp2" xml:space="preserve">
+    <value>Dejarlo intacto mantiene en marcha el resto del archivo y marca el párrafo con una advertencia que indica la posición del problema. Detener la tarea es para una cadena de trabajo en la que un mensaje roto nunca debe llegar a un traductor sin que nadie lo advierta.</value>
+  </data>
+  <data name="Finalise_Intro" xml:space="preserve">
+    <value>La finalización recorta cada mensaje a las formas que necesita el idioma de destino, escapa los caracteres especiales ICU escritos como texto y comprueba los marcadores de posición. Las advertencias van al comentario del segmento de origen y al informe de la tarea; nunca se escriben comentarios en el destino.</value>
+  </data>
+  <data name="Finalise_EmptyHeader" xml:space="preserve">
+    <value>Cuando una forma no tiene traducción</value>
+  </data>
+  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+    <value>Usar el texto de origen y añadir una advertencia</value>
+  </data>
+  <data name="Finalise_EmptyFail" xml:space="preserve">
+    <value>Detener la tarea</value>
+  </data>
+  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+    <value>¿Qué ocurre con una forma que nadie tradujo?</value>
+  </data>
+  <data name="Finalise_EmptyHelp1" xml:space="preserve">
+    <value>Todas las formas que necesita el idioma de destino deben estar presentes en el archivo generado; de lo contrario, la aplicación no muestra nada para las cantidades que la seleccionan. Usar el texto de origen mantiene válido el archivo y marca el comentario del segmento de origen y el informe, para que la carencia pueda encontrarse más tarde.</value>
+  </data>
+  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+    <value>Detener la tarea es para una entrega final, en la que una forma sin traducir no debe colarse en el idioma de origen.</value>
+  </data>
+  <data name="Finalise_MismatchHeader" xml:space="preserve">
+    <value>Cuando los marcadores de posición protegidos difieren entre origen y destino</value>
+  </data>
+  <data name="Finalise_MismatchWarn" xml:space="preserve">
+    <value>Añadir una advertencia y continuar</value>
+  </data>
+  <data name="Finalise_MismatchFail" xml:space="preserve">
+    <value>Detener la tarea</value>
+  </data>
+  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+    <value>¿Qué es una discrepancia de marcadores de posición?</value>
+  </data>
+  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+    <value>Los tramos protegidos de un segmento son los argumentos del mensaje, como {name}, y el marcador de cantidad #. Una traducción que ha perdido uno, o ha ganado uno que el origen no tiene, falla o muestra el texto equivocado cuando la aplicación se ejecuta.</value>
+  </data>
+  <data name="Finalise_MismatchHelp2" xml:space="preserve">
+    <value>Una advertencia va al comentario del segmento de origen y al informe, y el archivo se genera de todos modos. Detener la tarea rechaza la generación hasta que la traducción se corrija.</value>
+  </data>
+  <data name="Report_ExpandName" xml:space="preserve">
+    <value>ICU Expand Plural Forms</value>
+  </data>
+  <data name="Report_ExpandDescription" xml:space="preserve">
+    <value>{0} mensaje(s) ICU expandido(s) en {1} archivo(s); {2} con una advertencia.</value>
+  </data>
+  <data name="Report_FinaliseName" xml:space="preserve">
+    <value>ICU Finalise Messages</value>
+  </data>
+  <data name="Report_FinaliseDescription" xml:space="preserve">
+    <value>{0} mensaje(s) ICU finalizado(s) en {1} archivo(s); {2} forma(s) eliminada(s), {3} segmento(s) rellenado(s) desde el origen, {4} advertencia(s).</value>
+  </data>
+  <data name="Report_Summary" xml:space="preserve">
+    <value>Resumen</value>
+  </data>
+  <data name="Report_Project" xml:space="preserve">
+    <value>Proyecto</value>
+  </data>
+  <data name="Report_Languages" xml:space="preserve">
+    <value>Par de idiomas</value>
+  </data>
+  <data name="Report_Files" xml:space="preserve">
+    <value>Archivos</value>
+  </data>
+  <data name="Report_CreatedAt" xml:space="preserve">
+    <value>Creado el</value>
+  </data>
+  <data name="Report_Cldr" xml:space="preserve">
+    <value>Reglas de plural</value>
+  </data>
+  <data name="Report_Settings" xml:space="preserve">
+    <value>Configuración</value>
+  </data>
+  <data name="Report_Totals" xml:space="preserve">
+    <value>Totales</value>
+  </data>
+  <data name="Report_File" xml:space="preserve">
+    <value>Archivo</value>
+  </data>
+  <data name="Report_Messages" xml:space="preserve">
+    <value>Mensajes</value>
+  </data>
+  <data name="Report_Segments" xml:space="preserve">
+    <value>Segmentos</value>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>Advertencias</value>
+  </data>
+  <data name="Report_Details" xml:space="preserve">
+    <value>Detalles</value>
+  </data>
+  <data name="Report_Key" xml:space="preserve">
+    <value>Clave</value>
+  </data>
+  <data name="Report_Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Report_Outcome" xml:space="preserve">
+    <value>Resultado</value>
+  </data>
+  <data name="Report_Note" xml:space="preserve">
+    <value>Nota</value>
+  </data>
+  <data name="Report_Expanded" xml:space="preserve">
+    <value>Expandido</value>
+  </data>
+  <data name="Report_Protected" xml:space="preserve">
+    <value>Protegido</value>
+  </data>
+  <data name="Report_Walked" xml:space="preserve">
+    <value>Por encima del límite</value>
+  </data>
+  <data name="Report_PassedThrough" xml:space="preserve">
+    <value>Dejado intacto</value>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>Ya expandido</value>
+  </data>
+  <data name="Report_Pruned" xml:space="preserve">
+    <value>Formas eliminadas</value>
+  </data>
+  <data name="Report_Filled" xml:space="preserve">
+    <value>Rellenado desde el origen</value>
+  </data>
+  <data name="Report_NoWarnings" xml:space="preserve">
+    <value>Sin advertencias.</value>
+  </data>
+  <data name="Report_On" xml:space="preserve">
+    <value>Activado</value>
+  </data>
+  <data name="Report_Off" xml:space="preserve">
+    <value>Desactivado</value>
+  </data>
+</root>

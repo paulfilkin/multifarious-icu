@@ -83,4 +83,12 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The string resources beside the test assembly, so the satellite tests compare every
+         translated resx with the English one by file rather than through the resource manager,
+         which would silently fall back to English for a missing key. -->
+    <None Include="..\multifarious.Icu.BatchTasks\Resources\UIStrings.resx" Link="resources\UIStrings.resx" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\multifarious.Icu.BatchTasks\Resources\UIStrings.*.resx" Link="resources\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

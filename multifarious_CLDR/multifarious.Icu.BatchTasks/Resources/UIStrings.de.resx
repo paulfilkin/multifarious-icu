@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- de. Terminology follows Trados Studio's own UI in this language.
+       Translator comments live in the neutral UIStrings.resx and are not repeated here.
+       The report names stay as the task names appear in Studio's task list. -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Expand_Intro" xml:space="preserve">
+    <value>Wird nach „In Zielsprachen kopieren“ auf den Zieldateien ausgeführt und gliedert jede ICU-Pluralnachricht in ein Segment pro Form um, die die Zielsprache benötigt. Jedes Segment ist ein vollständiger Satz mit einem Kommentar, der angibt, welche Zahlen es auswählen. Die Syntax der Nachricht ist geschützt, sodass ein Übersetzer sie nicht beschädigen kann.</value>
+  </data>
+  <data name="Expand_KindsHeader" xml:space="preserve">
+    <value>Umzugliedernde Nachrichten</value>
+  </data>
+  <data name="Expand_KindsHelpHeader" xml:space="preserve">
+    <value>Warum überhaupt umgliedern?</value>
+  </data>
+  <data name="Expand_KindsHelp1" xml:space="preserve">
+    <value>Eine Pluralnachricht im Ausgangstext hat so viele Formen, wie die Ausgangssprache benötigt: zwei im Englischen, „one“ und „other“. Die Zielsprache braucht unter Umständen mehr. Russisch braucht vier, Arabisch sechs, Japanisch eine. Beim Umgliedern erhält der Übersetzer genau die Formen, die die Zielsprache benötigt, jede als vollständigen Satz statt eines Klammerausdrucks, der von Hand zu bearbeiten wäre.</value>
+  </data>
+  <data name="Expand_KindsHelp2" xml:space="preserve">
+    <value>Select-Nachrichten, die nach einem Wert wie dem Geschlecht statt nach einer Zahl auswählen, werden nie erweitert: Ihre Zweige gehören dem Entwickler, nicht der Sprache. Sie werden dennoch so umgegliedert, dass ihre Syntax geschützt ist und jeder Zweig ein Satz ist.</value>
+  </data>
+  <data name="Expand_Cardinal" xml:space="preserve">
+    <value>Pluralnachrichten ({count, plural, ...})</value>
+  </data>
+  <data name="Expand_Ordinal" xml:space="preserve">
+    <value>Ordinalnachrichten ({count, selectordinal, ...})</value>
+  </data>
+  <data name="Expand_KindsHint" xml:space="preserve">
+    <value>Eine Nachricht wird in ein Segment pro Form umgegliedert, die die Zielsprache benötigt, jedes ein vollständiger Satz. Eine Nachricht, deren einzige Selektoren zu einer nicht angekreuzten Art gehören, bleibt unverändert.</value>
+  </data>
+  <data name="Expand_SeedHeader" xml:space="preserve">
+    <value>Ausgangstext für Formen, die die Ausgangssprache nicht hat</value>
+  </data>
+  <data name="Expand_SeedMatching" xml:space="preserve">
+    <value>Die gleichnamige Ausgangsform, sofern vorhanden, sonst die Form „other“</value>
+  </data>
+  <data name="Expand_SeedAlwaysOther" xml:space="preserve">
+    <value>Immer die Form „other“</value>
+  </data>
+  <data name="Expand_SeedHint" xml:space="preserve">
+    <value>Der Kommentar zu jedem Segment gibt an, von welcher Ausgangsform es ausgeht, damit der Übersetzer weiß, wann der Ausgangstext nur ein Ausgangspunkt ist.</value>
+  </data>
+  <data name="Expand_SeedHelpHeader" xml:space="preserve">
+    <value>Woher kommt der Text für eine zusätzliche Form?</value>
+  </data>
+  <data name="Expand_SeedHelp1" xml:space="preserve">
+    <value>Englisch hat eine Form „one“ und eine Form „other“. Eine russische Form „few“ hat keine englische Entsprechung, ihr Segment muss also von einer der englischen Formen ausgehen, und dieser Text ist das, was der Übersetzer als Ausgangstext sieht.</value>
+  </data>
+  <data name="Expand_SeedHelp2" xml:space="preserve">
+    <value>Bei der ersten Wahl geht eine Zielform von der gleichnamigen Ausgangsform aus, sofern es sie gibt, sonst von „other“. Bei der zweiten geht jede Form von „other“ aus, was manche Teams bevorzugen, weil die englische Form „one“ oft auf genau ein Element hin formuliert ist und als Ausgangstext für alles andere seltsam wirkt.</value>
+  </data>
+  <data name="Expand_HintsHeader" xml:space="preserve">
+    <value>Segmentkommentare</value>
+  </data>
+  <data name="Expand_Hints" xml:space="preserve">
+    <value>Grammatikhinweis zur Form hinzufügen, wo einer bekannt ist</value>
+  </data>
+  <data name="Expand_HintsHint" xml:space="preserve">
+    <value>Jeder Kommentar nennt die Form und Beispielzahlen, die sie auswählen. Ein Hinweis ergänzt einen Satz dazu, was die Form üblicherweise verlangt, zum Beispiel den Genitiv Singular im Russischen.</value>
+  </data>
+  <data name="Expand_HintsHelpHeader" xml:space="preserve">
+    <value>Was sind Grammatikhinweise?</value>
+  </data>
+  <data name="Expand_HintsHelp1" xml:space="preserve">
+    <value>Die Unicode-CLDR-Daten nennen die Formen, die eine Sprache hat, und welche Zahlen jede auswählen, sagen aber nichts darüber, was die Sprache mit ihnen macht. Ein Hinweis ist ein kurzer Satz aus der eigenen Tabelle des Plugins, zum Beispiel, dass die russische Form „few“ den Genitiv Singular verlangt.</value>
+  </data>
+  <data name="Expand_HintsHelp2" xml:space="preserve">
+    <value>Hinweise sind Ratschläge für einen Übersetzer, der nicht täglich in der Sprache arbeitet, keine Regeln. Schalten Sie sie aus, wenn Ihre Übersetzer sie als Störung empfinden; der Name der Form und die Beispielzahlen bleiben in jedem Fall im Kommentar.</value>
+  </data>
+  <data name="Expand_BudgetHeader" xml:space="preserve">
+    <value>Zweig-Obergrenze</value>
+  </data>
+  <data name="Expand_BudgetLabel" xml:space="preserve">
+    <value>Höchstzahl der Segmente, in die eine Nachricht erweitert werden darf:</value>
+  </data>
+  <data name="Expand_BudgetHint" xml:space="preserve">
+    <value>Zwei unabhängige Plurale multiplizieren sich: sechs Formen mal sechs Formen ergeben 36 Segmente für Arabisch. Über der Obergrenze wird die Nachricht mit geschützter Syntax, aber ohne zusätzliche Formen angelegt, und der Bericht weist darauf hin.</value>
+  </data>
+  <data name="Expand_BudgetInvalid" xml:space="preserve">
+    <value>Geben Sie eine ganze Zahl von 1 bis 999 ein.</value>
+  </data>
+  <data name="Expand_BudgetHelpHeader" xml:space="preserve">
+    <value>Wozu dient die Zweig-Obergrenze?</value>
+  </data>
+  <data name="Expand_BudgetHelp1" xml:space="preserve">
+    <value>Eine Nachricht mit zwei unabhängigen Pluralen multipliziert sich: die Formen des einen mal die Formen des anderen. Sechs mal sechs ergibt 36 Segmente für Arabisch aus einer einzigen Nachricht, was viel zu übersetzen ist und meist ein Zeichen dafür, dass der Entwickler die Nachricht aufteilen sollte.</value>
+  </data>
+  <data name="Expand_BudgetHelp2" xml:space="preserve">
+    <value>Über der Obergrenze wird die Nachricht trotzdem umgegliedert, mit geschützter Syntax und ihren ursprünglichen Zweigen, aber es werden keine Formen hinzugefügt. Der Absatz erhält eine Warnung und der Bericht führt sie auf, sodass der Übersetzer die Nachricht nicht beschädigen kann und der Projektmanager weiß, dass der Sprache benötigte Formen fehlen könnten.</value>
+  </data>
+  <data name="Expand_ParseHeader" xml:space="preserve">
+    <value>Wenn ein Wert nicht als ICU-Nachricht gelesen werden kann</value>
+  </data>
+  <data name="Expand_ParsePassThrough" xml:space="preserve">
+    <value>Unverändert lassen und eine Warnung hinzufügen</value>
+  </data>
+  <data name="Expand_ParseFail" xml:space="preserve">
+    <value>Task abbrechen</value>
+  </data>
+  <data name="Expand_ParseHelpHeader" xml:space="preserve">
+    <value>Wann kann ein Wert nicht gelesen werden?</value>
+  </data>
+  <data name="Expand_ParseHelp1" xml:space="preserve">
+    <value>Eine Klammer ohne Gegenstück, ein Apostroph an einer Stelle, an der ICU ihn als Beginn eines Literals in Anführungszeichen liest, ein falsch geschriebenes Selektor-Schlüsselwort. Ein solcher Wert kann nicht umgegliedert werden, weil seine Struktur unbekannt ist.</value>
+  </data>
+  <data name="Expand_ParseHelp2" xml:space="preserve">
+    <value>Ihn unverändert zu lassen hält den Rest der Datei in Bewegung und versieht den Absatz mit einer Warnung, die die Position des Problems nennt. Den Task abzubrechen ist für eine Pipeline gedacht, in der eine defekte Nachricht niemals unbemerkt einen Übersetzer erreichen darf.</value>
+  </data>
+  <data name="Finalise_Intro" xml:space="preserve">
+    <value>Beim Abschließen wird jede Nachricht auf die Formen gekürzt, die die Zielsprache benötigt, ICU-Sonderzeichen, die als Text eingegeben wurden, werden maskiert, und die Platzhalter werden geprüft. Warnungen kommen in den Kommentar des Ausgangssegments und in den Task-Bericht; Zielkommentare werden nie geschrieben.</value>
+  </data>
+  <data name="Finalise_EmptyHeader" xml:space="preserve">
+    <value>Wenn eine Form keine Übersetzung hat</value>
+  </data>
+  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+    <value>Ausgangstext verwenden und eine Warnung hinzufügen</value>
+  </data>
+  <data name="Finalise_EmptyFail" xml:space="preserve">
+    <value>Task abbrechen</value>
+  </data>
+  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+    <value>Was geschieht mit einer Form, die niemand übersetzt hat?</value>
+  </data>
+  <data name="Finalise_EmptyHelp1" xml:space="preserve">
+    <value>Jede Form, die die Zielsprache benötigt, muss in der erzeugten Datei vorhanden sein, sonst zeigt die Anwendung für die Zahlen, die sie auswählen, gar nichts an. Die Verwendung des Ausgangstexts hält die Datei gültig und markiert den Kommentar des Ausgangssegments und den Bericht, sodass die Lücke später gefunden werden kann.</value>
+  </data>
+  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+    <value>Den Task abzubrechen ist für eine Endlieferung gedacht, bei der eine unübersetzte Form nicht in der Ausgangssprache durchrutschen darf.</value>
+  </data>
+  <data name="Finalise_MismatchHeader" xml:space="preserve">
+    <value>Wenn sich die geschützten Platzhalter in Ausgangs- und Zieltext unterscheiden</value>
+  </data>
+  <data name="Finalise_MismatchWarn" xml:space="preserve">
+    <value>Warnung hinzufügen und fortfahren</value>
+  </data>
+  <data name="Finalise_MismatchFail" xml:space="preserve">
+    <value>Task abbrechen</value>
+  </data>
+  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+    <value>Was ist eine Platzhalter-Abweichung?</value>
+  </data>
+  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+    <value>Die geschützten Bereiche in einem Segment sind die Argumente der Nachricht, etwa {name}, und die Zahlmarkierung #. Eine Übersetzung, die eines verloren oder eines hinzugewonnen hat, das der Ausgangstext nicht hat, schlägt fehl oder zeigt beim Ausführen der Anwendung den falschen Text.</value>
+  </data>
+  <data name="Finalise_MismatchHelp2" xml:space="preserve">
+    <value>Eine Warnung kommt in den Kommentar des Ausgangssegments und in den Bericht, und die Datei wird trotzdem erzeugt. Den Task abzubrechen verweigert die Erzeugung, bis die Übersetzung in Ordnung gebracht ist.</value>
+  </data>
+  <data name="Report_ExpandName" xml:space="preserve">
+    <value>ICU Expand Plural Forms</value>
+  </data>
+  <data name="Report_ExpandDescription" xml:space="preserve">
+    <value>{0} ICU-Nachricht(en) in {1} Datei(en) erweitert; {2} mit einer Warnung.</value>
+  </data>
+  <data name="Report_FinaliseName" xml:space="preserve">
+    <value>ICU Finalise Messages</value>
+  </data>
+  <data name="Report_FinaliseDescription" xml:space="preserve">
+    <value>{0} ICU-Nachricht(en) in {1} Datei(en) abgeschlossen; {2} Form(en) entfernt, {3} Segment(e) aus dem Ausgangstext gefüllt, {4} Warnung(en).</value>
+  </data>
+  <data name="Report_Summary" xml:space="preserve">
+    <value>Zusammenfassung</value>
+  </data>
+  <data name="Report_Project" xml:space="preserve">
+    <value>Projekt</value>
+  </data>
+  <data name="Report_Languages" xml:space="preserve">
+    <value>Sprachpaar</value>
+  </data>
+  <data name="Report_Files" xml:space="preserve">
+    <value>Dateien</value>
+  </data>
+  <data name="Report_CreatedAt" xml:space="preserve">
+    <value>Erstellt am</value>
+  </data>
+  <data name="Report_Cldr" xml:space="preserve">
+    <value>Pluralregeln</value>
+  </data>
+  <data name="Report_Settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="Report_Totals" xml:space="preserve">
+    <value>Summen</value>
+  </data>
+  <data name="Report_File" xml:space="preserve">
+    <value>Datei</value>
+  </data>
+  <data name="Report_Messages" xml:space="preserve">
+    <value>Nachrichten</value>
+  </data>
+  <data name="Report_Segments" xml:space="preserve">
+    <value>Segmente</value>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>Warnungen</value>
+  </data>
+  <data name="Report_Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Report_Key" xml:space="preserve">
+    <value>Schlüssel</value>
+  </data>
+  <data name="Report_Total" xml:space="preserve">
+    <value>Gesamt</value>
+  </data>
+  <data name="Report_Outcome" xml:space="preserve">
+    <value>Ergebnis</value>
+  </data>
+  <data name="Report_Note" xml:space="preserve">
+    <value>Hinweis</value>
+  </data>
+  <data name="Report_Expanded" xml:space="preserve">
+    <value>Erweitert</value>
+  </data>
+  <data name="Report_Protected" xml:space="preserve">
+    <value>Geschützt</value>
+  </data>
+  <data name="Report_Walked" xml:space="preserve">
+    <value>Über der Obergrenze</value>
+  </data>
+  <data name="Report_PassedThrough" xml:space="preserve">
+    <value>Unverändert gelassen</value>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>Bereits erweitert</value>
+  </data>
+  <data name="Report_Pruned" xml:space="preserve">
+    <value>Entfernte Formen</value>
+  </data>
+  <data name="Report_Filled" xml:space="preserve">
+    <value>Aus dem Ausgangstext gefüllt</value>
+  </data>
+  <data name="Report_NoWarnings" xml:space="preserve">
+    <value>Keine Warnungen.</value>
+  </data>
+  <data name="Report_On" xml:space="preserve">
+    <value>Ein</value>
+  </data>
+  <data name="Report_Off" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+</root>

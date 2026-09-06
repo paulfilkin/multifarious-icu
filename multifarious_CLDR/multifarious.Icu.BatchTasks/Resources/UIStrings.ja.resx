@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- ja. Terminology follows Trados Studio's own UI in this language.
+       Translator comments live in the neutral UIStrings.resx and are not repeated here.
+       The report names stay as the task names appear in Studio's task list. -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Expand_Intro" xml:space="preserve">
+    <value>「訳文言語にコピー」の後に訳文ファイルに対して実行され、ICU の複数形メッセージを、訳文言語に必要な形式ごとに 1 つのセグメントに再構成します。各セグメントは完全な文で、どの数がその形式を選択するかを示すコメントが付きます。メッセージの構文は保護されているため、翻訳者が壊すことはできません。</value>
+  </data>
+  <data name="Expand_KindsHeader" xml:space="preserve">
+    <value>再構成するメッセージ</value>
+  </data>
+  <data name="Expand_KindsHelpHeader" xml:space="preserve">
+    <value>なぜ再構成するのですか?</value>
+  </data>
+  <data name="Expand_KindsHelp1" xml:space="preserve">
+    <value>原文の複数形メッセージには、原文言語に必要な数だけの形式があります。英語では「one」と「other」の 2 つです。訳文言語ではもっと多く必要になることがあります。ロシア語は 4 つ、アラビア語は 6 つ、日本語は 1 つです。再構成すると、翻訳者は波かっこの式を手作業で編集する代わりに、訳文言語に必要な形式をそれぞれ完全な文として受け取ります。</value>
+  </data>
+  <data name="Expand_KindsHelp2" xml:space="preserve">
+    <value>数ではなく性別などの値で選択する select メッセージは展開されません。その分岐は言語ではなく開発者のものだからです。ただし、構文が保護され、各分岐が 1 つの文になるように再構成はされます。</value>
+  </data>
+  <data name="Expand_Cardinal" xml:space="preserve">
+    <value>複数形メッセージ ({count, plural, ...})</value>
+  </data>
+  <data name="Expand_Ordinal" xml:space="preserve">
+    <value>序数メッセージ ({count, selectordinal, ...})</value>
+  </data>
+  <data name="Expand_KindsHint" xml:space="preserve">
+    <value>メッセージは、訳文言語に必要な形式ごとに 1 つのセグメント (それぞれ完全な文) に再構成されます。チェックされていない種類のセレクターしか含まないメッセージはそのまま残されます。</value>
+  </data>
+  <data name="Expand_SeedHeader" xml:space="preserve">
+    <value>原文言語にない形式の原文テキスト</value>
+  </data>
+  <data name="Expand_SeedMatching" xml:space="preserve">
+    <value>同じ名前の原文の形式があればそれを、なければ「other」の形式を使用する</value>
+  </data>
+  <data name="Expand_SeedAlwaysOther" xml:space="preserve">
+    <value>常に「other」の形式を使用する</value>
+  </data>
+  <data name="Expand_SeedHint" xml:space="preserve">
+    <value>各セグメントのコメントには、どの原文の形式から始めたかが示されるため、翻訳者は原文が出発点にすぎない場合を把握できます。</value>
+  </data>
+  <data name="Expand_SeedHelpHeader" xml:space="preserve">
+    <value>追加の形式のテキストはどこから来るのですか?</value>
+  </data>
+  <data name="Expand_SeedHelp1" xml:space="preserve">
+    <value>英語には「one」の形式と「other」の形式があります。ロシア語の「few」の形式には対応する英語の形式がないため、そのセグメントは英語のいずれかの形式から始める必要があり、そのテキストが翻訳者に原文として表示されます。</value>
+  </data>
+  <data name="Expand_SeedHelp2" xml:space="preserve">
+    <value>最初の選択肢では、訳文の形式は同じ名前の原文の形式があればそこから、なければ「other」から始まります。2 番目の選択肢では、すべての形式が「other」から始まります。英語の「one」の形式はちょうど 1 つの項目を想定して書かれていることが多く、他の形式の原文としては不自然なため、こちらを好むチームもあります。</value>
+  </data>
+  <data name="Expand_HintsHeader" xml:space="preserve">
+    <value>セグメントのコメント</value>
+  </data>
+  <data name="Expand_Hints" xml:space="preserve">
+    <value>形式の文法ヒントが分かっている場合は追加する</value>
+  </data>
+  <data name="Expand_HintsHint" xml:space="preserve">
+    <value>各コメントには、形式と、それを選択する数の例が示されます。ヒントは、その形式が通常何を必要とするか (たとえばロシア語の属格単数形) を説明する文を追加します。</value>
+  </data>
+  <data name="Expand_HintsHelpHeader" xml:space="preserve">
+    <value>文法ヒントとは何ですか?</value>
+  </data>
+  <data name="Expand_HintsHelp1" xml:space="preserve">
+    <value>Unicode CLDR のデータは、言語にどの形式があり、どの数がそれぞれを選択するかを示しますが、言語がその形式をどう扱うかについては何も述べていません。ヒントはプラグイン独自の表から取られた短い文で、たとえばロシア語の「few」の形式には属格単数形が必要だといったものです。</value>
+  </data>
+  <data name="Expand_HintsHelp2" xml:space="preserve">
+    <value>ヒントは、その言語で毎日作業しているわけではない翻訳者への助言であり、規則ではありません。翻訳者が煩わしいと感じる場合はオフにしてください。形式の名前と数の例は、いずれにしてもコメントに残ります。</value>
+  </data>
+  <data name="Expand_BudgetHeader" xml:space="preserve">
+    <value>分岐の上限</value>
+  </data>
+  <data name="Expand_BudgetLabel" xml:space="preserve">
+    <value>1 つのメッセージが展開されるセグメント数の上限:</value>
+  </data>
+  <data name="Expand_BudgetHint" xml:space="preserve">
+    <value>独立した 2 つの複数形は掛け合わされます。アラビア語では 6 形式 × 6 形式で 36 セグメントになります。上限を超えると、メッセージは構文を保護したまま形式を追加せずに配置され、レポートにその旨が記載されます。</value>
+  </data>
+  <data name="Expand_BudgetInvalid" xml:space="preserve">
+    <value>1 から 999 までの整数を入力してください。</value>
+  </data>
+  <data name="Expand_BudgetHelpHeader" xml:space="preserve">
+    <value>分岐の上限は何のためにありますか?</value>
+  </data>
+  <data name="Expand_BudgetHelp1" xml:space="preserve">
+    <value>独立した 2 つの複数形を含むメッセージは、一方の形式数ともう一方の形式数の積になります。アラビア語では 6 × 6 で、1 つのメッセージから 36 セグメントが生まれます。翻訳量が多く、通常は開発者がメッセージを分割すべきだという合図です。</value>
+  </data>
+  <data name="Expand_BudgetHelp2" xml:space="preserve">
+    <value>上限を超えても、メッセージは構文を保護し元の分岐を保ったまま再構成されますが、形式は追加されません。段落には警告が付き、レポートに一覧されるため、翻訳者はメッセージを壊せず、プロジェクト マネージャーは言語に必要な形式が不足している可能性を把握できます。</value>
+  </data>
+  <data name="Expand_ParseHeader" xml:space="preserve">
+    <value>値を ICU メッセージとして読み取れない場合</value>
+  </data>
+  <data name="Expand_ParsePassThrough" xml:space="preserve">
+    <value>そのまま残して警告を追加する</value>
+  </data>
+  <data name="Expand_ParseFail" xml:space="preserve">
+    <value>タスクを停止する</value>
+  </data>
+  <data name="Expand_ParseHelpHeader" xml:space="preserve">
+    <value>値が読み取れないのはどんな場合ですか?</value>
+  </data>
+  <data name="Expand_ParseHelp1" xml:space="preserve">
+    <value>対応するもののない波かっこ、ICU が引用リテラルの開始として読み取る位置にあるアポストロフィ、つづりを間違えたセレクターのキーワードなどです。このような値は構造が不明なため再構成できません。</value>
+  </data>
+  <data name="Expand_ParseHelp2" xml:space="preserve">
+    <value>そのまま残せば、ファイルの残りの処理は続き、段落には問題の位置を示す警告が付きます。タスクの停止は、壊れたメッセージが気付かれないまま翻訳者に届いてはならないパイプライン向けです。</value>
+  </data>
+  <data name="Finalise_Intro" xml:space="preserve">
+    <value>最終処理では、各メッセージを訳文言語に必要な形式だけに絞り込み、テキストとして入力された ICU の特殊文字をエスケープし、プレースホルダーを確認します。警告は原文セグメントのコメントとタスク レポートに記録されます。訳文のコメントが書き込まれることはありません。</value>
+  </data>
+  <data name="Finalise_EmptyHeader" xml:space="preserve">
+    <value>形式に訳文がない場合</value>
+  </data>
+  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+    <value>原文テキストを使用して警告を追加する</value>
+  </data>
+  <data name="Finalise_EmptyFail" xml:space="preserve">
+    <value>タスクを停止する</value>
+  </data>
+  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+    <value>誰も翻訳しなかった形式はどうなりますか?</value>
+  </data>
+  <data name="Finalise_EmptyHelp1" xml:space="preserve">
+    <value>訳文言語に必要なすべての形式が生成ファイルに存在しなければ、アプリケーションはその形式を選択する数に対して何も表示しません。原文テキストを使用すればファイルは有効なまま保たれ、原文セグメントのコメントとレポートに印が付くため、抜けを後で見つけられます。</value>
+  </data>
+  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+    <value>タスクの停止は、未翻訳の形式が原文言語のまま通過してはならない最終納品向けです。</value>
+  </data>
+  <data name="Finalise_MismatchHeader" xml:space="preserve">
+    <value>保護されたプレースホルダーが原文と訳文で異なる場合</value>
+  </data>
+  <data name="Finalise_MismatchWarn" xml:space="preserve">
+    <value>警告を追加して続行する</value>
+  </data>
+  <data name="Finalise_MismatchFail" xml:space="preserve">
+    <value>タスクを停止する</value>
+  </data>
+  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+    <value>プレースホルダーの不一致とは何ですか?</value>
+  </data>
+  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+    <value>セグメント内の保護された範囲は、{name} などのメッセージの引数と、数のマーカー # です。それらの 1 つが失われた訳文や、原文にないものが加わった訳文は、アプリケーションの実行時にエラーになるか、誤ったテキストを表示します。</value>
+  </data>
+  <data name="Finalise_MismatchHelp2" xml:space="preserve">
+    <value>警告は原文セグメントのコメントとレポートに記録され、ファイルは生成されます。タスクを停止すると、訳文が修正されるまで生成を拒否します。</value>
+  </data>
+  <data name="Report_ExpandName" xml:space="preserve">
+    <value>ICU Expand Plural Forms</value>
+  </data>
+  <data name="Report_ExpandDescription" xml:space="preserve">
+    <value>{1} 個のファイルで {0} 件の ICU メッセージを展開しました。警告付き: {2} 件。</value>
+  </data>
+  <data name="Report_FinaliseName" xml:space="preserve">
+    <value>ICU Finalise Messages</value>
+  </data>
+  <data name="Report_FinaliseDescription" xml:space="preserve">
+    <value>{1} 個のファイルで {0} 件の ICU メッセージを最終処理しました。削除した形式: {2}、原文から補完したセグメント: {3}、警告: {4}。</value>
+  </data>
+  <data name="Report_Summary" xml:space="preserve">
+    <value>概要</value>
+  </data>
+  <data name="Report_Project" xml:space="preserve">
+    <value>プロジェクト</value>
+  </data>
+  <data name="Report_Languages" xml:space="preserve">
+    <value>言語ペア</value>
+  </data>
+  <data name="Report_Files" xml:space="preserve">
+    <value>ファイル</value>
+  </data>
+  <data name="Report_CreatedAt" xml:space="preserve">
+    <value>作成日時</value>
+  </data>
+  <data name="Report_Cldr" xml:space="preserve">
+    <value>複数形の規則</value>
+  </data>
+  <data name="Report_Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Report_Totals" xml:space="preserve">
+    <value>合計</value>
+  </data>
+  <data name="Report_File" xml:space="preserve">
+    <value>ファイル</value>
+  </data>
+  <data name="Report_Messages" xml:space="preserve">
+    <value>メッセージ</value>
+  </data>
+  <data name="Report_Segments" xml:space="preserve">
+    <value>セグメント</value>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="Report_Details" xml:space="preserve">
+    <value>詳細</value>
+  </data>
+  <data name="Report_Key" xml:space="preserve">
+    <value>キー</value>
+  </data>
+  <data name="Report_Total" xml:space="preserve">
+    <value>合計</value>
+  </data>
+  <data name="Report_Outcome" xml:space="preserve">
+    <value>結果</value>
+  </data>
+  <data name="Report_Note" xml:space="preserve">
+    <value>備考</value>
+  </data>
+  <data name="Report_Expanded" xml:space="preserve">
+    <value>展開済み</value>
+  </data>
+  <data name="Report_Protected" xml:space="preserve">
+    <value>保護済み</value>
+  </data>
+  <data name="Report_Walked" xml:space="preserve">
+    <value>上限超過</value>
+  </data>
+  <data name="Report_PassedThrough" xml:space="preserve">
+    <value>そのまま</value>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>展開済み (前回)</value>
+  </data>
+  <data name="Report_Pruned" xml:space="preserve">
+    <value>削除した形式</value>
+  </data>
+  <data name="Report_Filled" xml:space="preserve">
+    <value>原文から補完</value>
+  </data>
+  <data name="Report_NoWarnings" xml:space="preserve">
+    <value>警告はありません。</value>
+  </data>
+  <data name="Report_On" xml:space="preserve">
+    <value>オン</value>
+  </data>
+  <data name="Report_Off" xml:space="preserve">
+    <value>オフ</value>
+  </data>
+</root>
