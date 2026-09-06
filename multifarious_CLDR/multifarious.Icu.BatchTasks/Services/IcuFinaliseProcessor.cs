@@ -55,6 +55,7 @@ namespace multifarious.Icu.BatchTasks.Services
         private readonly FinaliseOptions _options;
         private readonly CldrPlurals _plurals = CldrPlurals.Default;
         private readonly List<ExpansionWarning> _warnings = new List<ExpansionWarning>();
+        private readonly List<FinaliseUnitOutcome> _outcomes = new List<FinaliseUnitOutcome>();
 
         private string _fileTargetLanguage;
         private Dictionary<SelectorKind, HashSet<string>> _keepSets;
@@ -75,6 +76,9 @@ namespace multifarious.Icu.BatchTasks.Services
         public int Filled { get; private set; }
 
         public IReadOnlyList<ExpansionWarning> Warnings { get { return _warnings; } }
+
+        /// <summary>What happened to every unit this plugin owns, in document order, for the report.</summary>
+        public IReadOnlyList<FinaliseUnitOutcome> Outcomes { get { return _outcomes; } }
 
         public override void SetFileProperties(IFileProperties fileInfo)
         {
@@ -130,6 +134,9 @@ namespace multifarious.Icu.BatchTasks.Services
             Units++;
             var unitId = unit.Properties.ParagraphUnitId.Id;
             var expandedPaths = ExpandedSelectorPaths(unit);
+            var prunedBefore = Pruned;
+            var filledBefore = Filled;
+            var unitWarnings = new List<string>();
 
             // 1. Prune both paragraphs with identical decisions; they are mirrored, so the same
             // branches disappear from each.
@@ -181,11 +188,15 @@ namespace multifarious.Icu.BatchTasks.Services
                     if (source != null) AddWarningComment(source, string.Join("\n", reasons));
                     foreach (var reason in reasons)
                     {
-                        _warnings.Add(new ExpansionWarning(unitId, "Segment " + target.Properties.Id.Id + ": " + reason));
+                        var text = "Segment " + target.Properties.Id.Id + ": " + reason;
+                        _warnings.Add(new ExpansionWarning(unitId, text));
+                        unitWarnings.Add(text);
                     }
                 }
             }
 
+            _outcomes.Add(new FinaliseUnitOutcome(unitId, ResourceKey.Of(unit), targetSegments.Count,
+                Pruned - prunedBefore, Filled - filledBefore, unitWarnings));
             Diagnostics.Write("  unit " + unitId + ": finalised, segments=" + targetSegments.Count);
         }
 

@@ -251,4 +251,23 @@ public class IcuFinaliseProcessorTests
         Finaliser("ja-JP").ProcessParagraphUnit(unit);
         Assert.Contains("It''s ", Projection(unit.Target));
     }
+
+    [Fact]
+    public void The_processor_records_an_outcome_per_unit_for_the_report()
+    {
+        // Expanded for Russian, finalised as Japanese: three forms pruned, one segment filled.
+        var unit = Expanded(UnreadCount);
+        var finaliser = Finaliser("ja-JP");
+
+        finaliser.ProcessParagraphUnit(unit);
+
+        var outcome = Assert.Single(finaliser.Outcomes);
+        Assert.Equal("key", outcome.Key);
+        Assert.Equal(1, outcome.Segments);
+        Assert.Equal(3, outcome.Pruned);
+        Assert.Equal(1, outcome.Filled);
+        var warning = Assert.Single(outcome.Warnings);
+        Assert.StartsWith("Segment ", warning);
+        Assert.Contains("untranslated", warning);
+    }
 }

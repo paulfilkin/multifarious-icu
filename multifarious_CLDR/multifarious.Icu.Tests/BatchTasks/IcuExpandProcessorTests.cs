@@ -388,4 +388,29 @@ public class IcuExpandProcessorTests
             MessageRenderer.Render(IcuMessage.Parse(sync).Nodes, arguments, CldrCategories.For("en")),
             MessageRenderer.Render(IcuMessage.Parse(projection).Nodes, arguments, CldrCategories.For("en")));
     }
+
+    [Fact]
+    public void The_processor_records_an_outcome_per_unit_for_the_report()
+    {
+        var processor = Processor("ru-RU");
+        var expanded = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
+        var protectedUnit = ParagraphUnits.Json("Hello {name}!", "['app.greeting']");
+        var broken = ParagraphUnits.Json("{count, plural, one {x}", "['broken']");
+        var plain = ParagraphUnits.Json("Message Centre", "['app.title']");
+
+        processor.ProcessParagraphUnit(expanded);
+        processor.ProcessParagraphUnit(protectedUnit);
+        processor.ProcessParagraphUnit(broken);
+        processor.ProcessParagraphUnit(plain);
+        processor.ProcessParagraphUnit(expanded);
+
+        // A value without ICU is not reported; a second pass over an expanded unit is.
+        Assert.Equal(
+            new[] { ExpandOutcome.Expanded, ExpandOutcome.Protected, ExpandOutcome.PassedThrough, ExpandOutcome.Skipped },
+            processor.Outcomes.Select(o => o.Outcome));
+        Assert.Equal(new[] { 4, 1, 0, 4 }, processor.Outcomes.Select(o => o.Segments));
+        Assert.Equal("['inbox.unreadCount']", processor.Outcomes[0].Key);
+        Assert.Contains("does not parse", processor.Outcomes[2].Detail);
+        Assert.Equal("", processor.Outcomes[0].Detail);
+    }
 }

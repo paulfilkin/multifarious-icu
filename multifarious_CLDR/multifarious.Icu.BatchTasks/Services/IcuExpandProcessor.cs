@@ -49,6 +49,7 @@ namespace multifarious.Icu.BatchTasks.Services
         private readonly CldrPlurals _plurals;
         private readonly ExpansionPlanner _planner;
         private readonly List<ExpansionWarning> _warnings = new List<ExpansionWarning>();
+        private readonly List<ExpandUnitOutcome> _outcomes = new List<ExpandUnitOutcome>();
 
         private ExpansionWriter _writer;
         private string _fileSourceLanguage;
@@ -78,6 +79,9 @@ namespace multifarious.Icu.BatchTasks.Services
 
         public IReadOnlyList<ExpansionWarning> Warnings { get { return _warnings; } }
 
+        /// <summary>What happened to every translatable unit that held ICU, in document order, for the report.</summary>
+        public IReadOnlyList<ExpandUnitOutcome> Outcomes { get { return _outcomes; } }
+
         public override void SetFileProperties(IFileProperties fileInfo)
         {
             base.SetFileProperties(fileInfo);
@@ -105,9 +109,11 @@ namespace multifarious.Icu.BatchTasks.Services
             Units++;
             var unitId = unit.Properties.ParagraphUnitId.Id;
 
+            var key = ResourceKey.Of(unit);
             if (ResourceKey.IsExpanded(unit))
             {
                 AlreadyExpanded++;
+                _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Skipped, CountSegments(unit.Source), null));
                 Diagnostics.Write("  unit " + unitId + ": already expanded, skipped");
                 return;
             }
@@ -128,11 +134,13 @@ namespace multifarious.Icu.BatchTasks.Services
                     }
 
                     Warn(unit, unitId, classification.Reason);
+                    _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.PassedThrough, 0, classification.Reason));
                     return;
 
                 case MessageKind.Protect:
-                    Writer.Write(unit, _planner.PlanProtected(classification), ResourceKey.Of(unit));
+                    Writer.Write(unit, _planner.PlanProtected(classification), key);
                     Expanded++;
+                    _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Protected, 1, null));
                     Diagnostics.Write("  unit " + unitId + ": arguments protected");
                     return;
 
@@ -148,16 +156,28 @@ namespace multifarious.Icu.BatchTasks.Services
                     var plan = _planner.Plan(classification, sourceLanguage, new[] { targetLanguage }, _options);
                     if (plan.ExceedsBudget)
                     {
-                        LayOutWalked(unit, unitId, classification, plan, sourceLanguage, targetLanguage);
+                        LayOutWalked(unit, unitId, key, classification, plan, sourceLanguage, targetLanguage);
                         return;
                     }
 
-                    Writer.Write(unit, plan, ResourceKey.Of(unit));
+                    Writer.Write(unit, plan, key);
                     Expanded++;
+                    _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Expanded, plan.Segments.Count, null));
                     Diagnostics.Write("  unit " + unitId + ": expanded to " + plan.Segments.Count
                         + " segments for " + targetLanguage);
                     return;
             }
+        }
+
+        private static int CountSegments(IAbstractMarkupDataContainer container)
+        {
+            var count = 0;
+            for (var i = 0; i < container.Count; i++)
+            {
+                if (container[i] is ISegment) count++;
+                else if (container[i] is IAbstractMarkupDataContainer nested) count += CountSegments(nested);
+            }
+            return count;
         }
 
         /// <summary>
@@ -168,7 +188,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// message through; Project 41 (6 September 2026) showed a passed-through value garbled
         /// in translation like any plain text.
         /// </summary>
-        private void LayOutWalked(IParagraphUnit unit, string unitId, MessageClassification classification,
+        private void LayOutWalked(IParagraphUnit unit, string unitId, string key, MessageClassification classification,
             ExpansionPlan rejected, string sourceLanguage, string targetLanguage)
         {
             var size = rejected.Segments.Count + " segments needed, " + rejected.MaxUnitsPerMessage + " allowed";
@@ -176,16 +196,19 @@ namespace multifarious.Icu.BatchTasks.Services
                 "over the branch budget: " + size);
             if (plan.ExceedsBudget)
             {
-                Warn(unit, unitId, "Expansion is over the branch budget (" + size
-                    + ") and so are the source's own branches (" + plan.Segments.Count + "); passed through unexpanded.");
+                var reason = "Expansion is over the branch budget (" + size
+                    + ") and so are the source's own branches (" + plan.Segments.Count + "); passed through unexpanded.";
+                Warn(unit, unitId, reason);
+                _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.PassedThrough, 0, reason));
                 return;
             }
 
-            Writer.Write(unit, plan, ResourceKey.Of(unit));
+            Writer.Write(unit, plan, key);
             Expanded++;
-            Warn(unit, unitId, "Expansion is over the branch budget (" + size
-                + "); the branches are the source's and " + targetLanguage + " may need forms the source does not have.",
-                "ICU message laid out without category expansion: ");
+            var detail = "Expansion is over the branch budget (" + size
+                + "); the branches are the source's and " + targetLanguage + " may need forms the source does not have.";
+            Warn(unit, unitId, detail, "ICU message laid out without category expansion: ");
+            _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Walked, plan.Segments.Count, detail));
         }
 
         private ExpansionWriter Writer

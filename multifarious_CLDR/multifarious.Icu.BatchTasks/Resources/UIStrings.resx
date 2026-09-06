@@ -28,10 +28,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
 
-  <!-- The expand page. -->
+  <!-- The expand page. Each group carries a collapsible help panel, as the sibling file types
+       do: a header phrased as the question a puzzled user would ask, then short paragraphs. -->
+  <data name="Expand_Intro" xml:space="preserve">
+    <value>Runs on the target files after Copy to Target Languages, and restructures every ICU plural message into one segment per form the target language needs, each a whole sentence with a comment saying which counts select it. The message's syntax is protected, so a translator cannot damage it.</value>
+    <comment>Paragraph at the top of the page.</comment>
+  </data>
   <data name="Expand_KindsHeader" xml:space="preserve">
     <value>Messages to expand</value>
     <comment>Group heading. Which kinds of ICU message the task restructures.</comment>
+  </data>
+  <data name="Expand_KindsHelpHeader" xml:space="preserve">
+    <value>Why expand at all?</value>
+    <comment>Header of a collapsible help panel. Phrased as the question a puzzled user would ask.</comment>
+  </data>
+  <data name="Expand_KindsHelp1" xml:space="preserve">
+    <value>A plural message in the source has as many forms as the source language needs: two for English, "one" and "other". The target language may need more. Russian needs four, Arabic six, Japanese one. Expanding gives the translator exactly the forms the target needs, each as a complete sentence, instead of a brace expression to edit by hand.</value>
+    <comment>Help paragraph. "one" and "other" are ICU keywords and must not be translated.</comment>
+  </data>
+  <data name="Expand_KindsHelp2" xml:space="preserve">
+    <value>Select messages, which choose by a value such as gender rather than by a count, are never expanded: their branches are the developer's, not the language's. They are still restructured so that their syntax is protected and each branch is a sentence.</value>
+    <comment>Help paragraph. "select" is the ICU keyword.</comment>
   </data>
   <data name="Expand_Cardinal" xml:space="preserve">
     <value>Plural messages ({count, plural, ...})</value>
@@ -61,6 +78,18 @@
     <value>The comment on each segment says which source form it started from, so the translator knows when the source is only a starting point.</value>
     <comment>Hint under the two radio buttons.</comment>
   </data>
+  <data name="Expand_SeedHelpHeader" xml:space="preserve">
+    <value>Where does the text for an extra form come from?</value>
+    <comment>Header of a collapsible help panel.</comment>
+  </data>
+  <data name="Expand_SeedHelp1" xml:space="preserve">
+    <value>English has a "one" form and an "other" form. A Russian "few" form has no English counterpart, so its segment has to start from one of the English forms, and that text is what the translator sees as the source.</value>
+    <comment>Help paragraph. "one", "other" and "few" are ICU keywords and must not be translated.</comment>
+  </data>
+  <data name="Expand_SeedHelp2" xml:space="preserve">
+    <value>With the first choice a target form starts from the source form of the same name where there is one, otherwise from "other". With the second every form starts from "other", which some teams prefer because the English "one" form is often worded for exactly one item and reads oddly as the source for anything else.</value>
+    <comment>Help paragraph. "one" and "other" are ICU keywords and must not be translated.</comment>
+  </data>
   <data name="Expand_HintsHeader" xml:space="preserve">
     <value>Segment comments</value>
     <comment>Group heading. What the task writes into the comment on each source segment.</comment>
@@ -72,6 +101,18 @@
   <data name="Expand_HintsHint" xml:space="preserve">
     <value>Every comment names the form and example counts that select it. A hint adds a sentence on what the form usually requires, for example the genitive singular in Russian.</value>
     <comment>Hint under the tick box. "genitive singular" is a grammatical case; translate it as a grammarian would.</comment>
+  </data>
+  <data name="Expand_HintsHelpHeader" xml:space="preserve">
+    <value>What are grammar hints?</value>
+    <comment>Header of a collapsible help panel.</comment>
+  </data>
+  <data name="Expand_HintsHelp1" xml:space="preserve">
+    <value>The Unicode CLDR data names the forms a language has and which counts select each one, but says nothing about what the language does with them. A hint is a short sentence from the plugin's own table, for example that the Russian "few" form takes the genitive singular.</value>
+    <comment>Help paragraph. "CLDR" is the Unicode Common Locale Data Repository and stays as it is. "few" is an ICU keyword.</comment>
+  </data>
+  <data name="Expand_HintsHelp2" xml:space="preserve">
+    <value>Hints are advice for a translator who does not work in the language every day, not rules. Turn them off if your translators find them noise; the form name and the example counts stay in the comment either way.</value>
+    <comment>Help paragraph.</comment>
   </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Branch budget</value>
@@ -89,6 +130,18 @@
     <value>Enter a whole number from 1 to 999.</value>
     <comment>Validation message shown when the number box holds something else.</comment>
   </data>
+  <data name="Expand_BudgetHelpHeader" xml:space="preserve">
+    <value>What is the branch budget for?</value>
+    <comment>Header of a collapsible help panel.</comment>
+  </data>
+  <data name="Expand_BudgetHelp1" xml:space="preserve">
+    <value>A message with two independent plurals multiplies: the forms of one times the forms of the other. Six times six is 36 segments for Arabic from a single message, which is a lot to translate and usually a sign that the developer should split the message.</value>
+    <comment>Help paragraph.</comment>
+  </data>
+  <data name="Expand_BudgetHelp2" xml:space="preserve">
+    <value>Over the budget the message is still restructured with its syntax protected and its original branches, but no forms are added. The paragraph carries a warning and the report lists it, so the translator cannot damage the message and the project manager knows the language may lack forms it needs.</value>
+    <comment>Help paragraph.</comment>
+  </data>
   <data name="Expand_ParseHeader" xml:space="preserve">
     <value>When a value does not parse as an ICU message</value>
     <comment>Group heading. What the task does with a value that has braces but is not valid ICU.</comment>
@@ -100,6 +153,18 @@
   <data name="Expand_ParseFail" xml:space="preserve">
     <value>Stop the task</value>
     <comment>Radio button. The whole batch task fails on the first such value.</comment>
+  </data>
+  <data name="Expand_ParseHelpHeader" xml:space="preserve">
+    <value>When does a value fail to parse?</value>
+    <comment>Header of a collapsible help panel.</comment>
+  </data>
+  <data name="Expand_ParseHelp1" xml:space="preserve">
+    <value>A brace without its partner, an apostrophe placed where ICU reads it as the start of a quoted literal, a selector keyword misspelt. Such a value cannot be restructured because its structure is unknown.</value>
+    <comment>Help paragraph.</comment>
+  </data>
+  <data name="Expand_ParseHelp2" xml:space="preserve">
+    <value>Leaving it untouched keeps the rest of the file moving and marks the paragraph with a warning that names the position of the problem. Stopping the task is for a pipeline where a broken message must never reach a translator unnoticed.</value>
+    <comment>Help paragraph.</comment>
   </data>
 
   <!-- The finalise page. -->
@@ -119,6 +184,18 @@
     <value>Stop the task</value>
     <comment>Radio button. The whole batch task fails on the first empty form.</comment>
   </data>
+  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+    <value>What happens to a form nobody translated?</value>
+    <comment>Header of a collapsible help panel.</comment>
+  </data>
+  <data name="Finalise_EmptyHelp1" xml:space="preserve">
+    <value>Every form the target language needs must be present in the generated file, or the application shows nothing at all for the counts that select it. Using the source text keeps the file valid and marks the source segment's comment and the report, so the gap can be found later.</value>
+    <comment>Help paragraph.</comment>
+  </data>
+  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+    <value>Stopping the task is for a final delivery, where an untranslated form must not slip through in the source language.</value>
+    <comment>Help paragraph.</comment>
+  </data>
   <data name="Finalise_MismatchHeader" xml:space="preserve">
     <value>When the protected placeholders in source and target differ</value>
     <comment>Group heading. A placeholder such as {name} missing from the translation or added to it.</comment>
@@ -130,5 +207,144 @@
   <data name="Finalise_MismatchFail" xml:space="preserve">
     <value>Stop the task</value>
     <comment>Radio button. The whole batch task fails on the first mismatch.</comment>
+  </data>
+  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+    <value>What is a placeholder mismatch?</value>
+    <comment>Header of a collapsible help panel.</comment>
+  </data>
+  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+    <value>The protected spans in a segment are the message's arguments, such as {name}, and the count marker #. A translation that has lost one, or gained one the source does not have, fails or shows the wrong text when the application runs.</value>
+    <comment>Help paragraph. "{name}" and "#" are ICU syntax and must not be translated.</comment>
+  </data>
+  <data name="Finalise_MismatchHelp2" xml:space="preserve">
+    <value>A warning goes on the source segment's comment and into the report, and the file is still generated. Stopping the task refuses to generate until the translation is put right.</value>
+    <comment>Help paragraph.</comment>
+  </data>
+
+  <!-- The task reports. The names and descriptions appear in Studio's Reports view; the
+       labels are the headings and column titles of the rendered report. -->
+  <data name="Report_ExpandName" xml:space="preserve">
+    <value>ICU Expand Plural Forms</value>
+    <comment>Report name and title, one per language pair. Same wording as the task name in Studio's batch task list.</comment>
+  </data>
+  <data name="Report_ExpandDescription" xml:space="preserve">
+    <value>{0} ICU message(s) expanded in {1} file(s); {2} with a warning.</value>
+    <comment>One-line description shown beside the report in Studio's Reports view. {0} messages, {1} files, {2} warnings; keep the placeholders.</comment>
+  </data>
+  <data name="Report_FinaliseName" xml:space="preserve">
+    <value>ICU Finalise Messages</value>
+    <comment>Report name and title, one per language pair. Same wording as the task name.</comment>
+  </data>
+  <data name="Report_FinaliseDescription" xml:space="preserve">
+    <value>{0} ICU message(s) finalised in {1} file(s); {2} form(s) removed, {3} segment(s) filled from the source, {4} warning(s).</value>
+    <comment>One-line description shown beside the report. {0} messages, {1} files, {2} forms removed, {3} segments filled, {4} warnings; keep the placeholders.</comment>
+  </data>
+  <data name="Report_Summary" xml:space="preserve">
+    <value>Summary</value>
+    <comment>Report heading, as in Studio's own reports.</comment>
+  </data>
+  <data name="Report_Project" xml:space="preserve">
+    <value>Project</value>
+    <comment>Row label in the summary.</comment>
+  </data>
+  <data name="Report_Languages" xml:space="preserve">
+    <value>Language pair</value>
+    <comment>Row label in the summary: source and target language of the report.</comment>
+  </data>
+  <data name="Report_Files" xml:space="preserve">
+    <value>Files</value>
+    <comment>Row label in the summary: number of files covered.</comment>
+  </data>
+  <data name="Report_CreatedAt" xml:space="preserve">
+    <value>Created at</value>
+    <comment>Row label in the summary: when the task ran.</comment>
+  </data>
+  <data name="Report_Cldr" xml:space="preserve">
+    <value>Plural rules</value>
+    <comment>Row label in the summary. The value is the CLDR version the plural rules came from, such as "CLDR 47 (Unicode 16.0)".</comment>
+  </data>
+  <data name="Report_Settings" xml:space="preserve">
+    <value>Settings</value>
+    <comment>Report heading: the settings the task ran with.</comment>
+  </data>
+  <data name="Report_Totals" xml:space="preserve">
+    <value>Totals</value>
+    <comment>Report heading over the per-file table.</comment>
+  </data>
+  <data name="Report_File" xml:space="preserve">
+    <value>File</value>
+    <comment>Column title.</comment>
+  </data>
+  <data name="Report_Messages" xml:space="preserve">
+    <value>Messages</value>
+    <comment>Column title: number of ICU messages in the file.</comment>
+  </data>
+  <data name="Report_Segments" xml:space="preserve">
+    <value>Segments</value>
+    <comment>Column title: number of Studio segments.</comment>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>Warnings</value>
+    <comment>Column title and report heading.</comment>
+  </data>
+  <data name="Report_Details" xml:space="preserve">
+    <value>Details</value>
+    <comment>Report heading over the per-message tables.</comment>
+  </data>
+  <data name="Report_Key" xml:space="preserve">
+    <value>Key</value>
+    <comment>Column title: the resource key of a message, such as inbox.unreadCount.</comment>
+  </data>
+  <data name="Report_Total" xml:space="preserve">
+    <value>Total</value>
+    <comment>Row label of the totals row.</comment>
+  </data>
+  <data name="Report_Outcome" xml:space="preserve">
+    <value>Outcome</value>
+    <comment>Column title: what the expand task did with the message.</comment>
+  </data>
+  <data name="Report_Note" xml:space="preserve">
+    <value>Note</value>
+    <comment>Column title: the warning text where there is one.</comment>
+  </data>
+  <data name="Report_Expanded" xml:space="preserve">
+    <value>Expanded</value>
+    <comment>Outcome and column title: one segment per form the target language needs.</comment>
+  </data>
+  <data name="Report_Protected" xml:space="preserve">
+    <value>Protected</value>
+    <comment>Outcome and column title: no plural, the arguments were protected in one segment.</comment>
+  </data>
+  <data name="Report_Walked" xml:space="preserve">
+    <value>Over budget</value>
+    <comment>Outcome and column title: the message exceeded the branch budget and was laid out with its syntax protected but no forms added.</comment>
+  </data>
+  <data name="Report_PassedThrough" xml:space="preserve">
+    <value>Passed through</value>
+    <comment>Outcome and column title: left untouched with a warning.</comment>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>Already expanded</value>
+    <comment>Outcome and column title: expanded by an earlier run and left alone.</comment>
+  </data>
+  <data name="Report_Pruned" xml:space="preserve">
+    <value>Forms removed</value>
+    <comment>Column title in the finalise report: plural forms removed because the target language does not use them.</comment>
+  </data>
+  <data name="Report_Filled" xml:space="preserve">
+    <value>Filled from source</value>
+    <comment>Column title in the finalise report: untranslated segments filled with the source text.</comment>
+  </data>
+  <data name="Report_NoWarnings" xml:space="preserve">
+    <value>No warnings.</value>
+    <comment>Shown under the Warnings heading when there are none.</comment>
+  </data>
+  <data name="Report_On" xml:space="preserve">
+    <value>On</value>
+    <comment>Value of a tick-box setting in the report's settings table.</comment>
+  </data>
+  <data name="Report_Off" xml:space="preserve">
+    <value>Off</value>
+    <comment>Value of a tick-box setting in the report's settings table.</comment>
   </data>
 </root>

@@ -40,6 +40,10 @@
   <ItemGroup>
     <!-- Embedded into the .sdlplugin; declares Studio 2026 compatibility (19.0-19.9) -->
     <Content Include="pluginpackage.manifest.xml" />
+    <!-- The task report stylesheet. Studio's report viewer renders a custom task's report XML
+         through the first .xsl resource it finds in the task assembly, so there is exactly one
+         and it serves both tasks. -->
+    <EmbeddedResource Include="Resources\TaskReport.xsl" />
   </ItemGroup>
 
   <ItemGroup>

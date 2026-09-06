@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Icu.Cldr;
+using multifarious.Icu.BatchTasks.Resources;
 using multifarious.Icu.BatchTasks.Services;
 using multifarious.Icu.BatchTasks.Settings;
 using multifarious.Icu.BatchTasks.Settings.Pages;
@@ -32,10 +34,16 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
     [RequiresSettings(typeof(IcuFinaliseSettings), typeof(IcuFinaliseSettingsPage))]
     public class IcuFinaliseTask : AbstractFileContentProcessingAutomaticTask
     {
-        private readonly List<IcuFinaliseProcessor> _processors = new List<IcuFinaliseProcessor>();
+        private readonly List<ProcessedFile> _processed = new List<ProcessedFile>();
         private FinaliseOptions _options;
         private int _filesSeen;
         private int _filesProcessed;
+
+        private sealed class ProcessedFile
+        {
+            public ProjectFile File;
+            public IcuFinaliseProcessor Processor;
+        }
 
         protected override void OnInitializeTask()
         {
@@ -76,7 +84,7 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                 : null;
 
             var processor = new IcuFinaliseProcessor(targetLanguage, _options);
-            _processors.Add(processor);
+            _processed.Add(new ProcessedFile { File = projectFile, Processor = processor });
 
             if (BilingualFileUpdater.Update(projectFile.LocalFilePath, processor, "finalise"))
             {
@@ -86,27 +94,71 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             }
         }
 
+        /// <summary>One report per language direction; see the expand task.</summary>
         public override void TaskComplete()
         {
             var units = 0;
             var pruned = 0;
             var filled = 0;
             var warnings = 0;
-            foreach (var processor in _processors)
+            foreach (var item in _processed)
             {
-                units += processor.Units;
-                pruned += processor.Pruned;
-                filled += processor.Filled;
-                warnings += processor.Warnings.Count;
+                units += item.Processor.Units;
+                pruned += item.Processor.Pruned;
+                filled += item.Processor.Filled;
+                warnings += item.Processor.Warnings.Count;
             }
 
             Diagnostics.Write("finalise task complete: seen=" + _filesSeen + " processed=" + _filesProcessed
                 + " units=" + units + " pruned=" + pruned + " filled=" + filled + " warnings=" + warnings);
 
-            var summary = string.Format(CultureInfo.CurrentCulture,
-                "{0} ICU message(s) finalised in {1} file(s); {2} branch(es) pruned, {3} segment(s) filled from source, {4} warning(s).",
-                units, _filesProcessed, pruned, filled, warnings);
-            CreateReport("ICU Finalise Messages", summary, string.Empty, TaskId);
+            var info = Project != null ? Project.GetProjectInfo() : null;
+            foreach (var group in _processed.GroupBy(item => LanguageKey(item.File)))
+            {
+                var direction = group.First().File.GetLanguageDirection();
+                var files = group.Select(item => new FinaliseReportFile(item.File.Name, item.Processor.Outcomes)).ToList();
+                var context = new ReportContext
+                {
+                    ProjectName = info != null ? info.Name : string.Empty,
+                    SourceLanguage = direction != null && direction.SourceLanguage != null ? direction.SourceLanguage.DisplayName : string.Empty,
+                    TargetLanguage = direction != null && direction.TargetLanguage != null ? direction.TargetLanguage.DisplayName : group.Key,
+                    RunAt = DateTime.Now,
+                    CldrVersion = CldrPlurals.Default.VersionDescription,
+                    AppVersion = AppVersion,
+                };
+
+                var description = string.Format(CultureInfo.CurrentCulture, UIStrings.Report_FinaliseDescription,
+                    group.Sum(item => item.Processor.Units), files.Count,
+                    group.Sum(item => item.Processor.Pruned), group.Sum(item => item.Processor.Filled),
+                    group.Sum(item => item.Processor.Warnings.Count));
+                var xml = TaskReportWriter.Finalise(context, _options, files);
+
+                if (direction != null)
+                {
+                    CreateReport(UIStrings.Report_FinaliseName, description, xml, direction);
+                }
+                else
+                {
+                    CreateReport(UIStrings.Report_FinaliseName, description, xml, TaskId);
+                }
+                Diagnostics.Write("report: " + group.Key + " files=" + files.Count);
+            }
+        }
+
+        private static string LanguageKey(ProjectFile file)
+        {
+            return file.Language != null && !string.IsNullOrEmpty(file.Language.IsoAbbreviation)
+                ? file.Language.IsoAbbreviation
+                : string.Empty;
+        }
+
+        private static string AppVersion
+        {
+            get
+            {
+                var version = typeof(IcuFinaliseTask).Assembly.GetName().Version;
+                return version == null ? "0.0.0" : version.ToString(3);
+            }
         }
     }
 }

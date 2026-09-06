@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Icu.Cldr;
+using multifarious.Icu.BatchTasks.Resources;
 using multifarious.Icu.BatchTasks.Services;
 using multifarious.Icu.BatchTasks.Settings;
 using multifarious.Icu.BatchTasks.Settings.Pages;
@@ -37,11 +39,18 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
     [RequiresSettings(typeof(IcuExpandSettings), typeof(IcuExpandSettingsPage))]
     public class IcuExpandTask : AbstractFileContentProcessingAutomaticTask
     {
-        private readonly List<IcuExpandProcessor> _processors = new List<IcuExpandProcessor>();
+        private readonly List<ProcessedFile> _processed = new List<ProcessedFile>();
         private ExpansionOptions _options;
         private string _sourceLanguage;
         private int _filesSeen;
         private int _filesProcessed;
+
+        /// <summary>A file the task ran over and the processor that did it, for the report.</summary>
+        private sealed class ProcessedFile
+        {
+            public ProjectFile File;
+            public IcuExpandProcessor Processor;
+        }
 
         protected override void OnInitializeTask()
         {
@@ -106,7 +115,7 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                 : null;
 
             var processor = new IcuExpandProcessor(_sourceLanguage, targetLanguage, _options, AppVersion);
-            _processors.Add(processor);
+            _processed.Add(new ProcessedFile { File = projectFile, Processor = processor });
 
             if (BilingualFileUpdater.Update(projectFile.LocalFilePath, processor, "expand"))
             {
@@ -115,28 +124,65 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             }
         }
 
+        /// <summary>
+        /// One report per language direction, as Studio's own tasks produce, which also gives
+        /// the file its language suffix. The report XML lists every message and what happened to
+        /// it; the stylesheet embedded beside it renders the XML in Studio's Reports view.
+        /// </summary>
         public override void TaskComplete()
         {
             var units = 0;
             var expanded = 0;
             var alreadyExpanded = 0;
-            var warnings = new List<ExpansionWarning>();
-            foreach (var processor in _processors)
+            var warnings = 0;
+            foreach (var item in _processed)
             {
-                units += processor.Units;
-                expanded += processor.Expanded;
-                alreadyExpanded += processor.AlreadyExpanded;
-                warnings.AddRange(processor.Warnings);
+                units += item.Processor.Units;
+                expanded += item.Processor.Expanded;
+                alreadyExpanded += item.Processor.AlreadyExpanded;
+                warnings += item.Processor.Warnings.Count;
             }
 
             Diagnostics.Write("expand task complete: seen=" + _filesSeen + " processed=" + _filesProcessed
                 + " units=" + units + " expanded=" + expanded + " alreadyExpanded=" + alreadyExpanded
-                + " warnings=" + warnings.Count);
+                + " warnings=" + warnings);
 
-            var summary = string.Format(CultureInfo.CurrentCulture,
-                "{0} ICU message(s) expanded in {1} file(s); {2} passed through with a warning.",
-                expanded, _filesProcessed, warnings.Count);
-            CreateReport("ICU Expand Plural Forms", summary, string.Empty, TaskId);
+            var info = Project != null ? Project.GetProjectInfo() : null;
+            foreach (var group in _processed.GroupBy(item => LanguageKey(item.File)))
+            {
+                var direction = group.First().File.GetLanguageDirection();
+                var files = group.Select(item => new ExpandReportFile(item.File.Name, item.Processor.Outcomes)).ToList();
+                var context = new ReportContext
+                {
+                    ProjectName = info != null ? info.Name : string.Empty,
+                    SourceLanguage = direction != null && direction.SourceLanguage != null ? direction.SourceLanguage.DisplayName : (_sourceLanguage ?? string.Empty),
+                    TargetLanguage = direction != null && direction.TargetLanguage != null ? direction.TargetLanguage.DisplayName : group.Key,
+                    RunAt = DateTime.Now,
+                    CldrVersion = CldrPlurals.Default.VersionDescription,
+                    AppVersion = AppVersion,
+                };
+
+                var description = string.Format(CultureInfo.CurrentCulture, UIStrings.Report_ExpandDescription,
+                    group.Sum(item => item.Processor.Expanded), files.Count, group.Sum(item => item.Processor.Warnings.Count));
+                var xml = TaskReportWriter.Expand(context, _options, files);
+
+                if (direction != null)
+                {
+                    CreateReport(UIStrings.Report_ExpandName, description, xml, direction);
+                }
+                else
+                {
+                    CreateReport(UIStrings.Report_ExpandName, description, xml, TaskId);
+                }
+                Diagnostics.Write("report: " + group.Key + " files=" + files.Count);
+            }
+        }
+
+        private static string LanguageKey(ProjectFile file)
+        {
+            return file.Language != null && !string.IsNullOrEmpty(file.Language.IsoAbbreviation)
+                ? file.Language.IsoAbbreviation
+                : string.Empty;
         }
 
         private static string AppVersion
