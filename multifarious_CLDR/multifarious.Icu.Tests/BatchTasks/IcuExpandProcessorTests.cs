@@ -352,4 +352,40 @@ public class IcuExpandProcessorTests
             RawValueReconstruction.Reconstruct(tagged.Source).RawValue,
             RawValueReconstruction.Reconstruct(locked.Source).RawValue);
     }
+
+    [Fact]
+    public void An_over_budget_message_is_laid_out_walked_with_its_syntax_locked_and_a_warning_on_the_unit()
+    {
+        // Two independent plurals are 36 segments for Arabic, over the budget of 24.
+        const string sync =
+            "{files, plural, one {# file} other {# files}} synchronised across " +
+            "{devices, plural, one {# device} other {# devices}}.";
+        var unit = ParagraphUnits.Json(sync, "['sync.status']");
+        var processor = Processor("ar-SA");
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(1, processor.Expanded);
+        var warning = Assert.Single(processor.Warnings);
+        Assert.Contains("36 segments needed, 24 allowed", warning.Reason);
+        Assert.Equal(1, unit.Properties.Comments.Count);
+        Assert.StartsWith("ICU message laid out without category expansion", unit.Properties.Comments.GetItem(0).Text);
+
+        // The source's own four branch paths, every piece of syntax locked, nothing recorded as
+        // expanded, and a projection that renders exactly as the source.
+        Assert.Equal(4, SegmentsOf(unit.Source).Count);
+        Assert.Equal(4, SegmentsOf(unit.Target).Count);
+        Assert.NotEmpty(ParagraphUnits.ItemsOf(unit.Source).OfType<ILockedContent>());
+        Assert.Contains("(over the branch budget: 36 segments needed, 24 allowed)",
+            ((ICommentMarker)SegmentsOf(unit.Source)[0][0]).Comments.GetItem(0).Text);
+
+        var context = unit.Properties.Contexts.Contexts.First(c => c.ContextType == Constants.IcuContextType);
+        Assert.Equal("", context.GetMetaData("icu:expandedSelectors"));
+
+        var projection = RawValueReconstruction.Reconstruct(unit.Source).RawValue;
+        var arguments = new Dictionary<string, string> { ["files"] = "3", ["devices"] = "1" };
+        Assert.Equal(
+            MessageRenderer.Render(IcuMessage.Parse(sync).Nodes, arguments, CldrCategories.For("en")),
+            MessageRenderer.Render(IcuMessage.Parse(projection).Nodes, arguments, CldrCategories.For("en")));
+    }
 }

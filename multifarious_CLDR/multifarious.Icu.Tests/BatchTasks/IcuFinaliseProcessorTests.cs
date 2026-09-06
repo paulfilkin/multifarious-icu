@@ -215,4 +215,34 @@ public class IcuFinaliseProcessorTests
         Assert.Equal(0, finaliser.Units);
         Assert.Equal("Message Centre", Projection(unit.Source));
     }
+
+    [Fact]
+    public void A_walked_plural_kind_is_kept_whole_and_escaped_whatever_the_language()
+    {
+        // Over the branch budget for Arabic, so laid out walked: the source's one and other
+        // branches are the developer's, and finalise keeps them even for a language with fewer
+        // forms, because nothing is recorded as expanded.
+        const string sync =
+            "{files, plural, one {# file} other {# files}} synchronised across " +
+            "{devices, plural, one {# device} other {# devices}}.";
+        var unit = Expanded(sync, "ar-SA");
+        Assert.Equal(4, SegmentsOf(unit.Source).Count);
+
+        var finaliser = Finaliser("ja-JP");
+        finaliser.ProcessParagraphUnit(unit);
+
+        Assert.Equal(0, finaliser.Pruned);
+        Assert.Equal(4, finaliser.Filled);
+        Assert.Equal(4, SegmentsOf(unit.Target).Count);
+        Assert.Equal(Projection(unit.Source), Projection(unit.Target));
+        Assert.Equal("1 file synchronised across 2 devices.",
+            MessageRenderer.Render(IcuMessage.Parse(Projection(unit.Target)).Nodes,
+                new Dictionary<string, string> { ["files"] = "1", ["devices"] = "2" }, CldrCategories.For("en")));
+
+        // A typed apostrophe in a walked branch is escaped like any other.
+        var text = ParagraphUnits.ItemsOf((ICommentMarker)SegmentsOf(unit.Target)[0][0]).OfType<IText>().First();
+        text.Properties.Text = "It's ";
+        Finaliser("ja-JP").ProcessParagraphUnit(unit);
+        Assert.Contains("It''s ", Projection(unit.Target));
+    }
 }

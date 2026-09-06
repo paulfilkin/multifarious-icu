@@ -218,4 +218,32 @@ public class ExpansionPlannerTests
             "other {Hello {name}, you have # unread messages!}}",
             plan.HoistedText);
     }
+
+    [Fact]
+    public void AnOverBudgetMessageIsPlannedWalkedWithTheReasonInEveryComment()
+    {
+        const string message =
+            "{files, plural, one {# file} other {# files}} synchronised across " +
+            "{devices, plural, one {# device} other {# devices}}.";
+        const string note = "over the branch budget: 36 segments needed, 24 allowed";
+        var classification = MessageClassifier.Classify(message, ExpansionOptions.Default);
+
+        var plan = new ExpansionPlanner().PlanWalked(classification, "en-GB", ["ar-SA"], ExpansionOptions.Default, note);
+
+        // The source's own branches, hoisted, and nothing category-expanded.
+        Assert.False(plan.ExceedsBudget);
+        Assert.Equal(
+            new[] { "files:one/devices:one", "files:one/devices:other", "files:other/devices:one", "files:other/devices:other" },
+            plan.Segments.Select(segment => segment.Path));
+        var root = Assert.IsType<PlannedSelector>(plan.Root);
+        Assert.False(root.IsExpanded);
+        Assert.All(root.Branches, branch => Assert.False(Assert.IsType<PlannedSelector>(branch.Content).IsExpanded));
+
+        // Whole sentences: the outer '#' is rewritten to the argument inside the inner branches.
+        Assert.Equal("{files, number} file synchronised across # device.", Text(plan.Segments[0]));
+
+        Assert.Equal($"Branch kept as authored: devices = one ({note})", plan.Segments[0].Comment);
+        Assert.All(plan.Segments, segment => Assert.EndsWith($"({note})", segment.Comment));
+        Assert.All(plan.Segments, segment => Assert.Equal("", segment.Metadata["icu:locale"]));
+    }
 }

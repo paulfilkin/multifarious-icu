@@ -27,7 +27,12 @@ namespace multifarious.Icu.BatchTasks.Services
             get { return Path.Combine(Path.GetTempPath(), "multifarious-icu-diagnostics.log"); }
         }
 
-        /// <summary>Begins the log fresh for one task run.</summary>
+        /// <summary>
+        /// Marks the start of one task run. The log accumulates across runs, so an expand and the
+        /// finalise that followed it can be read together; whoever reads it deletes it. It began
+        /// life truncating per run, and the first three-language Studio run (Project 41, 6
+        /// September 2026) lost its expand log to the finalise that followed.
+        /// </summary>
         public static void Start(string what)
         {
             if (!Enabled) return;
@@ -35,9 +40,10 @@ namespace multifarious.Icu.BatchTasks.Services
             {
                 try
                 {
-                    File.WriteAllText(LogPath,
-                        "=== " + what + " at " + DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture)
-                        + " ===" + Environment.NewLine);
+                    File.AppendAllText(LogPath,
+                        "=== " + what + " at "
+                        + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
+                        + " ===" + Environment.NewLine, Encoding.UTF8);
                 }
                 catch (Exception)
                 {

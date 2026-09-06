@@ -148,9 +148,7 @@ namespace multifarious.Icu.BatchTasks.Services
                     var plan = _planner.Plan(classification, sourceLanguage, new[] { targetLanguage }, _options);
                     if (plan.ExceedsBudget)
                     {
-                        Warn(unit, unitId, "Expansion would produce " + plan.Segments.Count
-                            + " segments, over the budget of " + plan.MaxUnitsPerMessage
-                            + "; passed through unexpanded.");
+                        LayOutWalked(unit, unitId, classification, plan, sourceLanguage, targetLanguage);
                         return;
                     }
 
@@ -160,6 +158,34 @@ namespace multifarious.Icu.BatchTasks.Services
                         + " segments for " + targetLanguage);
                     return;
             }
+        }
+
+        /// <summary>
+        /// A message over the branch budget is laid out all the same, with every selector walked:
+        /// the syntax is protected and each branch is a whole sentence, but no category is
+        /// expanded, so the branches stay the source's and the target language may lack forms it
+        /// needs. The unit says so in a comment and in the report. Design 5.7 passed such a
+        /// message through; Project 41 (6 September 2026) showed a passed-through value garbled
+        /// in translation like any plain text.
+        /// </summary>
+        private void LayOutWalked(IParagraphUnit unit, string unitId, MessageClassification classification,
+            ExpansionPlan rejected, string sourceLanguage, string targetLanguage)
+        {
+            var size = rejected.Segments.Count + " segments needed, " + rejected.MaxUnitsPerMessage + " allowed";
+            var plan = _planner.PlanWalked(classification, sourceLanguage, new[] { targetLanguage }, _options,
+                "over the branch budget: " + size);
+            if (plan.ExceedsBudget)
+            {
+                Warn(unit, unitId, "Expansion is over the branch budget (" + size
+                    + ") and so are the source's own branches (" + plan.Segments.Count + "); passed through unexpanded.");
+                return;
+            }
+
+            Writer.Write(unit, plan, ResourceKey.Of(unit));
+            Expanded++;
+            Warn(unit, unitId, "Expansion is over the branch budget (" + size
+                + "); the branches are the source's and " + targetLanguage + " may need forms the source does not have.",
+                "ICU message laid out without category expansion: ");
         }
 
         private ExpansionWriter Writer
@@ -181,11 +207,17 @@ namespace multifarious.Icu.BatchTasks.Services
         /// </summary>
         private void Warn(IParagraphUnit unit, string unitId, string reason)
         {
+            Warn(unit, unitId, reason, "ICU message passed through unexpanded: ");
+        }
+
+        /// <summary>The same, with the comment's opening words chosen by the caller: a walked layout is not a pass-through.</summary>
+        private void Warn(IParagraphUnit unit, string unitId, string reason, string commentPrefix)
+        {
             _warnings.Add(new ExpansionWarning(unitId, reason));
-            Diagnostics.Write("  unit " + unitId + ": passed through: " + reason);
+            Diagnostics.Write("  unit " + unitId + ": " + commentPrefix + reason);
 
             var comment = PropertiesFactory.CreateComment(
-                "ICU message passed through unexpanded: " + reason, Constants.CommentAuthor, Severity.Medium);
+                commentPrefix + reason, Constants.CommentAuthor, Severity.Medium);
             comment.Date = DateTime.Now;
             comment.DateSpecified = true;
 

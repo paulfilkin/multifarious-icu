@@ -43,7 +43,34 @@ public sealed class ExpansionPlanner
         MessageClassification classification,
         string sourceLanguageTag,
         IReadOnlyList<string> targetLanguageTags,
-        ExpansionOptions options)
+        ExpansionOptions options) =>
+        PlanCore(classification, sourceLanguageTag, targetLanguageTags, options, walkedNote: null);
+
+    /// <summary>
+    /// The plan for a message over the branch budget (design 5.7): the hoisted message with
+    /// every selector walked, so the syntax reaches the translator protected and every
+    /// branch is a whole sentence, but no category is expanded and the branches stay the
+    /// source's. The note says why in every segment comment. Added for Studio (6 September
+    /// 2026, Project 41) after a passed-through value was garbled in translation like any
+    /// plain text.
+    /// </summary>
+    public ExpansionPlan PlanWalked(
+        MessageClassification classification,
+        string sourceLanguageTag,
+        IReadOnlyList<string> targetLanguageTags,
+        ExpansionOptions options,
+        string walkedNote)
+    {
+        if (walkedNote is null) throw new ArgumentNullException(nameof(walkedNote));
+        return PlanCore(classification, sourceLanguageTag, targetLanguageTags, options, walkedNote);
+    }
+
+    private ExpansionPlan PlanCore(
+        MessageClassification classification,
+        string sourceLanguageTag,
+        IReadOnlyList<string> targetLanguageTags,
+        ExpansionOptions options,
+        string? walkedNote)
     {
         if (classification is null) throw new ArgumentNullException(nameof(classification));
         if (sourceLanguageTag is null) throw new ArgumentNullException(nameof(sourceLanguageTag));
@@ -63,7 +90,7 @@ public sealed class ExpansionPlanner
         }
 
         var hoisted = classification.Hoisted!;
-        var state = new PlanningState(sourceLanguageTag, targetLanguageTags, options);
+        var state = new PlanningState(sourceLanguageTag, targetLanguageTags, options, walkedNote);
         var root = PlanSequence(hoisted.Nodes, path: "", context: null, walked: null, state);
 
         return new ExpansionPlan(
@@ -113,17 +140,23 @@ public sealed class ExpansionPlanner
     /// <summary>Everything one Plan call carries down the walk.</summary>
     private sealed class PlanningState
     {
-        public PlanningState(string sourceLanguageTag, IReadOnlyList<string> targetLanguageTags, ExpansionOptions options)
+        public PlanningState(
+            string sourceLanguageTag, IReadOnlyList<string> targetLanguageTags, ExpansionOptions options, string? walkedNote)
         {
             SourceLanguageTag = sourceLanguageTag;
             TargetLanguageTags = targetLanguageTags;
             Options = options;
+            WalkedNote = walkedNote;
             SourceLanguageDisplay = DisplayNameOf(sourceLanguageTag);
         }
 
         public string SourceLanguageTag { get; }
         public IReadOnlyList<string> TargetLanguageTags { get; }
         public ExpansionOptions Options { get; }
+
+        /// <summary>Set where every selector is walked whatever its kind, and why; null for a normal plan.</summary>
+        public string? WalkedNote { get; }
+
         public string SourceLanguageDisplay { get; }
         public List<PlannedSegment> Segments { get; } = [];
     }
@@ -162,7 +195,7 @@ public sealed class ExpansionPlanner
     private PlannedSelector PlanSelector(
         SelectorNode selector, string path, SegmentContext? context, WalkedContext? walked, PlanningState state)
     {
-        var expanded = selector.IsPluralKind && (selector.Type == SelectorType.Plural
+        var expanded = state.WalkedNote is null && selector.IsPluralKind && (selector.Type == SelectorType.Plural
             ? state.Options.ExpandCardinal
             : state.Options.ExpandOrdinal);
 
@@ -234,7 +267,7 @@ public sealed class ExpansionPlanner
                 throw new InvalidOperationException($"Segment '{path}' has no selector above it.");
             }
 
-            return BuildWalkedSegment(path, nodes, walked);
+            return BuildWalkedSegment(path, nodes, walked, state.WalkedNote);
         }
 
         var kind = context.Selector.Type == SelectorType.Plural ? SelectorKind.Cardinal : SelectorKind.Ordinal;
@@ -299,17 +332,26 @@ public sealed class ExpansionPlanner
     }
 
     /// <summary>
-    /// A leaf whose every enclosing selector is walked: a select branch, or a branch
-    /// of a plural kind whose expansion is disabled. The branch is the developer's,
-    /// so there is no CLDR involvement and no seeding; the comment names the branch
-    /// and the metadata carries what finalise and the preview read (design 5.6).
+    /// A leaf whose every enclosing selector is walked: a select branch, a branch of a
+    /// plural kind whose expansion is disabled, or any branch of a plan walked for being
+    /// over budget. The branch is the developer's, so there is no CLDR involvement and
+    /// no seeding; the comment names the branch and the metadata carries what finalise
+    /// and the preview read (design 5.6).
     /// </summary>
     private static PlannedSegment BuildWalkedSegment(
-        string path, IReadOnlyList<MessageNode> nodes, WalkedContext walked)
+        string path, IReadOnlyList<MessageNode> nodes, WalkedContext walked, string? walkedNote)
     {
         string comment = walked.Selector.Type == SelectorType.Select
             ? $"Select branch: {walked.Selector.ArgumentName} = {walked.KeyText}"
-            : $"Branch kept as authored: {walked.Selector.ArgumentName} = {walked.KeyText} (expansion disabled)";
+            : $"Branch kept as authored: {walked.Selector.ArgumentName} = {walked.KeyText}";
+        if (walkedNote is not null)
+        {
+            comment += $" ({walkedNote})";
+        }
+        else if (walked.Selector.Type != SelectorType.Select)
+        {
+            comment += " (expansion disabled)";
+        }
 
         var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
         {
