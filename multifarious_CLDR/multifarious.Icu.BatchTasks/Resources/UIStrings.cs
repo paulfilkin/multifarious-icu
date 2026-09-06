@@ -73,6 +73,24 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Help paragraph. "one" and "other" are ICU keywords and must not be translated.</summary>
         public static string Expand_SeedHelp2 { get { return Manager.GetString("Expand_SeedHelp2", Culture); } }
 
+        /// <summary>Group heading. The arguments and the count marker inside a segment.</summary>
+        public static string Expand_PlaceholdersHeader { get { return Manager.GetString("Expand_PlaceholdersHeader", Culture); } }
+
+        /// <summary>Tick box. Off by default.</summary>
+        public static string Expand_LockPlaceholders { get { return Manager.GetString("Expand_LockPlaceholders", Culture); } }
+
+        /// <summary>Hint under the tick box. QuickPlace is Studio's feature name.</summary>
+        public static string Expand_LockHint { get { return Manager.GetString("Expand_LockHint", Culture); } }
+
+        /// <summary>Header of a collapsible help panel.</summary>
+        public static string Expand_PlaceholdersHelpHeader { get { return Manager.GetString("Expand_PlaceholdersHelpHeader", Culture); } }
+
+        /// <summary>Help paragraph. Keep {name} and #.</summary>
+        public static string Expand_PlaceholdersHelp1 { get { return Manager.GetString("Expand_PlaceholdersHelp1", Culture); } }
+
+        /// <summary>Help paragraph.</summary>
+        public static string Expand_PlaceholdersHelp2 { get { return Manager.GetString("Expand_PlaceholdersHelp2", Culture); } }
+
         /// <summary>Group heading. A cap on how many segments one message may become.</summary>
         public static string Expand_BudgetHeader { get { return Manager.GetString("Expand_BudgetHeader", Culture); } }
 

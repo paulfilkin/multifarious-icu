@@ -61,6 +61,24 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>Bei der ersten Wahl geht eine Zielform von der gleichnamigen Ausgangsform aus, sofern es sie gibt, sonst von „other“. Bei der zweiten geht jede Form von „other“ aus, was manche Teams bevorzugen, weil die englische Form „one“ oft auf genau ein Element hin formuliert ist und als Ausgangstext für alles andere seltsam wirkt.</value>
   </data>
+  <data name="Expand_PlaceholdersHeader" xml:space="preserve">
+    <value>Platzhalter</value>
+  </data>
+  <data name="Expand_LockPlaceholders" xml:space="preserve">
+    <value>Platzhalter sperren, damit sie nicht verschoben oder gelöscht werden können</value>
+  </data>
+  <data name="Expand_LockHint" xml:space="preserve">
+    <value>Jedes Argument und die Zählmarke sind ein Tag innerhalb des Segments. Ungesperrt lässt es sich mit QuickPlace oder Strg+Alt+Nach-unten einfügen, und ein fehlendes Tag melden der ICU-Prüfer und die Tag-Prüfung. Gesperrt kann es weder gelöscht noch verschoben werden und erscheint nicht mehr in QuickPlace.</value>
+  </data>
+  <data name="Expand_PlaceholdersHelpHeader" xml:space="preserve">
+    <value>Warum sind die Platzhalter Tags?</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp1" xml:space="preserve">
+    <value>Ein Argument wie {name} und die Zählmarke # müssen genau so in die Übersetzung gelangen, wie sie sind, an der Stelle, die die Sprache verlangt. Als Tags verhalten sie sich wie jedes Tag in Studio: QuickPlace und Strg+Alt+Nach-unten fügen sie ein, das Translation Memory erkennt sie, und die Tag-Prüfung und der ICU-Prüfer melden ein fehlendes oder überzähliges Tag.</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp2" xml:space="preserve">
+    <value>Das Sperren umhüllt jedes Tag, sodass es nicht versehentlich gelöscht oder verschoben werden kann. Das passt zu einem Team, das den Ausgangstext kopiert und um die Tags herum übersetzt. Der Preis: Ein gesperrtes Tag lässt sich nicht mit QuickPlace einfügen, sodass eine von Grund auf getippte oder aus einem Fuzzy-Match gefüllte Form vom Ausgangstext ausgehen muss. Standardmäßig aus.</value>
+  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Zweig-Obergrenze</value>
   </data>

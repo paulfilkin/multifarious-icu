@@ -90,6 +90,30 @@
     <value>With the first choice a target form starts from the source form of the same name where there is one, otherwise from "other". With the second every form starts from "other", which some teams prefer because the English "one" form is often worded for exactly one item and reads oddly as the source for anything else.</value>
     <comment>Help paragraph. "one" and "other" are ICU keywords and must not be translated.</comment>
   </data>
+  <data name="Expand_PlaceholdersHeader" xml:space="preserve">
+    <value>Placeholders</value>
+    <comment>Group heading. The arguments and the count marker inside a segment.</comment>
+  </data>
+  <data name="Expand_LockPlaceholders" xml:space="preserve">
+    <value>Lock the placeholders so they cannot be moved or deleted</value>
+    <comment>Tick box. Off by default.</comment>
+  </data>
+  <data name="Expand_LockHint" xml:space="preserve">
+    <value>Each argument and the count marker is a tag inside the segment. Unlocked, it can be placed with QuickPlace or Ctrl+Alt+Down, and a missing one is reported by the ICU Verifier and the tag verifier. Locked, it cannot be deleted or moved, and it drops out of QuickPlace.</value>
+    <comment>Hint under the tick box. QuickPlace is Studio's feature name.</comment>
+  </data>
+  <data name="Expand_PlaceholdersHelpHeader" xml:space="preserve">
+    <value>Why are the placeholders tags?</value>
+    <comment>Header of a collapsible help panel.</comment>
+  </data>
+  <data name="Expand_PlaceholdersHelp1" xml:space="preserve">
+    <value>An argument such as {name} and the count marker # must reach the translation exactly as they are, wherever the language wants them. As tags they behave like any tag in Studio: QuickPlace and Ctrl+Alt+Down insert them, the translation memory recognises them, and the tag verifier and the ICU Verifier report one that is missing or extra.</value>
+    <comment>Help paragraph. Keep {name} and #.</comment>
+  </data>
+  <data name="Expand_PlaceholdersHelp2" xml:space="preserve">
+    <value>Locking wraps each tag so it cannot be deleted or moved by mistake, which suits a team that copies the source and translates around the tags. The cost is that a locked tag cannot be placed by QuickPlace, so a form typed from scratch or filled from a fuzzy match has to start from the source. Off is the default.</value>
+    <comment>Help paragraph.</comment>
+  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Branch budget</value>
     <comment>Group heading. A cap on how many segments one message may become.</comment>

@@ -61,6 +61,24 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>Avec le premier choix, une forme cible part de la forme source du même nom lorsqu'elle existe, sinon de « other ». Avec le second, chaque forme part de « other », ce que certaines équipes préfèrent parce que la forme anglaise « one » est souvent rédigée pour exactement un élément et fait un drôle de point de départ pour tout le reste.</value>
   </data>
+  <data name="Expand_PlaceholdersHeader" xml:space="preserve">
+    <value>Espaces réservés</value>
+  </data>
+  <data name="Expand_LockPlaceholders" xml:space="preserve">
+    <value>Verrouiller les espaces réservés pour qu'ils ne puissent être ni déplacés ni supprimés</value>
+  </data>
+  <data name="Expand_LockHint" xml:space="preserve">
+    <value>Chaque argument et le marqueur de comptage sont une balise à l'intérieur du segment. Déverrouillée, elle se place avec QuickPlace ou Ctrl+Alt+Bas, et une balise manquante est signalée par le vérificateur ICU et le vérificateur de balises. Verrouillée, elle ne peut être ni supprimée ni déplacée et disparaît de QuickPlace.</value>
+  </data>
+  <data name="Expand_PlaceholdersHelpHeader" xml:space="preserve">
+    <value>Pourquoi les espaces réservés sont-ils des balises ?</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp1" xml:space="preserve">
+    <value>Un argument tel que {name} et le marqueur de comptage # doivent arriver dans la traduction exactement tels quels, à l'endroit que la langue exige. En tant que balises, ils se comportent comme toute balise dans Studio : QuickPlace et Ctrl+Alt+Bas les insèrent, la mémoire de traduction les reconnaît, et le vérificateur de balises et le vérificateur ICU signalent une balise manquante ou en trop.</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp2" xml:space="preserve">
+    <value>Le verrouillage enveloppe chaque balise pour qu'elle ne puisse être ni supprimée ni déplacée par erreur, ce qui convient à une équipe qui copie la source et traduit autour des balises. En contrepartie, une balise verrouillée ne peut pas être placée par QuickPlace : une forme saisie de zéro ou remplie depuis une correspondance partielle doit partir de la source. Désactivé par défaut.</value>
+  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Plafond de branches</value>
   </data>

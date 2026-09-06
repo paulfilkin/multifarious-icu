@@ -15,6 +15,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         private bool _expandCardinal;
         private bool _expandOrdinal;
         private SourceSeedStrategy _seedStrategy;
+        private bool _lockPlaceholders;
         private string _budgetText = string.Empty;
         private ParseErrorBehaviour _onParseError;
 
@@ -46,6 +47,12 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         {
             get { return _seedStrategy == SourceSeedStrategy.AlwaysOther; }
             set { if (value) SetSeed(SourceSeedStrategy.AlwaysOther); }
+        }
+
+        public bool LockPlaceholders
+        {
+            get { return _lockPlaceholders; }
+            set { Set(ref _lockPlaceholders, value); }
         }
 
         public string BudgetText
@@ -107,6 +114,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             _settings.ExpandCardinal = _expandCardinal;
             _settings.ExpandOrdinal = _expandOrdinal;
             _settings.SeedStrategy = _seedStrategy;
+            _settings.LockPlaceholders = _lockPlaceholders;
             _settings.MaxUnitsPerMessage = budget;
             _settings.OnParseError = _onParseError;
             return _settings;
@@ -148,6 +156,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             _expandCardinal = settings.ExpandCardinal;
             _expandOrdinal = settings.ExpandOrdinal;
             _seedStrategy = settings.SeedStrategy;
+            _lockPlaceholders = settings.LockPlaceholders;
             _budgetText = settings.MaxUnitsPerMessage.ToString(CultureInfo.CurrentCulture);
             _onParseError = settings.OnParseError;
         }
@@ -158,6 +167,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             Raise(nameof(ExpandOrdinal));
             Raise(nameof(SeedIsMatchingElseOther));
             Raise(nameof(SeedIsAlwaysOther));
+            Raise(nameof(LockPlaceholders));
             Raise(nameof(BudgetText));
             Raise(nameof(IsBudgetValid));
             Raise(nameof(IsValid));

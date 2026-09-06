@@ -19,6 +19,7 @@ namespace multifarious.Icu.BatchTasks.Settings
         private const string ExpandCardinalId = "ExpandCardinal";
         private const string ExpandOrdinalId = "ExpandOrdinal";
         private const string SeedStrategyId = "SeedStrategy";
+        private const string LockPlaceholdersId = "LockPlaceholders";
         private const string MaxUnitsPerMessageId = "MaxUnitsPerMessage";
         private const string OnParseErrorId = "OnParseError";
 
@@ -41,6 +42,12 @@ namespace multifarious.Icu.BatchTasks.Settings
         {
             get { return Parse(GetSetting<string>(SeedStrategyId).Value, ExpansionOptions.Default.SourceSeedStrategy); }
             set { GetSetting<string>(SeedStrategyId).Value = value.ToString(); }
+        }
+
+        public bool LockPlaceholders
+        {
+            get { return GetSetting<bool>(LockPlaceholdersId).Value; }
+            set { GetSetting<bool>(LockPlaceholdersId).Value = value; }
         }
 
         public int MaxUnitsPerMessage
@@ -68,6 +75,7 @@ namespace multifarious.Icu.BatchTasks.Settings
                 ExpandCardinal = ExpandCardinal,
                 ExpandOrdinal = ExpandOrdinal,
                 SourceSeedStrategy = SeedStrategy,
+                LockPlaceholders = LockPlaceholders,
                 MaxUnitsPerMessage = Math.Max(MinimumBudget, Math.Min(MaximumBudget, MaxUnitsPerMessage)),
                 OnParseError = OnParseError,
             };
@@ -80,6 +88,7 @@ namespace multifarious.Icu.BatchTasks.Settings
                 case ExpandCardinalId: return ExpansionOptions.Default.ExpandCardinal;
                 case ExpandOrdinalId: return ExpansionOptions.Default.ExpandOrdinal;
                 case SeedStrategyId: return ExpansionOptions.Default.SourceSeedStrategy.ToString();
+                case LockPlaceholdersId: return ExpansionOptions.Default.LockPlaceholders;
                 case MaxUnitsPerMessageId: return ExpansionOptions.Default.MaxUnitsPerMessage;
                 case OnParseErrorId: return ExpansionOptions.Default.OnParseError.ToString();
             }

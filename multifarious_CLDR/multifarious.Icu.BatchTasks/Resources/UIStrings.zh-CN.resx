@@ -61,6 +61,24 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>选择第一项时，目标形式若有同名源文形式则从该形式出发，否则从“other”出发。选择第二项时，所有形式都从“other”出发；有些团队偏好这种方式，因为英语的“one”形式往往是针对恰好一个项目写的，用作其他形式的源文会显得别扭。</value>
   </data>
+  <data name="Expand_PlaceholdersHeader" xml:space="preserve">
+    <value>占位符</value>
+  </data>
+  <data name="Expand_LockPlaceholders" xml:space="preserve">
+    <value>锁定占位符，使其无法移动或删除</value>
+  </data>
+  <data name="Expand_LockHint" xml:space="preserve">
+    <value>每个参数和计数标记都是句段内的一个标记。未锁定时，可以用 QuickPlace 或 Ctrl+Alt+向下键放置，缺失的标记会由 ICU 验证器和标记验证器报告。锁定后，无法删除或移动，并且不再出现在 QuickPlace 中。</value>
+  </data>
+  <data name="Expand_PlaceholdersHelpHeader" xml:space="preserve">
+    <value>为什么占位符是标记？</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp1" xml:space="preserve">
+    <value>像 {name} 这样的参数和计数标记 # 必须原样进入译文，并放在语言所需的位置。作为标记，它们的行为与 Studio 中的任何标记相同：QuickPlace 和 Ctrl+Alt+向下键可以插入它们，翻译记忆库能识别它们，标记验证器和 ICU 验证器会报告缺失或多余的标记。</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp2" xml:space="preserve">
+    <value>锁定会把每个标记包裹起来，使其不会被误删或误移，适合复制原文后围绕标记进行翻译的团队。代价是锁定的标记无法通过 QuickPlace 放置，因此从头输入或由模糊匹配填充的形式必须从原文开始。默认关闭。</value>
+  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>分支上限</value>
   </data>

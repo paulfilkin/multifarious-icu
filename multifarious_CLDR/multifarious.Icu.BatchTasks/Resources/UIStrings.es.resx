@@ -61,6 +61,24 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>Con la primera opción, una forma de destino parte de la forma de origen del mismo nombre cuando existe; si no, de «other». Con la segunda, todas las formas parten de «other», lo que algunos equipos prefieren porque la forma inglesa «one» suele estar redactada para exactamente un elemento y resulta extraña como origen de todo lo demás.</value>
   </data>
+  <data name="Expand_PlaceholdersHeader" xml:space="preserve">
+    <value>Marcadores de posición</value>
+  </data>
+  <data name="Expand_LockPlaceholders" xml:space="preserve">
+    <value>Bloquear los marcadores de posición para que no se puedan mover ni eliminar</value>
+  </data>
+  <data name="Expand_LockHint" xml:space="preserve">
+    <value>Cada argumento y el marcador de recuento son una etiqueta dentro del segmento. Sin bloquear, se coloca con QuickPlace o Ctrl+Alt+Abajo, y el verificador ICU y el verificador de etiquetas avisan si falta una. Bloqueada, no se puede eliminar ni mover y deja de aparecer en QuickPlace.</value>
+  </data>
+  <data name="Expand_PlaceholdersHelpHeader" xml:space="preserve">
+    <value>¿Por qué los marcadores de posición son etiquetas?</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp1" xml:space="preserve">
+    <value>Un argumento como {name} y el marcador de recuento # deben llegar a la traducción exactamente como están, donde el idioma los necesite. Como etiquetas se comportan como cualquier etiqueta de Studio: QuickPlace y Ctrl+Alt+Abajo las insertan, la memoria de traducción las reconoce, y el verificador de etiquetas y el verificador ICU avisan si falta o sobra una.</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp2" xml:space="preserve">
+    <value>El bloqueo envuelve cada etiqueta para que no se pueda eliminar ni mover por error, lo que conviene a un equipo que copia el origen y traduce alrededor de las etiquetas. El coste es que una etiqueta bloqueada no se puede colocar con QuickPlace, así que una forma escrita desde cero o rellenada desde una coincidencia parcial tiene que partir del origen. Desactivado de forma predeterminada.</value>
+  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Límite de ramas</value>
   </data>

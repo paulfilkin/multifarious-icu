@@ -68,7 +68,7 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                 + " source=" + (_sourceLanguage ?? "<null>")
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
             Diagnostics.Write("settings: cardinal=" + _options.ExpandCardinal + " ordinal=" + _options.ExpandOrdinal
-                + " seed=" + _options.SourceSeedStrategy
+                + " seed=" + _options.SourceSeedStrategy + " lock=" + _options.LockPlaceholders
                 + " budget=" + _options.MaxUnitsPerMessage + " parseError=" + _options.OnParseError);
         }
 

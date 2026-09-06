@@ -61,6 +61,24 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>Con la prima scelta una forma di destinazione parte dalla forma di origine con lo stesso nome, se esiste, altrimenti da «other». Con la seconda ogni forma parte da «other», cosa che alcuni team preferiscono perché la forma inglese «one» è spesso formulata per esattamente un elemento e risulta strana come origine per tutto il resto.</value>
   </data>
+  <data name="Expand_PlaceholdersHeader" xml:space="preserve">
+    <value>Segnaposto</value>
+  </data>
+  <data name="Expand_LockPlaceholders" xml:space="preserve">
+    <value>Blocca i segnaposto in modo che non possano essere spostati o eliminati</value>
+  </data>
+  <data name="Expand_LockHint" xml:space="preserve">
+    <value>Ogni argomento e il marcatore di conteggio sono un tag all'interno del segmento. Sbloccato, si inserisce con QuickPlace o Ctrl+Alt+Giù, e un tag mancante viene segnalato dal verificatore ICU e dal verificatore dei tag. Bloccato, non può essere eliminato né spostato e scompare da QuickPlace.</value>
+  </data>
+  <data name="Expand_PlaceholdersHelpHeader" xml:space="preserve">
+    <value>Perché i segnaposto sono tag?</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp1" xml:space="preserve">
+    <value>Un argomento come {name} e il marcatore di conteggio # devono arrivare nella traduzione esattamente come sono, nel punto richiesto dalla lingua. Come tag si comportano come qualsiasi tag in Studio: QuickPlace e Ctrl+Alt+Giù li inseriscono, la memoria di traduzione li riconosce, e il verificatore dei tag e il verificatore ICU segnalano un tag mancante o in eccesso.</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp2" xml:space="preserve">
+    <value>Il blocco avvolge ogni tag in modo che non possa essere eliminato o spostato per errore, il che si addice a un team che copia il testo di origine e traduce intorno ai tag. Il costo è che un tag bloccato non può essere inserito con QuickPlace, quindi una forma digitata da zero o riempita da una corrispondenza parziale deve partire dall'origine. Disattivato per impostazione predefinita.</value>
+  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Limite di rami</value>
   </data>

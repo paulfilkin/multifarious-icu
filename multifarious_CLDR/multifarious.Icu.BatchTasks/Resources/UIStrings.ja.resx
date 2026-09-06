@@ -61,6 +61,24 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>最初の選択肢では、訳文の形式は同じ名前の原文の形式があればそこから、なければ「other」から始まります。2 番目の選択肢では、すべての形式が「other」から始まります。英語の「one」の形式はちょうど 1 つの項目を想定して書かれていることが多く、他の形式の原文としては不自然なため、こちらを好むチームもあります。</value>
   </data>
+  <data name="Expand_PlaceholdersHeader" xml:space="preserve">
+    <value>プレースホルダー</value>
+  </data>
+  <data name="Expand_LockPlaceholders" xml:space="preserve">
+    <value>プレースホルダーをロックして移動や削除ができないようにする</value>
+  </data>
+  <data name="Expand_LockHint" xml:space="preserve">
+    <value>各引数とカウント マーカーはセグメント内のタグです。ロックしていない場合は QuickPlace または Ctrl+Alt+↓ で配置でき、欠落しているタグは ICU 検証と タグ検証が報告します。ロックすると削除も移動もできなくなり、QuickPlace には表示されなくなります。</value>
+  </data>
+  <data name="Expand_PlaceholdersHelpHeader" xml:space="preserve">
+    <value>プレースホルダーがタグである理由</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp1" xml:space="preserve">
+    <value>{name} のような引数とカウント マーカー # は、言語が求める位置に、そのままの形で訳文に入らなければなりません。タグであれば Studio の他のタグと同じように扱えます。QuickPlace と Ctrl+Alt+↓ で挿入でき、翻訳メモリが認識し、タグ検証と ICU 検証が欠落や余分なタグを報告します。</value>
+  </data>
+  <data name="Expand_PlaceholdersHelp2" xml:space="preserve">
+    <value>ロックすると各タグが包まれ、誤って削除したり移動したりできなくなります。原文をコピーしてタグの周りを翻訳するチームに向いています。その代わり、ロックされたタグは QuickPlace で配置できないため、一から入力した形や あいまい一致から埋めた形は原文から始める必要があります。既定ではオフです。</value>
+  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>分岐の上限</value>
   </data>

@@ -52,6 +52,7 @@ public class SettingsTests
         settings.ExpandCardinal = false;
         settings.ExpandOrdinal = false;
         settings.SeedStrategy = SourceSeedStrategy.AlwaysOther;
+        settings.LockPlaceholders = true;
         settings.MaxUnitsPerMessage = 48;
         settings.OnParseError = ParseErrorBehaviour.FailTask;
 
@@ -63,6 +64,7 @@ public class SettingsTests
                 ExpandCardinal = false,
                 ExpandOrdinal = false,
                 SourceSeedStrategy = SourceSeedStrategy.AlwaysOther,
+                LockPlaceholders = true,
                 MaxUnitsPerMessage = 48,
                 OnParseError = ParseErrorBehaviour.FailTask,
             },
@@ -161,12 +163,14 @@ public class SettingsTests
 
         viewModel.ExpandOrdinal = false;
         viewModel.SeedIsAlwaysOther = true;
+        viewModel.LockPlaceholders = true;
         viewModel.BudgetText = "36";
         viewModel.ParseErrorFailsTask = true;
         viewModel.Apply();
 
         Assert.False(settings.ExpandOrdinal);
         Assert.Equal(SourceSeedStrategy.AlwaysOther, settings.SeedStrategy);
+        Assert.True(settings.LockPlaceholders);
         Assert.Equal(36, settings.MaxUnitsPerMessage);
         Assert.Equal(ParseErrorBehaviour.FailTask, settings.OnParseError);
         Assert.False(viewModel.SeedIsMatchingElseOther);
