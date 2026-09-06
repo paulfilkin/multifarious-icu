@@ -180,19 +180,19 @@ namespace multifarious.Icu.BatchTasks.Services
 
         private static string Write(Action<XmlWriter> body)
         {
+            // No declaration: the string goes to Studio, which stores it in whatever encoding it
+            // chooses, and a writer over a string would declare utf-16 regardless (Project 45).
+            // Studio's own reports carry none either.
             var builder = new StringBuilder();
             var settings = new XmlWriterSettings
             {
                 Indent = true,
-                OmitXmlDeclaration = false,
-                Encoding = new UTF8Encoding(false),
+                OmitXmlDeclaration = true,
             };
 
             using (var writer = XmlWriter.Create(builder, settings))
             {
-                writer.WriteStartDocument();
                 body(writer);
-                writer.WriteEndDocument();
             }
 
             return builder.ToString();
@@ -204,7 +204,10 @@ namespace multifarious.Icu.BatchTasks.Services
             writer.WriteAttributeString("project", context.ProjectName ?? string.Empty);
             writer.WriteAttributeString("sourceLanguage", context.SourceLanguage ?? string.Empty);
             writer.WriteAttributeString("targetLanguage", context.TargetLanguage ?? string.Empty);
-            writer.WriteAttributeString("runAt", context.RunAt.ToString("g", CultureInfo.CurrentCulture));
+            // A fixed, unambiguous form: the batch task thread's culture is not the user's (it
+            // printed 9/6/2026 on a British machine in Project 45), so no culture's short date
+            // pattern can be trusted here.
+            writer.WriteAttributeString("runAt", context.RunAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture));
             writer.WriteAttributeString("files", fileCount.ToString(CultureInfo.InvariantCulture));
             writer.WriteAttributeString("cldr", context.CldrVersion ?? string.Empty);
             writer.WriteAttributeString("version", context.AppVersion ?? string.Empty);
