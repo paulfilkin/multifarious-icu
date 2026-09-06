@@ -73,7 +73,7 @@ changes, the AppStore decisions and screenshots, and a Release package.
 - **Verifier settings group is keyed on its class name** (`IcuVerifierSettings`), which is
   also the verifier's settings id, because the framework reads Enabled from the group named
   by that id.
-- **The AppStore folder is published**; the handovers and the built package are not.
+- **The AppStore folder and the session handovers are published**; the built package is not.
 - **No sample files ship with the documentation and no follow-along walkthrough.**  The
   samples folder is kept for Paul's screenshots and demos only.
 - **Zoom persists per user** in a small file under the roaming profile, not in Studio's
