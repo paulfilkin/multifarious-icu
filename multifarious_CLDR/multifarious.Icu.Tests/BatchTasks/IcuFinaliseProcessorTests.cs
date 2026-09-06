@@ -354,11 +354,18 @@ public class IcuFinaliseProcessorTests
         Assert.Equal(4, SegmentsOf(unit.Source).Count);
     }
 
+    /// <summary>
+    /// A message with a placeholder mismatch is warned about and left editable: its spans are
+    /// tags on both sides, and locked spans from the earlier run are turned back into tags, so
+    /// the missing one can be placed with QuickPlace (Project 52). Once corrected, the next run
+    /// locks the message as usual.
+    /// </summary>
     [Fact]
-    public void A_missing_protected_span_in_the_target_is_warned_about()
+    public void A_missing_protected_span_in_the_target_is_warned_about_and_the_message_stays_editable()
     {
         var unit = Expanded(UnreadCount);
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
+        Assert.Equal(0, TagsUnder(unit.Target));
         var target = SegmentsOf(unit.Target)[0];
         var span = ParagraphUnits.ItemsOf(target).OfType<ILockedContent>().First();
         span.RemoveFromParent();
@@ -367,9 +374,44 @@ public class IcuFinaliseProcessorTests
         finaliser.ProcessParagraphUnit(unit);
 
         Assert.Contains(finaliser.Warnings, w => w.Reason.Contains("missing from the target"));
+        Assert.Contains(finaliser.Warnings, w => w.Reason.Contains("run ICU Finalise Messages again"));
         var comments = ParagraphUnits.UnitComments(unit);
-        Assert.StartsWith("Segment 1: Placeholder mismatch", comments[comments.Count - 1]);
+        Assert.StartsWith("Segment 1: Placeholder mismatch", comments[comments.Count - 2]);
+        Assert.StartsWith("The message is left with its placeholders as tags", comments[comments.Count - 1]);
         Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
+
+        // Editable shape on both sides: tags, no locked span inside any segment.
+        Assert.Equal(8, TagsUnder(unit.Source));
+        Assert.Equal(7, TagsUnder(unit.Target));
+        Assert.All(SegmentsOf(unit.Source), s => Assert.Empty(ParagraphUnits.ItemsOf(s).OfType<ILockedContent>()));
+        Assert.All(SegmentsOf(unit.Target), s => Assert.Empty(ParagraphUnits.ItemsOf(s).OfType<ILockedContent>()));
+        Assert.Equal("{name}", ParagraphUnits.ItemsOf(SegmentsOf(unit.Source)[0]).OfType<IPlaceholderTag>().First().Properties.TagContent);
+
+        // The translator places the tag; the next run locks the message.
+        SegmentsOf(unit.Target)[0].Insert(1, Tag("{name}"));
+        var again = Finaliser("ru-RU");
+        again.ProcessParagraphUnit(unit);
+
+        Assert.DoesNotContain(again.Warnings, w => w.Reason.Contains("Placeholder mismatch"));
+        Assert.Equal(0, TagsUnder(unit.Source));
+        Assert.Equal(0, TagsUnder(unit.Target));
+        AssertRendersLikeSource(UnreadCount, Projection(unit.Target), "ru", new Dictionary<string, string> { ["name"] = "Anna" }, "1", "2", "5");
+    }
+
+    [Fact]
+    public void A_mismatch_on_a_freshly_expanded_message_leaves_its_tags_in_place()
+    {
+        var unit = Expanded(UnreadCount);
+        var targets = SegmentsOf(unit.Target);
+        targets[0].Add(ParagraphUnits.ItemFactory.CreateText(ParagraphUnits.PropertiesFactory.CreateTextProperties("Привет, у вас # сообщение!")));
+
+        var finaliser = Finaliser("ru-RU");
+        finaliser.ProcessParagraphUnit(unit);
+
+        Assert.Contains(finaliser.Warnings, w => w.Reason.Contains("Placeholder mismatch"));
+        Assert.Equal(8, TagsUnder(unit.Source));
+        Assert.Equal(6, TagsUnder(unit.Target));
+        Assert.All(SegmentsOf(unit.Source), s => Assert.Empty(ParagraphUnits.ItemsOf(s).OfType<ILockedContent>()));
     }
 
     [Fact]

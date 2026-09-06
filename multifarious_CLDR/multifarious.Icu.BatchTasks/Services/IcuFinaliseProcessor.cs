@@ -160,6 +160,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 CommentsStripped += StripOwnComments(segment);
             }
 
+            var mismatch = false;
             for (var index = 0; index < targetSegments.Count; index++)
             {
                 var target = targetSegments[index];
@@ -191,6 +192,7 @@ namespace multifarious.Icu.BatchTasks.Services
                     }
 
                     reasons.Add("Placeholder mismatch: " + parityDetail);
+                    mismatch = true;
                 }
 
                 if (reasons.Count > 0)
@@ -205,16 +207,34 @@ namespace multifarious.Icu.BatchTasks.Services
                 }
             }
 
-            // 3. Placeholder tags become locked text on both sides. Studio's JSON writer emits no
-            // placeholder tag of any kind, locked or not, while both writers emit locked text
-            // verbatim; a second run finds only locked spans and leaves them as they are.
-            foreach (var segment in sourceSegments) FlattenPlaceholders(segment);
-            foreach (var segment in targetSegments) FlattenPlaceholders(segment);
+            // 3. The message takes the shape its state calls for (Paul, 6 September 2026,
+            // Project 52). Clean: placeholder tags become locked text on both sides, because
+            // Studio's JSON writer emits no placeholder tag of any kind while both writers emit
+            // locked text verbatim; a second run finds only locked spans and leaves them. With a
+            // placeholder mismatch, and the task set to warn: the message stays editable, tags
+            // on both sides, and locked spans from an earlier run turn back into tags, so the
+            // translator can place the missing one with QuickPlace. It must be finalised again
+            // before the target file is generated, and the warning says so.
+            if (mismatch)
+            {
+                foreach (var segment in sourceSegments) RestorePlaceholders(segment);
+                foreach (var segment in targetSegments) RestorePlaceholders(segment);
+                var notice = "The message is left with its placeholders as tags so the translation can be corrected; "
+                    + "run ICU Finalise Messages again before Generate Target Translations.";
+                AddWarningComment(unit, notice);
+                _warnings.Add(new ExpansionWarning(unitId, notice));
+                unitWarnings.Add(notice);
+            }
+            else
+            {
+                foreach (var segment in sourceSegments) FlattenPlaceholders(segment);
+                foreach (var segment in targetSegments) FlattenPlaceholders(segment);
+            }
 
             _outcomes.Add(new FinaliseUnitOutcome(unitId, ResourceKey.Of(unit), targetSegments.Count,
                 Pruned - prunedBefore, Filled - filledBefore, unitWarnings));
             Diagnostics.Write("  unit " + unitId + ": finalised, segments=" + targetSegments.Count
-                + ", comments stripped=" + CommentsStripped);
+                + ", comments stripped=" + CommentsStripped + (mismatch ? ", left as tags" : ", locked"));
         }
 
         /// <summary>
@@ -560,6 +580,41 @@ namespace multifarious.Icu.BatchTasks.Services
                 var nested = item as IAbstractMarkupDataContainer;
                 if (nested != null) FlattenPlaceholders(nested);
             }
+        }
+
+        /// <summary>
+        /// The reverse of <see cref="FlattenPlaceholders"/>: every locked span inside the
+        /// segment becomes a bare placeholder tag carrying its text. Inside a segment a locked
+        /// span can only be a placeholder; the selector syntax sits between segments. A locked
+        /// span that already holds a tag is left as it is.
+        /// </summary>
+        private void RestorePlaceholders(IAbstractMarkupDataContainer container)
+        {
+            for (var i = 0; i < container.Count; i++)
+            {
+                var item = container[i];
+
+                var locked = item as ILockedContent;
+                if (locked != null)
+                {
+                    if (!ContainsTag(locked.Content))
+                    {
+                        Replace(container, i, Tag(RawValueReconstruction.Reconstruct(locked.Content).RawValue));
+                    }
+                    continue;
+                }
+
+                var nested = item as IAbstractMarkupDataContainer;
+                if (nested != null && !(item is IPlaceholderTag)) RestorePlaceholders(nested);
+            }
+        }
+
+        private IPlaceholderTag Tag(string syntax)
+        {
+            var properties = PropertiesFactory.CreatePlaceholderTagProperties(syntax);
+            properties.DisplayText = syntax;
+            properties.SegmentationHint = SegmentationHint.Include;
+            return ItemFactory.CreatePlaceholderTag(properties);
         }
 
         private static bool ContainsTag(IAbstractMarkupDataContainer container)
