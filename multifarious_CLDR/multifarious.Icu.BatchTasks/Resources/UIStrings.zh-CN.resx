@@ -38,7 +38,7 @@
     <value>序数消息 ({count, selectordinal, ...})</value>
   </data>
   <data name="Expand_KindsHint" xml:space="preserve">
-    <value>消息会被重构为目标语言所需的每种形式各一个句段，每个句段都是完整的句子。如果消息的选择器全都属于未勾选的类型，则保持原样。</value>
+    <value>每条消息会被重构为目标语言所需的每种形式各一个句段，每个句段都是完整的句子。未勾选类型的消息保持原样。</value>
   </data>
   <data name="Expand_SeedHeader" xml:space="preserve">
     <value>源语言没有的形式所用的源文</value>

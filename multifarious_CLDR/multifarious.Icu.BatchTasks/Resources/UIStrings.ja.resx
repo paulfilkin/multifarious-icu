@@ -38,7 +38,7 @@
     <value>序数メッセージ ({count, selectordinal, ...})</value>
   </data>
   <data name="Expand_KindsHint" xml:space="preserve">
-    <value>メッセージは、訳文言語に必要な形式ごとに 1 つのセグメント (それぞれ完全な文) に再構成されます。チェックされていない種類のセレクターしか含まないメッセージはそのまま残されます。</value>
+    <value>各メッセージは、訳文言語に必要な形式ごとに 1 つのセグメント (それぞれ完全な文) に再構成されます。チェックされていない種類のメッセージはそのまま残されます。</value>
   </data>
   <data name="Expand_SeedHeader" xml:space="preserve">
     <value>原文言語にない形式の原文テキスト</value>

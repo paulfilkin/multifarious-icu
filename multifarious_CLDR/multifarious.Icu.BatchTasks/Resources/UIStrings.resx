@@ -59,7 +59,7 @@
     <comment>Tick box. Ordinals are 1st, 2nd, 3rd. The bracketed part is ICU syntax and must not be translated.</comment>
   </data>
   <data name="Expand_KindsHint" xml:space="preserve">
-    <value>A message is restructured into one segment per form the target language needs, each a whole sentence. A message whose only selectors are of an unticked kind is left as it is.</value>
+    <value>Each message becomes one segment per form the target language needs, each a whole sentence. A message of a kind that is not ticked is left as it is.</value>
     <comment>Hint under the two tick boxes.</comment>
   </data>
   <data name="Expand_SeedHeader" xml:space="preserve">

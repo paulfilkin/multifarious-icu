@@ -38,7 +38,7 @@
     <value>서수 메시지({count, selectordinal, ...})</value>
   </data>
   <data name="Expand_KindsHint" xml:space="preserve">
-    <value>메시지는 대상 언어에 필요한 형태별로 하나의 세그먼트(각각 완전한 문장)로 재구성됩니다. 선택하지 않은 종류의 선택기만 있는 메시지는 그대로 둡니다.</value>
+    <value>각 메시지는 대상 언어에 필요한 형태별로 하나의 세그먼트(각각 완전한 문장)로 재구성됩니다. 선택하지 않은 종류의 메시지는 그대로 둡니다.</value>
   </data>
   <data name="Expand_SeedHeader" xml:space="preserve">
     <value>원본 언어에 없는 형태의 원본 텍스트</value>

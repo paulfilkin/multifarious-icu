@@ -38,7 +38,7 @@
     <value>Messages ordinaux ({count, selectordinal, ...})</value>
   </data>
   <data name="Expand_KindsHint" xml:space="preserve">
-    <value>Un message est restructuré en un segment par forme dont la langue cible a besoin, chacun étant une phrase complète. Un message dont les seuls sélecteurs sont d'un type non coché est laissé tel quel.</value>
+    <value>Chaque message est restructuré en un segment par forme dont la langue cible a besoin, chacun étant une phrase complète. Un message d'un type non coché est laissé tel quel.</value>
   </data>
   <data name="Expand_SeedHeader" xml:space="preserve">
     <value>Texte source pour les formes que la langue source ne possède pas</value>

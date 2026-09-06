@@ -38,7 +38,7 @@
     <value>Ordinalnachrichten ({count, selectordinal, ...})</value>
   </data>
   <data name="Expand_KindsHint" xml:space="preserve">
-    <value>Eine Nachricht wird in ein Segment pro Form umgegliedert, die die Zielsprache benötigt, jedes ein vollständiger Satz. Eine Nachricht, deren einzige Selektoren zu einer nicht angekreuzten Art gehören, bleibt unverändert.</value>
+    <value>Jede Nachricht wird in ein Segment pro Form umgegliedert, die die Zielsprache benötigt, jedes ein vollständiger Satz. Eine Nachricht einer nicht angekreuzten Art bleibt unverändert.</value>
   </data>
   <data name="Expand_SeedHeader" xml:space="preserve">
     <value>Ausgangstext für Formen, die die Ausgangssprache nicht hat</value>

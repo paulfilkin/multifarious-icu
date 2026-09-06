@@ -1,3 +1,0 @@
-{
- "rabbitWarning1": "{rabbitCount, plural, =0 {There are no rabbits. We appear to be safe.} =1 {That's no ordinary rabbit!} other {Run away! There are # vicious rabbits!}}"
-}

@@ -38,7 +38,7 @@
     <value>Messaggi ordinali ({count, selectordinal, ...})</value>
   </data>
   <data name="Expand_KindsHint" xml:space="preserve">
-    <value>Un messaggio viene ristrutturato in un segmento per ciascuna forma di cui la lingua di destinazione ha bisogno, ognuno una frase completa. Un messaggio i cui unici selettori sono di un tipo non selezionato viene lasciato com'è.</value>
+    <value>Ogni messaggio viene ristrutturato in un segmento per ciascuna forma di cui la lingua di destinazione ha bisogno, ognuno una frase completa. Un messaggio di un tipo non selezionato viene lasciato com'è.</value>
   </data>
   <data name="Expand_SeedHeader" xml:space="preserve">
     <value>Testo di origine per le forme che la lingua di origine non ha</value>
