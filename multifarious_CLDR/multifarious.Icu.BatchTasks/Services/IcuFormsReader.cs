@@ -552,18 +552,35 @@ namespace multifarious.Icu.BatchTasks.Services
             return null;
         }
 
+        /// <summary>
+        /// Compares the placeholders by count, not as sets: a second copy of '#' in the target is
+        /// an extra placeholder, and a set difference would not see it (Project 56, where the
+        /// verifier missed a duplicated count marker that the finalise task had reported).
+        /// </summary>
         private static string ParityProblem(ISegment source, ISegment target)
         {
             var sourceKeys = PlaceableKeys(source);
             var targetKeys = PlaceableKeys(target);
-            var missing = sourceKeys.Except(targetKeys).ToList();
-            var extra = targetKeys.Except(sourceKeys).ToList();
+            var missing = Surplus(sourceKeys, targetKeys);
+            var extra = Surplus(targetKeys, sourceKeys);
             if (missing.Count == 0 && extra.Count == 0) return null;
 
             var parts = new List<string>();
             if (missing.Count > 0) parts.Add("missing " + string.Join(", ", missing));
             if (extra.Count > 0) parts.Add("extra " + string.Join(", ", extra));
             return string.Join("; ", parts);
+        }
+
+        /// <summary>The keys in the first list beyond their count in the second, one entry per surplus copy.</summary>
+        private static List<string> Surplus(List<string> keys, List<string> against)
+        {
+            var remaining = new List<string>(against);
+            var surplus = new List<string>();
+            foreach (var key in keys)
+            {
+                if (!remaining.Remove(key)) surplus.Add(key);
+            }
+            return surplus;
         }
 
         private static List<string> PlaceableKeys(ISegment segment)

@@ -73,12 +73,16 @@ namespace multifarious.Icu.BatchTasks.Verification
                 _typedPound = settings.TypedPound;
                 _invalid = settings.Invalid;
             }
+
+            Diagnostics.Write("verifier: shared objects, segment=" + (_currentSegmentId.Id ?? "<all>")
+                + " bundle=" + (bundle != null) + " enabled=" + _enabled);
         }
 
         // ---- IBilingualContentHandler -------------------------------------------------------
 
         public void Initialize(IDocumentProperties documentInfo)
         {
+            Diagnostics.Write("verifier: initialise, reporter=" + (MessageReporter != null));
         }
 
         public void SetFileProperties(IFileProperties fileInfo)
@@ -87,6 +91,8 @@ namespace multifarious.Icu.BatchTasks.Verification
             var language = conversion == null ? null : conversion.TargetLanguage;
             _targetLanguage = language == null ? null
                 : language.CultureInfo != null ? language.CultureInfo.Name : language.IsoAbbreviation;
+            Diagnostics.Write("verifier: file " + (conversion != null && conversion.OriginalFilePath != null ? conversion.OriginalFilePath : "<?>")
+                + " target=" + (_targetLanguage ?? "<null>"));
         }
 
         public void FileComplete()
@@ -102,8 +108,26 @@ namespace multifarious.Icu.BatchTasks.Verification
             if (!_enabled || paragraphUnit == null || paragraphUnit.IsStructure || MessageReporter == null) return;
             if (!ResourceKey.IsExpanded(paragraphUnit)) return;
 
+            // A failure here must be seen, in the diagnostics and in the results, not swallowed.
+            try
+            {
+                Verify(paragraphUnit);
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.Write("verifier: FAILED on unit " + paragraphUnit.Properties.ParagraphUnitId.Id
+                    + ": " + ex.GetType().Name + ": " + ex.Message);
+                MessageReporter.ReportMessage(this, UIStrings.Verifier_Origin, ErrorLevel.Error,
+                    ex.GetType().Name + ": " + ex.Message, paragraphUnit.Properties.ParagraphUnitId.Id);
+            }
+        }
+
+        private void Verify(IParagraphUnit paragraphUnit)
+        {
             var model = _reader.Read(paragraphUnit, _targetLanguage);
             if (model == null) return;
+            Diagnostics.Write("verifier: unit " + paragraphUnit.Properties.ParagraphUnitId.Id
+                + " rows=" + model.Rows.Count + " parses=" + model.TargetParses);
 
             var targets = TargetSegments(paragraphUnit);
             var onlySegment = _currentSegmentId.Id;
@@ -147,6 +171,7 @@ namespace multifarious.Icu.BatchTasks.Verification
             if (level == null) return;
 
             var location = new TextLocation(target);
+            Diagnostics.Write("verifier: report " + level.Value + " segment " + target.Properties.Id.Id + ": " + message);
             MessageReporter.ReportMessage(this, UIStrings.Verifier_Origin, level.Value, message, location, location);
         }
 

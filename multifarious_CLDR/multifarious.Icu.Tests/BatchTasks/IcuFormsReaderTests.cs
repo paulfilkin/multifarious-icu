@@ -149,6 +149,21 @@ public class IcuFormsReaderTests
         Assert.True(model.TargetParses);
     }
 
+    /// <summary>A placeholder pasted twice is an extra one, even though the set of names is the same (Project 56).</summary>
+    [Fact]
+    public void A_duplicated_placeholder_in_the_target_is_reported_as_extra()
+    {
+        var unit = Expanded(UnreadCount);
+        var targets = TargetSegments(unit);
+        SetTarget(targets[0], "Привет, ", Tag("{name}"), ", у вас ", Tag("#"), " ", Tag("#"), " сообщение!");
+        SetTarget(targets[1], "Привет, ", Tag("{name}"), ", у вас сообщения!");
+
+        var model = new IcuFormsReader().Read(unit, "ru-RU")!;
+
+        Assert.Equal("extra #", model.Rows[0].PlaceholderWarning);
+        Assert.Equal("missing #", model.Rows[1].PlaceholderWarning);
+    }
+
     [Fact]
     public void A_translated_row_renders_the_target_with_the_same_samples_and_checks_parity()
     {
