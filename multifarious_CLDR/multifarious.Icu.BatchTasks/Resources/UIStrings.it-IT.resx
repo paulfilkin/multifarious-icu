@@ -61,24 +61,6 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>Con la prima scelta una forma di destinazione parte dalla forma di origine con lo stesso nome, se esiste, altrimenti da «other». Con la seconda ogni forma parte da «other», cosa che alcuni team preferiscono perché la forma inglese «one» è spesso formulata per esattamente un elemento e risulta strana come origine per tutto il resto.</value>
   </data>
-  <data name="Expand_HintsHeader" xml:space="preserve">
-    <value>Commenti dei segmenti</value>
-  </data>
-  <data name="Expand_Hints" xml:space="preserve">
-    <value>Aggiungi un suggerimento grammaticale per la forma quando è noto</value>
-  </data>
-  <data name="Expand_HintsHint" xml:space="preserve">
-    <value>Ogni commento indica la forma e alcune quantità di esempio che la selezionano. Un suggerimento aggiunge una frase su ciò che la forma richiede di solito, per esempio il genitivo singolare in russo.</value>
-  </data>
-  <data name="Expand_HintsHelpHeader" xml:space="preserve">
-    <value>Cosa sono i suggerimenti grammaticali?</value>
-  </data>
-  <data name="Expand_HintsHelp1" xml:space="preserve">
-    <value>I dati CLDR di Unicode indicano le forme di una lingua e quali quantità selezionano ciascuna, ma non dicono nulla su cosa la lingua ne faccia. Un suggerimento è una breve frase dalla tabella propria del plug-in, per esempio che la forma russa «few» richiede il genitivo singolare.</value>
-  </data>
-  <data name="Expand_HintsHelp2" xml:space="preserve">
-    <value>I suggerimenti sono consigli per un traduttore che non lavora nella lingua ogni giorno, non regole. Disattivateli se i vostri traduttori li trovano di disturbo; il nome della forma e le quantità di esempio restano comunque nel commento.</value>
-  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Limite di rami</value>
   </data>
@@ -345,15 +327,6 @@
   </data>
   <data name="Verifier_Invalid" xml:space="preserve">
     <value>Il messaggio ricomposto non è ICU valido: {0}.</value>
-  </data>
-  <data name="Expand_Comments" xml:space="preserve">
-    <value>Aggiungi a ogni segmento di origine un commento con la sua forma e le quantità che la selezionano</value>
-  </data>
-  <data name="Expand_CommentsHint" xml:space="preserve">
-    <value>Con la finestra ICU Forms aperta i commenti possono essere di disturbo; disattivateli e la finestra mostrerà comunque ogni forma.</value>
-  </data>
-  <data name="Expand_CommentsHelp1" xml:space="preserve">
-    <value>Ogni segmento di origine può portare un commento con la sua forma, le quantità che la selezionano e la provenienza del suo testo di origine. La finestra ICU Forms mostra le stesse informazioni dal messaggio stesso, quindi i commenti sono una comodità per i traduttori che lavorano senza la finestra, non qualcosa da cui dipendono le attività.</value>
   </data>
   <data name="VerifierPage_Intro" xml:space="preserve">
     <value>Il verificatore ICU controlla ogni forma di un messaggio ICU ristrutturato quando si preme F8 e man mano che i segmenti vengono confermati, ed elenca ciò che trova nella finestra Messaggi.</value>

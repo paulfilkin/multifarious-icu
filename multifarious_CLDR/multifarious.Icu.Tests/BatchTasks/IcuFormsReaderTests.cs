@@ -15,10 +15,10 @@ public class IcuFormsReaderTests
     private const string UnreadCount =
         "Hello {name}, you have {count, plural, one {# unread message} other {# unread messages}}!";
 
-    private static IParagraphUnit Expanded(string value, string language = "ru-RU", bool comments = true)
+    private static IParagraphUnit Expanded(string value, string language = "ru-RU")
     {
         var unit = ParagraphUnits.Json(value, "['inbox.unreadCount']");
-        new IcuExpandProcessor("en-GB", language, ExpansionOptions.Default with { WriteSegmentComments = comments }, "1.0.0")
+        new IcuExpandProcessor("en-GB", language, ExpansionOptions.Default, "1.0.0")
         {
             ItemFactory = ParagraphUnits.ItemFactory,
         }.ProcessParagraphUnit(unit);
@@ -26,30 +26,28 @@ public class IcuFormsReaderTests
     }
 
     [Fact]
-    public void The_rows_come_from_the_layout_and_cldr_so_a_file_without_comments_reads_the_same()
+    public void The_rows_and_their_tooltips_come_from_the_layout_cldr_and_the_unit_context()
     {
         var reader = new IcuFormsReader();
-        var withComments = reader.Read(Expanded(UnreadCount), "ru-RU")!;
-        var without = reader.Read(Expanded(UnreadCount, comments: false), "ru-RU")!;
+        var model = reader.Read(Expanded(UnreadCount), "ru-RU")!;
 
-        Assert.Equal(withComments.Rows.Select(r => r.Path), without.Rows.Select(r => r.Path));
-        Assert.Equal(withComments.Rows.Select(r => r.Category), without.Rows.Select(r => r.Category));
-        Assert.Equal(withComments.Rows.Select(r => r.Selector), without.Rows.Select(r => r.Selector));
-        Assert.Equal(withComments.Rows.Select(r => string.Join(",", r.Counts)), without.Rows.Select(r => string.Join(",", r.Counts)));
-        Assert.Equal(withComments.Rows.Select(r => r.FractionalOnly), without.Rows.Select(r => r.FractionalOnly));
-        Assert.Equal(withComments.Rows.Select(r => r.SourceRendered), without.Rows.Select(r => r.SourceRendered));
+        Assert.Equal(["count:one", "count:few", "count:many", "count:other"], model.Rows.Select(r => r.Path));
+        Assert.Equal(["one", "few", "many", "other"], model.Rows.Select(r => r.Category));
+        Assert.All(model.Rows, r => Assert.Equal("plural", r.Selector));
 
-        // The comment is the tooltip where it exists; without one the same facts are composed.
-        Assert.Contains("CLDR category: few", withComments.Rows[1].Comment);
-        Assert.Contains("CLDR category: few", without.Rows[1].Comment);
-        Assert.Contains("Used when the count is: 2, 3, 4", without.Rows[1].Comment);
-        Assert.Equal("other", withComments.Rows[1].SeededFrom);
-        Assert.Equal("", without.Rows[1].SeededFrom);
+        // The tooltip is composed: no comment is written anywhere, so the row says what a
+        // comment used to say, from the layout, CLDR and the seeding record on the context.
+        Assert.Contains("CLDR category: few", model.Rows[1].Comment);
+        Assert.Contains("Used when the count is: 2, 3, 4", model.Rows[1].Comment);
+        Assert.Contains("seeded from \"other\"", model.Rows[1].Comment);
+        Assert.Contains("Grammar:", model.Rows[2].Comment);
+        Assert.Equal("other", model.Rows[1].SeededFrom);
+        Assert.Equal("", model.Rows[0].SeededFrom);
 
         // A nested select over plurals and a walked message place their segments the same way.
         const string gendered =
             "{gender, select, female {{count, plural, one {She has # item} other {She has # items}}} other {{count, plural, one {They have # item} other {They have # items}}}} in the basket.";
-        var nested = reader.Read(Expanded(gendered, comments: false), "ru-RU")!;
+        var nested = reader.Read(Expanded(gendered), "ru-RU")!;
         Assert.Equal("gender:female/count:one", nested.Rows[0].Path);
         Assert.Equal("gender:other/count:other", nested.Rows[7].Path);
         Assert.Equal("plural", nested.Rows[0].Selector);
@@ -113,6 +111,42 @@ public class IcuFormsReaderTests
         Assert.Equal("", other.SeededFrom);
         Assert.Equal("other", model.Rows[1].SeededFrom);
         Assert.True(model.Rows[1].SyntheticSource);
+    }
+
+    private static IPlaceholderTag Tag(string syntax)
+    {
+        var properties = ParagraphUnits.PropertiesFactory.CreatePlaceholderTagProperties(syntax);
+        properties.DisplayText = syntax;
+        return ParagraphUnits.ItemFactory.CreatePlaceholderTag(properties);
+    }
+
+    /// <summary>
+    /// The expansion writes the arguments as placeholder tags, and a translator's target may
+    /// hold tags, locked spans from an older file, or a locked tag. Every shape renders with the
+    /// sample and counts as the same placeholder for parity.
+    /// </summary>
+    [Fact]
+    public void Tags_locked_spans_and_locked_tags_render_and_match_alike()
+    {
+        var unit = Expanded(UnreadCount);
+        var targets = TargetSegments(unit);
+        var lockedTag = ParagraphUnits.ItemFactory.CreateLockedContent(
+            ParagraphUnits.PropertiesFactory.CreateLockedContentProperties(LockTypeFlags.Manual));
+        lockedTag.Content.Add(Tag("#"));
+        SetTarget(targets[0], "Привет, ", Tag("{name}"), ", у вас ", Tag("#"), " сообщение!");
+        SetTarget(targets[1], "Привет, ", Locked("{name}"), ", у вас ", lockedTag, " сообщения!");
+        SetTarget(targets[2], "Привет, ", Tag("{name}"), ", у вас # сообщений!");
+
+        var model = new IcuFormsReader().Read(unit, "ru-RU")!;
+
+        Assert.Equal("Hello Anna, you have 1 unread message!", model.Rows[0].SourceRendered);
+        Assert.Equal("Привет, Anna, у вас 1 сообщение!", model.Rows[0].TargetRendered);
+        Assert.Null(model.Rows[0].PlaceholderWarning);
+        Assert.Equal("Привет, Anna, у вас 2 сообщения!", model.Rows[1].TargetRendered);
+        Assert.Null(model.Rows[1].PlaceholderWarning);
+        Assert.Contains("missing #", model.Rows[2].PlaceholderWarning);
+        Assert.True(model.Rows[2].TypedPound);
+        Assert.True(model.TargetParses);
     }
 
     [Fact]
@@ -228,7 +262,7 @@ public class IcuFormsReaderTests
         const string order =
             "{spam, plural, =0 {Egg and bacon, no spam} one {Egg, bacon and spam} other {Egg, bacon and # helpings of spam}} " +
             "for {diners, plural, one {# diner} other {# diners}}.";
-        var model = new IcuFormsReader().Read(Expanded(order, comments: false), "ru-RU")!;
+        var model = new IcuFormsReader().Read(Expanded(order), "ru-RU")!;
 
         Assert.Equal(20, model.Rows.Count);
         var rendered = model.Rows.ToDictionary(r => r.Path, r => r.SourceRendered);

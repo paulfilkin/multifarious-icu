@@ -61,24 +61,6 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>Avec le premier choix, une forme cible part de la forme source du même nom lorsqu'elle existe, sinon de « other ». Avec le second, chaque forme part de « other », ce que certaines équipes préfèrent parce que la forme anglaise « one » est souvent rédigée pour exactement un élément et fait un drôle de point de départ pour tout le reste.</value>
   </data>
-  <data name="Expand_HintsHeader" xml:space="preserve">
-    <value>Commentaires de segment</value>
-  </data>
-  <data name="Expand_Hints" xml:space="preserve">
-    <value>Ajouter une indication grammaticale pour la forme lorsqu'elle est connue</value>
-  </data>
-  <data name="Expand_HintsHint" xml:space="preserve">
-    <value>Chaque commentaire nomme la forme et des nombres d'exemple qui la sélectionnent. Une indication ajoute une phrase sur ce que la forme exige habituellement, par exemple le génitif singulier en russe.</value>
-  </data>
-  <data name="Expand_HintsHelpHeader" xml:space="preserve">
-    <value>Que sont les indications grammaticales ?</value>
-  </data>
-  <data name="Expand_HintsHelp1" xml:space="preserve">
-    <value>Les données CLDR d'Unicode nomment les formes d'une langue et les nombres qui sélectionnent chacune, mais ne disent rien de ce que la langue en fait. Une indication est une courte phrase issue de la table propre au plug-in, par exemple que la forme russe « few » exige le génitif singulier.</value>
-  </data>
-  <data name="Expand_HintsHelp2" xml:space="preserve">
-    <value>Les indications sont des conseils pour un traducteur qui ne travaille pas dans la langue tous les jours, pas des règles. Désactivez-les si vos traducteurs les trouvent gênantes ; le nom de la forme et les nombres d'exemple restent dans le commentaire quoi qu'il en soit.</value>
-  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Plafond de branches</value>
   </data>
@@ -345,15 +327,6 @@
   </data>
   <data name="Verifier_Invalid" xml:space="preserve">
     <value>Le message réassemblé n'est pas un ICU valide : {0}.</value>
-  </data>
-  <data name="Expand_Comments" xml:space="preserve">
-    <value>Ajouter à chaque segment source un commentaire nommant sa forme et les nombres qui la sélectionnent</value>
-  </data>
-  <data name="Expand_CommentsHint" xml:space="preserve">
-    <value>Avec la fenêtre ICU Forms ouverte, les commentaires peuvent gêner ; désactivez-les, la fenêtre montre toujours chaque forme.</value>
-  </data>
-  <data name="Expand_CommentsHelp1" xml:space="preserve">
-    <value>Chaque segment source peut porter un commentaire nommant sa forme, les nombres qui la sélectionnent et l'origine de son texte source. La fenêtre ICU Forms montre les mêmes informations à partir du message lui-même ; les commentaires sont donc une commodité pour les traducteurs qui travaillent sans la fenêtre, et non quelque chose dont les tâches dépendent.</value>
   </data>
   <data name="VerifierPage_Intro" xml:space="preserve">
     <value>Le vérificateur ICU contrôle chaque forme d'un message ICU restructuré quand vous appuyez sur F8 et au fur et à mesure que les segments sont confirmés, et liste ce qu'il trouve dans la fenêtre Messages.</value>

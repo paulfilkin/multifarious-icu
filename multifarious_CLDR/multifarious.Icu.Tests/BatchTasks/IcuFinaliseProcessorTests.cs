@@ -1,8 +1,10 @@
 using Icu.Core;
 using Icu.Core.Tests;
+using multifarious.Icu.BatchTasks;
 using multifarious.Icu.BatchTasks.Services;
 using multifarious.Icu.Expansion;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
+using Sdl.FileTypeSupport.Framework.NativeApi;
 
 namespace multifarious.Icu.Tests.BatchTasks;
 
@@ -32,8 +34,7 @@ public class IcuFinaliseProcessorTests
     private static IcuFinaliseProcessor Finaliser(string language, FinaliseOptions? options = null) =>
         new(language, options ?? FinaliseOptions.Default) { ItemFactory = ParagraphUnits.ItemFactory };
 
-    private static List<ISegment> SegmentsOf(IParagraph paragraph) =>
-        ParagraphUnits.ItemsOf(paragraph).OfType<ISegment>().ToList();
+    private static List<ISegment> SegmentsOf(IParagraph paragraph) => ParagraphUnits.SegmentsOf(paragraph);
 
     private static string Projection(IParagraph paragraph) => RawValueReconstruction.Reconstruct(paragraph).RawValue;
 
@@ -66,10 +67,13 @@ public class IcuFinaliseProcessorTests
         Assert.Equal(4, finaliser.Warnings.Count);
         Assert.All(finaliser.Warnings, w => Assert.Contains("untranslated", w.Reason));
 
-        // The warning joins the expansion comment on the source segment; the target segment
-        // carries no comment at all, because target comments are the translator's.
-        Assert.All(SegmentsOf(unit.Source), s => Assert.Equal(2, ((ICommentMarker)s[0]).Comments.Count));
-        Assert.All(SegmentsOf(unit.Target), s => Assert.DoesNotContain(ParagraphUnits.ItemsOf(s), i => i is ICommentMarker));
+        // The warnings go on the unit; no segment on either side carries a comment, because
+        // target comments are the translator's.
+        var comments = ParagraphUnits.UnitComments(unit);
+        Assert.Equal(["Segment 1: ", "Segment 2: ", "Segment 3: ", "Segment 4: "], comments.Select(c => c.Substring(0, 11)));
+        Assert.All(comments, c => Assert.Contains("untranslated", c));
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Source));
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
 
         AssertRendersLikeSource(UnreadCount, Projection(unit.Target), "ru",
             new Dictionary<string, string> { ["name"] = "Anna" }, "1", "2", "5", "21", "0.5");
@@ -150,6 +154,206 @@ public class IcuFinaliseProcessorTests
         Assert.DoesNotContain("''''", once);
     }
 
+    private static IParagraphUnit ExpandedLocked(string value)
+    {
+        var unit = ParagraphUnits.Json(value, "key");
+        new IcuExpandProcessor("en-GB", "ru-RU", ExpansionOptions.Default with { LockPlaceholders = true }, "1.0.0")
+        {
+            ItemFactory = ParagraphUnits.ItemFactory,
+        }.ProcessParagraphUnit(unit);
+        return unit;
+    }
+
+    private static IPlaceholderTag Tag(string syntax)
+    {
+        var properties = ParagraphUnits.PropertiesFactory.CreatePlaceholderTagProperties(syntax);
+        properties.DisplayText = syntax;
+        return ParagraphUnits.ItemFactory.CreatePlaceholderTag(properties);
+    }
+
+    private static int TagsUnder(IAbstractMarkupDataContainer container)
+    {
+        var count = 0;
+        for (var i = 0; i < container.Count; i++)
+        {
+            if (container[i] is IPlaceholderTag) count++;
+            var locked = container[i] as ILockedContent;
+            if (locked != null) count += TagsUnder(locked.Content);
+            else if (container[i] is IAbstractMarkupDataContainer nested) count += TagsUnder(nested);
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// The expansion writes placeholder tags inside the segments; Studio's JSON writer emits
+    /// none of them. Finalise turns every tag, bare in the target or locked in the source, into
+    /// locked text on both sides, the projection is unchanged, and a second run finds nothing
+    /// left to do.
+    /// </summary>
+    [Fact]
+    public void Placeholder_tags_become_locked_text_on_both_sides_and_a_second_run_changes_nothing()
+    {
+        var unit = Expanded(UnreadCount);
+        var targets = SegmentsOf(unit.Target);
+        targets[0].Add(ParagraphUnits.ItemFactory.CreateText(ParagraphUnits.PropertiesFactory.CreateTextProperties("Привет, ")));
+        targets[0].Add(Tag("{name}"));
+        targets[0].Add(ParagraphUnits.ItemFactory.CreateText(ParagraphUnits.PropertiesFactory.CreateTextProperties(", у вас ")));
+        targets[0].Add(Tag("#"));
+        targets[0].Add(ParagraphUnits.ItemFactory.CreateText(ParagraphUnits.PropertiesFactory.CreateTextProperties(" сообщение!")));
+        Assert.True(TagsUnder(unit.Source) > 0);
+
+        var finaliser = Finaliser("ru-RU");
+        finaliser.ProcessParagraphUnit(unit);
+        var once = Projection(unit.Target);
+
+        Assert.DoesNotContain(finaliser.Warnings, w => w.Reason.Contains("Placeholder mismatch"));
+        Assert.Equal(0, TagsUnder(unit.Source));
+        Assert.Equal(0, TagsUnder(unit.Target));
+        Assert.Equal(["{name}", "#"],
+            ParagraphUnits.ItemsOf(SegmentsOf(unit.Target)[0]).OfType<ILockedContent>()
+                .Select(l => RawValueReconstruction.Reconstruct(l.Content).RawValue));
+        Assert.Contains("one {Привет, {name}, у вас # сообщение!}", once);
+        Assert.Equal("Привет, Anna, у вас 1 сообщение!",
+            MessageRenderer.Render(IcuMessage.Parse(once).Nodes,
+                new Dictionary<string, string> { ["name"] = "Anna", ["count"] = "1" }, CldrCategories.For("ru")));
+
+        Finaliser("ru-RU").ProcessParagraphUnit(unit);
+        Assert.Equal(once, Projection(unit.Target));
+    }
+
+    [Fact]
+    public void Locked_placeholder_tags_flatten_the_same_way()
+    {
+        var unit = ExpandedLocked(UnreadCount);
+        Assert.True(TagsUnder(unit.Source) > 0);
+        Assert.NotEmpty(ParagraphUnits.ContentOf(SegmentsOf(unit.Source)[0]).OfType<ILockedContent>());
+
+        Finaliser("ru-RU").ProcessParagraphUnit(unit);
+
+        Assert.Equal(0, TagsUnder(unit.Source));
+        Assert.Equal(0, TagsUnder(unit.Target));
+        AssertRendersLikeSource(UnreadCount, Projection(unit.Target), "ru", new Dictionary<string, string> { ["name"] = "Anna" }, "1", "2", "5");
+    }
+
+    /// <summary>A tag in the target matches a locked span in the source and the other way round: the syntax is the key.</summary>
+    [Fact]
+    public void Parity_is_by_syntax_whichever_construct_carries_it()
+    {
+        var unit = Expanded(UnreadCount);
+        Finaliser("ru-RU").ProcessParagraphUnit(unit);
+        var target = SegmentsOf(unit.Target)[0];
+        var span = ParagraphUnits.ItemsOf(target).OfType<ILockedContent>().First();
+        var index = target.IndexOf(span);
+        target.RemoveAt(index);
+        target.Insert(index, Tag("{name}"));
+
+        var finaliser = Finaliser("ru-RU");
+        finaliser.ProcessParagraphUnit(unit);
+
+        Assert.Empty(finaliser.Warnings);
+        Assert.Equal(0, TagsUnder(unit.Target));
+    }
+
+    private static void CopySourceToTarget(ISegment source, ISegment target)
+    {
+        target.Clear();
+        foreach (var item in ParagraphUnits.ItemsOf(source))
+        {
+            target.Add((IAbstractMarkupData)item.Clone());
+        }
+    }
+
+    private static void WrapInPluginComment(ISegment segment)
+    {
+        var comment = ParagraphUnits.PropertiesFactory.CreateComment("CLDR category: one", Constants.CommentAuthor, Severity.Low);
+        var properties = ParagraphUnits.PropertiesFactory.CreateCommentProperties();
+        properties.Add(comment);
+        var marker = ParagraphUnits.ItemFactory.CreateCommentMarker(properties);
+        var content = ParagraphUnits.ItemsOf(segment);
+        segment.Clear();
+        foreach (var item in content) marker.Add(item);
+        segment.Add(marker);
+    }
+
+    private static ICommentMarker TranslatorComment(string text)
+    {
+        var comment = ParagraphUnits.PropertiesFactory.CreateComment(text, "Anna", Severity.Low);
+        var properties = ParagraphUnits.PropertiesFactory.CreateCommentProperties();
+        properties.Add(comment);
+        return ParagraphUnits.ItemFactory.CreateCommentMarker(properties);
+    }
+
+    /// <summary>
+    /// Studio's pseudo-translation and Copy Source to Target copy the source segment's content
+    /// with the plugin's comment marker in it. Finalise takes the plugin's comments out of the
+    /// targets and leaves the translator's own, whether in a marker of their own or sharing one.
+    /// </summary>
+    [Fact]
+    public void The_plugins_comments_copied_into_targets_are_removed_and_the_translators_stay()
+    {
+        // A file expanded before the notes moved to the unit comment: the source segments carry
+        // the plugin's marker, and Studio's copy put it into the targets.
+        var unit = Expanded(UnreadCount);
+        var sources = SegmentsOf(unit.Source);
+        var targets = SegmentsOf(unit.Target);
+        foreach (var source in sources) WrapInPluginComment(source);
+        for (var i = 0; i < targets.Count; i++) CopySourceToTarget(sources[i], targets[i]);
+        Assert.All(targets, t => Assert.IsAssignableFrom<ICommentMarker>(t[0]));
+
+        // Segment 2: the translator's own marker around a word, inside the copied marker.
+        var copied = (ICommentMarker)targets[1][0];
+        var note = TranslatorComment("check the case");
+        note.Add(ParagraphUnits.ItemFactory.CreateText(ParagraphUnits.PropertiesFactory.CreateTextProperties(" NB")));
+        copied.Add(note);
+
+        // Segment 3: the translator added a comment to the copied marker itself.
+        ((ICommentMarker)targets[2][0]).Comments.Add(
+            ParagraphUnits.PropertiesFactory.CreateComment("query for the client", "Anna", Severity.Low));
+
+        var finaliser = Finaliser("ru-RU");
+        finaliser.ProcessParagraphUnit(unit);
+
+        Assert.Equal(4, finaliser.CommentsStripped);
+        Assert.Empty(finaliser.Warnings);
+        targets = SegmentsOf(unit.Target);
+
+        Assert.DoesNotContain(ParagraphUnits.ItemsOf(targets[0]), i => i is ICommentMarker);
+        Assert.Equal(["{name}", "#"],
+            ParagraphUnits.ItemsOf(targets[0]).OfType<ILockedContent>().Select(l => RawValueReconstruction.Reconstruct(l.Content).RawValue));
+
+        var kept = Assert.Single(ParagraphUnits.ItemsOf(targets[1]).OfType<ICommentMarker>());
+        Assert.Equal("check the case", kept.Comments.GetItem(0).Text);
+
+        var shared = Assert.IsAssignableFrom<ICommentMarker>(targets[2][0]);
+        Assert.Equal(1, shared.Comments.Count);
+        Assert.Equal("query for the client", shared.Comments.GetItem(0).Text);
+
+        // The source keeps its comments, and the projection still parses with the note's text in place.
+        Assert.All(SegmentsOf(unit.Source), s => Assert.NotNull(ParagraphUnits.CommentOf(s)));
+        Assert.Contains("unread messages! NB}", Projection(unit.Target));
+        Assert.True(IcuParser.TryParse(Projection(unit.Target), out _, out _));
+
+        Finaliser("ru-RU").ProcessParagraphUnit(unit);
+        Assert.Equal(1, Assert.IsAssignableFrom<ICommentMarker>(SegmentsOf(unit.Target)[2][0]).Comments.Count);
+    }
+
+    /// <summary>Finalise warnings go on the unit, and no segment on either side gets a marker.</summary>
+    [Fact]
+    public void Finalise_warnings_go_on_the_unit_and_no_segment_gets_a_marker()
+    {
+        var unit = Expanded(UnreadCount);
+        Assert.Empty(ParagraphUnits.UnitComments(unit));
+
+        Finaliser("ru-RU").ProcessParagraphUnit(unit);
+
+        var comments = ParagraphUnits.UnitComments(unit);
+        Assert.Equal(4, comments.Count);
+        Assert.All(comments, c => Assert.Contains("untranslated", c));
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Source));
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
+        Assert.Equal(4, SegmentsOf(unit.Source).Count);
+    }
+
     [Fact]
     public void A_missing_protected_span_in_the_target_is_warned_about()
     {
@@ -163,9 +367,9 @@ public class IcuFinaliseProcessorTests
         finaliser.ProcessParagraphUnit(unit);
 
         Assert.Contains(finaliser.Warnings, w => w.Reason.Contains("missing from the target"));
-        var sourceComments = ((ICommentMarker)SegmentsOf(unit.Source)[0][0]).Comments;
-        Assert.Contains("Placeholder mismatch", sourceComments.GetItem(sourceComments.Count - 1).Text);
-        Assert.DoesNotContain(ParagraphUnits.ItemsOf(target), i => i is ICommentMarker);
+        var comments = ParagraphUnits.UnitComments(unit);
+        Assert.StartsWith("Segment 1: Placeholder mismatch", comments[comments.Count - 1]);
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
     }
 
     [Fact]

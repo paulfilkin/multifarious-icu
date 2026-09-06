@@ -82,7 +82,7 @@ public class IcuFormsViewTests
     public void The_view_model_shows_the_message_marks_the_active_row_and_resolves_a_count()
     {
         var unit = Expanded(UnreadCount);
-        var segments = ParagraphUnits.ItemsOf(unit.Source).OfType<ISegment>().ToList();
+        var segments = ParagraphUnits.SegmentsOf(unit.Source);
         var viewModel = new IcuFormsViewModel();
         Assert.False(viewModel.HasMessage);
         Assert.Equal("No document open", viewModel.EmptyTitle);

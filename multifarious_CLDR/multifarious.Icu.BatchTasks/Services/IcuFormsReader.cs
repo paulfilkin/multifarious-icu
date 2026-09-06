@@ -130,6 +130,16 @@ namespace multifarious.Icu.BatchTasks.Services
             var expanded = Metadata(context, "icu:expandedSelectors")
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
+            // Which segments were seeded from another source form, by segment number.
+            var seededFrom = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var entry in Metadata(context, "icu:seededFrom").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var colon = entry.IndexOf(':');
+                if (colon > 0) seededFrom[entry.Substring(0, colon)] = entry.Substring(colon + 1);
+            }
+            var synthetic = new HashSet<string>(
+                Metadata(context, "icu:syntheticSource").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.Ordinal);
+
             var samples = new Dictionary<string, string>(StringComparer.Ordinal);
             var nameOrdinal = 0;
             var inPluralContext = ContainsPluralKindSyntax(unit.Target);
@@ -142,7 +152,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 var place = placed[index];
                 var target = index < targetSegments.Count ? targetSegments[index] : null;
                 if (target != null && activeId != null && target.Properties.Id.Id == activeId) target = activeTarget;
-                rows.Add(Row(place, target, targetLanguageTag, samples, ref nameOrdinal, inPluralContext));
+                rows.Add(Row(place, target, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic));
             }
 
             var projection = EscapedProjection(unit.Target, inPluralContext, activeId, activeTarget);
@@ -213,10 +223,15 @@ namespace multifarious.Icu.BatchTasks.Services
         {
             var frames = new List<Frame>();
             var placed = new List<PlacedSegment>();
+            Place(source, frames, placed);
+            return placed;
+        }
 
-            for (var i = 0; i < source.Count; i++)
+        private static void Place(IAbstractMarkupDataContainer container, List<Frame> frames, List<PlacedSegment> placed)
+        {
+            for (var i = 0; i < container.Count; i++)
             {
-                var item = source[i];
+                var item = container[i];
                 var syntax = SyntaxOf(item);
                 if (syntax != null)
                 {
@@ -245,7 +260,14 @@ namespace multifarious.Icu.BatchTasks.Services
                 }
 
                 var segment = item as ISegment;
-                if (segment == null) continue;
+                if (segment == null)
+                {
+                    // The comment marker around a segment, or any other wrapper: the segments
+                    // inside take the frames as they stand.
+                    var wrapper = item as IAbstractMarkupDataContainer;
+                    if (wrapper != null) Place(wrapper, frames, placed);
+                    continue;
+                }
 
                 var place = new PlacedSegment { Segment = segment };
                 if (frames.Count > 0)
@@ -258,12 +280,10 @@ namespace multifarious.Icu.BatchTasks.Services
                 }
                 placed.Add(place);
             }
-
-            return placed;
         }
 
         private IcuFormRow Row(PlacedSegment place, ISegment target, string language, Dictionary<string, string> samples,
-            ref int nameOrdinal, bool inPluralContext)
+            ref int nameOrdinal, bool inPluralContext, Dictionary<string, string> seededFrom, HashSet<string> synthetic)
         {
             var source = place.Segment;
             var row = new IcuFormRow
@@ -303,18 +323,22 @@ namespace multifarious.Icu.BatchTasks.Services
             row.Counts = counts;
             row.SampleCount = counts.FirstOrDefault() ?? string.Empty;
 
-            // The expansion's comment, where there is one, is the tooltip and says which source
-            // form seeded this one; without it the tooltip is composed from the same facts.
+            // Which source form seeded this segment comes from the unit context; a file expanded
+            // when the segments carried comments has it on the comment, which then also serves
+            // as the tooltip. Otherwise the tooltip is composed from the same facts.
+            string seed;
+            row.SeededFrom = seededFrom.TryGetValue(row.SegmentId, out seed) ? seed : string.Empty;
+            row.SyntheticSource = synthetic.Contains(row.SegmentId);
             var comment = FirstComment(source);
             if (comment != null)
             {
-                row.SeededFrom = Metadata(comment, "icu:seededFrom");
-                row.SyntheticSource = Metadata(comment, "icu:syntheticSource") == "true";
+                if (comment.MetaDataContainsKey("icu:seededFrom")) row.SeededFrom = Metadata(comment, "icu:seededFrom");
+                if (comment.MetaDataContainsKey("icu:syntheticSource")) row.SyntheticSource = Metadata(comment, "icu:syntheticSource") == "true";
                 row.Comment = comment.Text ?? string.Empty;
             }
             else
             {
-                row.Comment = ComposedComment(place, counts, row.FractionalOnly, hint);
+                row.Comment = ComposedComment(place, counts, row.FractionalOnly, hint, row.SeededFrom);
             }
 
             var pound = row.SampleCount.Length == 0 ? "#" : row.SampleCount;
@@ -338,7 +362,7 @@ namespace multifarious.Icu.BatchTasks.Services
             return row;
         }
 
-        private static string ComposedComment(PlacedSegment place, List<string> counts, bool fractionalOnly, string hint)
+        private static string ComposedComment(PlacedSegment place, List<string> counts, bool fractionalOnly, string hint, string seededFrom)
         {
             if (place.Selector == "none") return string.Empty;
 
@@ -362,6 +386,10 @@ namespace multifarious.Icu.BatchTasks.Services
                 }
             }
 
+            if (!string.IsNullOrEmpty(seededFrom))
+            {
+                builder.Append('\n').Append("Source form: seeded from \"").Append(seededFrom).Append('"');
+            }
             if (hint != null) builder.Append('\n').Append("Grammar: ").Append(hint);
             return builder.ToString();
         }
@@ -549,9 +577,11 @@ namespace multifarious.Icu.BatchTasks.Services
             return keys;
         }
 
+        /// <summary>The expansion's comment: the marker inside the segment, wrapping its content, or one around the segment.</summary>
         private static IComment FirstComment(ISegment segment)
         {
-            var marker = segment.Count > 0 ? segment[0] as ICommentMarker : null;
+            var marker = segment.Parent as ICommentMarker;
+            if (marker == null) marker = segment.Count > 0 ? segment[0] as ICommentMarker : null;
             return marker != null && marker.Comments != null && marker.Comments.Count > 0 ? marker.Comments.GetItem(0) : null;
         }
 

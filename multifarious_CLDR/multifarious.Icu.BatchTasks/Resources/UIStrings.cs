@@ -73,33 +73,6 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Help paragraph. "one" and "other" are ICU keywords and must not be translated.</summary>
         public static string Expand_SeedHelp2 { get { return Manager.GetString("Expand_SeedHelp2", Culture); } }
 
-        /// <summary>Group heading. What the task writes into the comment on each source segment.</summary>
-        public static string Expand_HintsHeader { get { return Manager.GetString("Expand_HintsHeader", Culture); } }
-
-        /// <summary>Tick box, on by default. The comment is what the translator sees on the source segment.</summary>
-        public static string Expand_Comments { get { return Manager.GetString("Expand_Comments", Culture); } }
-
-        /// <summary>Hint under the tick box. "ICU Forms" is the name of the plugin's window under the editor.</summary>
-        public static string Expand_CommentsHint { get { return Manager.GetString("Expand_CommentsHint", Culture); } }
-
-        /// <summary>Help paragraph.</summary>
-        public static string Expand_CommentsHelp1 { get { return Manager.GetString("Expand_CommentsHelp1", Culture); } }
-
-        /// <summary>Tick box, on by default.</summary>
-        public static string Expand_Hints { get { return Manager.GetString("Expand_Hints", Culture); } }
-
-        /// <summary>Hint under the tick box. "genitive singular" is a grammatical case; translate it as a grammarian would.</summary>
-        public static string Expand_HintsHint { get { return Manager.GetString("Expand_HintsHint", Culture); } }
-
-        /// <summary>Header of a collapsible help panel.</summary>
-        public static string Expand_HintsHelpHeader { get { return Manager.GetString("Expand_HintsHelpHeader", Culture); } }
-
-        /// <summary>Help paragraph. "CLDR" is the Unicode Common Locale Data Repository and stays as it is. "few" is an ICU keyword.</summary>
-        public static string Expand_HintsHelp1 { get { return Manager.GetString("Expand_HintsHelp1", Culture); } }
-
-        /// <summary>Help paragraph.</summary>
-        public static string Expand_HintsHelp2 { get { return Manager.GetString("Expand_HintsHelp2", Culture); } }
-
         /// <summary>Group heading. A cap on how many segments one message may become.</summary>
         public static string Expand_BudgetHeader { get { return Manager.GetString("Expand_BudgetHeader", Culture); } }
 

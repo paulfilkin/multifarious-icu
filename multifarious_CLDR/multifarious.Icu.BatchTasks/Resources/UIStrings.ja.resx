@@ -61,24 +61,6 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>最初の選択肢では、訳文の形式は同じ名前の原文の形式があればそこから、なければ「other」から始まります。2 番目の選択肢では、すべての形式が「other」から始まります。英語の「one」の形式はちょうど 1 つの項目を想定して書かれていることが多く、他の形式の原文としては不自然なため、こちらを好むチームもあります。</value>
   </data>
-  <data name="Expand_HintsHeader" xml:space="preserve">
-    <value>セグメントのコメント</value>
-  </data>
-  <data name="Expand_Hints" xml:space="preserve">
-    <value>形式の文法ヒントが分かっている場合は追加する</value>
-  </data>
-  <data name="Expand_HintsHint" xml:space="preserve">
-    <value>各コメントには、形式と、それを選択する数の例が示されます。ヒントは、その形式が通常何を必要とするか (たとえばロシア語の属格単数形) を説明する文を追加します。</value>
-  </data>
-  <data name="Expand_HintsHelpHeader" xml:space="preserve">
-    <value>文法ヒントとは何ですか?</value>
-  </data>
-  <data name="Expand_HintsHelp1" xml:space="preserve">
-    <value>Unicode CLDR のデータは、言語にどの形式があり、どの数がそれぞれを選択するかを示しますが、言語がその形式をどう扱うかについては何も述べていません。ヒントはプラグイン独自の表から取られた短い文で、たとえばロシア語の「few」の形式には属格単数形が必要だといったものです。</value>
-  </data>
-  <data name="Expand_HintsHelp2" xml:space="preserve">
-    <value>ヒントは、その言語で毎日作業しているわけではない翻訳者への助言であり、規則ではありません。翻訳者が煩わしいと感じる場合はオフにしてください。形式の名前と数の例は、いずれにしてもコメントに残ります。</value>
-  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>分岐の上限</value>
   </data>
@@ -345,15 +327,6 @@
   </data>
   <data name="Verifier_Invalid" xml:space="preserve">
     <value>再構成されたメッセージは有効な ICU ではありません: {0}。</value>
-  </data>
-  <data name="Expand_Comments" xml:space="preserve">
-    <value>各原文セグメントに、その形式とそれを選択する数を示すコメントを追加する</value>
-  </data>
-  <data name="Expand_CommentsHint" xml:space="preserve">
-    <value>ICU Forms ウィンドウを開いているとコメントが邪魔になることがあります。オフにしても、ウィンドウにはすべての形式が表示されます。</value>
-  </data>
-  <data name="Expand_CommentsHelp1" xml:space="preserve">
-    <value>各原文セグメントには、その形式、それを選択する数、原文テキストの由来を示すコメントを付けられます。ICU Forms ウィンドウはメッセージ自体から同じ情報を表示するため、コメントはウィンドウなしで作業する翻訳者のための便宜であり、タスクが依存するものではありません。</value>
   </data>
   <data name="VerifierPage_Intro" xml:space="preserve">
     <value>ICU Verifier は、F8 を押したときとセグメントの確定時に、再構成された ICU メッセージのすべての形式を検証し、結果を [メッセージ] ウィンドウに一覧表示します。</value>

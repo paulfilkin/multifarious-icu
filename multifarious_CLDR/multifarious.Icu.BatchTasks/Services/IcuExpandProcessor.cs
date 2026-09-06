@@ -65,7 +65,7 @@ namespace multifarious.Icu.BatchTasks.Services
             _options = options ?? ExpansionOptions.Default;
             _appVersion = appVersion ?? string.Empty;
             _plurals = CldrPlurals.Default;
-            _planner = new ExpansionPlanner(_plurals, _options.IncludeHints ? GrammaticalHints.Embedded : GrammaticalHints.None);
+            _planner = new ExpansionPlanner(_plurals, GrammaticalHints.Embedded);
         }
 
         /// <summary>Translatable units seen.</summary>
@@ -217,8 +217,8 @@ namespace multifarious.Icu.BatchTasks.Services
             {
                 if (_writer == null)
                 {
-                    _writer = new ExpansionWriter(ItemFactory, PropertiesFactory, _options.TagConstruct,
-                        _plurals.CldrVersion, _appVersion, _options.WriteSegmentComments);
+                    _writer = new ExpansionWriter(ItemFactory, PropertiesFactory, _options.LockPlaceholders,
+                        _plurals.CldrVersion, _appVersion);
                 }
                 return _writer;
             }

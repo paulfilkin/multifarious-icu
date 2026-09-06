@@ -24,18 +24,11 @@ public class IcuExpandProcessorTests
         };
 
     private static List<ISegment> SegmentsOf(IAbstractMarkupDataContainer paragraph) =>
-        ParagraphUnits.ItemsOf(paragraph).OfType<ISegment>().ToList();
+        ParagraphUnits.SegmentsOf(paragraph);
 
-    private static List<string> RolesOf(IAbstractMarkupDataContainer paragraph) =>
-        ParagraphUnits.ItemsOf(paragraph).OfType<IPlaceholderTag>()
-            .Select(tag => tag.Properties.GetMetaData("icu:role"))
-            .ToList();
-
-    private static string CategoryOf(ISegment segment)
-    {
-        var marker = (ICommentMarker)segment[0];
-        return marker.Comments.GetItem(0).GetMetaData("icu:category");
-    }
+    /// <summary>The forms as the ICU Forms reader reads them back from the layout, in segment order.</summary>
+    private static List<IcuFormRow> Rows(IParagraphUnit unit, string language = "ru-RU") =>
+        new IcuFormsReader().Read(unit, language)!.Rows.ToList();
 
     [Fact]
     public void A_plural_expands_to_one_segment_per_target_category_in_both_paragraphs()
@@ -48,24 +41,25 @@ public class IcuExpandProcessorTests
         var target = SegmentsOf(unit.Target);
         Assert.Equal(4, source.Count);
         Assert.Equal(4, target.Count);
-        Assert.Equal(["one", "few", "many", "other"], source.Select(CategoryOf));
+        Assert.Equal(["one", "few", "many", "other"], Rows(unit).Select(r => r.Category));
         Assert.Equal(["1", "2", "3", "4"], source.Select(s => s.Properties.Id.Id));
         Assert.Equal(source.Select(s => s.Properties.Id.Id), target.Select(s => s.Properties.Id.Id));
         // Count rather than Assert.Empty: enumerating a framework segment is not guaranteed.
         Assert.All(target, segment => Assert.True(segment.Count == 0, "target segment is not empty"));
     }
 
-    private static ExpansionOptions WithTags => ExpansionOptions.Default with { TagConstruct = TagConstruct.PlaceholderTags };
+    private static ExpansionOptions WithLock => ExpansionOptions.Default with { LockPlaceholders = true };
 
     private static string LockedText(ILockedContent locked) =>
         RawValueReconstruction.Reconstruct(locked.Content).RawValue;
 
     /// <summary>
-    /// The default construct: locked text, the one thing both of Studio's writers emit verbatim.
-    /// The syntax sits between the segments; arguments and '#' sit inside them.
+    /// The syntax sits between the segments as locked text, the one thing both of Studio's
+    /// writers emit verbatim; arguments and '#' sit inside the segments as placeholder tags,
+    /// which the translator can place with QuickPlace and the verifiers can check.
     /// </summary>
     [Fact]
-    public void The_selector_syntax_sits_in_locked_content_between_the_segments()
+    public void The_selector_syntax_sits_in_locked_content_between_the_segments_and_the_arguments_are_tags()
     {
         var unit = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
 
@@ -84,42 +78,57 @@ public class IcuExpandProcessorTests
         ], items.OfType<ILockedContent>().Select(LockedText));
 
         var first = SegmentsOf(unit.Source)[0];
-        var marker = (ICommentMarker)first[0];
-        var inner = ParagraphUnits.ItemsOf(marker);
-        Assert.Equal(["{name}", "#"], inner.OfType<ILockedContent>().Select(LockedText));
-        Assert.Equal("count:one", marker.Comments.GetItem(0).GetMetaData("icu:path"));
+        var inner = ParagraphUnits.ContentOf(first);
+        Assert.Empty(inner.OfType<ILockedContent>());
+        var tags = inner.OfType<IPlaceholderTag>().ToList();
+        Assert.Equal(["{name}", "#"], tags.Select(t => t.Properties.TagContent));
+        Assert.Equal(["{name}", "#"], tags.Select(t => t.Properties.DisplayText));
+        Assert.Equal("count:one", Rows(unit)[0].Path);
     }
 
-    /// <summary>The variant: placeholder tags, which carry the path and role as metadata.</summary>
+    /// <summary>
+    /// With the placeholders locked, each tag sits inside its own locked content, so it shows as
+    /// a tag but cannot be moved or deleted. The syntax between segments is the same either way.
+    /// </summary>
     [Fact]
-    public void The_placeholder_tag_variant_puts_the_syntax_in_tags_with_metadata()
+    public void Locked_placeholders_wrap_each_tag_in_locked_content()
     {
         var unit = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
 
-        Processor("ru-RU", WithTags).ProcessParagraphUnit(unit);
+        Processor("ru-RU", WithLock).ProcessParagraphUnit(unit);
 
-        Assert.Equal(
-        [
-            "selectorOpen",
-            "branchOpen", "branchClose",
-            "branchOpen", "branchClose",
-            "branchOpen", "branchClose",
-            "branchOpen", "branchClose",
-            "selectorClose",
-        ], RolesOf(unit.Source));
-        Assert.Equal(RolesOf(unit.Source), RolesOf(unit.Target));
+        var inner = ParagraphUnits.ContentOf(SegmentsOf(unit.Source)[0]);
+        Assert.Empty(inner.OfType<IPlaceholderTag>());
+        var wrapped = inner.OfType<ILockedContent>().ToList();
+        Assert.Equal(["{name}", "#"], wrapped.Select(LockedText));
+        Assert.All(wrapped, locked => Assert.IsAssignableFrom<IPlaceholderTag>(locked.Content[0]));
+        Assert.Equal(10, ParagraphUnits.ItemsOf(unit.Source).OfType<ILockedContent>().Count());
+    }
 
-        var open = ParagraphUnits.ItemsOf(unit.Source).OfType<IPlaceholderTag>().First();
-        Assert.Equal("{count, plural,", open.Properties.TagContent);
-        Assert.Equal("count", open.Properties.GetMetaData("icu:path"));
-        Assert.Equal("true", open.Properties.GetMetaData("icu:expanded"));
+    /// <summary>
+    /// The expansion writes no comment anywhere: not in a segment, where Studio's
+    /// pseudo-translation and Copy Source to Target copy it into the target (Project 46), not
+    /// around a segment, which fails SDLXLIFF validation (Project 47), and not on the unit,
+    /// which only repeats what the ICU Forms window shows. Only a warning goes on the unit.
+    /// </summary>
+    [Fact]
+    public void The_expansion_writes_no_comment_at_all()
+    {
+        var unit = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
 
-        var fewOpen = ParagraphUnits.ItemsOf(unit.Source).OfType<IPlaceholderTag>()
-            .Single(tag => tag.Properties.GetMetaData("icu:path") == "count:few"
-                           && tag.Properties.GetMetaData("icu:role") == "branchOpen");
-        Assert.Equal(" few {", fewOpen.Properties.TagContent);
-        Assert.Equal("few", fewOpen.Properties.GetMetaData("icu:category"));
-        Assert.Equal("other", fewOpen.Properties.GetMetaData("icu:seededFrom"));
+        Processor("ru-RU").ProcessParagraphUnit(unit);
+
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Source));
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
+        Assert.All(SegmentsOf(unit.Source), s => Assert.IsAssignableFrom<IParagraph>(s.Parent));
+        Assert.Empty(ParagraphUnits.UnitComments(unit));
+
+        // The seeding facts the window's tooltip needs are on the unit context instead.
+        var context = unit.Properties.Contexts.Contexts.First(c => c.ContextType == Constants.IcuContextType);
+        Assert.Equal("2:other,3:other", context.GetMetaData("icu:seededFrom"));
+        Assert.Equal("2,3", context.GetMetaData("icu:syntheticSource"));
+        Assert.Equal(["", "other", "other", ""], Rows(unit).Select(r => r.SeededFrom));
+        Assert.Contains("seeded from \"other\"", Rows(unit)[1].Comment);
     }
 
     [Fact]
@@ -194,7 +203,7 @@ public class IcuExpandProcessorTests
         Processor("ja-JP").ProcessParagraphUnit(unit);
 
         Assert.Single(SegmentsOf(unit.Source));
-        Assert.Equal("other", CategoryOf(SegmentsOf(unit.Source)[0]));
+        Assert.Equal("other", Rows(unit, "ja-JP")[0].Category);
     }
 
     [Fact]
@@ -204,13 +213,13 @@ public class IcuExpandProcessorTests
             "{count, plural, offset:1 =0 {Nobody is coming} =1 {Only you are coming} one {You and # other guest are coming} other {You and # other guests are coming}}.";
         var unit = ParagraphUnits.Properties(guests, "party.guests");
 
-        Processor("ru-RU", WithTags).ProcessParagraphUnit(unit);
+        Processor("ru-RU").ProcessParagraphUnit(unit);
 
         Assert.Equal(6, SegmentsOf(unit.Source).Count);
-        var tags = ParagraphUnits.ItemsOf(unit.Source).OfType<IPlaceholderTag>().ToList();
-        Assert.Equal("{count, plural, offset:1", tags[0].Properties.TagContent);
-        Assert.Equal(" =0 {", tags[1].Properties.TagContent);
-        Assert.Equal("count:=0", tags[1].Properties.GetMetaData("icu:path"));
+        var syntax = ParagraphUnits.ItemsOf(unit.Source).OfType<ILockedContent>().Select(LockedText).ToList();
+        Assert.Equal("{count, plural, offset:1", syntax[0]);
+        Assert.Equal(" =0 {", syntax[1]);
+        Assert.Equal("count:=0", Rows(unit)[0].Path);
 
         var projection = RawValueReconstruction.Reconstruct(unit.Source).RawValue;
         var categories = CldrCategories.For("ru");
@@ -272,10 +281,8 @@ public class IcuExpandProcessorTests
         Assert.Single(segments);
         Assert.Empty(ParagraphUnits.ItemsOf(unit.Source).OfType<ILockedContent>());
 
-        var marker = (ICommentMarker)segments[0][0];
-        var spans = ParagraphUnits.ItemsOf(marker).OfType<ILockedContent>().Select(LockedText).ToList();
+        var spans = ParagraphUnits.ContentOf(segments[0]).OfType<IPlaceholderTag>().Select(t => t.Properties.TagContent).ToList();
         Assert.Equal(firstArgument, spans[0]);
-        Assert.Contains("protected", marker.Comments.GetItem(0).Text);
 
         Assert.Equal(value, RawValueReconstruction.Reconstruct(unit.Source).RawValue);
         Assert.True(ResourceKey.IsExpanded(unit));
@@ -338,18 +345,16 @@ public class IcuExpandProcessorTests
     }
 
     [Fact]
-    public void Both_constructs_produce_the_same_native_projection()
+    public void Locked_and_unlocked_placeholders_produce_the_same_native_projection()
     {
-        var tagged = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
-        Processor("ru-RU", WithTags).ProcessParagraphUnit(tagged);
+        var unlocked = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
+        Processor("ru-RU").ProcessParagraphUnit(unlocked);
 
         var locked = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
-        Processor("ru-RU").ProcessParagraphUnit(locked);
+        Processor("ru-RU", WithLock).ProcessParagraphUnit(locked);
 
-        Assert.NotEmpty(ParagraphUnits.ItemsOf(tagged.Source).OfType<IPlaceholderTag>());
-        Assert.NotEmpty(ParagraphUnits.ItemsOf(locked.Source).OfType<ILockedContent>());
         Assert.Equal(
-            RawValueReconstruction.Reconstruct(tagged.Source).RawValue,
+            RawValueReconstruction.Reconstruct(unlocked.Source).RawValue,
             RawValueReconstruction.Reconstruct(locked.Source).RawValue);
     }
 
@@ -376,8 +381,6 @@ public class IcuExpandProcessorTests
         Assert.Equal(4, SegmentsOf(unit.Source).Count);
         Assert.Equal(4, SegmentsOf(unit.Target).Count);
         Assert.NotEmpty(ParagraphUnits.ItemsOf(unit.Source).OfType<ILockedContent>());
-        Assert.Contains("(over the branch budget: 36 segments needed, 24 allowed)",
-            ((ICommentMarker)SegmentsOf(unit.Source)[0][0]).Comments.GetItem(0).Text);
 
         var context = unit.Properties.Contexts.Contexts.First(c => c.ContextType == Constants.IcuContextType);
         Assert.Equal("", context.GetMetaData("icu:expandedSelectors"));
@@ -387,22 +390,6 @@ public class IcuExpandProcessorTests
         Assert.Equal(
             MessageRenderer.Render(IcuMessage.Parse(sync).Nodes, arguments, CldrCategories.For("en")),
             MessageRenderer.Render(IcuMessage.Parse(projection).Nodes, arguments, CldrCategories.For("en")));
-    }
-
-    [Fact]
-    public void Segment_comments_can_be_left_out_and_the_layout_is_the_same()
-    {
-        var withComments = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
-        Processor("ru-RU").ProcessParagraphUnit(withComments);
-        var without = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
-        Processor("ru-RU", ExpansionOptions.Default with { WriteSegmentComments = false }).ProcessParagraphUnit(without);
-
-        Assert.All(SegmentsOf(withComments.Source), s => Assert.IsAssignableFrom<ICommentMarker>(s[0]));
-        Assert.All(SegmentsOf(without.Source), s => Assert.DoesNotContain(ParagraphUnits.ItemsOf(s), i => i is ICommentMarker));
-        Assert.Equal(4, SegmentsOf(without.Source).Count);
-        Assert.Equal(
-            RawValueReconstruction.Reconstruct(withComments.Source).RawValue,
-            RawValueReconstruction.Reconstruct(without.Source).RawValue);
     }
 
     [Fact]

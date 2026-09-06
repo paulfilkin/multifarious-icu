@@ -119,7 +119,6 @@ public class SatelliteLanguageTests
             ["Expand_SeedAlwaysOther"] = ["other"],
             ["Expand_KindsHelp1"] = ["one", "other"],
             ["Expand_SeedHelp1"] = ["one", "other", "few"],
-            ["Expand_HintsHelp1"] = ["CLDR", "few"],
             ["Finalise_MismatchHelp1"] = ["{name}", "#"],
         };
 

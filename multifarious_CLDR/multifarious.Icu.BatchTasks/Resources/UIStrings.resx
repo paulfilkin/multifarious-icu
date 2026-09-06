@@ -90,42 +90,6 @@
     <value>With the first choice a target form starts from the source form of the same name where there is one, otherwise from "other". With the second every form starts from "other", which some teams prefer because the English "one" form is often worded for exactly one item and reads oddly as the source for anything else.</value>
     <comment>Help paragraph. "one" and "other" are ICU keywords and must not be translated.</comment>
   </data>
-  <data name="Expand_HintsHeader" xml:space="preserve">
-    <value>Segment comments</value>
-    <comment>Group heading. What the task writes into the comment on each source segment.</comment>
-  </data>
-  <data name="Expand_Comments" xml:space="preserve">
-    <value>Add a comment to each source segment naming its form and the counts that select it</value>
-    <comment>Tick box, on by default. The comment is what the translator sees on the source segment.</comment>
-  </data>
-  <data name="Expand_CommentsHint" xml:space="preserve">
-    <value>With the ICU Forms window open the comments can be noise; turn them off and the window still shows every form.</value>
-    <comment>Hint under the tick box. "ICU Forms" is the name of the plugin's window under the editor.</comment>
-  </data>
-  <data name="Expand_CommentsHelp1" xml:space="preserve">
-    <value>Each source segment can carry a comment naming its form, the counts that select it, and where its source text came from. The ICU Forms window shows the same facts from the message itself, so the comments are a convenience for translators who work without the window, not something the tasks depend on.</value>
-    <comment>Help paragraph.</comment>
-  </data>
-  <data name="Expand_Hints" xml:space="preserve">
-    <value>Add a grammar hint for the form where one is known</value>
-    <comment>Tick box, on by default.</comment>
-  </data>
-  <data name="Expand_HintsHint" xml:space="preserve">
-    <value>Every comment names the form and example counts that select it. A hint adds a sentence on what the form usually requires, for example the genitive singular in Russian.</value>
-    <comment>Hint under the tick box. "genitive singular" is a grammatical case; translate it as a grammarian would.</comment>
-  </data>
-  <data name="Expand_HintsHelpHeader" xml:space="preserve">
-    <value>What are grammar hints?</value>
-    <comment>Header of a collapsible help panel.</comment>
-  </data>
-  <data name="Expand_HintsHelp1" xml:space="preserve">
-    <value>The Unicode CLDR data names the forms a language has and which counts select each one, but says nothing about what the language does with them. A hint is a short sentence from the plugin's own table, for example that the Russian "few" form takes the genitive singular.</value>
-    <comment>Help paragraph. "CLDR" is the Unicode Common Locale Data Repository and stays as it is. "few" is an ICU keyword.</comment>
-  </data>
-  <data name="Expand_HintsHelp2" xml:space="preserve">
-    <value>Hints are advice for a translator who does not work in the language every day, not rules. Turn them off if your translators find them noise; the form name and the example counts stay in the comment either way.</value>
-    <comment>Help paragraph.</comment>
-  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Branch budget</value>
     <comment>Group heading. A cap on how many segments one message may become.</comment>

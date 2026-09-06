@@ -75,6 +75,9 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>Target segments filled from the source.</summary>
         public int Filled { get; private set; }
 
+        /// <summary>The plugin's own comment markers removed from target segments, where Studio had copied them from the source.</summary>
+        public int CommentsStripped { get; private set; }
+
         public IReadOnlyList<ExpansionWarning> Warnings { get { return _warnings; } }
 
         /// <summary>What happened to every unit this plugin owns, in document order, for the report.</summary>
@@ -146,9 +149,16 @@ namespace multifarious.Icu.BatchTasks.Services
 
             // 2. Per remaining segment pair: fill empty targets from the source, escape target
             // text, and check placeholder parity. Filling precedes escaping so copied source
-            // content is escaped like everything else.
+            // content is escaped like everything else. First, the plugin's own comments are
+            // taken out of the targets: Studio's pseudo-translation and Copy Source to Target
+            // copy a source segment's content with its comment marker (Project 46), and target
+            // comments are the translator's. Theirs stay.
             var sourceSegments = SegmentsOf(unit.Source);
             var targetSegments = SegmentsOf(unit.Target);
+            foreach (var segment in targetSegments)
+            {
+                CommentsStripped += StripOwnComments(segment);
+            }
 
             for (var index = 0; index < targetSegments.Count; index++)
             {
@@ -185,7 +195,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
                 if (reasons.Count > 0)
                 {
-                    if (source != null) AddWarningComment(source, string.Join("\n", reasons));
+                    AddWarningComment(unit, "Segment " + target.Properties.Id.Id + ": " + string.Join("\n", reasons));
                     foreach (var reason in reasons)
                     {
                         var text = "Segment " + target.Properties.Id.Id + ": " + reason;
@@ -195,9 +205,16 @@ namespace multifarious.Icu.BatchTasks.Services
                 }
             }
 
+            // 3. Placeholder tags become locked text on both sides. Studio's JSON writer emits no
+            // placeholder tag of any kind, locked or not, while both writers emit locked text
+            // verbatim; a second run finds only locked spans and leaves them as they are.
+            foreach (var segment in sourceSegments) FlattenPlaceholders(segment);
+            foreach (var segment in targetSegments) FlattenPlaceholders(segment);
+
             _outcomes.Add(new FinaliseUnitOutcome(unitId, ResourceKey.Of(unit), targetSegments.Count,
                 Pruned - prunedBefore, Filled - filledBefore, unitWarnings));
-            Diagnostics.Write("  unit " + unitId + ": finalised, segments=" + targetSegments.Count);
+            Diagnostics.Write("  unit " + unitId + ": finalised, segments=" + targetSegments.Count
+                + ", comments stripped=" + CommentsStripped);
         }
 
         /// <summary>
@@ -288,8 +305,10 @@ namespace multifarious.Icu.BatchTasks.Services
                 var key = branchMatch.Groups["key"].Value;
                 index++;
 
+                // A leaf is the segment, or the comment marker the expansion wrote around it;
+                // anything that is not a syntax marker. A nested selector opens with syntax.
                 var content = new List<IAbstractMarkupData>();
-                if (items[index] is ISegment)
+                if (SyntaxOf(items[index]) == null)
                 {
                     content.Add(items[index]);
                     index++;
@@ -455,6 +474,119 @@ namespace multifarious.Icu.BatchTasks.Services
             });
         }
 
+        /// <summary>
+        /// Removes the plugin's own comments from a target segment, leaving the content in
+        /// place. A marker holding only the plugin's comments is unwrapped; one that also holds
+        /// a translator's comment keeps the marker and loses only the plugin's. Returns the
+        /// number of markers touched.
+        /// </summary>
+        private static int StripOwnComments(IAbstractMarkupDataContainer container)
+        {
+            var touched = 0;
+            for (var i = 0; i < container.Count; i++)
+            {
+                var item = container[i];
+                if (item is ILockedContent) continue;
+
+                var marker = item as ICommentMarker;
+                if (marker == null)
+                {
+                    var nested = item as IAbstractMarkupDataContainer;
+                    if (nested != null) touched += StripOwnComments(nested);
+                    continue;
+                }
+
+                touched += StripOwnComments(marker);
+
+                var own = new List<IComment>();
+                for (var c = 0; c < marker.Comments.Count; c++)
+                {
+                    var comment = marker.Comments.GetItem(c);
+                    if (comment.Author == Constants.CommentAuthor) own.Add(comment);
+                }
+                if (own.Count == 0) continue;
+
+                touched++;
+                if (own.Count < marker.Comments.Count)
+                {
+                    foreach (var comment in own) marker.Comments.Delete(comment);
+                    continue;
+                }
+
+                // Unwrap: the marker's children take its place, in order.
+                var children = ItemsOf(marker);
+                container.RemoveAt(i);
+                foreach (var child in children)
+                {
+                    child.RemoveFromParent();
+                }
+                for (var k = 0; k < children.Count; k++)
+                {
+                    container.Insert(i + k, children[k]);
+                }
+                i += children.Count - 1;
+            }
+            return touched;
+        }
+
+        /// <summary>
+        /// Replaces every placeholder tag under the segment, bare or wrapped in locked content,
+        /// with a locked text span carrying the same syntax. Recurses through markers, which are
+        /// containers; locked content is replaced whole from its reconstructed text.
+        /// </summary>
+        private void FlattenPlaceholders(IAbstractMarkupDataContainer container)
+        {
+            for (var i = 0; i < container.Count; i++)
+            {
+                var item = container[i];
+
+                var tag = item as IPlaceholderTag;
+                if (tag != null)
+                {
+                    Replace(container, i, LockedText(tag.Properties.TagContent));
+                    continue;
+                }
+
+                var locked = item as ILockedContent;
+                if (locked != null)
+                {
+                    if (ContainsTag(locked.Content))
+                    {
+                        Replace(container, i, LockedText(RawValueReconstruction.Reconstruct(locked.Content).RawValue));
+                    }
+                    continue;
+                }
+
+                var nested = item as IAbstractMarkupDataContainer;
+                if (nested != null) FlattenPlaceholders(nested);
+            }
+        }
+
+        private static bool ContainsTag(IAbstractMarkupDataContainer container)
+        {
+            for (var i = 0; i < container.Count; i++)
+            {
+                if (container[i] is IPlaceholderTag) return true;
+                var nested = container[i] as IAbstractMarkupDataContainer;
+                if (nested != null && ContainsTag(nested)) return true;
+            }
+            return false;
+        }
+
+        private static void Replace(IAbstractMarkupDataContainer container, int index, IAbstractMarkupData item)
+        {
+            container.RemoveAt(index);
+            container.Insert(index, item);
+        }
+
+        private ILockedContent LockedText(string syntax)
+        {
+            var locked = ItemFactory.CreateLockedContent(
+                PropertiesFactory.CreateLockedContentProperties(LockTypeFlags.Manual));
+            locked.Content.Add(ItemFactory.CreateText(PropertiesFactory.CreateTextProperties(syntax)));
+            return locked;
+        }
+
         private static bool PlaceholdersMatch(ISegment source, ISegment target, out string detail)
         {
             var sourceKeys = Counts(PlaceableKeys(source));
@@ -485,51 +617,39 @@ namespace multifarious.Icu.BatchTasks.Services
             return counts;
         }
 
-        /// <summary>The parity keys of a segment's protected spans: locked spans and tags by their text, so either construct is checked.</summary>
+        /// <summary>
+        /// The parity keys of a segment's protected spans: the syntax text, whichever construct
+        /// carries it, so a tag in the target matches a locked span in the source and the other
+        /// way round.
+        /// </summary>
         private static IEnumerable<string> PlaceableKeys(ISegment segment)
         {
             var keys = new List<string>();
             Walk(segment, item =>
             {
-                var locked = item as ILockedContent;
-                if (locked != null) keys.Add("locked:" + RawValueReconstruction.Reconstruct(locked.Content).RawValue);
-
-                var tag = item as IPlaceholderTag;
-                if (tag != null) keys.Add("tag:" + tag.Properties.TagContent);
+                var syntax = SyntaxOf(item);
+                if (syntax != null) keys.Add(syntax);
             });
             return keys;
         }
 
         /// <summary>
-        /// Records what was done to a target segment as a comment on its source segment, never
-        /// on the target: target comments are the translator's and stay clear (Paul, 6 September
-        /// 2026). The source segment normally already carries the expansion comment marker, and
-        /// the warning joins its comments; a segment without one is wrapped in a new marker.
+        /// Records what was done to a target segment as a comment on the paragraph unit, never
+        /// in a segment: target comments are the translator's and stay clear, and a comment in
+        /// a source segment is copied into the target by Studio's own operations (Paul, 6
+        /// September 2026). The unit comment is the one carrier Studio never copies.
         /// </summary>
-        private void AddWarningComment(ISegment source, string text)
+        private void AddWarningComment(IParagraphUnit unit, string text)
         {
             var comment = PropertiesFactory.CreateComment(text, Constants.CommentAuthor, Severity.Medium);
             comment.Date = DateTime.Now;
             comment.DateSpecified = true;
 
-            var existing = source.Count == 1 ? source[0] as ICommentMarker : null;
-            if (existing != null)
+            if (unit.Properties.Comments == null)
             {
-                existing.Comments.Add(comment);
-                return;
+                unit.Properties.Comments = PropertiesFactory.CreateCommentProperties();
             }
-
-            var properties = PropertiesFactory.CreateCommentProperties();
-            properties.Add(comment);
-
-            var marker = ItemFactory.CreateCommentMarker(properties);
-            var content = ItemsOf(source);
-            source.Clear();
-            foreach (var item in content)
-            {
-                marker.Add(item);
-            }
-            source.Add(marker);
+            unit.Properties.Comments.Add(comment);
         }
     }
 }

@@ -66,6 +66,46 @@ internal static class ParagraphUnits
         unit.Properties.Contexts.Contexts.Add(context);
     }
 
+    /// <summary>Every segment under a container in document order, through comment markers and other wrappers.</summary>
+    public static List<ISegment> SegmentsOf(IAbstractMarkupDataContainer container)
+    {
+        var segments = new List<ISegment>();
+        for (var i = 0; i < container.Count; i++)
+        {
+            if (container[i] is ISegment segment)
+            {
+                segments.Add(segment);
+            }
+            else if (container[i] is IAbstractMarkupDataContainer nested && container[i] is not ILockedContent)
+            {
+                segments.AddRange(SegmentsOf(nested));
+            }
+        }
+        return segments;
+    }
+
+    /// <summary>A comment marker on a segment, inside it or around it; the expansion writes none, so this finds a translator's or a copied one.</summary>
+    public static ICommentMarker? CommentOf(ISegment segment) =>
+        segment.Parent as ICommentMarker ?? (segment.Count > 0 ? segment[0] as ICommentMarker : null);
+
+    /// <summary>The texts of every comment on the unit, in order.</summary>
+    public static List<string> UnitComments(IParagraphUnit unit)
+    {
+        var texts = new List<string>();
+        var comments = unit.Properties.Comments;
+        if (comments == null) return texts;
+        for (var i = 0; i < comments.Count; i++) texts.Add(comments.GetItem(i).Text);
+        return texts;
+    }
+
+    /// <summary>True when no segment under the paragraph carries a comment marker, inside or around it.</summary>
+    public static bool NoSegmentComments(IAbstractMarkupDataContainer paragraph) =>
+        SegmentsOf(paragraph).All(s => CommentOf(s) == null && !ItemsOf(s).Any(i => i is ICommentMarker));
+
+    /// <summary>A segment's translatable content: the items inside its comment marker where it has one, else its own items.</summary>
+    public static List<IAbstractMarkupData> ContentOf(ISegment segment) =>
+        segment.Count == 1 && segment[0] is ICommentMarker marker ? ItemsOf(marker) : ItemsOf(segment);
+
     /// <summary>The top-level items of a paragraph, indexed rather than enumerated (see RawValueReconstruction).</summary>
     public static List<IAbstractMarkupData> ItemsOf(IAbstractMarkupDataContainer container)
     {

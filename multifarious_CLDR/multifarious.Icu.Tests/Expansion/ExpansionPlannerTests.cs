@@ -198,15 +198,6 @@ public class ExpansionPlannerTests
     }
 
     [Fact]
-    public void HintsCanBeTurnedOff()
-    {
-        var plan = Plan(WorkedExample, ["ru-RU"], new ExpansionOptions { IncludeHints = false });
-
-        var many = plan.Segments.Single(segment => segment.Path == "count:many");
-        Assert.DoesNotContain("Grammar:", many.Comment);
-    }
-
-    [Fact]
     public void ThePlanCarriesThePatternAndTheHoistedForm()
     {
         var plan = Plan(WorkedExample, ["ru-RU"]);

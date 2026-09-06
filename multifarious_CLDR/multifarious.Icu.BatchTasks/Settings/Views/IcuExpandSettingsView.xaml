@@ -99,25 +99,6 @@
         </StackPanel>
       </GroupBox>
 
-      <GroupBox Header="{x:Static res:UIStrings.Expand_HintsHeader}">
-        <StackPanel>
-          <CheckBox TabIndex="30" Content="{x:Static res:UIStrings.Expand_Comments}" IsChecked="{Binding WriteSegmentComments}" />
-          <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Expand_CommentsHint}" />
-          <CheckBox TabIndex="31" IsEnabled="{Binding WriteSegmentComments}" Margin="20,3,0,3"
-                    Content="{x:Static res:UIStrings.Expand_Hints}" IsChecked="{Binding IncludeHints}" />
-          <TextBlock Style="{StaticResource Hint}" Margin="40,2,0,8" Text="{x:Static res:UIStrings.Expand_HintsHint}" />
-          <Expander Style="{StaticResource Help}" TabIndex="32" Header="{x:Static res:UIStrings.Expand_HintsHelpHeader}">
-            <Border Style="{StaticResource HelpBody}">
-              <StackPanel>
-                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_CommentsHelp1}" />
-                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_HintsHelp1}" />
-                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_HintsHelp2}" Margin="0" />
-              </StackPanel>
-            </Border>
-          </Expander>
-        </StackPanel>
-      </GroupBox>
-
       <GroupBox Header="{x:Static res:UIStrings.Expand_BudgetHeader}">
         <StackPanel>
           <StackPanel Orientation="Horizontal">

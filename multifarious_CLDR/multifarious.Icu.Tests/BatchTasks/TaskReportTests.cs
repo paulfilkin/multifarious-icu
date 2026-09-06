@@ -102,7 +102,7 @@ public class TaskReportTests
         Assert.Equal("broken & \"odd\" <key>", messages[3].Attribute("key")!.Value);
         Assert.Equal("Walked", messages[2].Attribute("outcome")!.Value);
 
-        Assert.Equal(7, task.Element("settings")!.Elements("setting").Count());
+        Assert.Equal(5, task.Element("settings")!.Elements("setting").Count());
         Assert.NotEmpty(task.Element("labels")!.Elements("label"));
         Assert.All(task.Element("labels")!.Elements("label"), label => Assert.False(string.IsNullOrWhiteSpace(label.Value)));
     }

@@ -315,8 +315,7 @@ public sealed class ExpansionPlanner
                     : $"Source form: seeded from \"{context.SeededFrom}\"");
             }
 
-            if (state.Options.IncludeHints
-                && _hints.Find(resolution.ResolvedKey, category) is { } hint)
+            if (_hints.Find(resolution.ResolvedKey, category) is { } hint)
             {
                 comment.Append('\n');
                 comment.Append($"Grammar: {hint}");

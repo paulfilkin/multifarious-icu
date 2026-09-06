@@ -61,24 +61,6 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>Bei der ersten Wahl geht eine Zielform von der gleichnamigen Ausgangsform aus, sofern es sie gibt, sonst von „other“. Bei der zweiten geht jede Form von „other“ aus, was manche Teams bevorzugen, weil die englische Form „one“ oft auf genau ein Element hin formuliert ist und als Ausgangstext für alles andere seltsam wirkt.</value>
   </data>
-  <data name="Expand_HintsHeader" xml:space="preserve">
-    <value>Segmentkommentare</value>
-  </data>
-  <data name="Expand_Hints" xml:space="preserve">
-    <value>Grammatikhinweis zur Form hinzufügen, wo einer bekannt ist</value>
-  </data>
-  <data name="Expand_HintsHint" xml:space="preserve">
-    <value>Jeder Kommentar nennt die Form und Beispielzahlen, die sie auswählen. Ein Hinweis ergänzt einen Satz dazu, was die Form üblicherweise verlangt, zum Beispiel den Genitiv Singular im Russischen.</value>
-  </data>
-  <data name="Expand_HintsHelpHeader" xml:space="preserve">
-    <value>Was sind Grammatikhinweise?</value>
-  </data>
-  <data name="Expand_HintsHelp1" xml:space="preserve">
-    <value>Die Unicode-CLDR-Daten nennen die Formen, die eine Sprache hat, und welche Zahlen jede auswählen, sagen aber nichts darüber, was die Sprache mit ihnen macht. Ein Hinweis ist ein kurzer Satz aus der eigenen Tabelle des Plugins, zum Beispiel, dass die russische Form „few“ den Genitiv Singular verlangt.</value>
-  </data>
-  <data name="Expand_HintsHelp2" xml:space="preserve">
-    <value>Hinweise sind Ratschläge für einen Übersetzer, der nicht täglich in der Sprache arbeitet, keine Regeln. Schalten Sie sie aus, wenn Ihre Übersetzer sie als Störung empfinden; der Name der Form und die Beispielzahlen bleiben in jedem Fall im Kommentar.</value>
-  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>Zweig-Obergrenze</value>
   </data>
@@ -345,15 +327,6 @@
   </data>
   <data name="Verifier_Invalid" xml:space="preserve">
     <value>Die zusammengesetzte Nachricht ist kein gültiges ICU: {0}.</value>
-  </data>
-  <data name="Expand_Comments" xml:space="preserve">
-    <value>Jedem Ausgangssegment einen Kommentar hinzufügen, der seine Form und die auswählenden Zahlen nennt</value>
-  </data>
-  <data name="Expand_CommentsHint" xml:space="preserve">
-    <value>Bei geöffnetem Fenster „ICU Forms“ können die Kommentare stören; schalten Sie sie aus, das Fenster zeigt weiterhin jede Form.</value>
-  </data>
-  <data name="Expand_CommentsHelp1" xml:space="preserve">
-    <value>Jedes Ausgangssegment kann einen Kommentar tragen, der seine Form, die auswählenden Zahlen und die Herkunft seines Ausgangstexts nennt. Das Fenster „ICU Forms“ zeigt dieselben Angaben aus der Nachricht selbst; die Kommentare sind also eine Hilfe für Übersetzer, die ohne das Fenster arbeiten, und nichts, wovon die Tasks abhängen.</value>
   </data>
   <data name="VerifierPage_Intro" xml:space="preserve">
     <value>Der ICU Verifier prüft jede Form einer umgegliederten ICU-Nachricht, wenn Sie F8 drücken und wenn Segmente bestätigt werden, und führt seine Funde im Fenster „Meldungen“ auf.</value>

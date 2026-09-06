@@ -16,40 +16,45 @@ namespace multifarious.Icu.BatchTasks.Services
     /// like after Copy to Target Languages.
     ///
     /// Every branch is an (open, segment, close) triple whose open and close carry the selector
-    /// syntax as locked text between the segments; arguments and '#' inside a segment are locked
-    /// text too, carrying the exact source text. Locked content is what both of Studio's writers
-    /// emit verbatim: the JSON writer drops placeholder tags wherever they sit, shown first by
-    /// the cloud project's T4 and again by the first Studio generation here (Project 39, 5 Sep
-    /// 2026), where the target paragraph carried every tag and the generated file none.
-    /// Placeholder tags remain the configuration variant; under it the tags also carry the
-    /// branch path and role as metadata.
+    /// syntax as locked text between the segments. Locked content is what both of Studio's
+    /// writers emit verbatim: the JSON writer drops placeholder tags wherever they sit, shown
+    /// first by the cloud project's T4 and again by the first Studio generation here (Project
+    /// 39, 5 Sep 2026), where the target paragraph carried every tag and the generated file
+    /// none; its decompiled writer emits text for two special-character tags only.
     ///
-    /// Locked content carries no metadata, so each segment's comment is the machine-readable
-    /// carrier: it holds the design's rendered text and, as metadata, the branch path, category,
-    /// locale and examples. Comment metadata persists in SDLXLIFF and survived Analyse,
-    /// Pre-translate and an editor save in the same run.
+    /// Arguments and '#' inside a segment are placeholder tags carrying the exact source text
+    /// (Paul, 6 September 2026): a tag is what QuickPlace, Ctrl+Alt+Down, tag verification and
+    /// the translation memory's placeables work with, where a locked span cannot be placed by
+    /// the translator at all. Optionally each tag is wrapped in locked content so it cannot be
+    /// moved or deleted. The finalise task turns the tags back into locked text before the
+    /// target file is generated.
+    ///
+    /// No comment is written for a form (Paul, 6 September 2026): a comment marker inside a
+    /// source segment is copied into the target by Studio's pseudo-translation and Copy Source
+    /// to Target (Project 46), and target comments are the translator's; a marker around the
+    /// segment fails SDLXLIFF validation (Project 47); and a comment on the unit repeats what
+    /// the ICU Forms window shows per row, live. The layout, the unit context and CLDR say
+    /// everything the finalise task and the window need. Only warnings go on the unit.
     /// </summary>
     public sealed class ExpansionWriter
     {
         private readonly IDocumentItemFactory _itemFactory;
         private readonly IPropertiesFactory _propertiesFactory;
-        private readonly TagConstruct _tagConstruct;
+        private readonly bool _lockPlaceholders;
         private readonly string _cldrVersion;
         private readonly string _appVersion;
-        private readonly bool _writeComments;
 
         public ExpansionWriter(IDocumentItemFactory itemFactory, IPropertiesFactory propertiesFactory,
-            TagConstruct tagConstruct, string cldrVersion, string appVersion, bool writeComments = true)
+            bool lockPlaceholders, string cldrVersion, string appVersion)
         {
             if (itemFactory == null) throw new ArgumentNullException(nameof(itemFactory));
             if (propertiesFactory == null) throw new ArgumentNullException(nameof(propertiesFactory));
 
             _itemFactory = itemFactory;
             _propertiesFactory = propertiesFactory;
-            _tagConstruct = tagConstruct;
+            _lockPlaceholders = lockPlaceholders;
             _cldrVersion = cldrVersion ?? string.Empty;
             _appVersion = appVersion ?? string.Empty;
-            _writeComments = writeComments;
         }
 
         public void Write(IParagraphUnit unit, ExpansionPlan plan, string resourceKey)
@@ -65,13 +70,16 @@ namespace multifarious.Icu.BatchTasks.Services
             Refill(unit.Source, source);
             if (unit.Target != null) Refill(unit.Target, target);
 
-            AddContext(unit, plan, resourceKey);
+            AddContext(unit, plan, resourceKey, state);
         }
 
         private sealed class WriteState
         {
             /// <summary>Segment ids are per paragraph unit in SDLXLIFF, numbered from 1.</summary>
             public int NextSegmentNumber = 1;
+
+            /// <summary>The segments written, in document order, for the seeding record on the unit context.</summary>
+            public List<KeyValuePair<int, PlannedSegment>> Written = new List<KeyValuePair<int, PlannedSegment>>();
         }
 
         private static void Refill(IParagraph paragraph, List<IAbstractMarkupData> content)
@@ -114,20 +122,19 @@ namespace multifarious.Icu.BatchTasks.Services
                 openText.Append(" offset:").Append(selector.OffsetRaw);
             }
 
-            // The open tag records whether this selector's branches were category expanded:
+            // Which selectors were category expanded is recorded on the unit context, not here:
             // finalise prunes only expanded selectors, because a walked select or a disabled kind
             // carries the developer's branches.
-            AddSyntaxPair(openText.ToString(), "selectorOpen", selector.Path, selector.IsExpanded, source, target);
+            AddSyntaxPair(openText.ToString(), source, target);
 
             foreach (var branch in selector.Branches)
             {
-                AddSyntaxPair(" " + branch.KeyText + " {", "branchOpen", branch.Path, null, source, target,
-                    branch.Content as PlannedSegment);
+                AddSyntaxPair(" " + branch.KeyText + " {", source, target);
                 WriteNode(branch.Content, source, target, state);
-                AddSyntaxPair("}", "branchClose", branch.Path, null, source, target);
+                AddSyntaxPair("}", source, target);
             }
 
-            AddSyntaxPair("}", "selectorClose", selector.Path, null, source, target);
+            AddSyntaxPair("}", source, target);
         }
 
         private void WriteSegment(PlannedSegment planned, List<IAbstractMarkupData> source,
@@ -137,49 +144,19 @@ namespace multifarious.Icu.BatchTasks.Services
             properties.Id = new SegmentId(state.NextSegmentNumber.ToString(CultureInfo.InvariantCulture));
             state.NextSegmentNumber++;
 
-            // The comment is the translator's note and, under locked content, the carrier of the
-            // segment's metadata. Without it the layout and the unit context still say everything
-            // the finalise task and the ICU Forms window need.
+            // The segment holds text and tags only; the ICU Forms window is its note.
             var sourceSegment = _itemFactory.CreateSegment(properties);
-            if (_writeComments)
+            foreach (var item in BuildContent(planned.Nodes))
             {
-                var comment = _itemFactory.CreateCommentMarker(CommentProperties(planned));
-                foreach (var item in BuildContent(planned.Nodes))
-                {
-                    comment.Add(item);
-                }
-                sourceSegment.Add(comment);
+                sourceSegment.Add(item);
             }
-            else
-            {
-                foreach (var item in BuildContent(planned.Nodes))
-                {
-                    sourceSegment.Add(item);
-                }
-            }
+            source.Add(sourceSegment);
+            state.Written.Add(new KeyValuePair<int, PlannedSegment>(state.NextSegmentNumber - 1, planned));
 
             // The target segment is left empty for Copy Source to Target or pre-translation to
             // fill. It shares the pair properties with the source, which is how the framework
             // models a segment pair.
-            var targetSegment = _itemFactory.CreateSegment(properties);
-
-            source.Add(sourceSegment);
-            target.Add(targetSegment);
-        }
-
-        private ICommentProperties CommentProperties(PlannedSegment planned)
-        {
-            var comment = _propertiesFactory.CreateComment(planned.Comment, Constants.CommentAuthor, Severity.Low);
-            comment.Date = DateTime.Now;
-            comment.DateSpecified = true;
-            foreach (var pair in planned.Metadata)
-            {
-                comment.SetMetaData(pair.Key, pair.Value);
-            }
-
-            var properties = _propertiesFactory.CreateCommentProperties();
-            properties.Add(comment);
-            return properties;
+            target.Add(_itemFactory.CreateSegment(properties));
         }
 
         private IEnumerable<IAbstractMarkupData> BuildContent(IReadOnlyList<MessageNode> nodes)
@@ -251,63 +228,34 @@ namespace multifarious.Icu.BatchTasks.Services
             return _itemFactory.CreateText(_propertiesFactory.CreateTextProperties(value));
         }
 
-        /// <summary>An argument or '#' inside a segment, in the configured construct.</summary>
+        /// <summary>
+        /// An argument or '#' inside a segment: a placeholder tag whose content and display text
+        /// are the exact source syntax, wrapped in locked content when the placeholders are locked.
+        /// </summary>
         private IAbstractMarkupData ArgumentMarkup(string content)
         {
-            if (_tagConstruct == TagConstruct.LockedContent)
-            {
-                return Locked(content);
-            }
-
             var properties = _propertiesFactory.CreatePlaceholderTagProperties(content);
             properties.DisplayText = content;
             properties.SegmentationHint = SegmentationHint.Include;
-            return _itemFactory.CreatePlaceholderTag(properties);
+            var tag = _itemFactory.CreatePlaceholderTag(properties);
+            if (!_lockPlaceholders) return tag;
+
+            var locked = _itemFactory.CreateLockedContent(
+                _propertiesFactory.CreateLockedContentProperties(LockTypeFlags.Manual));
+            locked.Content.Add(tag);
+            return locked;
         }
 
         /// <summary>
-        /// One piece of selector syntax between segments, added to both paragraphs. Each side gets
-        /// its own properties object: the two paragraphs are separate documents to the writer.
-        /// Where the syntax opens a branch that is a leaf, the segment's metadata rides on the tag
-        /// as well as on the comment, so the branch path and category can be read from content.
+        /// One piece of selector syntax between segments, added to both paragraphs as locked text.
+        /// Each side gets its own object: the two paragraphs are separate documents to the writer.
+        /// Locked content carries no metadata; the segment's comment and the unit context are the
+        /// machine-readable carriers, and finalise reads the branch path from the syntax itself.
         /// </summary>
-        private void AddSyntaxPair(string content, string role, string path, bool? expanded,
-            List<IAbstractMarkupData> source, List<IAbstractMarkupData> target, PlannedSegment leaf = null)
+        private void AddSyntaxPair(string content, List<IAbstractMarkupData> source, List<IAbstractMarkupData> target)
         {
-            source.Add(SyntaxMarkup(content, role, path, expanded, leaf));
-            target.Add(SyntaxMarkup(content, role, path, expanded, leaf));
-        }
-
-        private IAbstractMarkupData SyntaxMarkup(string content, string role, string path, bool? expanded,
-            PlannedSegment leaf)
-        {
-            if (_tagConstruct == TagConstruct.LockedContent)
-            {
-                // Locked content carries no metadata; the segment's comment is the machine-readable
-                // carrier and finalise reads the branch path from it, by position within the unit.
-                return Locked(content);
-            }
-
-            var properties = _propertiesFactory.CreatePlaceholderTagProperties(content);
-            properties.DisplayText = content.Trim();
-            properties.SegmentationHint = SegmentationHint.Exclude;
-            properties.SetMetaData("icu:role", role);
-            properties.SetMetaData("icu:path", path);
-            if (expanded.HasValue)
-            {
-                properties.SetMetaData("icu:expanded", expanded.Value ? "true" : "false");
-            }
-
-            if (leaf != null)
-            {
-                foreach (var pair in leaf.Metadata)
-                {
-                    if (pair.Key == "icu:path") continue;
-                    properties.SetMetaData(pair.Key, pair.Value);
-                }
-            }
-
-            return _itemFactory.CreatePlaceholderTag(properties);
+            source.Add(Locked(content));
+            target.Add(Locked(content));
         }
 
         private ILockedContent Locked(string content)
@@ -324,7 +272,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// message, and the finalise task can find the units it owns. Context metadata persists
         /// in SDLXLIFF.
         /// </summary>
-        private void AddContext(IParagraphUnit unit, ExpansionPlan plan, string resourceKey)
+        private void AddContext(IParagraphUnit unit, ExpansionPlan plan, string resourceKey, WriteState state)
         {
             var context = _propertiesFactory.CreateContextInfo(Constants.IcuContextType);
             context.DisplayName = Constants.IcuContextDisplayName;
@@ -348,6 +296,25 @@ namespace multifarious.Icu.BatchTasks.Services
             var expanded = new List<string>();
             CollectExpanded(plan.Root, expanded);
             context.SetMetaData("icu:expandedSelectors", string.Join(",", expanded));
+
+            // Which segments started from a source form other than their own, by segment number:
+            // "2:other,3:other". The ICU Forms window says so in the row's tooltip.
+            var seeded = new List<string>();
+            var synthetic = new List<string>();
+            foreach (var pair in state.Written)
+            {
+                string value;
+                if (pair.Value.Metadata.TryGetValue("icu:seededFrom", out value) && !string.IsNullOrEmpty(value))
+                {
+                    seeded.Add(pair.Key.ToString(CultureInfo.InvariantCulture) + ":" + value);
+                }
+                if (pair.Value.Metadata.TryGetValue("icu:syntheticSource", out value) && value == "true")
+                {
+                    synthetic.Add(pair.Key.ToString(CultureInfo.InvariantCulture));
+                }
+            }
+            context.SetMetaData("icu:seededFrom", string.Join(",", seeded));
+            context.SetMetaData("icu:syntheticSource", string.Join(",", synthetic));
 
             // The unit gets its own context properties, never an addition to the object it
             // arrived with. The SDLXLIFF reader hands every paragraph unit in a group the same

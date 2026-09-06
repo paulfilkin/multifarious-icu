@@ -61,24 +61,6 @@
   <data name="Expand_SeedHelp2" xml:space="preserve">
     <value>첫 번째 선택에서는 대상 형태가 같은 이름의 원본 형태가 있으면 거기에서, 없으면 "other"에서 시작합니다. 두 번째 선택에서는 모든 형태가 "other"에서 시작합니다. 영어의 "one" 형태는 정확히 하나의 항목을 위해 쓰인 경우가 많아 나머지 형태의 원본으로는 어색하기 때문에 이 방식을 선호하는 팀도 있습니다.</value>
   </data>
-  <data name="Expand_HintsHeader" xml:space="preserve">
-    <value>세그먼트 주석</value>
-  </data>
-  <data name="Expand_Hints" xml:space="preserve">
-    <value>형태에 대한 문법 힌트가 알려진 경우 추가</value>
-  </data>
-  <data name="Expand_HintsHint" xml:space="preserve">
-    <value>각 주석에는 형태와 그 형태를 선택하는 수의 예가 표시됩니다. 힌트는 그 형태가 보통 무엇을 요구하는지(예: 러시아어의 속격 단수) 설명하는 문장을 추가합니다.</value>
-  </data>
-  <data name="Expand_HintsHelpHeader" xml:space="preserve">
-    <value>문법 힌트란 무엇입니까?</value>
-  </data>
-  <data name="Expand_HintsHelp1" xml:space="preserve">
-    <value>유니코드 CLDR 데이터는 언어에 어떤 형태가 있고 어떤 수가 각 형태를 선택하는지 알려 주지만, 언어가 그 형태를 어떻게 다루는지는 말해 주지 않습니다. 힌트는 플러그인 자체 표에서 가져온 짧은 문장으로, 예를 들어 러시아어의 "few" 형태에는 속격 단수가 필요하다는 내용입니다.</value>
-  </data>
-  <data name="Expand_HintsHelp2" xml:space="preserve">
-    <value>힌트는 그 언어로 매일 작업하지 않는 번역자를 위한 조언이지 규칙이 아닙니다. 번역자가 방해가 된다고 느끼면 끄십시오. 형태 이름과 수의 예는 어느 경우든 주석에 남습니다.</value>
-  </data>
   <data name="Expand_BudgetHeader" xml:space="preserve">
     <value>분기 상한</value>
   </data>
@@ -345,15 +327,6 @@
   </data>
   <data name="Verifier_Invalid" xml:space="preserve">
     <value>재조립된 메시지가 유효한 ICU가 아닙니다: {0}.</value>
-  </data>
-  <data name="Expand_Comments" xml:space="preserve">
-    <value>각 원본 세그먼트에 형태와 그 형태를 선택하는 수를 알려 주는 주석 추가</value>
-  </data>
-  <data name="Expand_CommentsHint" xml:space="preserve">
-    <value>ICU Forms 창이 열려 있으면 주석이 방해가 될 수 있습니다. 주석을 끄더라도 창에는 모든 형태가 계속 표시됩니다.</value>
-  </data>
-  <data name="Expand_CommentsHelp1" xml:space="preserve">
-    <value>각 원본 세그먼트에는 형태, 그 형태를 선택하는 수, 원본 텍스트의 출처를 알려 주는 주석을 붙일 수 있습니다. ICU Forms 창은 메시지 자체에서 같은 정보를 보여 주므로, 주석은 창 없이 작업하는 번역자를 위한 편의일 뿐 작업이 의존하는 것은 아닙니다.</value>
   </data>
   <data name="VerifierPage_Intro" xml:space="preserve">
     <value>ICU Verifier는 F8을 누를 때와 세그먼트를 확정할 때 재구성된 ICU 메시지의 모든 형태를 검사하고, 발견한 내용을 메시지 창에 나열합니다.</value>
