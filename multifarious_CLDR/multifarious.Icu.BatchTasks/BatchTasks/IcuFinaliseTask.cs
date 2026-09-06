@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using multifarious.Icu.BatchTasks.Services;
+using multifarious.Icu.BatchTasks.Settings;
+using multifarious.Icu.BatchTasks.Settings.Pages;
 using multifarious.Icu.Expansion;
 using Sdl.FileTypeSupport.Framework.IntegrationApi;
 using Sdl.ProjectAutomation.AutomaticTasks;
@@ -27,6 +29,7 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
         GeneratedFileType = AutomaticTaskFileType.BilingualTarget,
         AllowMultiple = true)]
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
+    [RequiresSettings(typeof(IcuFinaliseSettings), typeof(IcuFinaliseSettingsPage))]
     public class IcuFinaliseTask : AbstractFileContentProcessingAutomaticTask
     {
         private readonly List<IcuFinaliseProcessor> _processors = new List<IcuFinaliseProcessor>();
@@ -36,15 +39,17 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
 
         protected override void OnInitializeTask()
         {
-            // Settings pages arrive in a later slice; until then the design's defaults apply.
-            _options = FinaliseOptions.Default;
+            _options = GetSetting<IcuFinaliseSettings>().ToOptions();
 
             var info = Project != null ? Project.GetProjectInfo() : null;
             Diagnostics.Start("finalise task");
             Diagnostics.Write("project=" + (info != null ? info.Name : "<null>")
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
+            Diagnostics.Write("settings: emptyBranch=" + _options.OnEmptyBranch
+                + " placeholderMismatch=" + _options.OnPlaceholderMismatch);
         }
 
+        /// <summary>Only files of the two proven file types; see the expand task.</summary>
         public override bool ShouldProcessFile(ProjectFile projectFile)
         {
             _filesSeen++;

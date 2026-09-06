@@ -56,6 +56,14 @@
     <Reference Include="Sdl.Core.Globalization.Async">
       <HintPath>$(TradosFolder)\Sdl.Core.Globalization.Async.dll</HintPath>
     </Reference>
+    <!-- The settings tests run the groups through a real settings bundle, and the contract tests
+         check the page controls for the interfaces Studio demands. -->
+    <Reference Include="Sdl.Core.Settings">
+      <HintPath>$(TradosFolder)\Sdl.Core.Settings.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.Desktop.IntegrationApi">
+      <HintPath>$(TradosFolder)\Sdl.Desktop.IntegrationApi.dll</HintPath>
+    </Reference>
     <!-- The plugin project is WPF; referencing it needs the desktop assemblies resolvable. -->
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />

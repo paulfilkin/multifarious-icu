@@ -1,6 +1,12 @@
 using System.Resources;
 using multifarious.Icu.BatchTasks;
 using multifarious.Icu.BatchTasks.BatchTasks;
+using multifarious.Icu.BatchTasks.Settings;
+using multifarious.Icu.BatchTasks.Settings.Pages;
+using multifarious.Icu.BatchTasks.Settings.Views;
+using Sdl.Core.Settings;
+using Sdl.Desktop.IntegrationApi;
+using Sdl.Desktop.IntegrationApi.Interfaces;
 using Sdl.ProjectAutomation.AutomaticTasks;
 
 namespace multifarious.Icu.Tests.BatchTasks;
@@ -72,5 +78,49 @@ public class BatchTaskContractTests
     public void The_two_task_ids_differ()
     {
         Assert.NotEqual(Constants.ExpandTaskId, Constants.FinaliseTaskId);
+    }
+
+    public static IEnumerable<object[]> SettingsBindings =>
+    [
+        [typeof(IcuExpandTask), typeof(IcuExpandSettings), typeof(IcuExpandSettingsPage), typeof(IcuExpandSettingsView)],
+        [typeof(IcuFinaliseTask), typeof(IcuFinaliseSettings), typeof(IcuFinaliseSettingsPage), typeof(IcuFinaliseSettingsView)],
+    ];
+
+    /// <summary>
+    /// The settings page reaches Studio only through RequiresSettings, and its control only
+    /// through the two interfaces the page base class constrains it to. A control that merely
+    /// defines the members is never accepted; a missing attribute leaves the task without a
+    /// page and the project without the settings group.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(SettingsBindings))]
+    public void The_task_binds_its_settings_group_and_page(Type task, Type settings, Type page, Type view)
+    {
+        var attribute = task.GetCustomAttributes(typeof(RequiresSettingsAttribute), false)
+            .Cast<RequiresSettingsAttribute>()
+            .Single();
+
+        Assert.Equal(settings, attribute.SettingsType);
+        Assert.Equal(page, attribute.SettingsPageType);
+        Assert.True(typeof(SettingsGroup).IsAssignableFrom(settings));
+        Assert.NotNull(settings.GetConstructor(Type.EmptyTypes));
+        Assert.NotNull(page.GetConstructor(Type.EmptyTypes));
+
+        Assert.True(typeof(IUISettingsControl).IsAssignableFrom(view), "the control must declare IUISettingsControl");
+        Assert.True(typeof(ISettingsAware<>).MakeGenericType(settings).IsAssignableFrom(view),
+            "the control must declare ISettingsAware<TSettings>");
+    }
+
+    /// <summary>
+    /// The bundle stores a group under its class name, so the class name is the id the project
+    /// file carries and renaming the class orphans every project's settings.
+    /// </summary>
+    [Fact]
+    public void The_settings_groups_are_stored_under_their_class_names()
+    {
+        var bundle = SettingsUtil.CreateSettingsBundle(null);
+
+        Assert.Equal("IcuExpandSettings", bundle.GetSettingsGroup<IcuExpandSettings>().Id);
+        Assert.Equal("IcuFinaliseSettings", bundle.GetSettingsGroup<IcuFinaliseSettings>().Id);
     }
 }

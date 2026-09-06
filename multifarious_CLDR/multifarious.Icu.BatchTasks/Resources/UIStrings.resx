@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    User-visible strings for the two batch task settings pages.
+
+    Every entry carries a comment giving the context a translator needs. Words that recur:
+
+      "form"     - one branch of an ICU plural message: the text shown for counts that select
+                   "one", "few", "many" and so on. The CLDR term is "category"; "form" is used
+                   in the UI because it is what a translator sees.
+      "message"  - one ICU MessageFormat value in a resource file, such as
+                   "{count, plural, one {# file} other {# files}}".
+      "segment"  - a Trados Studio segment, one translatable unit in the editor.
+
+    ICU keywords (plural, selectordinal, select, other, offset) are code and must not be
+    translated.
+  -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- The expand page. -->
+  <data name="Expand_KindsHeader" xml:space="preserve">
+    <value>Messages to expand</value>
+    <comment>Group heading. Which kinds of ICU message the task restructures.</comment>
+  </data>
+  <data name="Expand_Cardinal" xml:space="preserve">
+    <value>Plural messages ({count, plural, ...})</value>
+    <comment>Tick box. The bracketed part is ICU syntax and must not be translated.</comment>
+  </data>
+  <data name="Expand_Ordinal" xml:space="preserve">
+    <value>Ordinal messages ({count, selectordinal, ...})</value>
+    <comment>Tick box. Ordinals are 1st, 2nd, 3rd. The bracketed part is ICU syntax and must not be translated.</comment>
+  </data>
+  <data name="Expand_KindsHint" xml:space="preserve">
+    <value>A message is restructured into one segment per form the target language needs, each a whole sentence. A message whose only selectors are of an unticked kind is left as it is.</value>
+    <comment>Hint under the two tick boxes.</comment>
+  </data>
+  <data name="Expand_SeedHeader" xml:space="preserve">
+    <value>Source text for forms the source language does not have</value>
+    <comment>Group heading. English has two plural forms; Russian needs four, so two of the Russian segments have no exact English counterpart and start from an English form chosen here.</comment>
+  </data>
+  <data name="Expand_SeedMatching" xml:space="preserve">
+    <value>The source form with the same name where there is one, otherwise the "other" form</value>
+    <comment>Radio button, the default. "other" is the ICU keyword and must not be translated.</comment>
+  </data>
+  <data name="Expand_SeedAlwaysOther" xml:space="preserve">
+    <value>Always the "other" form</value>
+    <comment>Radio button. "other" is the ICU keyword and must not be translated.</comment>
+  </data>
+  <data name="Expand_SeedHint" xml:space="preserve">
+    <value>The comment on each segment says which source form it started from, so the translator knows when the source is only a starting point.</value>
+    <comment>Hint under the two radio buttons.</comment>
+  </data>
+  <data name="Expand_HintsHeader" xml:space="preserve">
+    <value>Segment comments</value>
+    <comment>Group heading. What the task writes into the comment on each source segment.</comment>
+  </data>
+  <data name="Expand_Hints" xml:space="preserve">
+    <value>Add a grammar hint for the form where one is known</value>
+    <comment>Tick box, on by default.</comment>
+  </data>
+  <data name="Expand_HintsHint" xml:space="preserve">
+    <value>Every comment names the form and example counts that select it. A hint adds a sentence on what the form usually requires, for example the genitive singular in Russian.</value>
+    <comment>Hint under the tick box. "genitive singular" is a grammatical case; translate it as a grammarian would.</comment>
+  </data>
+  <data name="Expand_BudgetHeader" xml:space="preserve">
+    <value>Branch budget</value>
+    <comment>Group heading. A cap on how many segments one message may become.</comment>
+  </data>
+  <data name="Expand_BudgetLabel" xml:space="preserve">
+    <value>Most segments one message may expand to:</value>
+    <comment>Label before a number box. The default is 24.</comment>
+  </data>
+  <data name="Expand_BudgetHint" xml:space="preserve">
+    <value>Two independent plurals multiply: six forms times six forms is 36 segments for Arabic. Over the budget the message is laid out with its syntax protected but no forms added, and the report says so.</value>
+    <comment>Hint under the number box.</comment>
+  </data>
+  <data name="Expand_BudgetInvalid" xml:space="preserve">
+    <value>Enter a whole number from 1 to 999.</value>
+    <comment>Validation message shown when the number box holds something else.</comment>
+  </data>
+  <data name="Expand_ParseHeader" xml:space="preserve">
+    <value>When a value does not parse as an ICU message</value>
+    <comment>Group heading. What the task does with a value that has braces but is not valid ICU.</comment>
+  </data>
+  <data name="Expand_ParsePassThrough" xml:space="preserve">
+    <value>Leave it untouched and add a warning</value>
+    <comment>Radio button, the default.</comment>
+  </data>
+  <data name="Expand_ParseFail" xml:space="preserve">
+    <value>Stop the task</value>
+    <comment>Radio button. The whole batch task fails on the first such value.</comment>
+  </data>
+
+  <!-- The finalise page. -->
+  <data name="Finalise_Intro" xml:space="preserve">
+    <value>Finalise prunes each message to the forms the target language needs, escapes ICU special characters typed as text, and checks the placeholders. Warnings go on the source segment's comment and into the task report; target comments are never written.</value>
+    <comment>Paragraph at the top of the page.</comment>
+  </data>
+  <data name="Finalise_EmptyHeader" xml:space="preserve">
+    <value>When a form has no translation</value>
+    <comment>Group heading. A required segment whose target is empty.</comment>
+  </data>
+  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+    <value>Use the source text and add a warning</value>
+    <comment>Radio button, the default.</comment>
+  </data>
+  <data name="Finalise_EmptyFail" xml:space="preserve">
+    <value>Stop the task</value>
+    <comment>Radio button. The whole batch task fails on the first empty form.</comment>
+  </data>
+  <data name="Finalise_MismatchHeader" xml:space="preserve">
+    <value>When the protected placeholders in source and target differ</value>
+    <comment>Group heading. A placeholder such as {name} missing from the translation or added to it.</comment>
+  </data>
+  <data name="Finalise_MismatchWarn" xml:space="preserve">
+    <value>Add a warning and continue</value>
+    <comment>Radio button, the default.</comment>
+  </data>
+  <data name="Finalise_MismatchFail" xml:space="preserve">
+    <value>Stop the task</value>
+    <comment>Radio button. The whole batch task fails on the first mismatch.</comment>
+  </data>
+</root>

@@ -1,0 +1,101 @@
+<UserControl x:Class="multifarious.Icu.BatchTasks.Settings.Views.IcuExpandSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:multifarious.Icu.BatchTasks.Resources"
+             xmlns:views="clr-namespace:multifarious.Icu.BatchTasks.Settings.Views"
+             KeyboardNavigation.TabNavigation="Continue"
+             PreviewKeyDown="OnPreviewKeyDown">
+  <!-- Strings come from UIStrings.resx via x:Static, so a renamed entry is a compile error rather
+       than a blank label. Studio's own control styles, so the page matches Studio's chrome. No
+       minimum width: the batch task wizard's settings panel is narrower than the file type
+       settings dialog, and a fixed width pushed the right-hand column out of view (Project 44). -->
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/buttonresources.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/radiobuttonresources.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/groupboxresources.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/textblockresources.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/checkboxresources.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <Style TargetType="CheckBox" BasedOn="{StaticResource Sdl.Checkbox.GenericStyle}">
+        <Setter Property="Margin" Value="0,3,0,3" />
+      </Style>
+      <Style TargetType="RadioButton" BasedOn="{StaticResource Sdl.RadioButton.GenericStyle}">
+        <Setter Property="Margin" Value="0,3,0,3" />
+      </Style>
+      <Style TargetType="GroupBox" BasedOn="{StaticResource Sdl.GroupBox.SingleLineStyle}">
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Padding" Value="8" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="Hint">
+        <Setter Property="Foreground" Value="#666666" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="20,2,0,8" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="Invalid">
+        <Setter Property="Foreground" Value="#B00020" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,4,0,0" />
+      </Style>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+    <StackPanel>
+
+      <GroupBox Header="{x:Static res:UIStrings.Expand_KindsHeader}">
+        <StackPanel>
+          <CheckBox TabIndex="10" Content="{x:Static res:UIStrings.Expand_Cardinal}" IsChecked="{Binding ExpandCardinal}" />
+          <CheckBox TabIndex="11" Content="{x:Static res:UIStrings.Expand_Ordinal}" IsChecked="{Binding ExpandOrdinal}" />
+          <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Expand_KindsHint}" />
+        </StackPanel>
+      </GroupBox>
+
+      <GroupBox Header="{x:Static res:UIStrings.Expand_SeedHeader}">
+        <StackPanel>
+          <RadioButton GroupName="Seed" TabIndex="20" Content="{x:Static res:UIStrings.Expand_SeedMatching}" IsChecked="{Binding SeedIsMatchingElseOther}" />
+          <RadioButton GroupName="Seed" TabIndex="21" Content="{x:Static res:UIStrings.Expand_SeedAlwaysOther}" IsChecked="{Binding SeedIsAlwaysOther}" />
+          <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Expand_SeedHint}" />
+        </StackPanel>
+      </GroupBox>
+
+      <GroupBox Header="{x:Static res:UIStrings.Expand_HintsHeader}">
+        <StackPanel>
+          <CheckBox TabIndex="30" Content="{x:Static res:UIStrings.Expand_Hints}" IsChecked="{Binding IncludeHints}" />
+          <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Expand_HintsHint}" />
+        </StackPanel>
+      </GroupBox>
+
+      <GroupBox Header="{x:Static res:UIStrings.Expand_BudgetHeader}">
+        <StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" Text="{x:Static res:UIStrings.Expand_BudgetLabel}" />
+            <TextBox TabIndex="40" Width="60" Padding="2" VerticalContentAlignment="Center"
+                     AutomationProperties.Name="{x:Static res:UIStrings.Expand_BudgetLabel}"
+                     Text="{Binding BudgetText, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+          <TextBlock Style="{StaticResource Invalid}" Text="{x:Static res:UIStrings.Expand_BudgetInvalid}">
+            <TextBlock.Visibility>
+              <Binding Path="IsBudgetValid">
+                <Binding.Converter>
+                  <views:InverseBooleanToVisibilityConverter />
+                </Binding.Converter>
+              </Binding>
+            </TextBlock.Visibility>
+          </TextBlock>
+          <TextBlock Style="{StaticResource Hint}" Margin="0,6,0,0" Text="{x:Static res:UIStrings.Expand_BudgetHint}" />
+        </StackPanel>
+      </GroupBox>
+
+      <GroupBox Header="{x:Static res:UIStrings.Expand_ParseHeader}">
+        <StackPanel>
+          <RadioButton GroupName="Parse" TabIndex="50" Content="{x:Static res:UIStrings.Expand_ParsePassThrough}" IsChecked="{Binding ParseErrorPassesThrough}" />
+          <RadioButton GroupName="Parse" TabIndex="51" Content="{x:Static res:UIStrings.Expand_ParseFail}" IsChecked="{Binding ParseErrorFailsTask}" />
+        </StackPanel>
+      </GroupBox>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

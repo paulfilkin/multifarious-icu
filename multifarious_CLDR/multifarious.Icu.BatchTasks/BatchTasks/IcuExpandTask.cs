@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using multifarious.Icu.BatchTasks.Services;
+using multifarious.Icu.BatchTasks.Settings;
+using multifarious.Icu.BatchTasks.Settings.Pages;
 using multifarious.Icu.Expansion;
 using Sdl.FileTypeSupport.Framework.IntegrationApi;
 using Sdl.ProjectAutomation.AutomaticTasks;
@@ -29,6 +31,10 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
     // without complaint, and never appears in Studio's list - there is nothing telling Studio which
     // files it applies to, so it applies to none.
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
+    // Binds the settings group and its page to the task: Studio shows the page under the task's
+    // name in the batch task wizard and the project settings, and stores the group in the
+    // project's settings bundle.
+    [RequiresSettings(typeof(IcuExpandSettings), typeof(IcuExpandSettingsPage))]
     public class IcuExpandTask : AbstractFileContentProcessingAutomaticTask
     {
         private readonly List<IcuExpandProcessor> _processors = new List<IcuExpandProcessor>();
@@ -39,8 +45,9 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
 
         protected override void OnInitializeTask()
         {
-            // Settings pages arrive in a later slice; until then the design's defaults apply.
-            _options = ExpansionOptions.Default;
+            // The settings Studio stores in the project; a project that has never seen the page
+            // yields the design's defaults.
+            _options = GetSetting<IcuExpandSettings>().ToOptions();
 
             var info = Project != null ? Project.GetProjectInfo() : null;
             _sourceLanguage = info != null && info.SourceLanguage != null && info.SourceLanguage.CultureInfo != null
@@ -51,11 +58,16 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             Diagnostics.Write("project=" + (info != null ? info.Name : "<null>")
                 + " source=" + (_sourceLanguage ?? "<null>")
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
+            Diagnostics.Write("settings: cardinal=" + _options.ExpandCardinal + " ordinal=" + _options.ExpandOrdinal
+                + " seed=" + _options.SourceSeedStrategy + " hints=" + _options.IncludeHints
+                + " budget=" + _options.MaxUnitsPerMessage + " parseError=" + _options.OnParseError);
         }
 
         /// <summary>
-        /// Only files of the allowlisted file types. A project can hold anything, and a brace in
-        /// a Word document is not ICU.
+        /// Only files of the two proven file types. A project can hold anything, and a brace in
+        /// a Word document is not ICU. The pair is fixed rather than a setting: a file type that
+        /// has not been run end to end is not known to work, so new ones join by a change here
+        /// once they have been (Paul, 6 September 2026).
         /// </summary>
         public override bool ShouldProcessFile(ProjectFile projectFile)
         {

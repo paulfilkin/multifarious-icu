@@ -13,10 +13,13 @@ namespace multifarious.Icu.BatchTasks
         public const string FinaliseTaskId = "multifarious_Icu_FinaliseTask";
 
         /// <summary>
-        /// The file type definition ids the tasks process by default: Studio's own JSON and Java
-        /// Resources filters, which are the two formats proven end to end. A project can hold
-        /// anything, and a brace in a Word document is not ICU, so the tasks work from an
-        /// allowlist rather than from the classifier alone.
+        /// The file type definition ids the tasks process: Studio's own JSON and Java Resources
+        /// filters, which are the two formats proven end to end. A project can hold anything,
+        /// and a brace in a Word document is not ICU, so the tasks work from this list rather
+        /// than from the classifier alone. Not a setting, by decision (6 Sep 2026): a file type
+        /// that has not been run end to end is not known to work, and a customised copy of a
+        /// shipped filter carries a different id and is therefore skipped. New ids join here
+        /// once proven.
         ///
         /// Confirmed against ProjectFile.FileTypeId in the Phase 0 diagnostics log (5 Sep 2026).
         /// </summary>

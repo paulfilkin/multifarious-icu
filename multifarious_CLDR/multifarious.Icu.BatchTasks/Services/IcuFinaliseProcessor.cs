@@ -28,7 +28,8 @@ namespace multifarious.Icu.BatchTasks.Services
     /// selectors to the target language's exact set, both paragraphs in step; fill an empty
     /// target segment from the source; escape ICU special characters typed as target text; and
     /// check that every protected span in the source is in the target. Anything done to a
-    /// segment beyond pruning and escaping is recorded as a comment on it.
+    /// target segment beyond pruning and escaping is recorded as a comment on its source
+    /// segment; target comments belong to the translator and are never written.
     ///
     /// The layout is read from the content itself. The syntax between segments is locked text
     /// (or a placeholder tag under the variant) whose text is one of three shapes: a selector
@@ -177,7 +178,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
                 if (reasons.Count > 0)
                 {
-                    AddWarningComment(target, string.Join("\n", reasons));
+                    if (source != null) AddWarningComment(source, string.Join("\n", reasons));
                     foreach (var reason in reasons)
                     {
                         _warnings.Add(new ExpansionWarning(unitId, "Segment " + target.Properties.Id.Id + ": " + reason));
@@ -488,22 +489,36 @@ namespace multifarious.Icu.BatchTasks.Services
             return keys;
         }
 
-        private void AddWarningComment(ISegment segment, string text)
+        /// <summary>
+        /// Records what was done to a target segment as a comment on its source segment, never
+        /// on the target: target comments are the translator's and stay clear (Paul, 6 September
+        /// 2026). The source segment normally already carries the expansion comment marker, and
+        /// the warning joins its comments; a segment without one is wrapped in a new marker.
+        /// </summary>
+        private void AddWarningComment(ISegment source, string text)
         {
             var comment = PropertiesFactory.CreateComment(text, Constants.CommentAuthor, Severity.Medium);
             comment.Date = DateTime.Now;
             comment.DateSpecified = true;
+
+            var existing = source.Count == 1 ? source[0] as ICommentMarker : null;
+            if (existing != null)
+            {
+                existing.Comments.Add(comment);
+                return;
+            }
+
             var properties = PropertiesFactory.CreateCommentProperties();
             properties.Add(comment);
 
             var marker = ItemFactory.CreateCommentMarker(properties);
-            var content = ItemsOf(segment);
-            segment.Clear();
+            var content = ItemsOf(source);
+            source.Clear();
             foreach (var item in content)
             {
                 marker.Add(item);
             }
-            segment.Add(marker);
+            source.Add(marker);
         }
     }
 }

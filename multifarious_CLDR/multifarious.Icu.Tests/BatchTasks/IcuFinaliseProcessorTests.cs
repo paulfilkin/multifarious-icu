@@ -66,6 +66,11 @@ public class IcuFinaliseProcessorTests
         Assert.Equal(4, finaliser.Warnings.Count);
         Assert.All(finaliser.Warnings, w => Assert.Contains("untranslated", w.Reason));
 
+        // The warning joins the expansion comment on the source segment; the target segment
+        // carries no comment at all, because target comments are the translator's.
+        Assert.All(SegmentsOf(unit.Source), s => Assert.Equal(2, ((ICommentMarker)s[0]).Comments.Count));
+        Assert.All(SegmentsOf(unit.Target), s => Assert.DoesNotContain(ParagraphUnits.ItemsOf(s), i => i is ICommentMarker));
+
         AssertRendersLikeSource(UnreadCount, Projection(unit.Target), "ru",
             new Dictionary<string, string> { ["name"] = "Anna" }, "1", "2", "5", "21", "0.5");
     }
@@ -110,8 +115,7 @@ public class IcuFinaliseProcessorTests
 
         // A translator types an apostrophe and a literal brace into the first target form.
         var target = SegmentsOf(unit.Target)[0];
-        var marker = (ICommentMarker)target[0];
-        var text = ParagraphUnits.ItemsOf(marker).OfType<IText>().First();
+        var text = ParagraphUnits.ItemsOf(target).OfType<IText>().First();
         text.Properties.Text = "It's {literal} ";
 
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
@@ -133,7 +137,7 @@ public class IcuFinaliseProcessorTests
         var unit = Expanded(UnreadCount);
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         var target = SegmentsOf(unit.Target)[0];
-        var text = ParagraphUnits.ItemsOf((ICommentMarker)target[0]).OfType<IText>().First();
+        var text = ParagraphUnits.ItemsOf(target).OfType<IText>().First();
         text.Properties.Text = "It's ";
 
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
@@ -152,14 +156,16 @@ public class IcuFinaliseProcessorTests
         var unit = Expanded(UnreadCount);
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         var target = SegmentsOf(unit.Target)[0];
-        var marker = (ICommentMarker)target[0];
-        var span = ParagraphUnits.ItemsOf(marker).OfType<ILockedContent>().First();
+        var span = ParagraphUnits.ItemsOf(target).OfType<ILockedContent>().First();
         span.RemoveFromParent();
 
         var finaliser = Finaliser("ru-RU");
         finaliser.ProcessParagraphUnit(unit);
 
         Assert.Contains(finaliser.Warnings, w => w.Reason.Contains("missing from the target"));
+        var sourceComments = ((ICommentMarker)SegmentsOf(unit.Source)[0][0]).Comments;
+        Assert.Contains("Placeholder mismatch", sourceComments.GetItem(sourceComments.Count - 1).Text);
+        Assert.DoesNotContain(ParagraphUnits.ItemsOf(target), i => i is ICommentMarker);
     }
 
     [Fact]
@@ -168,7 +174,7 @@ public class IcuFinaliseProcessorTests
         var unit = Expanded(UnreadCount);
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         var target = SegmentsOf(unit.Target)[0];
-        ParagraphUnits.ItemsOf((ICommentMarker)target[0]).OfType<ILockedContent>().First().RemoveFromParent();
+        ParagraphUnits.ItemsOf(target).OfType<ILockedContent>().First().RemoveFromParent();
 
         var finaliser = Finaliser("ru-RU",
             FinaliseOptions.Default with { OnPlaceholderMismatch = PlaceholderMismatchBehaviour.FailTask });
@@ -198,7 +204,7 @@ public class IcuFinaliseProcessorTests
         Assert.Equal("Hello {name}, welcome back!", Projection(unit.Target));
 
         // '#' is plain text outside a plural and must not be quoted.
-        var text = ParagraphUnits.ItemsOf((ICommentMarker)SegmentsOf(unit.Target)[0][0]).OfType<IText>().First();
+        var text = ParagraphUnits.ItemsOf(SegmentsOf(unit.Target)[0]).OfType<IText>().First();
         text.Properties.Text = "Item #1 for ";
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         Assert.StartsWith("Item #1 for {name}", Projection(unit.Target));
@@ -240,7 +246,7 @@ public class IcuFinaliseProcessorTests
                 new Dictionary<string, string> { ["files"] = "1", ["devices"] = "2" }, CldrCategories.For("en")));
 
         // A typed apostrophe in a walked branch is escaped like any other.
-        var text = ParagraphUnits.ItemsOf((ICommentMarker)SegmentsOf(unit.Target)[0][0]).OfType<IText>().First();
+        var text = ParagraphUnits.ItemsOf(SegmentsOf(unit.Target)[0]).OfType<IText>().First();
         text.Properties.Text = "It's ";
         Finaliser("ja-JP").ProcessParagraphUnit(unit);
         Assert.Contains("It''s ", Projection(unit.Target));
