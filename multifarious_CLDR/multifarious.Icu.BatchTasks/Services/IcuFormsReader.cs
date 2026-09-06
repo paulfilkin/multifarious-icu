@@ -193,6 +193,8 @@ namespace multifarious.Icu.BatchTasks.Services
             public string Path = string.Empty;
             public string Selector = "none";
             public string Key = string.Empty;
+            /// <summary>The selectors above the segment, outermost first, as they stood when it was placed.</summary>
+            public List<Frame> Frames = new List<Frame>();
         }
 
         private sealed class Frame
@@ -252,6 +254,7 @@ namespace multifarious.Icu.BatchTasks.Services
                     place.Path = string.Join("/", frames.Select(f => f.Argument + ":" + (f.Key ?? string.Empty)));
                     place.Selector = innermost.Kind;
                     place.Key = innermost.Key ?? string.Empty;
+                    place.Frames = frames.Select(f => new Frame { Argument = f.Argument, Kind = f.Kind, Key = f.Key }).ToList();
                 }
                 placed.Add(place);
             }
@@ -316,9 +319,13 @@ namespace multifarious.Icu.BatchTasks.Services
 
             var pound = row.SampleCount.Length == 0 ? "#" : row.SampleCount;
 
-            row.SourceRendered = Rendered(source, pound, samples, ref nameOrdinal, inPluralContext);
+            // An outer plural's '#' was rewritten by hoisting to "{argument, number}", so it
+            // renders as that selector's own sample count for this row, not a fixed number.
+            var bound = BoundCounts(place, language);
+
+            row.SourceRendered = Rendered(source, pound, bound, samples, ref nameOrdinal, inPluralContext);
             row.TargetEmpty = target == null || IsEmpty(target);
-            row.TargetRendered = target == null ? string.Empty : Rendered(target, pound, samples, ref nameOrdinal, inPluralContext);
+            row.TargetRendered = target == null ? string.Empty : Rendered(target, pound, bound, samples, ref nameOrdinal, inPluralContext);
 
             // An empty target has no placeholders by definition; "not translated" is the whole
             // story and parity is only checked once there is a translation to check.
@@ -372,11 +379,42 @@ namespace multifarious.Icu.BatchTasks.Services
         }
 
         /// <summary>
-        /// The segment as a sentence: text runs as the translator sees them (typed escapes
-        /// undone), '#' as the sample count, arguments as sample values that stay the same
-        /// across the rows of one message.
+        /// The sample count for each plural or ordinal selector on the row's path, by argument
+        /// name: the explicit value itself, otherwise the first CLDR example for the category.
         /// </summary>
-        private static string Rendered(ISegment segment, string pound, Dictionary<string, string> samples, ref int nameOrdinal, bool inPluralContext)
+        private Dictionary<string, string> BoundCounts(PlacedSegment place, string language)
+        {
+            var bound = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var frame in place.Frames)
+            {
+                if (frame.Kind == "select" || frame.Key == null) continue;
+                if (frame.Key.StartsWith("=", StringComparison.Ordinal))
+                {
+                    bound[frame.Argument] = frame.Key.Substring(1);
+                    continue;
+                }
+
+                PluralCategory category;
+                if (string.IsNullOrEmpty(language) || !PluralCategories.TryParse(frame.Key, out category)) continue;
+                var kind = frame.Kind == "selectordinal" ? SelectorKind.Ordinal : SelectorKind.Cardinal;
+                var ruleSet = _plurals.Resolve(language, kind).RuleSet;
+                var rule = ruleSet != null ? ruleSet.GetRule(category) : null;
+                var pluralSamples = rule != null ? rule.Samples : PluralSamples.Empty;
+                var first = (pluralSamples.IsFractionalOnly
+                    ? pluralSamples.TakeDecimalExamples(1)
+                    : pluralSamples.TakeIntegerExamples(1)).FirstOrDefault();
+                if (first != null) bound[frame.Argument] = first;
+            }
+            return bound;
+        }
+
+        /// <summary>
+        /// The segment as a sentence: text runs as the translator sees them (typed escapes
+        /// undone), '#' as the sample count, an outer selector's rewritten '#' as that
+        /// selector's count for the row, and other arguments as sample values that stay the
+        /// same across the rows of one message.
+        /// </summary>
+        private static string Rendered(ISegment segment, string pound, Dictionary<string, string> bound, Dictionary<string, string> samples, ref int nameOrdinal, bool inPluralContext)
         {
             var builder = new StringBuilder();
             var ordinal = nameOrdinal;
@@ -398,10 +436,28 @@ namespace multifarious.Icu.BatchTasks.Services
                     return;
                 }
 
+                string count;
+                if (bound.TryGetValue(ArgumentName(syntax), out count))
+                {
+                    builder.Append(count);
+                    return;
+                }
+
                 builder.Append(SampleFor(syntax, samples, ref ordinal));
             });
             nameOrdinal = ordinal;
             return builder.ToString();
+        }
+
+        /// <summary>The argument name of a protected span's syntax: "amount" for <c>{amount, number, ::currency/EUR}</c>.</summary>
+        private static string ArgumentName(string syntax)
+        {
+            var inner = syntax.Trim();
+            if (inner.StartsWith("{", StringComparison.Ordinal) && inner.EndsWith("}", StringComparison.Ordinal))
+            {
+                inner = inner.Substring(1, inner.Length - 2);
+            }
+            return inner.Split(',')[0].Trim();
         }
 
         /// <summary>A sample for a protected argument such as <c>{name}</c> or <c>{amount, number, ::currency/EUR}</c>, one per argument name per message.</summary>

@@ -217,6 +217,27 @@ public class IcuFormsReaderTests
         Assert.Equal(["count:one"], reader.RowsFor(model, "2").Select(r => r.Path));
     }
 
+    /// <summary>
+    /// Hoisting rewrites an outer plural's '#' to "{argument, number}". Each row renders that
+    /// span with the outer form's own sample count, so "few / one" reads as 2 helpings for
+    /// 1 diner and "many / few" as 0 helpings for 2 diners, not a fixed 2 in every row.
+    /// </summary>
+    [Fact]
+    public void An_outer_plurals_count_marker_renders_with_that_rows_outer_count()
+    {
+        const string order =
+            "{spam, plural, =0 {Egg and bacon, no spam} one {Egg, bacon and spam} other {Egg, bacon and # helpings of spam}} " +
+            "for {diners, plural, one {# diner} other {# diners}}.";
+        var model = new IcuFormsReader().Read(Expanded(order, comments: false), "ru-RU")!;
+
+        Assert.Equal(20, model.Rows.Count);
+        var rendered = model.Rows.ToDictionary(r => r.Path, r => r.SourceRendered);
+        Assert.Equal("Egg and bacon, no spam for 1 diner.", rendered["spam:=0/diners:one"]);
+        Assert.Equal("Egg, bacon and 2 helpings of spam for 1 diner.", rendered["spam:few/diners:one"]);
+        Assert.Equal("Egg, bacon and 0 helpings of spam for 2 diners.", rendered["spam:many/diners:few"]);
+        Assert.Equal("Egg, bacon and 0.0 helpings of spam for 0.0 diners.", rendered["spam:other/diners:other"]);
+    }
+
     [Fact]
     public void A_select_over_a_plural_reads_every_leaf_and_the_count_marks_all_rows_of_a_form()
     {
