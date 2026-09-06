@@ -1,7 +1,9 @@
 # Project docs are kept locally, not in the repo, except the AppStore material
-# (documentation, samples, images), which is published. The built package is not.
+# (documentation, samples, images) and the session handovers, which are published.
+# The built package is not.
 Documentation/*
 !Documentation/appstore/
+!Documentation/Build_Progress/
 Documentation/appstore/*.sdlplugin
 
 # Claude Code session settings and the project instructions, which name local paths.
