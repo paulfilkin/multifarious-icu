@@ -67,13 +67,18 @@ public class IcuFinaliseProcessorTests
         Assert.Equal(4, finaliser.Warnings.Count);
         Assert.All(finaliser.Warnings, w => Assert.Contains("untranslated", w.Reason));
 
-        // The warnings go on the unit; no segment on either side carries a comment, because
-        // target comments are the translator's.
-        var comments = ParagraphUnits.UnitComments(unit);
-        Assert.Equal(["Segment 1: ", "Segment 2: ", "Segment 3: ", "Segment 4: "], comments.Select(c => c.Substring(0, 11)));
-        Assert.All(comments, c => Assert.Contains("untranslated", c));
+        // Each filled target carries the finding as a medium comment by the plugin; the source
+        // and the unit carry nothing.
+        foreach (var target in SegmentsOf(unit.Target))
+        {
+            var marker = Assert.IsAssignableFrom<ICommentMarker>(target[0]);
+            var comment = marker.Comments.GetItem(0);
+            Assert.Contains("untranslated", comment.Text);
+            Assert.Equal(Constants.CommentAuthor, comment.Author);
+            Assert.Equal(Severity.Medium, comment.Severity);
+        }
         Assert.True(ParagraphUnits.NoSegmentComments(unit.Source));
-        Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
+        Assert.Empty(ParagraphUnits.UnitComments(unit));
 
         AssertRendersLikeSource(UnreadCount, Projection(unit.Target), "ru",
             new Dictionary<string, string> { ["name"] = "Anna" }, "1", "2", "5", "21", "0.5");
@@ -119,7 +124,7 @@ public class IcuFinaliseProcessorTests
 
         // A translator types an apostrophe and a literal brace into the first target form.
         var target = SegmentsOf(unit.Target)[0];
-        var text = ParagraphUnits.ItemsOf(target).OfType<IText>().First();
+        var text = ParagraphUnits.ContentOf(target).OfType<IText>().First();
         text.Properties.Text = "It's {literal} ";
 
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
@@ -141,7 +146,7 @@ public class IcuFinaliseProcessorTests
         var unit = Expanded(UnreadCount);
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         var target = SegmentsOf(unit.Target)[0];
-        var text = ParagraphUnits.ItemsOf(target).OfType<IText>().First();
+        var text = ParagraphUnits.ContentOf(target).OfType<IText>().First();
         text.Properties.Text = "It's ";
 
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
@@ -210,7 +215,7 @@ public class IcuFinaliseProcessorTests
         Assert.Equal(0, TagsUnder(unit.Source));
         Assert.Equal(0, TagsUnder(unit.Target));
         Assert.Equal(["{name}", "#"],
-            ParagraphUnits.ItemsOf(SegmentsOf(unit.Target)[0]).OfType<ILockedContent>()
+            ParagraphUnits.ContentOf(SegmentsOf(unit.Target)[0]).OfType<ILockedContent>()
                 .Select(l => RawValueReconstruction.Reconstruct(l.Content).RawValue));
         Assert.Contains("one {Привет, {name}, у вас # сообщение!}", once);
         Assert.Equal("Привет, Anna, у вас 1 сообщение!",
@@ -242,10 +247,11 @@ public class IcuFinaliseProcessorTests
         var unit = Expanded(UnreadCount);
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         var target = SegmentsOf(unit.Target)[0];
-        var span = ParagraphUnits.ItemsOf(target).OfType<ILockedContent>().First();
-        var index = target.IndexOf(span);
-        target.RemoveAt(index);
-        target.Insert(index, Tag("{name}"));
+        IAbstractMarkupDataContainer container = ParagraphUnits.CommentOf(target) ?? (IAbstractMarkupDataContainer)target;
+        var span = ParagraphUnits.ContentOf(target).OfType<ILockedContent>().First();
+        var index = container.IndexOf(span);
+        container.RemoveAt(index);
+        container.Insert(index, Tag("{name}"));
 
         var finaliser = Finaliser("ru-RU");
         finaliser.ProcessParagraphUnit(unit);
@@ -317,11 +323,11 @@ public class IcuFinaliseProcessorTests
         Assert.Empty(finaliser.Warnings);
         targets = SegmentsOf(unit.Target);
 
-        Assert.DoesNotContain(ParagraphUnits.ItemsOf(targets[0]), i => i is ICommentMarker);
+        Assert.DoesNotContain(ParagraphUnits.ContentOf(targets[0]), i => i is ICommentMarker);
         Assert.Equal(["{name}", "#"],
-            ParagraphUnits.ItemsOf(targets[0]).OfType<ILockedContent>().Select(l => RawValueReconstruction.Reconstruct(l.Content).RawValue));
+            ParagraphUnits.ContentOf(targets[0]).OfType<ILockedContent>().Select(l => RawValueReconstruction.Reconstruct(l.Content).RawValue));
 
-        var kept = Assert.Single(ParagraphUnits.ItemsOf(targets[1]).OfType<ICommentMarker>());
+        var kept = Assert.Single(ParagraphUnits.ContentOf(targets[1]).OfType<ICommentMarker>());
         Assert.Equal("check the case", kept.Comments.GetItem(0).Text);
 
         var shared = Assert.IsAssignableFrom<ICommentMarker>(targets[2][0]);
@@ -337,21 +343,22 @@ public class IcuFinaliseProcessorTests
         Assert.Equal(1, Assert.IsAssignableFrom<ICommentMarker>(SegmentsOf(unit.Target)[2][0]).Comments.Count);
     }
 
-    /// <summary>Finalise warnings go on the unit, and no segment on either side gets a marker.</summary>
+    /// <summary>A finding written on a target is removed by the next run, so a corrected file comes out clean and a stale warning never lingers.</summary>
     [Fact]
-    public void Finalise_warnings_go_on_the_unit_and_no_segment_gets_a_marker()
+    public void A_finding_on_a_target_is_cleared_by_the_next_run()
     {
         var unit = Expanded(UnreadCount);
-        Assert.Empty(ParagraphUnits.UnitComments(unit));
-
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
+        Assert.All(SegmentsOf(unit.Target), t => Assert.NotNull(ParagraphUnits.CommentOf(t)));
 
-        var comments = ParagraphUnits.UnitComments(unit);
-        Assert.Equal(4, comments.Count);
-        Assert.All(comments, c => Assert.Contains("untranslated", c));
-        Assert.True(ParagraphUnits.NoSegmentComments(unit.Source));
+        var again = Finaliser("ru-RU");
+        again.ProcessParagraphUnit(unit);
+
+        // Filled from the source on the first run, so translated now: no finding, no comment.
+        Assert.Empty(again.Warnings);
         Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
-        Assert.Equal(4, SegmentsOf(unit.Source).Count);
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Source));
+        Assert.Empty(ParagraphUnits.UnitComments(unit));
     }
 
     /// <summary>
@@ -367,7 +374,7 @@ public class IcuFinaliseProcessorTests
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         Assert.Equal(0, TagsUnder(unit.Target));
         var target = SegmentsOf(unit.Target)[0];
-        var span = ParagraphUnits.ItemsOf(target).OfType<ILockedContent>().First();
+        var span = ParagraphUnits.ContentOf(target).OfType<ILockedContent>().First();
         span.RemoveFromParent();
 
         var finaliser = Finaliser("ru-RU");
@@ -375,24 +382,30 @@ public class IcuFinaliseProcessorTests
 
         Assert.Contains(finaliser.Warnings, w => w.Reason.Contains("missing from the target"));
         Assert.Contains(finaliser.Warnings, w => w.Reason.Contains("run ICU Finalise Messages again"));
-        var comments = ParagraphUnits.UnitComments(unit);
-        Assert.StartsWith("Segment 1: Placeholder mismatch", comments[comments.Count - 2]);
-        Assert.StartsWith("The message is left with its placeholders as tags", comments[comments.Count - 1]);
-        Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
+
+        // The finding sits on the target segment as a high-severity comment; the others are clear.
+        var targets = SegmentsOf(unit.Target);
+        var marker = Assert.IsAssignableFrom<ICommentMarker>(targets[0][0]);
+        Assert.StartsWith("Placeholder mismatch", marker.Comments.GetItem(0).Text);
+        Assert.Contains("run ICU Finalise Messages again", marker.Comments.GetItem(0).Text);
+        Assert.Equal(Severity.High, marker.Comments.GetItem(0).Severity);
+        Assert.All(targets.Skip(1), t => Assert.Null(ParagraphUnits.CommentOf(t)));
+        Assert.Empty(ParagraphUnits.UnitComments(unit));
 
         // Editable shape on both sides: tags, no locked span inside any segment.
         Assert.Equal(8, TagsUnder(unit.Source));
         Assert.Equal(7, TagsUnder(unit.Target));
         Assert.All(SegmentsOf(unit.Source), s => Assert.Empty(ParagraphUnits.ItemsOf(s).OfType<ILockedContent>()));
-        Assert.All(SegmentsOf(unit.Target), s => Assert.Empty(ParagraphUnits.ItemsOf(s).OfType<ILockedContent>()));
+        Assert.All(SegmentsOf(unit.Target), s => Assert.Empty(ParagraphUnits.ContentOf(s).OfType<ILockedContent>()));
         Assert.Equal("{name}", ParagraphUnits.ItemsOf(SegmentsOf(unit.Source)[0]).OfType<IPlaceholderTag>().First().Properties.TagContent);
 
-        // The translator places the tag; the next run locks the message.
-        SegmentsOf(unit.Target)[0].Insert(1, Tag("{name}"));
+        // The translator places the tag; the next run clears the comment and locks the message.
+        marker.Insert(1, Tag("{name}"));
         var again = Finaliser("ru-RU");
         again.ProcessParagraphUnit(unit);
 
         Assert.DoesNotContain(again.Warnings, w => w.Reason.Contains("Placeholder mismatch"));
+        Assert.True(ParagraphUnits.NoSegmentComments(unit.Target));
         Assert.Equal(0, TagsUnder(unit.Source));
         Assert.Equal(0, TagsUnder(unit.Target));
         AssertRendersLikeSource(UnreadCount, Projection(unit.Target), "ru", new Dictionary<string, string> { ["name"] = "Anna" }, "1", "2", "5");
@@ -420,7 +433,7 @@ public class IcuFinaliseProcessorTests
         var unit = Expanded(UnreadCount);
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         var target = SegmentsOf(unit.Target)[0];
-        ParagraphUnits.ItemsOf(target).OfType<ILockedContent>().First().RemoveFromParent();
+        ParagraphUnits.ContentOf(target).OfType<ILockedContent>().First().RemoveFromParent();
 
         var finaliser = Finaliser("ru-RU",
             FinaliseOptions.Default with { OnPlaceholderMismatch = PlaceholderMismatchBehaviour.FailTask });
@@ -450,7 +463,7 @@ public class IcuFinaliseProcessorTests
         Assert.Equal("Hello {name}, welcome back!", Projection(unit.Target));
 
         // '#' is plain text outside a plural and must not be quoted.
-        var text = ParagraphUnits.ItemsOf(SegmentsOf(unit.Target)[0]).OfType<IText>().First();
+        var text = ParagraphUnits.ContentOf(SegmentsOf(unit.Target)[0]).OfType<IText>().First();
         text.Properties.Text = "Item #1 for ";
         Finaliser("ru-RU").ProcessParagraphUnit(unit);
         Assert.StartsWith("Item #1 for {name}", Projection(unit.Target));
@@ -492,7 +505,7 @@ public class IcuFinaliseProcessorTests
                 new Dictionary<string, string> { ["files"] = "1", ["devices"] = "2" }, CldrCategories.For("en")));
 
         // A typed apostrophe in a walked branch is escaped like any other.
-        var text = ParagraphUnits.ItemsOf(SegmentsOf(unit.Target)[0]).OfType<IText>().First();
+        var text = ParagraphUnits.ContentOf(SegmentsOf(unit.Target)[0]).OfType<IText>().First();
         text.Properties.Text = "It's ";
         Finaliser("ja-JP").ProcessParagraphUnit(unit);
         Assert.Contains("It''s ", Projection(unit.Target));

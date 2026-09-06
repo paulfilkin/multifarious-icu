@@ -191,13 +191,17 @@ namespace multifarious.Icu.BatchTasks.Services
                             "Target segment " + target.Properties.Id.Id + ": " + parityDetail);
                     }
 
-                    reasons.Add("Placeholder mismatch: " + parityDetail);
+                    reasons.Add("Placeholder mismatch: " + parityDetail + ". "
+                        + "The message is left with its placeholders as tags; correct it and run ICU Finalise Messages again before Generate Target Translations.");
                     mismatch = true;
                 }
 
                 if (reasons.Count > 0)
                 {
-                    AddWarningComment(unit, "Segment " + target.Properties.Id.Id + ": " + string.Join("\n", reasons));
+                    // On the target segment, where the problem is and where a reviewer would put
+                    // it (Paul, 6 September 2026, Project 56): the comment icon shows on the row
+                    // and the Comments window jumps to it. The next run clears it first.
+                    AddTargetComment(target, string.Join("\n", reasons), mismatch ? Severity.High : Severity.Medium);
                     foreach (var reason in reasons)
                     {
                         var text = "Segment " + target.Properties.Id.Id + ": " + reason;
@@ -219,11 +223,6 @@ namespace multifarious.Icu.BatchTasks.Services
             {
                 foreach (var segment in sourceSegments) RestorePlaceholders(segment);
                 foreach (var segment in targetSegments) RestorePlaceholders(segment);
-                var notice = "The message is left with its placeholders as tags so the translation can be corrected; "
-                    + "run ICU Finalise Messages again before Generate Target Translations.";
-                AddWarningComment(unit, notice);
-                _warnings.Add(new ExpansionWarning(unitId, notice));
-                unitWarnings.Add(notice);
             }
             else
             {
@@ -689,22 +688,27 @@ namespace multifarious.Icu.BatchTasks.Services
         }
 
         /// <summary>
-        /// Records what was done to a target segment as a comment on the paragraph unit, never
-        /// in a segment: target comments are the translator's and stay clear, and a comment in
-        /// a source segment is copied into the target by Studio's own operations (Paul, 6
-        /// September 2026). The unit comment is the one carrier Studio never copies.
+        /// Records a finding on the target segment it concerns, as a reviewer would: a comment
+        /// marker around the segment's content, by the plugin's author name, which the next run
+        /// removes before it checks again. The translator's own comments stay.
         /// </summary>
-        private void AddWarningComment(IParagraphUnit unit, string text)
+        private void AddTargetComment(ISegment target, string text, Severity severity)
         {
-            var comment = PropertiesFactory.CreateComment(text, Constants.CommentAuthor, Severity.Medium);
+            var comment = PropertiesFactory.CreateComment(text, Constants.CommentAuthor, severity);
             comment.Date = DateTime.Now;
             comment.DateSpecified = true;
 
-            if (unit.Properties.Comments == null)
+            var properties = PropertiesFactory.CreateCommentProperties();
+            properties.Add(comment);
+
+            var marker = ItemFactory.CreateCommentMarker(properties);
+            var content = ItemsOf(target);
+            target.Clear();
+            foreach (var item in content)
             {
-                unit.Properties.Comments = PropertiesFactory.CreateCommentProperties();
+                marker.Add(item);
             }
-            unit.Properties.Comments.Add(comment);
+            target.Add(marker);
         }
     }
 }

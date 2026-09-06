@@ -9,6 +9,7 @@ using multifarious.Icu.BatchTasks.Settings;
 using multifarious.Icu.BatchTasks.Settings.Pages;
 using multifarious.Icu.Expansion;
 using Sdl.FileTypeSupport.Framework.IntegrationApi;
+using Sdl.FileTypeSupport.Framework.NativeApi;
 using Sdl.ProjectAutomation.AutomaticTasks;
 using Sdl.ProjectAutomation.Core;
 
@@ -121,6 +122,14 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             {
                 Diagnostics.Write("expand: " + projectFile.Name + " units=" + processor.Units
                     + " expanded=" + processor.Expanded + " warnings=" + processor.Warnings.Count);
+            }
+
+            // The warnings reach the Task Results window through Studio's own converter.
+            if (processor.Warnings.Count > 0)
+            {
+                var messages = processor.Warnings.Select(w => w.Reason).ToList();
+                converter.AddBilingualProcessor(new TaskMessageRelay(
+                    TaskMessageRelay.OriginFor("Task_Expand_Name"), projectFile.Name, messages, ErrorLevel.Warning));
             }
         }
 
