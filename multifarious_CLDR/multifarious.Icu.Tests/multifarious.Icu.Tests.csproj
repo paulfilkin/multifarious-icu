@@ -64,6 +64,16 @@
     <Reference Include="Sdl.Desktop.IntegrationApi">
       <HintPath>$(TradosFolder)\Sdl.Desktop.IntegrationApi.dll</HintPath>
     </Reference>
+    <!-- The view part contract tests read the attributes Studio discovers the editor parts by. -->
+    <Reference Include="Sdl.Desktop.IntegrationApi.Extensions">
+      <HintPath>$(TradosFolder)\Sdl.Desktop.IntegrationApi.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.TranslationStudioAutomation.IntegrationApi">
+      <HintPath>$(TradosFolder)\Sdl.TranslationStudioAutomation.IntegrationApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdl.Verification.Api">
+      <HintPath>$(TradosFolder)\Sdl.Verification.Api.dll</HintPath>
+    </Reference>
     <!-- The plugin project is WPF; referencing it needs the desktop assemblies resolvable. -->
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -89,6 +99,8 @@
          which would silently fall back to English for a missing key. -->
     <None Include="..\multifarious.Icu.BatchTasks\Resources\UIStrings.resx" Link="resources\UIStrings.resx" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\multifarious.Icu.BatchTasks\Resources\UIStrings.*.resx" Link="resources\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The view part's markup, read as text by the binding checks. -->
+    <None Include="..\multifarious.Icu.BatchTasks\Editor\Views\IcuFormsView.xaml" Link="views\IcuFormsView.xaml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

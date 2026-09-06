@@ -261,5 +261,92 @@ namespace multifarious.Icu.BatchTasks.Resources
 
         /// <summary>Value of a tick-box setting in the report's settings table.</summary>
         public static string Report_Off { get { return Manager.GetString("Report_Off", Culture); } }
+
+        /// <summary>Body of the empty states: what the window is for. "ICU MessageFormat" is a technology name and stays as it is.</summary>
+        public static string Forms_Purpose { get { return Manager.GetString("Forms_Purpose", Culture); } }
+
+        /// <summary>Title of the empty state when the editor has no document.</summary>
+        public static string Forms_NoDocumentTitle { get { return Manager.GetString("Forms_NoDocumentTitle", Culture); } }
+
+        /// <summary>Note of the empty state when the editor has no document. "ICU Expand Plural Forms" is the batch task's name as Studio lists it.</summary>
+        public static string Forms_NoDocument { get { return Manager.GetString("Forms_NoDocument", Culture); } }
+
+        /// <summary>Title of the empty state when the open file is of a file type the plugin does not handle.</summary>
+        public static string Forms_UnsupportedTitle { get { return Manager.GetString("Forms_UnsupportedTitle", Culture); } }
+
+        /// <summary>Note of the unsupported-file state. {0} is Studio's file type identifier, such as "Word 2007-2019 v 1.0.0.0"; keep the placeholder.</summary>
+        public static string Forms_UnsupportedWhy { get { return Manager.GetString("Forms_UnsupportedWhy", Culture); } }
+
+        /// <summary>Note of the unsupported-file state when Studio reports no file type identifier for the file.</summary>
+        public static string Forms_UnsupportedUnknown { get { return Manager.GetString("Forms_UnsupportedUnknown", Culture); } }
+
+        /// <summary>Title of the empty state when the file is a supported type but the expand task has not run on it.</summary>
+        public static string Forms_NotExpandedTitle { get { return Manager.GetString("Forms_NotExpandedTitle", Culture); } }
+
+        /// <summary>Note of the not-expanded state. "ICU Expand Plural Forms" is the batch task's name.</summary>
+        public static string Forms_NotExpanded { get { return Manager.GetString("Forms_NotExpanded", Culture); } }
+
+        /// <summary>Title of the empty state when the selected segment belongs to an ordinary paragraph of an expanded file.</summary>
+        public static string Forms_NotIcuTitle { get { return Manager.GetString("Forms_NotIcuTitle", Culture); } }
+
+        /// <summary>Note of the not-an-ICU-message state.</summary>
+        public static string Forms_NotIcu { get { return Manager.GetString("Forms_NotIcu", Culture); } }
+
+        /// <summary>Line under the message key. {0} is the target language name, {1} the number of forms; keep the placeholders.</summary>
+        public static string Forms_Summary { get { return Manager.GetString("Forms_Summary", Culture); } }
+
+        /// <summary>Column title: the plural form, explicit value or select key of the row.</summary>
+        public static string Forms_ColumnForm { get { return Manager.GetString("Forms_ColumnForm", Culture); } }
+
+        /// <summary>Column title: example counts that select the form.</summary>
+        public static string Forms_ColumnCounts { get { return Manager.GetString("Forms_ColumnCounts", Culture); } }
+
+        /// <summary>Column title: the source sentence with sample values.</summary>
+        public static string Forms_ColumnSource { get { return Manager.GetString("Forms_ColumnSource", Culture); } }
+
+        /// <summary>Column title: the translation with sample values.</summary>
+        public static string Forms_ColumnTarget { get { return Manager.GetString("Forms_ColumnTarget", Culture); } }
+
+        /// <summary>Appended to the counts of a form only fractional numbers select, such as Russian "other".</summary>
+        public static string Forms_FractionalOnly { get { return Manager.GetString("Forms_FractionalOnly", Culture); } }
+
+        /// <summary>Shown in the Target column for a form with no translation yet.</summary>
+        public static string Forms_EmptyTarget { get { return Manager.GetString("Forms_EmptyTarget", Culture); } }
+
+        /// <summary>Label before a small box where the translator types a number to see which form it selects.</summary>
+        public static string Forms_TryCount { get { return Manager.GetString("Forms_TryCount", Culture); } }
+
+        /// <summary>Result beside the count box. {0} is the form name, such as "few" or "=0"; keep the placeholder.</summary>
+        public static string Forms_ResolvesTo { get { return Manager.GetString("Forms_ResolvesTo", Culture); } }
+
+        /// <summary>Result beside the count box when the text is not a number or the message has no plural.</summary>
+        public static string Forms_ResolvesNothing { get { return Manager.GetString("Forms_ResolvesNothing", Culture); } }
+
+        /// <summary>Label over the read-only box showing the whole target message as it will be written to the file.</summary>
+        public static string Forms_Projection { get { return Manager.GetString("Forms_Projection", Culture); } }
+
+        /// <summary>Status beside the reassembled message when it parses.</summary>
+        public static string Forms_Parses { get { return Manager.GetString("Forms_Parses", Culture); } }
+
+        /// <summary>Status beside the reassembled message when it does not parse. {0} is the parser's description; keep the placeholder.</summary>
+        public static string Forms_ParseError { get { return Manager.GetString("Forms_ParseError", Culture); } }
+
+        /// <summary>Tooltip on a target cell whose protected placeholders differ from the source. {0} lists what is missing or extra; keep the placeholder.</summary>
+        public static string Forms_PlaceholderWarning { get { return Manager.GetString("Forms_PlaceholderWarning", Culture); } }
+
+        /// <summary>The Origin column of the Messages window. Same wording as the verifier's name in the Verification settings.</summary>
+        public static string Verifier_Origin { get { return Manager.GetString("Verifier_Origin", Culture); } }
+
+        /// <summary>Warning. {0} is the form's path, such as "count:few"; keep the placeholder.</summary>
+        public static string Verifier_EmptyForm { get { return Manager.GetString("Verifier_EmptyForm", Culture); } }
+
+        /// <summary>Error. {0} lists what is missing or extra, such as "missing {name}"; keep the placeholder.</summary>
+        public static string Verifier_Placeholders { get { return Manager.GetString("Verifier_Placeholders", Culture); } }
+
+        /// <summary>Warning. '#' is ICU syntax and must not be translated.</summary>
+        public static string Verifier_TypedPound { get { return Manager.GetString("Verifier_TypedPound", Culture); } }
+
+        /// <summary>Error. {0} is the parser's description of the problem; keep the placeholder.</summary>
+        public static string Verifier_Invalid { get { return Manager.GetString("Verifier_Invalid", Culture); } }
     }
 }

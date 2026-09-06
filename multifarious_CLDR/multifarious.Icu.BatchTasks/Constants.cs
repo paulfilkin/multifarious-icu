@@ -12,6 +12,18 @@ namespace multifarious.Icu.BatchTasks
         /// <summary>Identifies the finalise task to Studio. Same rules as the expand id.</summary>
         public const string FinaliseTaskId = "multifarious_Icu_FinaliseTask";
 
+        /// <summary>The ICU Forms view part, its ribbon group and the action that shows it. Studio stores window layouts against the view part id.</summary>
+        public const string FormsViewPartId = "multifarious_Icu_FormsViewPart";
+
+        public const string RibbonGroupId = "multifarious_Icu_RibbonGroup";
+
+        public const string ShowFormsActionId = "multifarious_Icu_ShowFormsAction";
+
+        /// <summary>The ICU verifier Studio lists under Verification, and the settings group id Studio keeps its Enabled flag in.</summary>
+        public const string VerifierId = "multifarious_Icu_Verifier";
+
+        public const string VerifierSettingsId = "multifarious_Icu_VerifierSettings";
+
         /// <summary>
         /// The file type definition ids the tasks process: Studio's own JSON and Java Resources
         /// filters, which are the two formats proven end to end. A project can hold anything,

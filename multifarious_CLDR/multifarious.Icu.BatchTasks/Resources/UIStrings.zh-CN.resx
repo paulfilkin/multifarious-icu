@@ -250,4 +250,91 @@
   <data name="Report_Off" xml:space="preserve">
     <value>关</value>
   </data>
+  <data name="Forms_Purpose" xml:space="preserve">
+    <value>ICU Forms 会显示 ICU MessageFormat 消息的每种复数、序数和 select 形式及示例数量，以及重新组合后的完整消息，这样在输入时就能检查译文。</value>
+  </data>
+  <data name="Forms_NoDocumentTitle" xml:space="preserve">
+    <value>未打开文档</value>
+  </data>
+  <data name="Forms_NoDocument" xml:space="preserve">
+    <value>请打开经 ICU Expand Plural Forms 处理过的 JSON 或 Java properties 文件，并移到复数消息的某个句段。</value>
+  </data>
+  <data name="Forms_UnsupportedTitle" xml:space="preserve">
+    <value>此文件不可用</value>
+  </data>
+  <data name="Forms_UnsupportedWhy" xml:space="preserve">
+    <value>此窗口适用于 Studio 的 JSON 和 Java Resources 两种文件类型，即 ICU 任务经过验证的两种类型。此文件使用的文件类型为“{0}”，ICU 任务不处理该类型，因此没有可显示的形式。</value>
+  </data>
+  <data name="Forms_UnsupportedUnknown" xml:space="preserve">
+    <value>此窗口适用于 Studio 的 JSON 和 Java Resources 两种文件类型，即 ICU 任务经过验证的两种类型。此文件属于另一种类型，ICU 任务不处理该类型，因此没有可显示的形式。</value>
+  </data>
+  <data name="Forms_NotExpandedTitle" xml:space="preserve">
+    <value>此文件中没有重构过的 ICU 消息</value>
+  </data>
+  <data name="Forms_NotExpanded" xml:space="preserve">
+    <value>请在翻译前对此文件运行 ICU Expand Plural Forms，然后重新打开。在此之前，复数消息只是带花括号语法的单个句段。</value>
+  </data>
+  <data name="Forms_NotIcuTitle" xml:space="preserve">
+    <value>不是 ICU 消息</value>
+  </data>
+  <data name="Forms_NotIcu" xml:space="preserve">
+    <value>当前句段是普通文本，没有可展开的内容。移到复数、序数或 select 消息的句段，其形式就会显示在这里。</value>
+  </data>
+  <data name="Forms_Summary" xml:space="preserve">
+    <value>{0}，{1} 种形式</value>
+  </data>
+  <data name="Forms_ColumnForm" xml:space="preserve">
+    <value>形式</value>
+  </data>
+  <data name="Forms_ColumnCounts" xml:space="preserve">
+    <value>数量</value>
+  </data>
+  <data name="Forms_ColumnSource" xml:space="preserve">
+    <value>源文</value>
+  </data>
+  <data name="Forms_ColumnTarget" xml:space="preserve">
+    <value>译文</value>
+  </data>
+  <data name="Forms_FractionalOnly" xml:space="preserve">
+    <value>仅限小数</value>
+  </data>
+  <data name="Forms_EmptyTarget" xml:space="preserve">
+    <value>(未翻译)</value>
+  </data>
+  <data name="Forms_TryCount" xml:space="preserve">
+    <value>试一个数量：</value>
+  </data>
+  <data name="Forms_ResolvesTo" xml:space="preserve">
+    <value>选中 {0}</value>
+  </data>
+  <data name="Forms_ResolvesNothing" xml:space="preserve">
+    <value>不是数量</value>
+  </data>
+  <data name="Forms_Projection" xml:space="preserve">
+    <value>重新组合的消息</value>
+  </data>
+  <data name="Forms_Parses" xml:space="preserve">
+    <value>有效的 ICU</value>
+  </data>
+  <data name="Forms_ParseError" xml:space="preserve">
+    <value>无效的 ICU：{0}</value>
+  </data>
+  <data name="Forms_PlaceholderWarning" xml:space="preserve">
+    <value>占位符：{0}</value>
+  </data>
+  <data name="Verifier_Origin" xml:space="preserve">
+    <value>ICU Verifier</value>
+  </data>
+  <data name="Verifier_EmptyForm" xml:space="preserve">
+    <value>形式“{0}”没有译文；完成处理时将使用源文。</value>
+  </data>
+  <data name="Verifier_Placeholders" xml:space="preserve">
+    <value>受保护的占位符与源文不一致：{0}。</value>
+  </data>
+  <data name="Verifier_TypedPound" xml:space="preserve">
+    <value>以文本形式输入的“#”将按字面显示；请使用受保护的 # 表示数量。</value>
+  </data>
+  <data name="Verifier_Invalid" xml:space="preserve">
+    <value>重新组合的消息不是有效的 ICU：{0}。</value>
+  </data>
 </root>

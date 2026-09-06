@@ -250,4 +250,91 @@
   <data name="Report_Off" xml:space="preserve">
     <value>Aus</value>
   </data>
+  <data name="Forms_Purpose" xml:space="preserve">
+    <value>ICU Forms zeigt jede Plural-, Ordinal- und Select-Form einer ICU-MessageFormat-Nachricht mit Beispielzahlen sowie die zusammengesetzte Nachricht, damit eine Übersetzung schon beim Eingeben geprüft werden kann.</value>
+  </data>
+  <data name="Forms_NoDocumentTitle" xml:space="preserve">
+    <value>Kein Dokument geöffnet</value>
+  </data>
+  <data name="Forms_NoDocument" xml:space="preserve">
+    <value>Öffnen Sie eine JSON- oder Java-Properties-Datei, die ICU Expand Plural Forms verarbeitet hat, und wechseln Sie zu einem Segment einer Pluralnachricht.</value>
+  </data>
+  <data name="Forms_UnsupportedTitle" xml:space="preserve">
+    <value>Für diese Datei nicht verfügbar</value>
+  </data>
+  <data name="Forms_UnsupportedWhy" xml:space="preserve">
+    <value>Es funktioniert mit den Dateitypen JSON und Java Resources von Studio, den beiden, für die die ICU-Tasks erprobt sind. Diese Datei verwendet den Dateityp „{0}“, den die ICU-Tasks nicht verarbeiten, daher gibt es keine Formen anzuzeigen.</value>
+  </data>
+  <data name="Forms_UnsupportedUnknown" xml:space="preserve">
+    <value>Es funktioniert mit den Dateitypen JSON und Java Resources von Studio, den beiden, für die die ICU-Tasks erprobt sind. Diese Datei hat einen anderen Typ, den die ICU-Tasks nicht verarbeiten, daher gibt es keine Formen anzuzeigen.</value>
+  </data>
+  <data name="Forms_NotExpandedTitle" xml:space="preserve">
+    <value>Keine ICU-Nachrichten in dieser Datei umgegliedert</value>
+  </data>
+  <data name="Forms_NotExpanded" xml:space="preserve">
+    <value>Führen Sie ICU Expand Plural Forms für diese Datei aus, bevor Sie sie übersetzen, und öffnen Sie sie dann erneut. Bis dahin sind die Pluralnachrichten einzelne Segmente mit Klammersyntax.</value>
+  </data>
+  <data name="Forms_NotIcuTitle" xml:space="preserve">
+    <value>Keine ICU-Nachricht</value>
+  </data>
+  <data name="Forms_NotIcu" xml:space="preserve">
+    <value>Das aktive Segment ist gewöhnlicher Text ohne etwas zu erweitern. Wechseln Sie zu einem Segment einer Plural-, Ordinal- oder Select-Nachricht, dann erscheinen hier ihre Formen.</value>
+  </data>
+  <data name="Forms_Summary" xml:space="preserve">
+    <value>{0}, {1} Form(en)</value>
+  </data>
+  <data name="Forms_ColumnForm" xml:space="preserve">
+    <value>Form</value>
+  </data>
+  <data name="Forms_ColumnCounts" xml:space="preserve">
+    <value>Zahlen</value>
+  </data>
+  <data name="Forms_ColumnSource" xml:space="preserve">
+    <value>Ausgangstext</value>
+  </data>
+  <data name="Forms_ColumnTarget" xml:space="preserve">
+    <value>Zieltext</value>
+  </data>
+  <data name="Forms_FractionalOnly" xml:space="preserve">
+    <value>nur Bruchzahlen</value>
+  </data>
+  <data name="Forms_EmptyTarget" xml:space="preserve">
+    <value>(nicht übersetzt)</value>
+  </data>
+  <data name="Forms_TryCount" xml:space="preserve">
+    <value>Zahl ausprobieren:</value>
+  </data>
+  <data name="Forms_ResolvesTo" xml:space="preserve">
+    <value>wählt {0}</value>
+  </data>
+  <data name="Forms_ResolvesNothing" xml:space="preserve">
+    <value>keine Zahl</value>
+  </data>
+  <data name="Forms_Projection" xml:space="preserve">
+    <value>Zusammengesetzte Nachricht</value>
+  </data>
+  <data name="Forms_Parses" xml:space="preserve">
+    <value>Gültiges ICU</value>
+  </data>
+  <data name="Forms_ParseError" xml:space="preserve">
+    <value>Kein gültiges ICU: {0}</value>
+  </data>
+  <data name="Forms_PlaceholderWarning" xml:space="preserve">
+    <value>Platzhalter: {0}</value>
+  </data>
+  <data name="Verifier_Origin" xml:space="preserve">
+    <value>ICU Verifier</value>
+  </data>
+  <data name="Verifier_EmptyForm" xml:space="preserve">
+    <value>Die Form „{0}“ hat keine Übersetzung; beim Abschließen wird der Ausgangstext verwendet.</value>
+  </data>
+  <data name="Verifier_Placeholders" xml:space="preserve">
+    <value>Die geschützten Platzhalter weichen vom Ausgangstext ab: {0}.</value>
+  </data>
+  <data name="Verifier_TypedPound" xml:space="preserve">
+    <value>Ein als Text eingegebenes „#“ wird wörtlich angezeigt; verwenden Sie das geschützte # für die Zahl.</value>
+  </data>
+  <data name="Verifier_Invalid" xml:space="preserve">
+    <value>Die zusammengesetzte Nachricht ist kein gültiges ICU: {0}.</value>
+  </data>
 </root>

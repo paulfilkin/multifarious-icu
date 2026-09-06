@@ -98,6 +98,14 @@
     <Reference Include="Sdl.ProjectAutomation.Core">
       <HintPath>$(TradosFolder)\Sdl.ProjectAutomation.Core.dll</HintPath>
     </Reference>
+    <!-- The editor: the ICU Forms view part docks under it and follows its active segment. -->
+    <Reference Include="Sdl.TranslationStudioAutomation.IntegrationApi">
+      <HintPath>$(TradosFolder)\Sdl.TranslationStudioAutomation.IntegrationApi.dll</HintPath>
+    </Reference>
+    <!-- The verifier Studio lists under Verification and runs on F8. -->
+    <Reference Include="Sdl.Verification.Api">
+      <HintPath>$(TradosFolder)\Sdl.Verification.Api.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

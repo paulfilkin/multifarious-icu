@@ -250,4 +250,91 @@
   <data name="Report_Off" xml:space="preserve">
     <value>Disattivo</value>
   </data>
+  <data name="Forms_Purpose" xml:space="preserve">
+    <value>ICU Forms mostra ogni forma plurale, ordinale e select di un messaggio ICU MessageFormat con quantità di esempio, e il messaggio intero ricomposto, così una traduzione può essere controllata mentre viene digitata.</value>
+  </data>
+  <data name="Forms_NoDocumentTitle" xml:space="preserve">
+    <value>Nessun documento aperto</value>
+  </data>
+  <data name="Forms_NoDocument" xml:space="preserve">
+    <value>Aprire un file JSON o Java properties elaborato da ICU Expand Plural Forms e spostarsi su un segmento di un messaggio plurale.</value>
+  </data>
+  <data name="Forms_UnsupportedTitle" xml:space="preserve">
+    <value>Non disponibile per questo file</value>
+  </data>
+  <data name="Forms_UnsupportedWhy" xml:space="preserve">
+    <value>Funziona con i tipi di file JSON e Java Resources di Studio, i due su cui le attività ICU sono collaudate. Questo file usa il tipo di file «{0}», che le attività ICU non elaborano, quindi non ci sono forme da mostrare.</value>
+  </data>
+  <data name="Forms_UnsupportedUnknown" xml:space="preserve">
+    <value>Funziona con i tipi di file JSON e Java Resources di Studio, i due su cui le attività ICU sono collaudate. Questo file è di un altro tipo, che le attività ICU non elaborano, quindi non ci sono forme da mostrare.</value>
+  </data>
+  <data name="Forms_NotExpandedTitle" xml:space="preserve">
+    <value>Nessun messaggio ICU ristrutturato in questo file</value>
+  </data>
+  <data name="Forms_NotExpanded" xml:space="preserve">
+    <value>Eseguire ICU Expand Plural Forms su questo file prima di tradurlo, poi riaprirlo. Fino ad allora i messaggi plurali sono singoli segmenti di sintassi tra parentesi graffe.</value>
+  </data>
+  <data name="Forms_NotIcuTitle" xml:space="preserve">
+    <value>Non è un messaggio ICU</value>
+  </data>
+  <data name="Forms_NotIcu" xml:space="preserve">
+    <value>Il segmento attivo è testo ordinario senza nulla da espandere. Spostarsi su un segmento di un messaggio plurale, ordinale o select e le sue forme compariranno qui.</value>
+  </data>
+  <data name="Forms_Summary" xml:space="preserve">
+    <value>{0}, {1} forma/e</value>
+  </data>
+  <data name="Forms_ColumnForm" xml:space="preserve">
+    <value>Forma</value>
+  </data>
+  <data name="Forms_ColumnCounts" xml:space="preserve">
+    <value>Quantità</value>
+  </data>
+  <data name="Forms_ColumnSource" xml:space="preserve">
+    <value>Origine</value>
+  </data>
+  <data name="Forms_ColumnTarget" xml:space="preserve">
+    <value>Destinazione</value>
+  </data>
+  <data name="Forms_FractionalOnly" xml:space="preserve">
+    <value>solo quantità frazionarie</value>
+  </data>
+  <data name="Forms_EmptyTarget" xml:space="preserve">
+    <value>(non tradotto)</value>
+  </data>
+  <data name="Forms_TryCount" xml:space="preserve">
+    <value>Prova una quantità:</value>
+  </data>
+  <data name="Forms_ResolvesTo" xml:space="preserve">
+    <value>seleziona {0}</value>
+  </data>
+  <data name="Forms_ResolvesNothing" xml:space="preserve">
+    <value>non è una quantità</value>
+  </data>
+  <data name="Forms_Projection" xml:space="preserve">
+    <value>Messaggio ricomposto</value>
+  </data>
+  <data name="Forms_Parses" xml:space="preserve">
+    <value>ICU valido</value>
+  </data>
+  <data name="Forms_ParseError" xml:space="preserve">
+    <value>ICU non valido: {0}</value>
+  </data>
+  <data name="Forms_PlaceholderWarning" xml:space="preserve">
+    <value>Segnaposto: {0}</value>
+  </data>
+  <data name="Verifier_Origin" xml:space="preserve">
+    <value>ICU Verifier</value>
+  </data>
+  <data name="Verifier_EmptyForm" xml:space="preserve">
+    <value>La forma «{0}» non ha traduzione; la finalizzazione userà il testo di origine.</value>
+  </data>
+  <data name="Verifier_Placeholders" xml:space="preserve">
+    <value>I segnaposto protetti differiscono dall'origine: {0}.</value>
+  </data>
+  <data name="Verifier_TypedPound" xml:space="preserve">
+    <value>Un «#» digitato come testo verrà mostrato letteralmente; usare il # protetto per la quantità.</value>
+  </data>
+  <data name="Verifier_Invalid" xml:space="preserve">
+    <value>Il messaggio ricomposto non è ICU valido: {0}.</value>
+  </data>
 </root>

@@ -1,0 +1,196 @@
+<UserControl x:Class="multifarious.Icu.BatchTasks.Editor.Views.IcuFormsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:multifarious.Icu.BatchTasks.Resources">
+  <!-- The ICU Forms window under the editor: header, one row per form, the count box and the
+       reassembled message. Native WPF. The table is an ItemsControl of grids rather than a
+       ListView: Studio's implicit list styles stretched a ListView's rows to the window's height
+       and its fixed columns pushed the Target column off the right edge (Project 45). Two star
+       columns share whatever width the window has, so nothing is ever clipped; the text wraps.
+       Read-only bindings are OneWay where the control would default to TwoWay, because a TwoWay
+       binding onto a getter-only property throws inside Studio. -->
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <BooleanToVisibilityConverter x:Key="Visible" />
+      <SolidColorBrush x:Key="Muted" Color="#6B6B6B" />
+      <SolidColorBrush x:Key="Rule" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Active" Color="#E8F0FA" />
+      <SolidColorBrush x:Key="Accent" Color="#1A5FB4" />
+      <SolidColorBrush x:Key="Matched" Color="#FFF4CE" />
+      <SolidColorBrush x:Key="Alternate" Color="#F7F7F7" />
+      <SolidColorBrush x:Key="Warning" Color="#B00020" />
+      <SolidColorBrush x:Key="Good" Color="#2E7D32" />
+
+      <Style TargetType="TextBlock" x:Key="Header">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="Margin" Value="6,2,6,3" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="Cell">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="6,2,6,2" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+      </Style>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <Grid Margin="6" Grid.IsSharedSizeScope="True">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <!-- Empty state: a titled explanation, shown while there is no message and hidden by the
+         trigger otherwise. Three lines: what is the matter, what the window is for, what to do. -->
+    <Border Grid.Row="0" Grid.RowSpan="4" HorizontalAlignment="Left" VerticalAlignment="Top" MaxWidth="640" Margin="4"
+            Background="#F7F9FC" BorderBrush="{StaticResource Accent}" BorderThickness="4,0,0,0" Padding="14,10,16,12">
+      <Border.Style>
+        <Style TargetType="Border">
+          <Setter Property="Visibility" Value="Visible" />
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding HasMessage, Mode=OneWay}" Value="True">
+              <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </Border.Style>
+      <StackPanel>
+        <TextBlock FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,6"
+                   Text="{Binding EmptyTitle, Mode=OneWay}" />
+        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{StaticResource Muted}"
+                   Text="{Binding EmptyBody, Mode=OneWay}" />
+        <TextBlock TextWrapping="Wrap" Text="{Binding EmptyNote, Mode=OneWay}" />
+      </StackPanel>
+    </Border>
+
+    <!-- Header: key, language and form count on the left, validity on the right -->
+    <DockPanel Grid.Row="0" Margin="0,0,0,6" LastChildFill="False"
+               Visibility="{Binding HasMessage, Mode=OneWay, Converter={StaticResource Visible}}">
+      <TextBlock DockPanel.Dock="Left" FontWeight="SemiBold" FontFamily="Consolas" VerticalAlignment="Center"
+                 Text="{Binding Key, Mode=OneWay}" Margin="0,0,12,0" />
+      <TextBlock DockPanel.Dock="Left" Foreground="{StaticResource Muted}" VerticalAlignment="Center"
+                 Text="{Binding Summary, Mode=OneWay}" />
+      <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="480" TextAlignment="Right"
+                 Text="{Binding ParseStatus, Mode=OneWay}">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Warning}" />
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding Parses, Mode=OneWay}" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Good}" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </DockPanel>
+
+    <!-- Column titles -->
+    <Border Grid.Row="1" BorderBrush="{StaticResource Rule}" BorderThickness="0,0,0,1"
+            Visibility="{Binding HasMessage, Mode=OneWay, Converter={StaticResource Visible}}">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" SharedSizeGroup="Form" />
+          <ColumnDefinition Width="Auto" SharedSizeGroup="Counts" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Style="{StaticResource Header}" Text="{x:Static res:UIStrings.Forms_ColumnForm}" />
+        <TextBlock Grid.Column="1" Style="{StaticResource Header}" Text="{x:Static res:UIStrings.Forms_ColumnCounts}" />
+        <TextBlock Grid.Column="2" Style="{StaticResource Header}" Text="{x:Static res:UIStrings.Forms_ColumnSource}" />
+        <TextBlock Grid.Column="3" Style="{StaticResource Header}" Text="{x:Static res:UIStrings.Forms_ColumnTarget}" />
+      </Grid>
+    </Border>
+
+    <!-- Rows -->
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  Visibility="{Binding HasMessage, Mode=OneWay, Converter={StaticResource Visible}}">
+      <ItemsControl ItemsSource="{Binding Rows, Mode=OneWay}" IsTabStop="False" AlternationCount="2">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border BorderThickness="3,0,0,0" ToolTip="{Binding Comment, Mode=OneWay}">
+              <Border.Style>
+                <Style TargetType="Border">
+                  <Setter Property="BorderBrush" Value="Transparent" />
+                  <Setter Property="Background" Value="Transparent" />
+                  <Style.Triggers>
+                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                      <Setter Property="Background" Value="{StaticResource Alternate}" />
+                    </Trigger>
+                    <DataTrigger Binding="{Binding IsMatched, Mode=OneWay}" Value="True">
+                      <Setter Property="Background" Value="{StaticResource Matched}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsActive, Mode=OneWay}" Value="True">
+                      <Setter Property="Background" Value="{StaticResource Active}" />
+                      <Setter Property="BorderBrush" Value="{StaticResource Accent}" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Border.Style>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="Form" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="Counts" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Style="{StaticResource Cell}" FontFamily="Consolas" FontWeight="SemiBold"
+                           Text="{Binding Form, Mode=OneWay}" ToolTip="{Binding Path, Mode=OneWay}" />
+                <TextBlock Grid.Column="1" Style="{StaticResource Cell}" Foreground="{StaticResource Muted}" MaxWidth="220"
+                           Text="{Binding Counts, Mode=OneWay}" />
+                <TextBlock Grid.Column="2" Style="{StaticResource Cell}" Text="{Binding Source, Mode=OneWay}" />
+                <TextBlock Grid.Column="3" Text="{Binding Target, Mode=OneWay}" ToolTip="{Binding Warning, Mode=OneWay}">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource Cell}">
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding TargetEmpty, Mode=OneWay}" Value="True">
+                          <Setter Property="Foreground" Value="{StaticResource Muted}" />
+                          <Setter Property="FontStyle" Value="Italic" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding HasWarning, Mode=OneWay}" Value="True">
+                          <Setter Property="Foreground" Value="{StaticResource Warning}" />
+                          <Setter Property="TextDecorations" Value="Underline" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <!-- Count box and reassembled message -->
+    <Grid Grid.Row="3" Margin="0,6,0,0" Visibility="{Binding HasMessage, Mode=OneWay, Converter={StaticResource Visible}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,4"
+                  Visibility="{Binding ShowsCountBox, Mode=OneWay, Converter={StaticResource Visible}}">
+        <TextBlock VerticalAlignment="Center" Text="{x:Static res:UIStrings.Forms_TryCount}" Margin="0,0,6,0" />
+        <TextBox Width="70" Padding="2" VerticalContentAlignment="Center" TabIndex="10"
+                 AutomationProperties.Name="{x:Static res:UIStrings.Forms_TryCount}"
+                 Text="{Binding CountText, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{StaticResource Muted}" Text="{Binding CountResult, Mode=OneWay}" />
+      </StackPanel>
+
+      <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" Margin="0,3,8,0" Foreground="{StaticResource Muted}"
+                 Text="{x:Static res:UIStrings.Forms_Projection}" />
+      <!-- Grows with the message; only a very long one scrolls, at about twelve lines. -->
+      <TextBox Grid.Row="1" Grid.Column="1" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" MaxHeight="200" Padding="4" TabIndex="20"
+               VerticalScrollBarVisibility="Auto"
+               AutomationProperties.Name="{x:Static res:UIStrings.Forms_Projection}"
+               Text="{Binding Projection, Mode=OneWay}" />
+    </Grid>
+  </Grid>
+</UserControl>

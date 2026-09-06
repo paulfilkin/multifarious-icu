@@ -30,4 +30,32 @@
   <data name="Task_Finalise_Description" xml:space="preserve">
     <value>Prunes plural branches to the target language's CLDR set, escapes ICU special characters typed as text and checks placeholder parity, ready for target generation.</value>
   </data>
+  <data name="ViewPart_Forms_Name" xml:space="preserve">
+    <value>ICU Forms</value>
+  </data>
+  <data name="ViewPart_Forms_Description" xml:space="preserve">
+    <value>Every form of the ICU message the active segment belongs to, with sample counts, the reassembled message and whether it is valid.</value>
+  </data>
+  <data name="RibbonGroup_Icu_Name" xml:space="preserve">
+    <value>multifarious ICU</value>
+  </data>
+  <data name="RibbonGroup_Icu_Description" xml:space="preserve">
+    <value>ICU MessageFormat tools.</value>
+  </data>
+  <data name="Action_ShowForms_Name" xml:space="preserve">
+    <value>ICU Forms</value>
+  </data>
+  <data name="Action_ShowForms_Description" xml:space="preserve">
+    <value>Show the ICU Forms window under the editor.</value>
+  </data>
+  <data name="Verifier_Name" xml:space="preserve">
+    <value>ICU Verifier</value>
+  </data>
+  <data name="Verifier_Description" xml:space="preserve">
+    <value>Checks every form of an expanded ICU message: untranslated forms, placeholders that differ from the source, a count marker typed as text, and a message that will not parse.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="IcuForms_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\Images\icu-expansion-tile.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

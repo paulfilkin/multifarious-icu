@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Resources;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using multifarious.Icu.BatchTasks.Resources;
@@ -41,19 +42,13 @@ public class SatelliteLanguageTests
     private static Dictionary<string, string> Translated(string culture) =>
         Entries(Path.Combine(ResourceDirectory(), "UIStrings." + culture + ".resx"));
 
-    private static string Lookup(string culture, string key)
-    {
-        var previous = UIStrings.Culture;
-        try
-        {
-            UIStrings.Culture = new CultureInfo(culture);
-            return UIStrings.Get(key);
-        }
-        finally
-        {
-            UIStrings.Culture = previous;
-        }
-    }
+    /// <summary>
+    /// Through a resource manager of its own rather than the accessor's shared culture, which
+    /// the other test classes read at the same time: xunit runs classes in parallel.
+    /// </summary>
+    private static string Lookup(string culture, string key) =>
+        new ResourceManager("multifarious.Icu.BatchTasks.Resources.UIStrings", typeof(UIStrings).Assembly)
+            .GetString(key, new CultureInfo(culture))!;
 
     [Fact]
     public void The_eight_languages_the_sibling_plugins_ship_are_all_present()

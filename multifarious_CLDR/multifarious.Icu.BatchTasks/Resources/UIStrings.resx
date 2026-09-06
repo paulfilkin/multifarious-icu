@@ -347,4 +347,125 @@
     <value>Off</value>
     <comment>Value of a tick-box setting in the report's settings table.</comment>
   </data>
+
+  <!-- The ICU Forms window under the editor. The four empty states each have a title, a body
+       and a note; the title is short, the body says what is going on, the note what to do. -->
+  <data name="Forms_Purpose" xml:space="preserve">
+    <value>ICU Forms shows every plural, ordinal and select form of an ICU MessageFormat message with sample counts, and the whole message reassembled, so a translation can be checked while it is typed.</value>
+    <comment>Body of the empty states: what the window is for. "ICU MessageFormat" is a technology name and stays as it is.</comment>
+  </data>
+  <data name="Forms_NoDocumentTitle" xml:space="preserve">
+    <value>No document open</value>
+    <comment>Title of the empty state when the editor has no document.</comment>
+  </data>
+  <data name="Forms_NoDocument" xml:space="preserve">
+    <value>Open a JSON or Java properties file that ICU Expand Plural Forms has processed, and move to a segment of a plural message.</value>
+    <comment>Note of the empty state when the editor has no document. "ICU Expand Plural Forms" is the batch task's name as Studio lists it.</comment>
+  </data>
+  <data name="Forms_UnsupportedTitle" xml:space="preserve">
+    <value>Not available for this file</value>
+    <comment>Title of the empty state when the open file is of a file type the plugin does not handle.</comment>
+  </data>
+  <data name="Forms_UnsupportedWhy" xml:space="preserve">
+    <value>It works with Studio's JSON and Java Resources file types, the two the ICU tasks are proven on. This file uses the file type "{0}", which the ICU tasks do not process, so there are no forms to show.</value>
+    <comment>Note of the unsupported-file state. {0} is Studio's file type identifier, such as "Word 2007-2019 v 1.0.0.0"; keep the placeholder.</comment>
+  </data>
+  <data name="Forms_UnsupportedUnknown" xml:space="preserve">
+    <value>It works with Studio's JSON and Java Resources file types, the two the ICU tasks are proven on. This file is of another type, which the ICU tasks do not process, so there are no forms to show.</value>
+    <comment>Note of the unsupported-file state when Studio reports no file type identifier for the file.</comment>
+  </data>
+  <data name="Forms_NotExpandedTitle" xml:space="preserve">
+    <value>No ICU messages expanded in this file</value>
+    <comment>Title of the empty state when the file is a supported type but the expand task has not run on it.</comment>
+  </data>
+  <data name="Forms_NotExpanded" xml:space="preserve">
+    <value>Run ICU Expand Plural Forms on this file before translating it, then open it again. Until then the plural messages are single segments of brace syntax.</value>
+    <comment>Note of the not-expanded state. "ICU Expand Plural Forms" is the batch task's name.</comment>
+  </data>
+  <data name="Forms_NotIcuTitle" xml:space="preserve">
+    <value>Not an ICU message</value>
+    <comment>Title of the empty state when the selected segment belongs to an ordinary paragraph of an expanded file.</comment>
+  </data>
+  <data name="Forms_NotIcu" xml:space="preserve">
+    <value>The active segment is ordinary text with nothing to expand. Move to a segment of a plural, ordinal or select message and its forms appear here.</value>
+    <comment>Note of the not-an-ICU-message state.</comment>
+  </data>
+  <data name="Forms_Summary" xml:space="preserve">
+    <value>{0}, {1} form(s)</value>
+    <comment>Line under the message key. {0} is the target language name, {1} the number of forms; keep the placeholders.</comment>
+  </data>
+  <data name="Forms_ColumnForm" xml:space="preserve">
+    <value>Form</value>
+    <comment>Column title: the plural form, explicit value or select key of the row.</comment>
+  </data>
+  <data name="Forms_ColumnCounts" xml:space="preserve">
+    <value>Counts</value>
+    <comment>Column title: example counts that select the form.</comment>
+  </data>
+  <data name="Forms_ColumnSource" xml:space="preserve">
+    <value>Source</value>
+    <comment>Column title: the source sentence with sample values.</comment>
+  </data>
+  <data name="Forms_ColumnTarget" xml:space="preserve">
+    <value>Target</value>
+    <comment>Column title: the translation with sample values.</comment>
+  </data>
+  <data name="Forms_FractionalOnly" xml:space="preserve">
+    <value>fractional counts only</value>
+    <comment>Appended to the counts of a form only fractional numbers select, such as Russian "other".</comment>
+  </data>
+  <data name="Forms_EmptyTarget" xml:space="preserve">
+    <value>(not translated)</value>
+    <comment>Shown in the Target column for a form with no translation yet.</comment>
+  </data>
+  <data name="Forms_TryCount" xml:space="preserve">
+    <value>Try a count:</value>
+    <comment>Label before a small box where the translator types a number to see which form it selects.</comment>
+  </data>
+  <data name="Forms_ResolvesTo" xml:space="preserve">
+    <value>selects {0}</value>
+    <comment>Result beside the count box. {0} is the form name, such as "few" or "=0"; keep the placeholder.</comment>
+  </data>
+  <data name="Forms_ResolvesNothing" xml:space="preserve">
+    <value>not a count</value>
+    <comment>Result beside the count box when the text is not a number or the message has no plural.</comment>
+  </data>
+  <data name="Forms_Projection" xml:space="preserve">
+    <value>Reassembled message</value>
+    <comment>Label over the read-only box showing the whole target message as it will be written to the file.</comment>
+  </data>
+  <data name="Forms_Parses" xml:space="preserve">
+    <value>Valid ICU</value>
+    <comment>Status beside the reassembled message when it parses.</comment>
+  </data>
+  <data name="Forms_ParseError" xml:space="preserve">
+    <value>Not valid ICU: {0}</value>
+    <comment>Status beside the reassembled message when it does not parse. {0} is the parser's description; keep the placeholder.</comment>
+  </data>
+  <data name="Forms_PlaceholderWarning" xml:space="preserve">
+    <value>Placeholders: {0}</value>
+    <comment>Tooltip on a target cell whose protected placeholders differ from the source. {0} lists what is missing or extra; keep the placeholder.</comment>
+  </data>
+
+  <!-- The ICU verifier's messages, shown in Studio's Messages window. -->
+  <data name="Verifier_Origin" xml:space="preserve">
+    <value>ICU Verifier</value>
+    <comment>The Origin column of the Messages window. Same wording as the verifier's name in the Verification settings.</comment>
+  </data>
+  <data name="Verifier_EmptyForm" xml:space="preserve">
+    <value>The form "{0}" has no translation; Finalise will use the source text.</value>
+    <comment>Warning. {0} is the form's path, such as "count:few"; keep the placeholder.</comment>
+  </data>
+  <data name="Verifier_Placeholders" xml:space="preserve">
+    <value>The protected placeholders differ from the source: {0}.</value>
+    <comment>Error. {0} lists what is missing or extra, such as "missing {name}"; keep the placeholder.</comment>
+  </data>
+  <data name="Verifier_TypedPound" xml:space="preserve">
+    <value>A '#' typed as text will be shown literally; use the protected # for the count.</value>
+    <comment>Warning. '#' is ICU syntax and must not be translated.</comment>
+  </data>
+  <data name="Verifier_Invalid" xml:space="preserve">
+    <value>The reassembled message is not valid ICU: {0}.</value>
+    <comment>Error. {0} is the parser's description of the problem; keep the placeholder.</comment>
+  </data>
 </root>

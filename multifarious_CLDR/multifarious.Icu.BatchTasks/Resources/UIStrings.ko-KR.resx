@@ -250,4 +250,91 @@
   <data name="Report_Off" xml:space="preserve">
     <value>꺼짐</value>
   </data>
+  <data name="Forms_Purpose" xml:space="preserve">
+    <value>ICU Forms는 ICU MessageFormat 메시지의 모든 복수형, 서수, select 형태를 수의 예와 함께 보여 주고 메시지 전체를 재조립하여 보여 주므로, 입력하면서 번역을 확인할 수 있습니다.</value>
+  </data>
+  <data name="Forms_NoDocumentTitle" xml:space="preserve">
+    <value>열린 문서 없음</value>
+  </data>
+  <data name="Forms_NoDocument" xml:space="preserve">
+    <value>ICU Expand Plural Forms로 처리한 JSON 또는 Java properties 파일을 열고 복수형 메시지의 세그먼트로 이동하십시오.</value>
+  </data>
+  <data name="Forms_UnsupportedTitle" xml:space="preserve">
+    <value>이 파일에서는 사용할 수 없음</value>
+  </data>
+  <data name="Forms_UnsupportedWhy" xml:space="preserve">
+    <value>이 창은 ICU 작업이 검증된 두 가지 파일 형식인 Studio의 JSON 및 Java Resources 파일 형식에서 작동합니다. 이 파일은 ICU 작업이 처리하지 않는 "{0}" 파일 형식을 사용하므로 표시할 형태가 없습니다.</value>
+  </data>
+  <data name="Forms_UnsupportedUnknown" xml:space="preserve">
+    <value>이 창은 ICU 작업이 검증된 두 가지 파일 형식인 Studio의 JSON 및 Java Resources 파일 형식에서 작동합니다. 이 파일은 ICU 작업이 처리하지 않는 다른 형식이므로 표시할 형태가 없습니다.</value>
+  </data>
+  <data name="Forms_NotExpandedTitle" xml:space="preserve">
+    <value>이 파일에 재구성된 ICU 메시지가 없음</value>
+  </data>
+  <data name="Forms_NotExpanded" xml:space="preserve">
+    <value>번역하기 전에 이 파일에 ICU Expand Plural Forms를 실행한 다음 다시 여십시오. 그때까지 복수형 메시지는 중괄호 구문으로 된 단일 세그먼트입니다.</value>
+  </data>
+  <data name="Forms_NotIcuTitle" xml:space="preserve">
+    <value>ICU 메시지가 아님</value>
+  </data>
+  <data name="Forms_NotIcu" xml:space="preserve">
+    <value>활성 세그먼트는 확장할 것이 없는 일반 텍스트입니다. 복수형, 서수 또는 select 메시지의 세그먼트로 이동하면 그 형태가 여기에 표시됩니다.</value>
+  </data>
+  <data name="Forms_Summary" xml:space="preserve">
+    <value>{0}, 형태 {1}개</value>
+  </data>
+  <data name="Forms_ColumnForm" xml:space="preserve">
+    <value>형태</value>
+  </data>
+  <data name="Forms_ColumnCounts" xml:space="preserve">
+    <value>수</value>
+  </data>
+  <data name="Forms_ColumnSource" xml:space="preserve">
+    <value>원본</value>
+  </data>
+  <data name="Forms_ColumnTarget" xml:space="preserve">
+    <value>대상</value>
+  </data>
+  <data name="Forms_FractionalOnly" xml:space="preserve">
+    <value>소수만</value>
+  </data>
+  <data name="Forms_EmptyTarget" xml:space="preserve">
+    <value>(번역되지 않음)</value>
+  </data>
+  <data name="Forms_TryCount" xml:space="preserve">
+    <value>수 시험:</value>
+  </data>
+  <data name="Forms_ResolvesTo" xml:space="preserve">
+    <value>{0} 선택</value>
+  </data>
+  <data name="Forms_ResolvesNothing" xml:space="preserve">
+    <value>수가 아님</value>
+  </data>
+  <data name="Forms_Projection" xml:space="preserve">
+    <value>재조립된 메시지</value>
+  </data>
+  <data name="Forms_Parses" xml:space="preserve">
+    <value>유효한 ICU</value>
+  </data>
+  <data name="Forms_ParseError" xml:space="preserve">
+    <value>유효하지 않은 ICU: {0}</value>
+  </data>
+  <data name="Forms_PlaceholderWarning" xml:space="preserve">
+    <value>자리 표시자: {0}</value>
+  </data>
+  <data name="Verifier_Origin" xml:space="preserve">
+    <value>ICU Verifier</value>
+  </data>
+  <data name="Verifier_EmptyForm" xml:space="preserve">
+    <value>"{0}" 형태에 번역이 없습니다. 마무리 작업에서 원본 텍스트가 사용됩니다.</value>
+  </data>
+  <data name="Verifier_Placeholders" xml:space="preserve">
+    <value>보호된 자리 표시자가 원본과 다릅니다: {0}.</value>
+  </data>
+  <data name="Verifier_TypedPound" xml:space="preserve">
+    <value>텍스트로 입력한 "#"는 그대로 표시됩니다. 수에는 보호된 #를 사용하십시오.</value>
+  </data>
+  <data name="Verifier_Invalid" xml:space="preserve">
+    <value>재조립된 메시지가 유효한 ICU가 아닙니다: {0}.</value>
+  </data>
 </root>

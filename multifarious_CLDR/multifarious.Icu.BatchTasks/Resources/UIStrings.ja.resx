@@ -250,4 +250,91 @@
   <data name="Report_Off" xml:space="preserve">
     <value>オフ</value>
   </data>
+  <data name="Forms_Purpose" xml:space="preserve">
+    <value>ICU Forms は、ICU MessageFormat メッセージの複数形・序数・select の各形式を数の例とともに表示し、メッセージ全体を再構成して示すため、入力しながら訳文を確認できます。</value>
+  </data>
+  <data name="Forms_NoDocumentTitle" xml:space="preserve">
+    <value>文書が開かれていません</value>
+  </data>
+  <data name="Forms_NoDocument" xml:space="preserve">
+    <value>ICU Expand Plural Forms で処理した JSON または Java properties ファイルを開き、複数形メッセージのセグメントに移動してください。</value>
+  </data>
+  <data name="Forms_UnsupportedTitle" xml:space="preserve">
+    <value>このファイルでは使用できません</value>
+  </data>
+  <data name="Forms_UnsupportedWhy" xml:space="preserve">
+    <value>このウィンドウは、ICU タスクの動作が確認されている Studio の JSON と Java Resources の 2 つのファイル タイプで機能します。このファイルのファイル タイプは「{0}」で、ICU タスクは処理しないため、表示する形式はありません。</value>
+  </data>
+  <data name="Forms_UnsupportedUnknown" xml:space="preserve">
+    <value>このウィンドウは、ICU タスクの動作が確認されている Studio の JSON と Java Resources の 2 つのファイル タイプで機能します。このファイルは別のタイプで、ICU タスクは処理しないため、表示する形式はありません。</value>
+  </data>
+  <data name="Forms_NotExpandedTitle" xml:space="preserve">
+    <value>このファイルには再構成された ICU メッセージがありません</value>
+  </data>
+  <data name="Forms_NotExpanded" xml:space="preserve">
+    <value>翻訳の前にこのファイルに対して ICU Expand Plural Forms を実行し、開き直してください。それまでは、複数形メッセージは波かっこ構文の単一セグメントのままです。</value>
+  </data>
+  <data name="Forms_NotIcuTitle" xml:space="preserve">
+    <value>ICU メッセージではありません</value>
+  </data>
+  <data name="Forms_NotIcu" xml:space="preserve">
+    <value>アクティブなセグメントは展開するもののない通常のテキストです。複数形・序数・select メッセージのセグメントに移動すると、その形式がここに表示されます。</value>
+  </data>
+  <data name="Forms_Summary" xml:space="preserve">
+    <value>{0}、{1} 個の形式</value>
+  </data>
+  <data name="Forms_ColumnForm" xml:space="preserve">
+    <value>形式</value>
+  </data>
+  <data name="Forms_ColumnCounts" xml:space="preserve">
+    <value>数</value>
+  </data>
+  <data name="Forms_ColumnSource" xml:space="preserve">
+    <value>原文</value>
+  </data>
+  <data name="Forms_ColumnTarget" xml:space="preserve">
+    <value>訳文</value>
+  </data>
+  <data name="Forms_FractionalOnly" xml:space="preserve">
+    <value>小数のみ</value>
+  </data>
+  <data name="Forms_EmptyTarget" xml:space="preserve">
+    <value>(未翻訳)</value>
+  </data>
+  <data name="Forms_TryCount" xml:space="preserve">
+    <value>数を試す:</value>
+  </data>
+  <data name="Forms_ResolvesTo" xml:space="preserve">
+    <value>{0} を選択</value>
+  </data>
+  <data name="Forms_ResolvesNothing" xml:space="preserve">
+    <value>数ではありません</value>
+  </data>
+  <data name="Forms_Projection" xml:space="preserve">
+    <value>再構成されたメッセージ</value>
+  </data>
+  <data name="Forms_Parses" xml:space="preserve">
+    <value>有効な ICU</value>
+  </data>
+  <data name="Forms_ParseError" xml:space="preserve">
+    <value>無効な ICU: {0}</value>
+  </data>
+  <data name="Forms_PlaceholderWarning" xml:space="preserve">
+    <value>プレースホルダー: {0}</value>
+  </data>
+  <data name="Verifier_Origin" xml:space="preserve">
+    <value>ICU Verifier</value>
+  </data>
+  <data name="Verifier_EmptyForm" xml:space="preserve">
+    <value>形式「{0}」に訳文がありません。最終処理では原文テキストが使用されます。</value>
+  </data>
+  <data name="Verifier_Placeholders" xml:space="preserve">
+    <value>保護されたプレースホルダーが原文と異なります: {0}。</value>
+  </data>
+  <data name="Verifier_TypedPound" xml:space="preserve">
+    <value>テキストとして入力された「#」はそのまま表示されます。数には保護された # を使用してください。</value>
+  </data>
+  <data name="Verifier_Invalid" xml:space="preserve">
+    <value>再構成されたメッセージは有効な ICU ではありません: {0}。</value>
+  </data>
 </root>
