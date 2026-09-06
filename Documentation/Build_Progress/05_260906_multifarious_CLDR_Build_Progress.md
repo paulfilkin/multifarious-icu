@@ -13,11 +13,12 @@ verifier's placeholder comparison, and rewrote the AppStore documentation.  Six 
 > `Documentation\Build_Progress\05_260906_multifarious_CLDR_Build_Progress.md`.
 >
 > The plugin is complete for 1.0 and the Release package (1.0.0.0) is at
-> `Documentation\appstore\IcuSupport.sdlplugin`.  Everything is proven in Studio except the
-> verifier's count-based placeholder comparison, which is deployed but not yet seen.  What
-> remains is store housekeeping: my screenshots for the guide, the product page, the upload.
-> Start by asking me whether the store submission has happened and what came back.  Any new
-> work: propose the plan first.
+> `Documentation\appstore\IcuSupport.sdlplugin`.  One fix is outstanding and written up as the
+> first open item: the ICU Forms window's Counts column is wrong for a message the task did not
+> category-expand.  Start there, with the plan, then the Studio check of the count-based
+> placeholder comparison, which is deployed but not yet seen.  After that only store
+> housekeeping remains, which is mine: the screenshots, the product page, the upload.  A fixed
+> Counts column needs a fresh Release package before the upload.
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -25,7 +26,8 @@ verifier's placeholder comparison, and rewrote the AppStore documentation.  Six 
 
 ## Where we are in one line
 
-Complete for 1.0; the Release package is built; the store submission is Paul's.
+Complete for 1.0 but for the Counts column of a walked message; the Release package is built;
+the store submission is Paul's.
 
 ## What was done
 
@@ -97,6 +99,19 @@ Complete for 1.0; the Release package is built; the store submission is Paul's.
 
 ## Open items
 
+- **The Counts column is wrong for a walked message** (Paul, 6 Sep 2026, Project 56, Arabic
+  `sync.status` in nested.json).  `IcuFormsReader.Row` takes the counts from
+  `CldrPlurals.Resolve(language, kind).RuleSet.GetRule(category).Samples`, the samples of the
+  category whose name the branch carries.  In a message the task did not category-expand, the
+  branches are the source's, and at run time ICU sends every category with no branch of its own
+  to `other`.  So the Arabic `other` row showed 100, 101, 102, 200, 201, 202 when the branch is
+  in fact used for 0, 2, 5, 11 and everything else except exactly 1, and a translator reading
+  the column writes for the wrong range.  The fix: the reader already reads
+  `icu:expandedSelectors` from the unit context for the layout walk, so where a selector's path
+  is not in that set, the counts of a branch are the union of the samples of its own category
+  and of every category the message has no branch for, and the row's tooltip says the branch is
+  a catch-all.  Tests: an Arabic and a Russian walked message, and an expanded one to show the
+  counts are unchanged there.
 - Studio look at the count-based parity: a duplicated tag should now be reported by the ICU
   Verifier in the editor and in Verify Files.
 - Twelve screenshots for `Documentation\appstore\multifarious_images\`, the product page, the
