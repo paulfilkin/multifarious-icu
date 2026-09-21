@@ -9,12 +9,11 @@ tested, committed as `2529ea9`, and seen in Studio: the Counts column and the co
 > Read `CLAUDE.md`, then
 > `Documentation\Build_Progress\06_260921_multifarious_CLDR_Build_Progress.md`.
 >
-> The compact notation fix is released as 1.0.1.0 and on the store.  The Counts column fix
-> for a walked message is written and tested (1,436 tests) but not yet seen in Studio, and
-> Studio was open when the session ended, so the Debug package in `Packages` predates it.
-> Start with a Debug build with Studio closed, then the Studio check under open items, then
-> the 1.0.2.0 bump, Release build and upload.  After that the open items from handover 05
-> stand: the Studio look at count-based parity, the store housekeeping.
+> 1.0.1.0 (compact notation) is on the store.  1.0.2.0 (walked Counts column, count box
+> fallback and label) is built in `Documentation\appstore\` with its changelog entry, seen in
+> Studio but for the label, and awaits Paul's upload.  1,437 tests.  Nothing is open in the
+> code from this session; the open items from handover 05 stand: the Studio look at
+> count-based parity, the store housekeeping.
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -22,8 +21,7 @@ tested, committed as `2529ea9`, and seen in Studio: the Counts column and the co
 
 ## Where we are in one line
 
-The compact notation fix is committed and seen in Studio; Release 1.0.1.0 is built for the
-store.
+1.0.1.0 is on the store; 1.0.2.0 is built for it.
 
 ## The defect
 
@@ -106,15 +104,19 @@ compact sample first.
 
 ## Open items
 
-- **Version bump to 1.0.2.0, Release build and store upload**, on Paul's word: he is
-  exploring something else first.  The changelog entry is written.  The walked Counts column
-  is seen in Studio (Paul, 21 Sep 2026, screenshot): Arabic, `nested.json`, `sync.status`,
-  the `other` rows read `0, 2, 3, 4, 5, 6` and 5 marks them.  The same screenshot showed the
-  count box label saying "selects one" for that count: the view model took the first matched
-  row's own category, an inner branch in a nested message, walked or not.  Fixed: the reader's
-  `RowsFor` now returns the outermost branch the rows were matched on, and the label uses it
-  (1,437 tests).  The Debug package with that fix is deployed (22:09) but the label is not yet
-  seen in Studio.
+- **Store upload of 1.0.2.0**, Paul's.  Release 1.0.2.0 is built (manifest and assembly
+  agree, no symbols) and copied to `Documentation\appstore\IcuSupport.sdlplugin`; the
+  changelog entry covers the three fixes.  The walked Counts column is seen in Studio (Paul,
+  21 Sep 2026, screenshot): Arabic, `nested.json`, `sync.status`, the `other` rows read
+  `0, 2, 3, 4, 5, 6` and 5 marks them.  The same screenshot showed the count box label saying
+  "selects one" for that count: the view model took the first matched row's own category, an
+  inner branch in a nested message, walked or not.  Fixed (commit 7accd4d): the reader's
+  `RowsFor` returns the outermost branch the rows were matched on, and the label uses it
+  (1,437 tests).  The label itself has not been seen in Studio; the reader and view model
+  tests cover it.
+- **No count box for a plural inside a select** (`profile.itemsByGender`, 18 Arabic rows,
+  seen 21 Sep): the box appears only when the outermost selector is a plural.  The matching
+  by path component would work for a plural under a select.  Offered, not taken up.
 - **Explicit values are not subtracted from a category's counts**: with `=0` present, a
   Russian `many` row still lists 0.  The reader does not know the selector's offset, on which
   the comparison depends, so it is not the one-line filter it looks like.  Left as is.

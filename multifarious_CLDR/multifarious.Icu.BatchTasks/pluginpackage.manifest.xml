@@ -3,7 +3,7 @@
   <!-- Must match the RWS AppStore listing name exactly: the store signs the upload and ties it to
        the listing by this name. -->
   <PlugInName>multifariousICU Support for Trados Studio</PlugInName>
-  <Version>1.0.1.0</Version>
+  <Version>1.0.2.0</Version>
   <Description>Batch tasks for ICU MessageFormat messages in JSON and Java properties files: expand plural forms into one translatable segment per CLDR category the target language needs, and finalise the translated messages before target generation.</Description>
   <Author>multifarious</Author>
   <RequiredProduct name="TradosStudio" minversion="19.0" maxversion="19.9"/>
