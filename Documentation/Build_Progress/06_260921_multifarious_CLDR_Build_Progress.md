@@ -1,19 +1,22 @@
 # 06 - multifarious_CLDR Build Progress - 2026-09-21
 
 Sixth session.  A review of the plugin against the compact decimal notation defect found in
-the cloud app on 21 September (its commit `d7f138b`), then the port of the cloud fix.  Built,
-tested, committed as `2529ea9`, and seen in Studio: the Counts column and the count box.
+the cloud app that morning (its commit `d7f138b`), the port of that fix as 1.0.1.0, then the
+walked Counts column from handover 05 and two count box defects found in Studio while checking
+it, as 1.0.2.0.  Both releases are on the store with their changelog entries, the user guide
+and documentation match, and the tree is clean.  Eight commits on `main`, pushed.
 
 ## Kickoff prompt for the next session (paste this)
 
 > Read `CLAUDE.md`, then
 > `Documentation\Build_Progress\06_260921_multifarious_CLDR_Build_Progress.md`.
 >
-> 1.0.1.0 (compact notation) is on the store.  1.0.2.0 (walked Counts column, count box
-> fallback and label) is built in `Documentation\appstore\` with its changelog entry, seen in
-> Studio but for the label, and awaits Paul's upload.  1,437 tests.  Nothing is open in the
-> code from this session; the open items from handover 05 stand: the Studio look at
-> count-based parity, the store housekeeping.
+> 1.0.1.0 (compact notation) and 1.0.2.0 (walked Counts column, count box fallback and
+> label) are on the store, with the changelog, user guide and documentation matching.  1,437
+> tests.  Nothing is open in the code from this session.  The open items from handover 05
+> stand: the Studio look at count-based parity, the store housekeeping.  A technical note for
+> the cloud app is at `Documentation\Cloud_Notes\Compact_Notation_and_Walked_Counts.md`
+> (gitignored, local).
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -21,9 +24,9 @@ tested, committed as `2529ea9`, and seen in Studio: the Counts column and the co
 
 ## Where we are in one line
 
-1.0.1.0 is on the store; 1.0.2.0 is built for it.
+1.0.2.0 is on the store; nothing is open in the code.
 
-## The defect
+## The compact notation defect (1.0.1.0)
 
 Since CLDR 42 the plural samples and rules use compact decimal notation: `1c6` is 1000000
 written compactly, `1.2c6` is 1200000, and `e` is a synonym for `c`.  The exponent is a plural
@@ -33,7 +36,7 @@ its numeric value 1100000 selects `other`.  Nine cardinal locales in CLDR 48 car
 samples: ca, es, fr, it, lld, pt, pt-PT, scn, vec.  No ordinal does, and no category lists a
 compact sample first.
 
-## What the review found
+What the review found:
 
 - **Covered already**: `PluralOperands` parses the written form with the exponent, the rule
   parser maps `c` and `e` to the C operand, the data is CLDR 48 with `many` for the four
@@ -52,47 +55,47 @@ compact sample first.
 
 ## What was done
 
-- **`Icu.Core\MessageRenderer.cs`** matches the reference: `TryParseNumber` reads the compact
-  form (mantissa, marker, exponent, bound 28), the numeric value has the consumed fraction
-  digits gone (`1.2c6` is 1200000, `1.0000001c6` is 1000000.1), a compact count with no offset
-  goes to the category decision as written, and an offset forces numeric subtraction as ICU
-  does.  One net48 substitution: `decimal.Scale` is .NET 7, so `ScaleOf` reads it from
-  `decimal.GetBits`.  Recorded under Porting in CLAUDE.md.
-- **`Icu.Cldr\Rules\SampleDisplay.cs`** copied from the reference: examples render at their
-  numeric value, duplicates collapse (`1000000` and `1c6`), and a converted value that no
-  longer selects its own category is dropped.  Spanish `many` therefore lists
-  `1000000, 2000000, ...` and no decimal examples at all.
-- **`PreviewForms`**: the count resolver accepts what `PluralOperands.TryParse` accepts, the
-  offset subtraction takes the numeric value from the operand parser with the sign read off the
-  text (`StartsWith(string)`, the char overload is not on net48), and the rows use the
-  converted examples, so the `decimal.Parse` calls left only ever see plain numbers.
-- **`ExpansionPlanner`** uses `SampleDisplay` for the example metadata, in step with the
-  reference; the writer does not emit it.
-- **`IcuFormsReader`**: the Counts column, the tooltip and the bound counts of an outer
-  selector come from `SampleDisplay`, with fractional-only derived from the converted lists.
-- **Release 1.0.1.0** built after the Studio check: manifest and assembly bumped and agree,
-  no symbols in the package, copied to `Documentation\appstore\IcuSupport.sdlplugin`.  Built
-  with `-p:DeployPluginPackage=false` because Studio was open, so the Debug package in
-  `Packages` is the one Studio has; the Release package is for the store.  The AppStore
-  changelog has a 1.0.1.0 entry.
-- **Counts column for a walked message** (handover 05's first open item), after the 1.0.1.0
-  release.  `IcuFormsReader` now reads the layout for each row's innermost selector: its path
-  in `icu:expandedSelectors`, and the branch keys the layout has for it.  In a selector the
-  task did not category expand, the `other` row's counts are the merge of its own and of every
+- **Compact notation** (commit 2529ea9).  `Icu.Core\MessageRenderer.cs` matches the
+  reference: `TryParseNumber` reads the compact form (mantissa, marker, exponent, bound 28),
+  the numeric value has the consumed fraction digits gone (`1.2c6` is 1200000, `1.0000001c6`
+  is 1000000.1), a compact count with no offset goes to the category decision as written, and
+  an offset forces numeric subtraction as ICU does.  `Icu.Cldr\Rules\SampleDisplay.cs` copied
+  from the reference: examples render at their numeric value, duplicates collapse, and a
+  converted value that no longer selects its own category is dropped, so Spanish `many` lists
+  `1000000, 2000000, ...` and no decimal examples.  `PreviewForms`: the count resolver accepts
+  what `PluralOperands.TryParse` accepts, the offset subtraction takes the numeric value from
+  the operand parser, the rows use the converted examples.  `ExpansionPlanner` uses
+  `SampleDisplay` for its example metadata, which the writer does not emit.  `IcuFormsReader`:
+  the Counts column, the tooltip and the bound counts of an outer selector come from
+  `SampleDisplay`.  Seen in Studio on a Spanish target: the Counts column and `1.2c6` in the
+  count box selecting `many`.  Released as 1.0.1.0 (commit fd32176).
+- **Walked Counts column** (commit b2f243e, handover 05's first open item).
+  `IcuFormsReader` reads the layout for each row's innermost selector: its path in
+  `icu:expandedSelectors`, and the branch keys the layout has for it.  In a selector the task
+  did not category expand, the `other` row's counts are the merge of its own and of every
   category the language has and the message has no branch for, whole numbers first then
   fractions, and the tooltip says "Also used for: zero, two, few, many"; a branch for a
   category the language does not have shows no counts and "Not used".  The `#` sample stays
   the branch's own first count, so the rendered sentence is unchanged.  The count box falls
   back to the outermost selector's `other` row when the resolved category has no row and the
-  selector was not expanded, as ICU does.  Three reader tests: the over-budget Arabic sync
-  message, Russian walked by a budget of 2, and a Russian ordinal walked by switching ordinal
-  expansion off.  Not seen in Studio yet.
-- **Tests** (31 new, 1,436 in all): the reference's renderer tests (written-form selection,
-  `#` at the numeric value, explicit value matching numerically, offset forcing numeric,
-  hoisting property for a compact count, malformed `1c`, `c6`, `1c2c3`, `1c-2` rejected),
-  `SampleDisplayTests`, the preview's resolver and row tests for es-ES, `1c` and `c6` in the
-  operand tests, and a forms reader test that a Spanish `many` row shows the plain counts and
-  that `1c6` and `1.2c6` typed in the count box land on it.
+  selector was not expanded, as ICU does.  Seen in Studio: Arabic, `nested.json`,
+  `sync.status`, the `other` rows read `0, 2, 3, 4, 5, 6` and 5 marks them.
+- **Count box label** (commit 7accd4d), found in that screenshot: 5 said "selects one" while
+  the `other` rows were marked.  The view model took the first matched row's own category, an
+  inner branch in a nested message, walked or not.  `RowsFor` now also returns the outermost
+  branch the rows were matched on, and the label uses it.  Covered by a view model test, not
+  yet seen in Studio.  Released with the above as 1.0.2.0 (commit fa3333e).
+- **Documentation**: changelog entries for both releases; user guide and documentation
+  updated for each (commits ea3e265 and 748daab): a Spanish row in the plural forms table and
+  the `many` form for millions, counts written out in full, the count box accepting `1c6`,
+  what the window shows for a message kept with the source's forms, and a troubleshooting entry
+  in each for a `many` form a translator has not seen.
+- **Tests**: 32 new, 1,437 in all.  The reference's renderer tests, `SampleDisplayTests`,
+  the preview's resolver and row tests for es-ES, `1c` and `c6` in the operand tests, a
+  Spanish forms reader test, three walked reader tests (the over-budget Arabic sync message,
+  Russian walked by a budget of 2, a Russian ordinal walked by switching ordinal expansion
+  off) and a view model test for the label on a nested message.
+- Porting notes in CLAUDE.md (gitignored) record the two net48 substitutions.
 
 ## Decisions taken this session
 
@@ -100,36 +103,35 @@ compact sample first.
   In a nested message a count of 1 on the Arabic sync message marks both rows under
   `files: one`, while the Counts column of each row belongs to the inner `devices` selector.
   Naming the argument on the label, or a box per argument, was offered and declined as
-  over-complication.
+  over-complication.  The user guide says what the box does in a nested message.
+- **No count box for a plural inside a select** (`profile.itemsByGender`, 18 Arabic rows):
+  the box appears only when the outermost selector is a plural.  The matching by path
+  component would work for a plural under a select.  Offered, not taken up.
+
+## Findings worth keeping
+
+- **A budget of 1 passes a message through rather than walking it**: the walked layout of a
+  two-branch plural needs two segments, and the processor passes the message through when the
+  walked plan is over budget too.  A budget of 2 walks a single English plural.  A single
+  plural for a one-category language such as Japanese can never be over budget, so the "never
+  used" branch case is tested by switching ordinal expansion off instead.
+- **Whole numbers before fractions when merging categories' samples**: a numeric sort would
+  list Russian walked `other` as 0, 0.1, 0.2, 0.3, 0.4, 0.5 and bury 2 and 5.
+- **`decimal.Scale` and `string.StartsWith(char)` are not on net48.**
 
 ## Open items
 
-- **Store upload of 1.0.2.0**, Paul's.  Release 1.0.2.0 is built (manifest and assembly
-  agree, no symbols) and copied to `Documentation\appstore\IcuSupport.sdlplugin`; the
-  changelog entry covers the three fixes.  The walked Counts column is seen in Studio (Paul,
-  21 Sep 2026, screenshot): Arabic, `nested.json`, `sync.status`, the `other` rows read
-  `0, 2, 3, 4, 5, 6` and 5 marks them.  The same screenshot showed the count box label saying
-  "selects one" for that count: the view model took the first matched row's own category, an
-  inner branch in a nested message, walked or not.  Fixed (commit 7accd4d): the reader's
-  `RowsFor` returns the outermost branch the rows were matched on, and the label uses it
-  (1,437 tests).  The label itself has not been seen in Studio; the reader and view model
-  tests cover it.
-- **No count box for a plural inside a select** (`profile.itemsByGender`, 18 Arabic rows,
-  seen 21 Sep): the box appears only when the outermost selector is a plural.  The matching
-  by path component would work for a plural under a select.  Offered, not taken up.
 - **Explicit values are not subtracted from a category's counts**: with `=0` present, a
   Russian `many` row still lists 0.  The reader does not know the selector's offset, on which
   the comparison depends, so it is not the one-line filter it looks like.  Left as is.
-- The compact notation fix is seen in Studio (Paul, 21 Sep 2026, two screenshots):
-  `messages.json`, Spanish (Spain) target, the `many` row of `inbox.unreadCount` reads
-  `1000000, 2000000, 3000000, 4000000, 5000000, 6000000`, the source renders at 1000000, and
-  `1.2c6` in the count box selects `many` with the row highlighted.
-- The Counts column of a walked message, the Studio look at count-based parity, the store
-  housekeeping, the refiner tool's id reuse and the verifier's diagnostics lines: all as in
-  handover 05.
+- The count box label on a nested message has not been seen in Studio; the tests cover it.
+- The Studio look at count-based parity, the store housekeeping, the refiner tool's id reuse
+  and the verifier's diagnostics lines: all as in handover 05.
 
 ## Traps
 
-- **`decimal.Scale` and `string.StartsWith(char)` are not on net48**; a file copied from the
-  reference that uses either will not build.  The substitutions are in CLAUDE.md.
+- **A file copied from the reference may use `decimal.Scale` or `StartsWith(char)`**; neither
+  builds on net48.  The substitutions are in CLAUDE.md.
+- **Build with `-p:DeployPluginPackage=false` while Studio is open**, and remember the Debug
+  package in `Packages` is then behind the code.
 - All earlier traps stand (handovers 01 to 05).
