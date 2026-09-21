@@ -145,7 +145,7 @@ Click **ICU Forms** on the Add-ins tab. The window docks under the editor and fo
 
 - The header names the message key, the target language and the number of forms, and shows whether the reassembled message is valid ICU.
 - One row per form: the form's name, the numbers that select it, and the source and target as sentences with sample values in place of the arguments. The numbers are written out in full, so a Spanish `many` row reads 1000000, 2000000, 3000000. The active segment's row is shaded. An untranslated form shows "(not translated)". A target whose placeholders differ from the source shows in red, with the detail in a tooltip.
-- **Try a count**: type a number and the row it selects is highlighted. Exact values match first, then the language's rules, as in the application. A large number can also be typed the way CLDR writes it, `1c6` for 1000000 or `1.2c6` for 1200000.
+- **Try a count**: type a number and the row it selects is highlighted. Exact values match first, then the language's rules, as in the application. A large number can also be typed the way CLDR writes it, `1c6` for 1000000 or `1.2c6` for 1200000. In a message with one plural inside another, the count applies to the outer plural and marks every row under the form it selects. In a message kept with the source's own forms, a number whose form the message does not have marks the `other` row, as in the application.
 - **Reassembled message**: the whole target message as Finalise will write it, updated as you type, with "Valid ICU" or the parser's message beside it.
 - **Zoom**: Ctrl and the mouse wheel, or the buttons in the top right corner, from 60% to 250%. The zoom is remembered.
 
@@ -305,6 +305,8 @@ Two branches times five Russian forms is ten segments; Arabic fourteen; Japanese
 | Japanese | 2 |
 | Arabic | 42 would be needed, over the budget of 24, so the message keeps the source's six branches and is reported |
 
+For the Arabic file the ICU Forms window shows which numbers each kept branch is used for: `one` for 1, and `other` for 0, 2, 3, 4, 5, 6 and everything else, because the application uses `other` for every number whose form the message does not have.
+
 **An ordinal and two plurals.** Russian needs 1 times 4 times 4, sixteen segments. Welsh would need 216 and gets the budget warning.
 
 ```
@@ -335,7 +337,7 @@ Type '{' to insert a placeholder, and don''t forget to close it.
 The file is not JSON or Java properties, its values hold no ICU messages, or it was already expanded. The report lists what was seen.
 
 **A message has only the source's forms and a budget warning.**
-It exceeded the branch budget. Raise the budget on the expand page and run again on a fresh project, or accept the source's branches for that message.
+It exceeded the branch budget. Raise the budget on the expand page and run again on a fresh project, or accept the source's branches for that message. The ICU Forms window shows which numbers each of those forms is used for; the `other` form takes every number the message has no form for.
 
 **The Messages window lists a form with no translation after I translated everything.**
 A form was filled by a memory match that left it empty, or a segment was cleared. The ICU Forms window shows the empty row.

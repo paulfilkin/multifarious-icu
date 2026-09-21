@@ -63,7 +63,7 @@ The plugin fits Studio's normal workflow: create the project, expand, translate,
 ### Advanced Tips
 - **A form the source language does not have**, such as Russian "few", starts from the source's "one" form where there is one, otherwise from "other". The ICU Forms window's tooltip says which. Switch to "always other" if your translators prefer the general form as the starting point.
 - **Nested messages**: a select, which chooses a branch by a value such as gender, keeps its branches, and a plural inside each branch is expanded. Offsets, exact values such as `=0` and ordinals are handled.
-- **Two independent plurals in one message multiply**: six forms times six is 36 segments for Arabic. Over the branch budget the message keeps the source's own branches with the syntax protected, and the report says so.
+- **Two independent plurals in one message multiply**: six forms times six is 36 segments for Arabic. Over the branch budget the message keeps the source's own branches with the syntax protected, and the report says so. The ICU Forms window shows which numbers each kept branch is used for; `other` takes every number the message has no form for.
 - **Apostrophes**: type them as usual. Finalise doubles the straight apostrophe as ICU requires. Studio's AutoCorrect may replace it with a typographic one, which ICU treats as plain text.
 - **Reports**: after each task, one report per language pair in the Reports view lists every message with its outcome and any warning.
 
@@ -78,7 +78,7 @@ A1: The task processes Studio's JSON and Java Resources file types only, and onl
 A2: The file is of a type the plugin does not handle. The window and the tasks work with JSON and Java properties files.
 
 **Q3: A message shows the source's own forms only, and a warning about the branch budget.**
-A3: The message has several independent plurals and would need more segments than the budget allows. Raise the budget on the expand page if you want every form, or ask the developer to split the message.
+A3: The message has several independent plurals and would need more segments than the budget allows. Raise the budget on the expand page if you want every form, or ask the developer to split the message. Meanwhile the ICU Forms window shows which numbers each kept branch is used for.
 
 **Q4: The Messages window says a form has no translation.**
 A4: Every form the language needs must be present. Translate it, or let Finalise fill it from the source, which it does with a warning so the gap is recorded in the report.
