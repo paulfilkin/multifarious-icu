@@ -15,7 +15,7 @@ Full documentation in detail is maintained at <https://multifarious.filkin.com/p
 - **One segment per form the language needs**: Russian four, Arabic six, Japanese one, each a whole sentence.
 - **Syntax protected**: the selector and branch syntax sits between the segments as locked text. Arguments such as `{name}` and the count marker `#` are placeholder tags inside the sentence, placed like any tag, with an option to lock them.
 - **Finalise before delivery**: the forms a language does not use are removed, apostrophes and braces typed as text are escaped, placeholders are checked, untranslated forms are filled from the source with a warning, and the tags become locked text for Studio's file writers.
-- **ICU Forms window**: every form of the active message with the numbers that select it, the source and target as sentences, a count box, the reassembled message checked as you type, and a zoom.
+- **ICU Forms window**: every form of the active message with the numbers that select it, written out in full, the source and target as sentences, a count box, the reassembled message checked as you type, and a zoom.
 - **ICU Verifier**: untranslated forms, placeholder mismatches, a count marker typed as text and a message that will not parse, on F8 and as segments are confirmed, with a severity per check.
 - **Reports** per language pair listing every message and what happened to it.
 - **Localised**: settings pages with help, the window, the reports and the verifier messages in English, German, French, Spanish, Italian, Japanese, Korean, Russian and Simplified Chinese.
@@ -91,6 +91,9 @@ A6: Yes. A second run on a clean file changes nothing.
 
 **Q7: After Finalise the placeholders are locked and I need to correct a segment.**
 A7: Run Finalise again. A message whose placeholders differ from the source is turned back into tags, with a comment on the target segment, so the missing one can be placed. Once corrected, the next run removes the comment and locks the message, and Generate Target Translations needs that locked shape.
+
+**Q8: A Spanish, French, Italian or Portuguese file has a "many" form I have never seen.**
+A8: CLDR gives these languages, and Catalan, a `many` form for a round million and above. The application uses it, so the form is needed. The ICU Forms window shows the numbers: 1000000, 2000000, 3000000.
 
 > **Tip**: Full documentation in detail is maintained at <https://multifarious.filkin.com/product/icu-support/>.
 

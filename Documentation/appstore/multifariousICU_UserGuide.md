@@ -32,7 +32,10 @@ Inside a branch, `#` stands for the number. The branch names are the plural cate
 | English | one, other | other |
 | Russian | one, few, many, other | many |
 | Arabic | zero, one, two, few, many, other | few |
+| Spanish | one, many, other | other |
 | Japanese | other | other |
+
+Spanish, French, Italian, Portuguese and Catalan have a `many` form that is used for a round million and above: 1000000, 2000000, 3000000. Applications use it, so a translation needs it, and the plugin lays it out like any other form.
 
 Three other constructs appear in real files:
 
@@ -141,8 +144,8 @@ Each form is an ordinary segment. Translate the sentence as your language needs 
 Click **ICU Forms** on the Add-ins tab. The window docks under the editor and follows the active segment.
 
 - The header names the message key, the target language and the number of forms, and shows whether the reassembled message is valid ICU.
-- One row per form: the form's name, the numbers that select it, and the source and target as sentences with sample values in place of the arguments. The active segment's row is shaded. An untranslated form shows "(not translated)". A target whose placeholders differ from the source shows in red, with the detail in a tooltip.
-- **Try a count**: type a number and the row it selects is highlighted. Exact values match first, then the language's rules, as in the application.
+- One row per form: the form's name, the numbers that select it, and the source and target as sentences with sample values in place of the arguments. The numbers are written out in full, so a Spanish `many` row reads 1000000, 2000000, 3000000. The active segment's row is shaded. An untranslated form shows "(not translated)". A target whose placeholders differ from the source shows in red, with the detail in a tooltip.
+- **Try a count**: type a number and the row it selects is highlighted. Exact values match first, then the language's rules, as in the application. A large number can also be typed the way CLDR writes it, `1c6` for 1000000 or `1.2c6` for 1200000.
 - **Reassembled message**: the whole target message as Finalise will write it, updated as you type, with "Valid ICU" or the parser's message beside it.
 - **Zoom**: Ctrl and the mouse wheel, or the buttons in the top right corner, from 60% to 250%. The zoom is remembered.
 
@@ -343,6 +346,9 @@ Run Finalise again. A message whose placeholders differ from the source is turne
 
 **My typed apostrophe was not doubled in the file.**
 Studio's AutoCorrect replaced it with a typographic apostrophe (’), which ICU treats as plain text. The file is valid.
+
+**A Spanish, French, Italian or Portuguese file has a "many" form I have never seen.**
+CLDR gives these languages, and Catalan, a `many` form for a round million and above. The application uses it, so the form is needed. The Counts column shows the numbers: 1000000, 2000000, 3000000. Translate it as the sentence your language uses for those numbers.
 
 ---
 
