@@ -12,8 +12,8 @@ tested, committed as `2529ea9`, and seen in Studio: the Counts column and the co
 > The compact notation fix is committed (2529ea9), 1,433 tests passing, and seen in Studio on
 > a Spanish target: the Counts column and the count box.  Nothing is open from this session.
 > The open items from handover 05 stand: the Counts column of a walked message, the Studio
-> look at count-based parity, the store housekeeping.  A fresh Release package is needed
-> before the store upload, since 1.0.0.0 predates this fix.
+> look at count-based parity, the store housekeeping.  Release 1.0.1.0 is built and in
+> `Documentation\appstore\`, with its changelog entry, ready for the upload.
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -21,8 +21,8 @@ tested, committed as `2529ea9`, and seen in Studio: the Counts column and the co
 
 ## Where we are in one line
 
-The compact notation fix is committed and seen in Studio; the Release package needs rebuilding
-before the store upload.
+The compact notation fix is committed and seen in Studio; Release 1.0.1.0 is built for the
+store.
 
 ## The defect
 
@@ -71,6 +71,11 @@ compact sample first.
   reference; the writer does not emit it.
 - **`IcuFormsReader`**: the Counts column, the tooltip and the bound counts of an outer
   selector come from `SampleDisplay`, with fractional-only derived from the converted lists.
+- **Release 1.0.1.0** built after the Studio check: manifest and assembly bumped and agree,
+  no symbols in the package, copied to `Documentation\appstore\IcuSupport.sdlplugin`.  Built
+  with `-p:DeployPluginPackage=false` because Studio was open, so the Debug package in
+  `Packages` is the one Studio has; the Release package is for the store.  The AppStore
+  changelog has a 1.0.1.0 entry.
 - **Tests** (28 new, 1,433 in all): the reference's renderer tests (written-form selection,
   `#` at the numeric value, explicit value matching numerically, offset forcing numeric,
   hoisting property for a compact count, malformed `1c`, `c6`, `1c2c3`, `1c-2` rejected),

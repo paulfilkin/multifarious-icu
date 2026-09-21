@@ -1,5 +1,17 @@
 # multifariousICU Support for Trados Studio - Changelog
 
+## 1.0.1.0 (September 2026)
+
+### Fixed
+
+- The ICU Forms window showed the numbers that select a form the way the Common Locale Data
+  Repository (CLDR) writes them. For Spanish, French, Italian, Portuguese and Catalan that
+  included a compact form such as `1c6`, which means 1000000. The Counts column now shows the
+  plain numbers.
+- The count box under the ICU Forms window accepts a compact number such as `1c6` or `1.2c6`
+  and marks the form it selects. Before, it matched nothing.
+- The batch tasks are unchanged. Files expanded with 1.0.0.0 need no rework.
+
 ## 1.0.0.0 (September 2026)
 
 Initial release.
