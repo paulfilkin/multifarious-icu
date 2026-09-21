@@ -151,6 +151,8 @@ Click **ICU Forms** on the Add-ins tab. The window docks under the editor and fo
 
 For a select containing a plural, such as a gendered message, the Form column shows the full path: "female / one", "female / few".
 
+In a message kept with the source's own forms, over the branch budget, the `other` row is used for every number whose form the message does not have. Its Counts column lists those numbers too, and the tooltip names the forms covered. A form the language does not have shows no numbers.
+
 ![The ICU Forms window with a count typed and its row highlighted](multifarious_images/06.png)
 *Screenshot 6: the window with 22 typed in the count box and the few row highlighted.*
 

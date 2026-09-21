@@ -146,13 +146,14 @@ namespace multifarious.Icu.BatchTasks.Services
 
             var placed = PlaceSegments(unit.Source);
             var targetSegments = SegmentsOf(unit.Target);
+            var layout = new Layout(expanded, placed);
             var rows = new List<IcuFormRow>();
             for (var index = 0; index < placed.Count; index++)
             {
                 var place = placed[index];
                 var target = index < targetSegments.Count ? targetSegments[index] : null;
                 if (target != null && activeId != null && target.Properties.Id.Id == activeId) target = activeTarget;
-                rows.Add(Row(place, target, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic));
+                rows.Add(Row(place, target, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic, layout));
             }
 
             var projection = EscapedProjection(unit.Target, inPluralContext, activeId, activeTarget);
@@ -188,7 +189,19 @@ namespace multifarious.Icu.BatchTasks.Services
             var resolution = _forms.ResolveCount(message, model.TargetLanguage, count.Trim());
             if (resolution == null) return new List<IcuFormRow>();
 
-            var component = model.CountArgument + ":" + resolution.BranchKey;
+            var matched = RowsOn(model, model.CountArgument + ":" + resolution.BranchKey);
+
+            // In a message the task did not category expand, the branches are the source's, and
+            // ICU sends a number whose category has no branch to 'other'.
+            if (matched.Count == 0 && !resolution.IsExplicit && !model.ExpandedSelectors.Contains(model.CountArgument))
+            {
+                matched = RowsOn(model, model.CountArgument + ":other");
+            }
+            return matched;
+        }
+
+        private static List<IcuFormRow> RowsOn(IcuFormsModel model, string component)
+        {
             return model.Rows
                 .Where(row => row.Path.Split('/').Any(part => part == component))
                 .ToList();
@@ -282,8 +295,59 @@ namespace multifarious.Icu.BatchTasks.Services
             }
         }
 
+        /// <summary>
+        /// What the layout says about each selector: whether the task category expanded it, and
+        /// which branch keys it has. A selector's path is its argument under the branches above
+        /// it, <c>count</c> or <c>gender:female/count</c>, the form the expansion records under
+        /// <c>icu:expandedSelectors</c> and Finalise matches on.
+        /// </summary>
+        private sealed class Layout
+        {
+            private readonly HashSet<string> _expanded;
+            private readonly Dictionary<string, HashSet<string>> _branches = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+
+            public Layout(IEnumerable<string> expanded, IEnumerable<PlacedSegment> placed)
+            {
+                _expanded = new HashSet<string>(expanded, StringComparer.Ordinal);
+                foreach (var place in placed)
+                {
+                    for (var depth = 0; depth < place.Frames.Count; depth++)
+                    {
+                        var frame = place.Frames[depth];
+                        if (frame.Key == null) continue;
+                        var path = SelectorPath(place.Frames, depth);
+                        HashSet<string> keys;
+                        if (!_branches.TryGetValue(path, out keys))
+                        {
+                            keys = new HashSet<string>(StringComparer.Ordinal);
+                            _branches[path] = keys;
+                        }
+                        keys.Add(frame.Key);
+                    }
+                }
+            }
+
+            public bool IsExpanded(List<Frame> frames, int depth)
+            {
+                return _expanded.Contains(SelectorPath(frames, depth));
+            }
+
+            public bool HasBranch(List<Frame> frames, int depth, string key)
+            {
+                HashSet<string> keys;
+                return _branches.TryGetValue(SelectorPath(frames, depth), out keys) && keys.Contains(key);
+            }
+
+            private static string SelectorPath(List<Frame> frames, int depth)
+            {
+                var above = frames.Take(depth).Select(f => f.Argument + ":" + (f.Key ?? string.Empty));
+                var prefix = string.Join("/", above);
+                return prefix.Length == 0 ? frames[depth].Argument : prefix + "/" + frames[depth].Argument;
+            }
+        }
+
         private IcuFormRow Row(PlacedSegment place, ISegment target, string language, Dictionary<string, string> samples,
-            ref int nameOrdinal, bool inPluralContext, Dictionary<string, string> seededFrom, HashSet<string> synthetic)
+            ref int nameOrdinal, bool inPluralContext, Dictionary<string, string> seededFrom, HashSet<string> synthetic, Layout layout)
         {
             var source = place.Segment;
             var row = new IcuFormRow
@@ -299,10 +363,13 @@ namespace multifarious.Icu.BatchTasks.Services
             // The counts from CLDR: the explicit value itself, the category's samples, nothing
             // for a select key.
             string hint = null;
+            string note = null;
             var counts = new List<string>();
+            var sample = string.Empty;
             if (place.Key.StartsWith("=", StringComparison.Ordinal))
             {
                 counts.Add(place.Key.Substring(1));
+                sample = counts[0];
             }
             else if (place.Selector != "select" && place.Selector != "none" && !string.IsNullOrEmpty(language))
             {
@@ -311,18 +378,44 @@ namespace multifarious.Icu.BatchTasks.Services
                 {
                     var kind = place.Selector == "selectordinal" ? SelectorKind.Ordinal : SelectorKind.Cardinal;
                     var resolution = _plurals.Resolve(language, kind);
-                    // The examples are converted for display: CLDR writes some compactly (1c6 is
-                    // 1000000), which means nothing to a translator, and a converted value that
-                    // no longer selects its own category is dropped rather than shown.
-                    var integers = SampleDisplay.IntegerExamples(resolution.RuleSet, category, ExampleCount);
-                    var decimals = SampleDisplay.DecimalExamples(resolution.RuleSet, category, ExampleCount);
-                    row.FractionalOnly = integers.Count == 0 && decimals.Count > 0;
-                    counts.AddRange(row.FractionalOnly ? decimals : integers);
+                    var own = CategoryCounts(resolution.RuleSet, category);
+                    row.FractionalOnly = own.FractionalOnly;
+                    counts.AddRange(own.Counts);
+                    sample = own.Counts.FirstOrDefault() ?? string.Empty;
                     hint = _hints.Find(resolution.ResolvedKey, category);
+
+                    // In a message the task did not category expand, the branches are the
+                    // source's. ICU sends a number whose category has no branch to 'other', so
+                    // that row is used for every such category as well as its own; and a branch
+                    // for a category the language does not have is never used at all.
+                    var depth = place.Frames.Count - 1;
+                    if (!layout.IsExpanded(place.Frames, depth))
+                    {
+                        if (!resolution.Categories.Contains(category))
+                        {
+                            counts.Clear();
+                            row.FractionalOnly = false;
+                            note = "Not used: the language has no such form";
+                        }
+                        else if (category == PluralCategory.Other)
+                        {
+                            var uncovered = resolution.Categories
+                                .Where(c => c != PluralCategory.Other && !layout.HasBranch(place.Frames, depth, c.ToKeyword()))
+                                .ToList();
+                            if (uncovered.Count > 0)
+                            {
+                                var lists = new List<CountList> { own };
+                                lists.AddRange(uncovered.Select(c => CategoryCounts(resolution.RuleSet, c)));
+                                counts = Merge(lists);
+                                row.FractionalOnly = lists.All(l => l.FractionalOnly);
+                                note = "Also used for: " + string.Join(", ", uncovered.Select(c => c.ToKeyword()));
+                            }
+                        }
+                    }
                 }
             }
             row.Counts = counts;
-            row.SampleCount = counts.FirstOrDefault() ?? string.Empty;
+            row.SampleCount = sample;
 
             // Which source form seeded this segment comes from the unit context; a file expanded
             // when the segments carried comments has it on the comment, which then also serves
@@ -339,7 +432,7 @@ namespace multifarious.Icu.BatchTasks.Services
             }
             else
             {
-                row.Comment = ComposedComment(place, counts, row.FractionalOnly, hint, row.SeededFrom);
+                row.Comment = ComposedComment(place, counts, row.FractionalOnly, note, hint, row.SeededFrom);
             }
 
             var pound = row.SampleCount.Length == 0 ? "#" : row.SampleCount;
@@ -363,7 +456,42 @@ namespace multifarious.Icu.BatchTasks.Services
             return row;
         }
 
-        private static string ComposedComment(PlacedSegment place, List<string> counts, bool fractionalOnly, string hint, string seededFrom)
+        /// <summary>The displayed counts of one category and whether only fractions reach it.</summary>
+        private sealed class CountList
+        {
+            public IReadOnlyList<string> Counts;
+            public bool FractionalOnly;
+        }
+
+        /// <summary>
+        /// The examples are converted for display: CLDR writes some compactly (1c6 is 1000000),
+        /// which means nothing to a translator, and a converted value that no longer selects its
+        /// own category is dropped rather than shown.
+        /// </summary>
+        private static CountList CategoryCounts(PluralRuleSet ruleSet, PluralCategory category)
+        {
+            var integers = SampleDisplay.IntegerExamples(ruleSet, category, ExampleCount);
+            var decimals = SampleDisplay.DecimalExamples(ruleSet, category, ExampleCount);
+            var fractionalOnly = integers.Count == 0 && decimals.Count > 0;
+            return new CountList { Counts = fractionalOnly ? decimals : integers, FractionalOnly = fractionalOnly };
+        }
+
+        /// <summary>
+        /// The counts of several categories as one list: whole numbers first in ascending order,
+        /// then fractions, the first few of each, as CLDR itself lists integer samples before
+        /// decimal ones. A fraction-first order would bury 2 and 5 under 0.1, 0.2, 0.3.
+        /// </summary>
+        private static List<string> Merge(IEnumerable<CountList> lists)
+        {
+            var values = lists.SelectMany(l => l.Counts).Distinct(StringComparer.Ordinal)
+                .Select(text => new { Text = text, Value = decimal.Parse(text, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) })
+                .OrderBy(v => v.Text.IndexOf('.') >= 0 ? 1 : 0)
+                .ThenBy(v => v.Value)
+                .Select(v => v.Text);
+            return values.Take(ExampleCount).ToList();
+        }
+
+        private static string ComposedComment(PlacedSegment place, List<string> counts, bool fractionalOnly, string note, string hint, string seededFrom)
         {
             if (place.Selector == "none") return string.Empty;
 
@@ -385,6 +513,7 @@ namespace multifarious.Icu.BatchTasks.Services
                         ? "Used when the count is: fractional counts only, e.g. " + string.Join(", ", counts)
                         : "Used when the count is: " + string.Join(", ", counts));
                 }
+                if (note != null) builder.Append('\n').Append(note);
             }
 
             if (!string.IsNullOrEmpty(seededFrom))

@@ -1,5 +1,18 @@
 # multifariousICU Support for Trados Studio - Changelog
 
+## 1.0.2.0 (September 2026)
+
+### Fixed
+
+- In a message kept with the source's own forms, over the branch budget, the ICU Forms
+  window showed the `other` row with the numbers of the `other` form only. The application
+  uses that form for every number whose form the message does not have, so an Arabic `other`
+  row is used for 0, 2, 5 and 11 as well. The Counts column now lists those numbers and the
+  tooltip names the forms covered. A form the language does not have shows no numbers.
+- The count box under the ICU Forms window marks the `other` row for such a number, as the
+  application would. Before, it marked nothing.
+- The batch tasks are unchanged.
+
 ## 1.0.1.0 (September 2026)
 
 ### Fixed

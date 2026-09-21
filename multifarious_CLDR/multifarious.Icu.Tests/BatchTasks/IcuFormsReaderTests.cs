@@ -15,10 +15,10 @@ public class IcuFormsReaderTests
     private const string UnreadCount =
         "Hello {name}, you have {count, plural, one {# unread message} other {# unread messages}}!";
 
-    private static IParagraphUnit Expanded(string value, string language = "ru-RU")
+    private static IParagraphUnit Expanded(string value, string language = "ru-RU", ExpansionOptions? options = null)
     {
         var unit = ParagraphUnits.Json(value, "['inbox.unreadCount']");
-        new IcuExpandProcessor("en-GB", language, ExpansionOptions.Default, "1.0.0")
+        new IcuExpandProcessor("en-GB", language, options ?? ExpansionOptions.Default, "1.0.0")
         {
             ItemFactory = ParagraphUnits.ItemFactory,
         }.ProcessParagraphUnit(unit);
@@ -243,6 +243,99 @@ public class IcuFormsReaderTests
         Assert.Equal(["count:other"], reader.RowsFor(model, "1.5").Select(r => r.Path));
         Assert.Empty(reader.RowsFor(model, "abc"));
         Assert.Empty(reader.RowsFor(model, ""));
+    }
+
+    /// <summary>
+    /// A message the task did not category expand keeps the source's branches, and ICU sends
+    /// every number whose category has no branch to 'other'. The Arabic 'other' row therefore
+    /// covers zero, two, few and many as well, its counts say so, and a typed count with no
+    /// row of its own lands there. The 'one' row is unchanged.
+    /// </summary>
+    [Fact]
+    public void A_walked_messages_other_row_covers_every_category_without_a_branch()
+    {
+        // Two independent plurals are 36 segments for Arabic, over the budget of 24.
+        const string sync =
+            "{files, plural, one {# file} other {# files}} synchronised across " +
+            "{devices, plural, one {# device} other {# devices}}.";
+        var reader = new IcuFormsReader();
+        var model = reader.Read(Expanded(sync, "ar-SA"), "ar-SA")!;
+
+        Assert.Empty(model.ExpandedSelectors);
+        Assert.Equal(
+            ["files:one/devices:one", "files:one/devices:other", "files:other/devices:one", "files:other/devices:other"],
+            model.Rows.Select(r => r.Path));
+
+        var other = model.Rows[3];
+        Assert.Equal(["0", "2", "3", "4", "5", "6"], other.Counts);
+        Assert.Equal("100", other.SampleCount);
+        Assert.False(other.FractionalOnly);
+        Assert.Contains("Used when the count is: 0, 2, 3, 4, 5, 6", other.Comment);
+        Assert.Contains("Also used for: zero, two, few, many", other.Comment);
+
+        var one = model.Rows[2];
+        Assert.Equal(["1"], one.Counts);
+        Assert.DoesNotContain("Also used", one.Comment);
+
+        // 5 is Arabic 'few', which has no branch, so it lands on the 'other' rows of the
+        // outermost selector; 1 has its own.
+        Assert.Equal(["files:other/devices:one", "files:other/devices:other"], reader.RowsFor(model, "5").Select(r => r.Path));
+        Assert.Equal(["files:one/devices:one", "files:one/devices:other"], reader.RowsFor(model, "1").Select(r => r.Path));
+    }
+
+    /// <summary>
+    /// The same for Russian, walked by a budget of two (four forms needed, the source's two
+    /// branches fit): whole numbers come before the fractions that reach Russian 'other', so
+    /// 2 and 5 are not buried under 0.1, 0.2; and an expanded Russian message keeps its own
+    /// counts.
+    /// </summary>
+    [Fact]
+    public void A_walked_russian_other_row_lists_whole_numbers_before_fractions_and_an_expanded_one_is_unchanged()
+    {
+        var reader = new IcuFormsReader();
+        var walked = reader.Read(Expanded(UnreadCount, "ru-RU", new ExpansionOptions { MaxUnitsPerMessage = 2 }), "ru-RU")!;
+
+        Assert.Equal(["count:one", "count:other"], walked.Rows.Select(r => r.Path));
+        Assert.Equal(["0", "2", "3", "4", "5", "6"], walked.Rows[1].Counts);
+        Assert.False(walked.Rows[1].FractionalOnly);
+        Assert.Contains("Also used for: few, many", walked.Rows[1].Comment);
+        Assert.Equal(["count:other"], reader.RowsFor(walked, "3").Select(r => r.Path));
+        Assert.Equal(["count:other"], reader.RowsFor(walked, "0.5").Select(r => r.Path));
+        Assert.Equal(["count:one"], reader.RowsFor(walked, "21").Select(r => r.Path));
+
+        var expanded = reader.Read(Expanded(UnreadCount), "ru-RU")!;
+        Assert.Equal(["count:one", "count:few", "count:many", "count:other"], expanded.Rows.Select(r => r.Path));
+        Assert.Equal(["2", "3", "4", "22", "23", "24"], expanded.Rows[1].Counts);
+        Assert.True(expanded.Rows[3].FractionalOnly);
+        Assert.DoesNotContain("Also used", expanded.Rows[3].Comment);
+        Assert.Empty(reader.RowsFor(expanded, "abc"));
+    }
+
+    /// <summary>
+    /// A walked branch for a category the language does not have is never selected: with
+    /// ordinal expansion off, the English ordinal's 'one', 'two' and 'few' branches stay in a
+    /// Russian file, whose ordinals have 'other' only. Those rows show no counts and say so;
+    /// the 'other' row has nothing extra to cover; the expanded plural around them is unchanged.
+    /// </summary>
+    [Fact]
+    public void A_walked_branch_the_language_does_not_have_shows_no_counts()
+    {
+        const string visitor =
+            "{count, plural, one {# item} other {# items}} for the " +
+            "{position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} visitor.";
+        var reader = new IcuFormsReader();
+        var model = reader.Read(Expanded(visitor, "ru-RU", new ExpansionOptions { ExpandOrdinal = false }), "ru-RU")!;
+
+        Assert.Equal(["count"], model.ExpandedSelectors);
+
+        var notUsed = model.Rows.First(r => r.Path == "count:few/position:one");
+        Assert.Empty(notUsed.Counts);
+        Assert.Contains("Not used", notUsed.Comment);
+
+        var used = model.Rows.First(r => r.Path == "count:few/position:other");
+        Assert.NotEmpty(used.Counts);
+        Assert.DoesNotContain("Also used", used.Comment);
+        Assert.DoesNotContain("Not used", used.Comment);
     }
 
     /// <summary>

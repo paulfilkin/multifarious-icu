@@ -9,11 +9,12 @@ tested, committed as `2529ea9`, and seen in Studio: the Counts column and the co
 > Read `CLAUDE.md`, then
 > `Documentation\Build_Progress\06_260921_multifarious_CLDR_Build_Progress.md`.
 >
-> The compact notation fix is committed (2529ea9), 1,433 tests passing, and seen in Studio on
-> a Spanish target: the Counts column and the count box.  Nothing is open from this session.
-> The open items from handover 05 stand: the Counts column of a walked message, the Studio
-> look at count-based parity, the store housekeeping.  Release 1.0.1.0 is built and in
-> `Documentation\appstore\`, with its changelog entry, ready for the upload.
+> The compact notation fix is released as 1.0.1.0 and on the store.  The Counts column fix
+> for a walked message is written and tested (1,436 tests) but not yet seen in Studio, and
+> Studio was open when the session ended, so the Debug package in `Packages` predates it.
+> Start with a Debug build with Studio closed, then the Studio check under open items, then
+> the 1.0.2.0 bump, Release build and upload.  After that the open items from handover 05
+> stand: the Studio look at count-based parity, the store housekeeping.
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -76,7 +77,19 @@ compact sample first.
   with `-p:DeployPluginPackage=false` because Studio was open, so the Debug package in
   `Packages` is the one Studio has; the Release package is for the store.  The AppStore
   changelog has a 1.0.1.0 entry.
-- **Tests** (28 new, 1,433 in all): the reference's renderer tests (written-form selection,
+- **Counts column for a walked message** (handover 05's first open item), after the 1.0.1.0
+  release.  `IcuFormsReader` now reads the layout for each row's innermost selector: its path
+  in `icu:expandedSelectors`, and the branch keys the layout has for it.  In a selector the
+  task did not category expand, the `other` row's counts are the merge of its own and of every
+  category the language has and the message has no branch for, whole numbers first then
+  fractions, and the tooltip says "Also used for: zero, two, few, many"; a branch for a
+  category the language does not have shows no counts and "Not used".  The `#` sample stays
+  the branch's own first count, so the rendered sentence is unchanged.  The count box falls
+  back to the outermost selector's `other` row when the resolved category has no row and the
+  selector was not expanded, as ICU does.  Three reader tests: the over-budget Arabic sync
+  message, Russian walked by a budget of 2, and a Russian ordinal walked by switching ordinal
+  expansion off.  Not seen in Studio yet.
+- **Tests** (31 new, 1,436 in all): the reference's renderer tests (written-form selection,
   `#` at the numeric value, explicit value matching numerically, offset forcing numeric,
   hoisting property for a compact count, malformed `1c`, `c6`, `1c2c3`, `1c-2` rejected),
   `SampleDisplayTests`, the preview's resolver and row tests for es-ES, `1c` and `c6` in the
@@ -85,7 +98,15 @@ compact sample first.
 
 ## Open items
 
-- None from this session.  Seen in Studio (Paul, 21 Sep 2026, two screenshots):
+- **Studio check of the walked Counts column.**  Arabic target, `nested.json`, the
+  `sync.status` message (36 segments, over the budget): the `other` rows should read
+  `0, 2, 3, 4, 5, 6` with "Also used for: zero, two, few, many" in the tooltip, and 5 in the
+  count box should mark the `other` rows.  Then the version bump to 1.0.2.0, the Release
+  build and the store upload; the changelog entry is written.
+- **Explicit values are not subtracted from a category's counts**: with `=0` present, a
+  Russian `many` row still lists 0.  The reader does not know the selector's offset, on which
+  the comparison depends, so it is not the one-line filter it looks like.  Left as is.
+- The compact notation fix is seen in Studio (Paul, 21 Sep 2026, two screenshots):
   `messages.json`, Spanish (Spain) target, the `many` row of `inbox.unreadCount` reads
   `1000000, 2000000, 3000000, 4000000, 5000000, 6000000`, the source renders at 1000000, and
   `1.2c6` in the count box selects `many` with the row highlighted.
