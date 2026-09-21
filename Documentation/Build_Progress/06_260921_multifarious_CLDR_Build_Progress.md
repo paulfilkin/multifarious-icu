@@ -1,21 +1,19 @@
 # 06 - multifarious_CLDR Build Progress - 2026-09-21
 
 Sixth session.  A review of the plugin against the compact decimal notation defect found in
-the cloud app on 21 September (its commit `d7f138b`), then the port of the cloud fix.  The
-changes are built, tested and deployed to Studio's Packages folder, not yet seen in Studio and
-not committed.
+the cloud app on 21 September (its commit `d7f138b`), then the port of the cloud fix.  Built,
+tested, committed as `2529ea9`, and seen in Studio: the Counts column and the count box.
 
 ## Kickoff prompt for the next session (paste this)
 
 > Read `CLAUDE.md`, then
 > `Documentation\Build_Progress\06_260921_multifarious_CLDR_Build_Progress.md`.
 >
-> The compact notation fix is in the working tree, built, 1,433 tests passing, and the Debug
-> package is deployed but not yet started in Studio.  Start with the Studio check written up
-> under open items: a Spanish target, the ICU Forms window's Counts column on the `many` row,
-> and the count box with `1c6`, `1.2c6`, `1c` and `c6`.  Then the commit, if Paul has not made
-> it.  After that the open items from handover 05 stand: the Counts column of a walked message,
-> the Studio look at count-based parity, the store housekeeping.
+> The compact notation fix is committed (2529ea9), 1,433 tests passing, and seen in Studio on
+> a Spanish target: the Counts column and the count box.  Nothing is open from this session.
+> The open items from handover 05 stand: the Counts column of a walked message, the Studio
+> look at count-based parity, the store housekeeping.  A fresh Release package is needed
+> before the store upload, since 1.0.0.0 predates this fix.
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -23,7 +21,8 @@ not committed.
 
 ## Where we are in one line
 
-The compact notation fix is written and tested; the Studio check and the commit remain.
+The compact notation fix is committed and seen in Studio; the Release package needs rebuilding
+before the store upload.
 
 ## The defect
 
@@ -81,14 +80,10 @@ compact sample first.
 
 ## Open items
 
-- **Studio check of the fix**.  Studio was not running this session; the Debug package is in
-  `Packages` (21 Sep, 15:48) and installs on the next start.  Make a project with
-  `test-corpus\messages.json` and a Spanish target, run Expand, open the file, and look at the
-  `many` row of a plural in the ICU Forms window: the Counts column should read
-  `1000000, 2000000, 3000000, 4000000, 5000000, 6000000` and the tooltip the same.  In the
-  count box `1c6` and `1.2c6` should mark the `many` row, `999999` the `other` row, and `1c`
-  and `c6` nothing.
-- **Commit** the change once seen.  Proposed message in the session's closing report.
+- None from this session.  Seen in Studio (Paul, 21 Sep 2026, two screenshots):
+  `messages.json`, Spanish (Spain) target, the `many` row of `inbox.unreadCount` reads
+  `1000000, 2000000, 3000000, 4000000, 5000000, 6000000`, the source renders at 1000000, and
+  `1.2c6` in the count box selects `many` with the row highlighted.
 - The Counts column of a walked message, the Studio look at count-based parity, the store
   housekeeping, the refiner tool's id reuse and the verifier's diagnostics lines: all as in
   handover 05.
