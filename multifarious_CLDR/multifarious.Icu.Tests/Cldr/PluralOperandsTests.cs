@@ -81,6 +81,8 @@ public class PluralOperandsTests
     [InlineData("1.")]
     [InlineData(".5")]
     [InlineData("1.2c")]
+    [InlineData("1c")]
+    [InlineData("c6")]
     [InlineData("1,5")]
     [InlineData("1 000")]
     [InlineData("99999999999999999999999")]

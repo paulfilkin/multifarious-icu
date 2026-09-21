@@ -96,10 +96,9 @@ public sealed class PreviewForms
         var resolution = _plurals.Resolve(targetLanguageTag, kind);
         foreach (var category in resolution.Categories)
         {
-            var samples = resolution.RuleSet?.GetRule(category)?.Samples ?? PluralSamples.Empty;
-            var integers = samples.TakeIntegerExamples(6);
-            var decimals = samples.TakeDecimalExamples(6);
-            var fractionalOnly = samples.IsFractionalOnly;
+            var integers = SampleDisplay.IntegerExamples(resolution.RuleSet, category, 6);
+            var decimals = SampleDisplay.DecimalExamples(resolution.RuleSet, category, 6);
+            var fractionalOnly = integers.Count == 0 && decimals.Count > 0;
             var counts = fractionalOnly ? decimals : integers;
             var usable = counts.FirstOrDefault(count =>
                 !explicitValues.Contains(decimal.Parse(
@@ -138,7 +137,7 @@ public sealed class PreviewForms
 
         var kind = selector.Type == SelectorType.SelectOrdinal ? SelectorKind.Ordinal : SelectorKind.Cardinal;
         var ruleSet = _plurals.Resolve(targetLanguageTag, kind).RuleSet;
-        if (ruleSet is null || !decimal.TryParse(count, NumberStyles.Number, CultureInfo.InvariantCulture, out _))
+        if (ruleSet is null || !PluralOperands.TryParse(count, out _))
         {
             return null;
         }
@@ -247,6 +246,16 @@ public sealed class PreviewForms
     private static string Subtract(string number, decimal offset) =>
         offset == 0
             ? number
-            : (decimal.Parse(number, NumberStyles.Number, CultureInfo.InvariantCulture) - offset)
-            .ToString(CultureInfo.InvariantCulture);
+            : (Numeric(number) - offset).ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// The signed numeric value of a count as written, compact exponent applied.
+    /// The operand parser drops the sign because n is an absolute value, so it is
+    /// read off the text; the offset subtraction is the one place the sign matters.
+    /// </summary>
+    private static decimal Numeric(string number)
+    {
+        var magnitude = PluralOperands.Parse(number).N;
+        return number.TrimStart().StartsWith("-", StringComparison.Ordinal) ? -magnitude : magnitude;
+    }
 }

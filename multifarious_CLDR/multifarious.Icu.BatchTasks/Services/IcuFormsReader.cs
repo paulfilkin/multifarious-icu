@@ -311,12 +311,13 @@ namespace multifarious.Icu.BatchTasks.Services
                 {
                     var kind = place.Selector == "selectordinal" ? SelectorKind.Ordinal : SelectorKind.Cardinal;
                     var resolution = _plurals.Resolve(language, kind);
-                    var rule = resolution.RuleSet != null ? resolution.RuleSet.GetRule(category) : null;
-                    var pluralSamples = rule != null ? rule.Samples : PluralSamples.Empty;
-                    row.FractionalOnly = pluralSamples.IsFractionalOnly;
-                    counts.AddRange(row.FractionalOnly
-                        ? pluralSamples.TakeDecimalExamples(ExampleCount)
-                        : pluralSamples.TakeIntegerExamples(ExampleCount));
+                    // The examples are converted for display: CLDR writes some compactly (1c6 is
+                    // 1000000), which means nothing to a translator, and a converted value that
+                    // no longer selects its own category is dropped rather than shown.
+                    var integers = SampleDisplay.IntegerExamples(resolution.RuleSet, category, ExampleCount);
+                    var decimals = SampleDisplay.DecimalExamples(resolution.RuleSet, category, ExampleCount);
+                    row.FractionalOnly = integers.Count == 0 && decimals.Count > 0;
+                    counts.AddRange(row.FractionalOnly ? decimals : integers);
                     hint = _hints.Find(resolution.ResolvedKey, category);
                 }
             }
@@ -426,11 +427,9 @@ namespace multifarious.Icu.BatchTasks.Services
                 if (string.IsNullOrEmpty(language) || !PluralCategories.TryParse(frame.Key, out category)) continue;
                 var kind = frame.Kind == "selectordinal" ? SelectorKind.Ordinal : SelectorKind.Cardinal;
                 var ruleSet = _plurals.Resolve(language, kind).RuleSet;
-                var rule = ruleSet != null ? ruleSet.GetRule(category) : null;
-                var pluralSamples = rule != null ? rule.Samples : PluralSamples.Empty;
-                var first = (pluralSamples.IsFractionalOnly
-                    ? pluralSamples.TakeDecimalExamples(1)
-                    : pluralSamples.TakeIntegerExamples(1)).FirstOrDefault();
+                var integers = SampleDisplay.IntegerExamples(ruleSet, category, 1);
+                var first = (integers.Count > 0 ? integers : SampleDisplay.DecimalExamples(ruleSet, category, 1))
+                    .FirstOrDefault();
                 if (first != null) bound[frame.Argument] = first;
             }
             return bound;

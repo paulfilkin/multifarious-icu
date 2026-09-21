@@ -123,6 +123,80 @@ public class MessageRendererTests
         Assert.Equal(original, afterHoist);
     }
 
+    /// <summary>
+    /// CLDR's compact notation: 1c6 is 1000000 written compactly, and the exponent is
+    /// itself a plural operand. Spanish reaches 'many' through it, so the count must
+    /// go to the category decision as written, not reformatted through decimal.
+    /// </summary>
+    [Theory]
+    [InlineData("1c6", "many")]
+    [InlineData("2c6", "many")]
+    [InlineData("1000000", "many")]
+    [InlineData("5", "other")]
+    public void ACompactCountSelectsOnItsWrittenForm(string count, string expected)
+    {
+        Assert.Equal(expected, Render(
+            "{n, plural, one {one} many {many} other {other}}", "es", ("n", count)));
+    }
+
+    /// <summary>
+    /// '#' renders the numeric value: the exponent consumes fraction digits into the
+    /// integer part, so 1.2c6 is 1200000 with nothing visible after the point.
+    /// </summary>
+    [Theory]
+    [InlineData("1c6", "1000000")]
+    [InlineData("1.2c6", "1200000")]
+    [InlineData("1.0000001c6", "1000000.1")]
+    public void APoundRendersACompactCountAtItsNumericValue(string count, string expected)
+    {
+        Assert.Equal(expected, Render("{n, plural, other {#}}", "en", ("n", count)));
+    }
+
+    [Fact]
+    public void AnExplicitValueMatchesACompactCountNumerically()
+    {
+        Assert.Equal("a round million", Render(
+            "{n, plural, =1000000 {a round million} other {#}}", "en", ("n", "1c6")));
+    }
+
+    [Fact]
+    public void AnOffsetForcesACompactCountNumeric()
+    {
+        // The compact operand does not survive the offset subtraction: 1c6 minus 1
+        // is 999999, which is Spanish 'other', not 'many'.
+        Assert.Equal("999999", Render(
+            "{n, plural, offset:1 many {millions} other {#}}", "es", ("n", "1c6")));
+    }
+
+    /// <summary>
+    /// The hoisting property holds for compact counts too: '#' rewritten to a number
+    /// argument renders the same numeric value the '#' did.
+    /// </summary>
+    [Fact]
+    public void ARewrittenPoundRendersACompactCountAsThePoundDid()
+    {
+        var message = IcuMessage.Parse("{n, plural, many {# things} other {# thing}}");
+        var hoisted = Hoister.Hoist(message.Nodes);
+        var arguments = new Dictionary<string, string> { ["n"] = "1.2c6" };
+
+        var original = MessageRenderer.Render(message.Nodes, arguments, CldrCategories.For("es"));
+        var afterHoist = MessageRenderer.Render(hoisted, arguments, CldrCategories.For("es"));
+
+        Assert.Equal("1200000 things", original);
+        Assert.Equal(original, afterHoist);
+    }
+
+    [Theory]
+    [InlineData("1c")]
+    [InlineData("c6")]
+    [InlineData("1c2c3")]
+    [InlineData("1c-2")]
+    public void AMalformedCompactCountIsRejected(string count)
+    {
+        Assert.Throws<InvalidOperationException>(() =>
+            Render("{n, plural, other {#}}", "en", ("n", count)));
+    }
+
     [Fact]
     public void AMissingArgumentIsReportedByName()
     {

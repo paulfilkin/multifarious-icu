@@ -245,6 +245,34 @@ public class IcuFormsReaderTests
         Assert.Empty(reader.RowsFor(model, ""));
     }
 
+    /// <summary>
+    /// Spanish 'many' is reached through CLDR's compact samples (1c6 is 1000000). The
+    /// Counts column and the tooltip show the plain values, the compact decimal samples
+    /// that would select 'other' once converted are dropped, and a typed compact count
+    /// still lands on the row.
+    /// </summary>
+    [Fact]
+    public void A_category_with_compact_samples_shows_plain_counts_and_resolves_a_compact_count()
+    {
+        var reader = new IcuFormsReader();
+        var model = reader.Read(Expanded(UnreadCount, "es-ES"), "es-ES")!;
+
+        Assert.Equal(["count:one", "count:many", "count:other"], model.Rows.Select(r => r.Path));
+
+        var many = model.Rows[1];
+        Assert.Equal(["1000000", "2000000", "3000000", "4000000", "5000000", "6000000"], many.Counts);
+        Assert.Equal("1000000", many.SampleCount);
+        Assert.False(many.FractionalOnly);
+        Assert.Contains("Used when the count is: 1000000, 2000000", many.Comment);
+        Assert.Equal("Hello Anna, you have 1000000 unread messages!", many.SourceRendered);
+
+        Assert.Equal(["count:many"], reader.RowsFor(model, "1c6").Select(r => r.Path));
+        Assert.Equal(["count:many"], reader.RowsFor(model, "1.2c6").Select(r => r.Path));
+        Assert.Equal(["count:other"], reader.RowsFor(model, "999999").Select(r => r.Path));
+        Assert.Empty(reader.RowsFor(model, "1c"));
+        Assert.Empty(reader.RowsFor(model, "c6"));
+    }
+
     [Fact]
     public void Explicit_values_and_the_offset_read_back_and_resolve_first()
     {

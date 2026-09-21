@@ -298,12 +298,11 @@ public sealed class ExpansionPlanner
         {
             var category = context.Category!.Value;
             var resolution = ResolutionFor(category, kind, state);
-            var samples = resolution.RuleSet?.GetRule(category)?.Samples ?? PluralSamples.Empty;
-            var integers = samples.TakeIntegerExamples(ExampleCount);
-            var decimals = samples.TakeDecimalExamples(ExampleCount);
+            var integers = SampleDisplay.IntegerExamples(resolution.RuleSet, category, ExampleCount);
+            var decimals = SampleDisplay.DecimalExamples(resolution.RuleSet, category, ExampleCount);
 
             comment.Append($"CLDR category: {context.KeyText}").Append('\n');
-            comment.Append(samples.IsFractionalOnly
+            comment.Append(integers.Count == 0 && decimals.Count > 0
                 ? $"Used when the count is: fractional counts only, e.g. {string.Join(", ", decimals)}"
                 : $"Used when the count is: {string.Join(", ", integers)}");
 

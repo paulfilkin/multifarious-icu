@@ -104,6 +104,54 @@ public class PreviewFormsTests
         Assert.Equal("You and 1 other", one.SourceRendered);
     }
 
+    /// <summary>
+    /// A compact count such as 1c6 resolves through its written form: the exponent
+    /// is a plural operand, and Spanish 'many' is reached through it.
+    /// </summary>
+    [Theory]
+    [InlineData("1c6", "many")]
+    [InlineData("1000000", "many")]
+    [InlineData("5", "other")]
+    public void ACompactCountResolvesThroughItsWrittenForm(string count, string branch)
+    {
+        var forms = new PreviewForms();
+        const string message = "{count, plural, one {a} many {b} other {c}}";
+
+        var resolution = forms.ResolveCount(message, "es-ES", count);
+
+        Assert.NotNull(resolution);
+        Assert.Equal(branch, resolution!.BranchKey);
+    }
+
+    [Theory]
+    [InlineData("1c")]
+    [InlineData("c6")]
+    public void AMalformedCompactCountResolvesToNothing(string count)
+    {
+        var forms = new PreviewForms();
+
+        Assert.Null(forms.ResolveCount("{count, plural, one {a} many {b} other {c}}", "es-ES", count));
+    }
+
+    /// <summary>
+    /// A category whose samples are compact shows plain counts: the 'many' row must
+    /// not print 1c6 at a translator, and rendering it must not throw.
+    /// </summary>
+    [Fact]
+    public void ACompactSampleRowShowsPlainCounts()
+    {
+        var forms = new PreviewForms();
+        var rows = forms.Rows(
+            "{n, plural, one {# message} other {# messages}}",
+            "{n, plural, one {# mensaje} many {# millones de mensajes} other {# mensajes}}",
+            "en-GB", "es-ES");
+
+        var many = rows.Single(row => row.BranchKey == "many");
+        Assert.Equal("1000000", many.SampleCount);
+        Assert.DoesNotContain(many.Counts, count => count.Contains('c'));
+        Assert.Equal("1000000 millones de mensajes", many.TargetRendered);
+    }
+
     [Fact]
     public void ACountThatIsNotANumberOrAMessageWithoutAPluralResolvesToNothing()
     {
