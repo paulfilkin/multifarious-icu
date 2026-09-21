@@ -183,20 +183,36 @@ namespace multifarious.Icu.BatchTasks.Services
         /// </summary>
         public IReadOnlyList<IcuFormRow> RowsFor(IcuFormsModel model, string count)
         {
+            string branch;
+            return RowsFor(model, count, out branch);
+        }
+
+        /// <summary>
+        /// The rows a typed count lands on, and the branch of the outermost selector they were
+        /// matched on: the resolved category, or 'other' where the count fell back to it. Null
+        /// where nothing matched. A row's own category is its innermost branch, which in a
+        /// nested message is not the one the count selected.
+        /// </summary>
+        public IReadOnlyList<IcuFormRow> RowsFor(IcuFormsModel model, string count, out string branch)
+        {
+            branch = null;
             if (model == null || model.CountArgument == null || string.IsNullOrWhiteSpace(count)) return new List<IcuFormRow>();
 
             var message = model.Hoisted.Length > 0 ? model.Hoisted : model.Pattern;
             var resolution = _forms.ResolveCount(message, model.TargetLanguage, count.Trim());
             if (resolution == null) return new List<IcuFormRow>();
 
-            var matched = RowsOn(model, model.CountArgument + ":" + resolution.BranchKey);
+            branch = resolution.BranchKey;
+            var matched = RowsOn(model, model.CountArgument + ":" + branch);
 
             // In a message the task did not category expand, the branches are the source's, and
             // ICU sends a number whose category has no branch to 'other'.
             if (matched.Count == 0 && !resolution.IsExplicit && !model.ExpandedSelectors.Contains(model.CountArgument))
             {
-                matched = RowsOn(model, model.CountArgument + ":other");
+                branch = "other";
+                matched = RowsOn(model, model.CountArgument + ":" + branch);
             }
+            if (matched.Count == 0) branch = null;
             return matched;
         }
 

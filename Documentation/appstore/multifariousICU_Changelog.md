@@ -11,6 +11,8 @@
   tooltip names the forms covered. A form the language does not have shows no numbers.
 - The count box under the ICU Forms window marks the `other` row for such a number, as the
   application would. Before, it marked nothing.
+- For a message with one plural inside another, the count box named the inner form of the
+  first marked row. It now names the form the number selects.
 - The batch tasks are unchanged.
 
 ## 1.0.1.0 (September 2026)

@@ -313,16 +313,19 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
                 return;
             }
 
-            var matched = _reader.RowsFor(_model, _countText);
+            string branch;
+            var matched = _reader.RowsFor(_model, _countText, out branch);
             var paths = new HashSet<string>(matched.Select(row => row.Path));
             foreach (var row in Rows)
             {
                 row.IsMatched = paths.Contains(row.Path);
             }
 
-            CountResult = matched.Count == 0
+            // The branch the count selected on the outermost selector, not the first matched
+            // row's own category, which in a nested message is an inner branch.
+            CountResult = branch == null
                 ? UIStrings.Forms_ResolvesNothing
-                : string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_ResolvesTo, matched[0].Category);
+                : string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_ResolvesTo, branch);
         }
     }
 }

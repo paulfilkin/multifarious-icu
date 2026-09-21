@@ -279,8 +279,13 @@ public class IcuFormsReaderTests
 
         // 5 is Arabic 'few', which has no branch, so it lands on the 'other' rows of the
         // outermost selector; 1 has its own.
-        Assert.Equal(["files:other/devices:one", "files:other/devices:other"], reader.RowsFor(model, "5").Select(r => r.Path));
-        Assert.Equal(["files:one/devices:one", "files:one/devices:other"], reader.RowsFor(model, "1").Select(r => r.Path));
+        string branch;
+        Assert.Equal(["files:other/devices:one", "files:other/devices:other"], reader.RowsFor(model, "5", out branch).Select(r => r.Path));
+        Assert.Equal("other", branch);
+        Assert.Equal(["files:one/devices:one", "files:one/devices:other"], reader.RowsFor(model, "1", out branch).Select(r => r.Path));
+        Assert.Equal("one", branch);
+        Assert.Empty(reader.RowsFor(model, "abc", out branch));
+        Assert.Null(branch);
     }
 
     /// <summary>

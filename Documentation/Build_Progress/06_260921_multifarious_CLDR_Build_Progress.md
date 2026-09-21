@@ -96,13 +96,25 @@ compact sample first.
   operand tests, and a forms reader test that a Spanish `many` row shows the plain counts and
   that `1c6` and `1.2c6` typed in the count box land on it.
 
+## Decisions taken this session
+
+- **The count box drives the outermost plural only, and that stays** (Paul, 21 Sep 2026).
+  In a nested message a count of 1 on the Arabic sync message marks both rows under
+  `files: one`, while the Counts column of each row belongs to the inner `devices` selector.
+  Naming the argument on the label, or a box per argument, was offered and declined as
+  over-complication.
+
 ## Open items
 
-- **Studio check of the walked Counts column.**  Arabic target, `nested.json`, the
-  `sync.status` message (36 segments, over the budget): the `other` rows should read
-  `0, 2, 3, 4, 5, 6` with "Also used for: zero, two, few, many" in the tooltip, and 5 in the
-  count box should mark the `other` rows.  Then the version bump to 1.0.2.0, the Release
-  build and the store upload; the changelog entry is written.
+- **Version bump to 1.0.2.0, Release build and store upload**, on Paul's word: he is
+  exploring something else first.  The changelog entry is written.  The walked Counts column
+  is seen in Studio (Paul, 21 Sep 2026, screenshot): Arabic, `nested.json`, `sync.status`,
+  the `other` rows read `0, 2, 3, 4, 5, 6` and 5 marks them.  The same screenshot showed the
+  count box label saying "selects one" for that count: the view model took the first matched
+  row's own category, an inner branch in a nested message, walked or not.  Fixed: the reader's
+  `RowsFor` now returns the outermost branch the rows were matched on, and the label uses it
+  (1,437 tests).  The Debug package with that fix is deployed (22:09) but the label is not yet
+  seen in Studio.
 - **Explicit values are not subtracted from a category's counts**: with `=0` present, a
   Russian `many` row still lists 0.  The reader does not know the selector's offset, on which
   the comparison depends, so it is not the one-line filter it looks like.  Left as is.

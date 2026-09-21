@@ -78,6 +78,36 @@ public class IcuFormsViewTests
         Assert.IsType<Icon>(resources.GetObject(action.Icon));
     }
 
+    /// <summary>
+    /// The count result names the branch the count selected on the outermost selector. In a
+    /// nested message the first matched row's own category is an inner branch: the Arabic
+    /// sync message walked over budget, 5 marks the two "other / ..." rows and must say
+    /// "selects other", not the first row's "one" (Paul, 21 Sep 2026, Studio screenshot).
+    /// </summary>
+    [Fact]
+    public void The_count_result_names_the_outer_branch_in_a_nested_message()
+    {
+        const string sync =
+            "{files, plural, one {# file} other {# files}} synchronised across " +
+            "{devices, plural, one {# device} other {# devices}}.";
+        var unit = ParagraphUnits.Json(sync, "['sync.status']");
+        new IcuExpandProcessor("en-GB", "ar-SA", ExpansionOptions.Default, "1.0.0")
+        {
+            ItemFactory = ParagraphUnits.ItemFactory,
+        }.ProcessParagraphUnit(unit);
+        var segments = ParagraphUnits.SegmentsOf(unit.Source);
+        var viewModel = new IcuFormsViewModel();
+        viewModel.Show(unit, segments[0].Properties.Id.Id, "ar-SA", "Arabic (Saudi Arabia)");
+
+        viewModel.CountText = "5";
+        Assert.Equal(["other / one", "other / other"], viewModel.MatchedRows.Select(r => r.Form));
+        Assert.Equal("selects other", viewModel.CountResult);
+
+        viewModel.CountText = "1";
+        Assert.Equal(["one / one", "one / other"], viewModel.MatchedRows.Select(r => r.Form));
+        Assert.Equal("selects one", viewModel.CountResult);
+    }
+
     [Fact]
     public void The_view_model_shows_the_message_marks_the_active_row_and_resolves_a_count()
     {
