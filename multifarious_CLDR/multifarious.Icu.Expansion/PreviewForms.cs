@@ -67,11 +67,27 @@ public sealed class PreviewForms
         if (selector.Type == SelectorType.Select)
         {
             // A select's branches are the developer's; each row simply picks one.
+            // The count-or-all pattern is the exception: a plural on the same
+            // argument nested in the message cannot select on the literal branch
+            // key, so the 'other' row substitutes a number that matches no named
+            // key - the select still falls through to 'other' and the plural can
+            // voice it. A named branch keeps its key: its content is only reachable
+            // when the value is that key, so a same-argument plural under one is
+            // unreachable at run time too.
+            var sharesArgumentWithPlural =
+                ContainsPluralOn(source.Nodes, selector.ArgumentName)
+                || (target is not null && ContainsPluralOn(target.Nodes, selector.ArgumentName));
+
             foreach (var branch in selector.Branches)
             {
-                rows.Add(new PreviewForm(branch.Key.Text, false, branch.Key.Text, [], false,
-                    Render(source, sourceLanguageTag, branch.Key.Text, selector),
-                    target is null ? "" : Render(target, targetLanguageTag, branch.Key.Text, selector)));
+                var count = sharesArgumentWithPlural
+                    && string.Equals(branch.Key.Text, "other", StringComparison.Ordinal)
+                    ? FirstCountAvoiding(selector)
+                    : branch.Key.Text;
+
+                rows.Add(new PreviewForm(branch.Key.Text, false, count, [], false,
+                    Render(source, sourceLanguageTag, count, selector),
+                    target is null ? "" : Render(target, targetLanguageTag, count, selector)));
             }
 
             return rows;
@@ -228,6 +244,47 @@ public sealed class PreviewForms
 
     private static SelectorNode? OutermostSelector(IReadOnlyList<MessageNode> nodes) =>
         nodes.OfType<SelectorNode>().FirstOrDefault();
+
+    /// <summary>Whether a plural-kind selector on this argument sits anywhere in the tree.</summary>
+    private static bool ContainsPluralOn(IReadOnlyList<MessageNode> nodes, string argumentName)
+    {
+        foreach (var node in nodes)
+        {
+            if (node is not SelectorNode selector)
+            {
+                continue;
+            }
+
+            if (selector.Type != SelectorType.Select
+                && string.Equals(selector.ArgumentName, argumentName, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            if (selector.Branches.Any(branch => ContainsPluralOn(branch.Nodes, argumentName)))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// The smallest count from 2 upwards that matches no named branch key, so the
+    /// select still falls through to 'other' when the count is substituted.
+    /// </summary>
+    private static string FirstCountAvoiding(SelectorNode select)
+    {
+        for (var candidate = 2; ; candidate++)
+        {
+            var text = candidate.ToString(CultureInfo.InvariantCulture);
+            if (!select.Branches.Any(branch => branch.Key.Text == text))
+            {
+                return text;
+            }
+        }
+    }
 
     private static IcuMessage? ParseOrNull(string message) =>
         message.Length > 0 && IcuParser.TryParse(message, out var parsed, out _) ? parsed : null;

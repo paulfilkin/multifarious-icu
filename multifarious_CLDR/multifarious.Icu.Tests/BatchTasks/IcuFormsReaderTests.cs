@@ -344,6 +344,37 @@ public class IcuFormsReaderTests
     }
 
     /// <summary>
+    /// The count-or-all pattern, a select and a plural sharing one argument, crashed the
+    /// cloud app's all-forms preview (22 Sep 2026): its select row substituted the literal
+    /// branch key as the argument's value and the nested plural could not select on it. The
+    /// window renders from the layout, where the select's syntax is locked text between the
+    /// segments and never a value, so the rows come out and nothing throws. The count box is
+    /// not offered because the outermost selector is a select.
+    /// </summary>
+    [Fact]
+    public void A_count_or_all_message_reads_as_rows_without_a_count_box()
+    {
+        const string countOrAll =
+            "{n, select, all {All datasets} other {{n, plural, one {# dataset} other {# datasets}}}}";
+        var reader = new IcuFormsReader();
+        var model = reader.Read(Expanded(countOrAll, "ru-RU"), "ru-RU")!;
+
+        Assert.Equal(["n:all", "n:other/n:one", "n:other/n:few", "n:other/n:many", "n:other/n:other"], model.Rows.Select(r => r.Path));
+        Assert.Equal(["n:other/n"], model.ExpandedSelectors);
+        Assert.Null(model.CountArgument);
+
+        var all = model.Rows[0];
+        Assert.Equal("select", all.Selector);
+        Assert.Empty(all.Counts);
+        Assert.Equal("All datasets", all.SourceRendered);
+
+        var one = model.Rows[1];
+        Assert.Equal("1", one.SampleCount);
+        Assert.Equal("1 dataset", one.SourceRendered);
+        Assert.Empty(reader.RowsFor(model, "2"));
+    }
+
+    /// <summary>
     /// Spanish 'many' is reached through CLDR's compact samples (1c6 is 1000000). The
     /// Counts column and the tooltip show the plain values, the compact decimal samples
     /// that would select 'other' once converted are dropped, and a typed compact count

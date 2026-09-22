@@ -105,6 +105,58 @@ public class PreviewFormsTests
     }
 
     /// <summary>
+    /// The count-or-all pattern: a select and a plural sharing one argument. The
+    /// select's 'other' row must substitute a numeric count, or the nested plural
+    /// is asked to select on the literal 'other' and the renderer throws.
+    /// </summary>
+    [Fact]
+    public void ACountOrAllMessageRendersItsOtherRowAtANumericCount()
+    {
+        var forms = new PreviewForms();
+        const string message =
+            "{n, select, all {All datasets} other {{n, plural, one {# dataset} other {# datasets}}}}";
+
+        var rows = forms.Rows(message, message, "en-GB", "ru-RU");
+
+        Assert.Equal(["all", "other"], rows.Select(row => row.BranchKey));
+        Assert.Equal("all", rows[0].SampleCount);
+        Assert.Equal("All datasets", rows[0].SourceRendered);
+        Assert.Equal("2", rows[1].SampleCount);
+        Assert.Equal("2 datasets", rows[1].SourceRendered);
+    }
+
+    /// <summary>The substituted count must still fall through to 'other'.</summary>
+    [Fact]
+    public void TheSubstitutedCountDodgesNumericBranchKeys()
+    {
+        var forms = new PreviewForms();
+        const string message =
+            "{n, select, 2 {A pair} other {{n, plural, other {# items}}}}";
+
+        var rows = forms.Rows(message, "", "en-GB", "ru-RU");
+
+        var other = rows.Single(row => row.BranchKey == "other");
+        Assert.Equal("3", other.SampleCount);
+        Assert.Equal("3 items", other.SourceRendered);
+    }
+
+    /// <summary>
+    /// Without a same-argument plural there is no substitution: a gender select's
+    /// 'other' row keeps its branch key as the count.
+    /// </summary>
+    [Fact]
+    public void APlainSelectRowKeepsItsBranchKeyAsTheCount()
+    {
+        var forms = new PreviewForms();
+        const string message = "{gender, select, female {her} male {his} other {their}}";
+
+        var rows = forms.Rows(message, "", "en-GB", "ru-RU");
+
+        Assert.Equal("other", rows[2].SampleCount);
+        Assert.Equal("their", rows[2].SourceRendered);
+    }
+
+    /// <summary>
     /// A compact count such as 1c6 resolves through its written form: the exponent
     /// is a plural operand, and Spanish 'many' is reached through it.
     /// </summary>
