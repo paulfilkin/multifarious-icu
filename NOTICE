@@ -1,0 +1,8 @@
+multifariousICU Support for Trados Studio
+Copyright 2026 Paul Filkin, multifarious
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+This product includes plural rule data from the Unicode Common Locale Data Repository
+(CLDR), release 48, Copyright 1991-2026 Unicode, Inc., used under the Unicode License v3.
+The licence text is in multifarious_CLDR/Icu.Cldr/Data/LICENSE-UNICODE.txt.

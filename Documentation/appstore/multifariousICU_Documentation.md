@@ -100,7 +100,7 @@ A8: CLDR gives these languages, and Catalan, a `many` form for a round million a
 ---
 
 ## License
-Copyright 2026 multifarious. All rights reserved.
+Copyright 2026 multifarious. Released under the Apache License, Version 2.0. The source code is at <https://github.com/paulfilkin/multifarious-icu>.
 
 ---
 
