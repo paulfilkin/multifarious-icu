@@ -131,4 +131,4 @@ Third-party material:
 
 ## Author
 
-Paul Filkin, multifarious.  <https://multifarious.filkin.com>
+multifarious.  <https://multifarious.filkin.com>
