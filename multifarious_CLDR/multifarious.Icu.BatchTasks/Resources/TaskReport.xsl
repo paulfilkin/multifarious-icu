@@ -76,7 +76,7 @@
             <xsl:call-template name="ExpandBody" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:call-template name="FinaliseBody" />
+            <xsl:call-template name="RestoreBody" />
           </xsl:otherwise>
         </xsl:choose>
       </body>
@@ -161,9 +161,9 @@
     <td class="{$class}"><xsl:value-of select="@warnings" /></td>
   </xsl:template>
 
-  <!-- ==================== finalise ==================== -->
+  <!-- ==================== restore ==================== -->
 
-  <xsl:template name="FinaliseBody">
+  <xsl:template name="RestoreBody">
     <h2><xsl:value-of select="key('label', 'totals')" /></h2>
     <table class="ReportTable" border="0" cellspacing="0" cellpadding="2" width="100%">
       <thead>
@@ -180,13 +180,13 @@
         <xsl:for-each select="file">
           <tr>
             <td class="File" align="left"><xsl:value-of select="@name" /></td>
-            <xsl:call-template name="FinaliseCounts" />
+            <xsl:call-template name="RestoreCounts" />
           </tr>
         </xsl:for-each>
         <tr>
           <td class="File" align="left"><xsl:value-of select="key('label', 'total')" /></td>
           <xsl:for-each select="totals">
-            <xsl:call-template name="FinaliseCounts">
+            <xsl:call-template name="RestoreCounts">
               <xsl:with-param name="class" select="'Total'" />
             </xsl:call-template>
           </xsl:for-each>
@@ -222,7 +222,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template name="FinaliseCounts">
+  <xsl:template name="RestoreCounts">
     <xsl:param name="class" select="'Unit'" />
     <td class="{$class}"><xsl:value-of select="@units" /></td>
     <td class="{$class}"><xsl:value-of select="@segments" /></td>

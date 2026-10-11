@@ -18,9 +18,11 @@ A translator normally receives that whole expression as one segment.  They have 
 
 ## What the plugin does
 
-**ICU Expand Plural Forms**, a batch task, restructures every `plural` and `selectordinal` message in a JSON or Java properties target file into one segment per CLDR form the target language needs.  For the message above a Russian file gets four segments, `one`, `few`, `many` and `other`, each a complete sentence.  The selector syntax between the forms is locked text.  Arguments such as `{name}` and the count marker `#` are placeholder tags inside the sentence, placed like any tag in Studio.  A `select` keeps its branches and a plural inside one is expanded.  A message with arguments and no plural becomes one segment with the arguments protected.
+**Expand ICU**, a batch task, restructures every `plural` and `selectordinal` message in a JSON or Java properties target file into one segment per CLDR form the target language needs.  For the message above a Russian file gets four segments, `one`, `few`, `many` and `other`, each a complete sentence.  The selector syntax between the forms is locked text.  Arguments such as `{name}` and the count marker `#` are placeholder tags inside the sentence, placed like any tag in Studio.  A `select` keeps its branches and a plural inside one is expanded.  A message with arguments and no plural becomes one segment with the arguments protected.
 
-**ICU Finalise Messages**, a batch task for the end of the workflow, removes the forms the language does not use, escapes apostrophes and braces typed as text, checks the placeholders against the source, fills an untranslated form from the source with a warning, and turns the placeholder tags back into locked text so Studio's file writers produce valid ICU.  A second run on a clean file changes nothing.
+**Restore ICU**, a batch task, puts each message back together as one plain segment on each side: it removes the forms the language does not use, escapes apostrophes and braces typed as text, checks the placeholders against the source, fills an untranslated form from the source with a warning, and assembles the forms into one ICU message, the shape Studio's file writers emit as it stands.  Run it before Generate Target Translations, or whenever you want the whole messages back.  Expand ICU on a restored file lays the forms out again with their translations and their confirmation states, so the two shapes can be switched between at will.
+
+A project pre-translated from a memory of whole messages can keep them: Expand ICU has a setting to leave a message alone when every segment of it is matched at a chosen percentage or better, locked if you wish.  It is off by default, so a translator sees every match form by form unless the project says otherwise.
 
 **ICU Forms**, a window under the editor, shows every form of the message the active segment belongs to: the numbers that select each form, source and target as sentences, a count box, and the whole message reassembled and checked as you type.
 
@@ -33,13 +35,13 @@ The plural rules and the numbers that select each form come from the CLDR data e
 ## Workflow
 
 1. Create the project with your JSON or Java properties files as usual.
-2. Run **ICU Expand Plural Forms** on the target files, after Copy to Target Languages and before Analyse and Pre-translate, so word counts and matches see whole sentences.
+2. Run **Expand ICU** on the target files, after Copy to Target Languages and before Analyse and Pre-translate, so word counts and matches see whole sentences.
 3. Translate.  Open **ICU Forms** from the Add-ins tab to see every form of the current message.
 4. Press F8.  The verifier lists what is still wrong.
-5. Run **ICU Finalise Messages** after Update Main Translation Memories and before Generate Target Translations.
+5. Run **Restore ICU** before Generate Target Translations.
 6. Generate the target files.
 
-Finalise must run before Generate Target Translations: Studio's JSON writer does not write placeholder tags, and Finalise is what turns them into locked text.
+Restore must run before Generate Target Translations: Studio's JSON writer does not write placeholder tags, and Restore is what turns the forms back into one plain message.  Update Main Translation Memories stores whatever shape the file is in when it runs: one unit per form while expanded, one unit per whole message once restored.  Which to store, or both, is the translator's choice.
 
 The full user guide is at <https://multifarious.filkin.com/product/icu-support/>.
 
@@ -108,9 +110,10 @@ The design is recorded as it was made, in the handovers under `Documentation\Bui
 
 - **Target side only.**  Both tasks run after Copy to Target Languages, so each language gets its own category set and no union of forms across languages is needed.
 - **Locked syntax between segments, tags inside them.**  A locked span cannot be placed by the translator at all.  A tag works with QuickPlace, tag verification and translation memory placeables.  The selector and branch syntax is therefore locked text between the segments, and the arguments inside a segment are placeholder tags.
-- **Finalise reads the layout from the content.**  Locked syntax has three shapes (selector open, branch open, close brace), the expanded selectors are recorded in the paragraph unit's context, and escaping is unescape-then-escape, so a second run is idempotent.
+- **Restore reads the layout from the content.**  Locked syntax has three shapes (selector open, branch open, close brace), the expanded selectors are recorded in the paragraph unit's context, and escaping is unescape-then-escape, so a restored message is the same whether or not the translator typed ICU escapes.
+- **Restore collapses to plain text in the hoisted shape, on both sides.**  The target can only come back in the shape the translator worked in, with the shared text inside every form, so the source is put back the same way and the two line up form for form.  The pattern as the file carried it stays in the unit context.  Before the collapse, each form's confirmation level, lock and translation origin are recorded by branch path, and Expand hands them back.
 - **Over-budget messages are laid out walked, not passed through.**  Two independent plurals multiply: six forms times six is 36 segments for Arabic.  Above the branch budget the message keeps the source's own branches with the syntax protected, and the report says so.
-- **No comments except warnings, and those on the paragraph unit.**  Studio copies a comment inside a source segment into the target.  Expand warnings go on the unit, which Studio never copies.  Finalise findings go on the target segment concerned, as a reviewer would record them, and are removed at the start of the next run.
+- **No comments except warnings, and those on the paragraph unit.**  Studio copies a comment inside a source segment into the target.  Expand warnings go on the unit, which Studio never copies.  Restore findings go on the target segment concerned, as a reviewer would record them, and are removed at the start of the next run.
 - **Bilingual API, not BCM converters.**  Studio ships converters from SDLXLIFF to its Bilingual Content Model and back, which would have let the cloud app's code run unchanged.  They are undocumented and the fidelity of the regenerated SDLXLIFF is unproven, so the tasks operate on SDLXLIFF through the File Type Support Framework.
 
 ## Maturity and feedback

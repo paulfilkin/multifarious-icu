@@ -37,11 +37,11 @@ public class SettingsTests
     }
 
     [Fact]
-    public void A_fresh_finalise_group_yields_the_design_defaults()
+    public void A_fresh_restore_group_yields_the_design_defaults()
     {
-        var settings = Bundle().GetSettingsGroup<IcuFinaliseSettings>();
+        var settings = Bundle().GetSettingsGroup<IcuRestoreSettings>();
 
-        Assert.Equal(FinaliseOptions.Default, settings.ToOptions());
+        Assert.Equal(RestoreOptions.Default, settings.ToOptions());
     }
 
     [Fact]
@@ -55,6 +55,9 @@ public class SettingsTests
         settings.LockPlaceholders = true;
         settings.MaxUnitsPerMessage = 48;
         settings.OnParseError = ParseErrorBehaviour.FailTask;
+        settings.KeepTranslated = true;
+        settings.KeepMinimumMatch = 95;
+        settings.LockKept = false;
 
         var restored = RoundTrip(bundle).GetSettingsGroup<IcuExpandSettings>();
 
@@ -65,6 +68,9 @@ public class SettingsTests
                 ExpandOrdinal = false,
                 SourceSeedStrategy = SourceSeedStrategy.AlwaysOther,
                 LockPlaceholders = true,
+                KeepTranslated = true,
+                KeepMinimumMatch = 95,
+                LockKept = false,
                 MaxUnitsPerMessage = 48,
                 OnParseError = ParseErrorBehaviour.FailTask,
             },
@@ -109,14 +115,14 @@ public class SettingsTests
     }
 
     [Fact]
-    public void Finalise_values_survive_the_bundles_xml_round_trip()
+    public void Restore_values_survive_the_bundles_xml_round_trip()
     {
         var bundle = Bundle();
-        var settings = bundle.GetSettingsGroup<IcuFinaliseSettings>();
+        var settings = bundle.GetSettingsGroup<IcuRestoreSettings>();
         settings.OnEmptyBranch = EmptyBranchBehaviour.FailTask;
         settings.OnPlaceholderMismatch = PlaceholderMismatchBehaviour.FailTask;
 
-        var restored = RoundTrip(bundle).GetSettingsGroup<IcuFinaliseSettings>();
+        var restored = RoundTrip(bundle).GetSettingsGroup<IcuRestoreSettings>();
 
         Assert.Equal(EmptyBranchBehaviour.FailTask, restored.OnEmptyBranch);
         Assert.Equal(PlaceholderMismatchBehaviour.FailTask, restored.OnPlaceholderMismatch);
@@ -166,6 +172,9 @@ public class SettingsTests
         viewModel.LockPlaceholders = true;
         viewModel.BudgetText = "36";
         viewModel.ParseErrorFailsTask = true;
+        viewModel.KeepTranslated = true;
+        viewModel.KeepMinimumText = "99";
+        viewModel.LockKept = false;
         viewModel.Apply();
 
         Assert.False(settings.ExpandOrdinal);
@@ -173,6 +182,9 @@ public class SettingsTests
         Assert.True(settings.LockPlaceholders);
         Assert.Equal(36, settings.MaxUnitsPerMessage);
         Assert.Equal(ParseErrorBehaviour.FailTask, settings.OnParseError);
+        Assert.True(settings.KeepTranslated);
+        Assert.Equal(99, settings.KeepMinimumMatch);
+        Assert.False(settings.LockKept);
         Assert.False(viewModel.SeedIsMatchingElseOther);
 
         viewModel.ResetToDefaults();
@@ -181,6 +193,28 @@ public class SettingsTests
         Assert.True(viewModel.SeedIsMatchingElseOther);
         Assert.Equal("24", viewModel.BudgetText);
         Assert.Equal(24, settings.MaxUnitsPerMessage);
+        Assert.False(viewModel.KeepTranslated);
+        Assert.Equal("100", viewModel.KeepMinimumText);
+        Assert.True(viewModel.LockKept);
+    }
+
+    /// <summary>The match box only matters while keeping is on: off, whatever it holds, the page saves.</summary>
+    [Theory]
+    [InlineData("100", true, true)]
+    [InlineData(" 0 ", true, true)]
+    [InlineData("101", true, false)]
+    [InlineData("-1", true, false)]
+    [InlineData("most", true, false)]
+    [InlineData("most", false, true)]
+    public void The_minimum_match_is_validated_while_keeping_is_on(string typed, bool keep, bool valid)
+    {
+        var settings = Bundle().GetSettingsGroup<IcuExpandSettings>();
+        var viewModel = new IcuExpandSettingsViewModel(settings) { KeepTranslated = keep, KeepMinimumText = typed };
+
+        Assert.Equal(valid, viewModel.IsValid);
+
+        viewModel.Apply();
+        Assert.Equal(valid && keep ? int.Parse(typed.Trim()) : 100, settings.KeepMinimumMatch);
     }
 
     [Theory]
@@ -203,10 +237,10 @@ public class SettingsTests
     }
 
     [Fact]
-    public void The_finalise_view_model_loads_applies_and_resets()
+    public void The_restore_view_model_loads_applies_and_resets()
     {
-        var settings = Bundle().GetSettingsGroup<IcuFinaliseSettings>();
-        var viewModel = new IcuFinaliseSettingsViewModel(settings);
+        var settings = Bundle().GetSettingsGroup<IcuRestoreSettings>();
+        var viewModel = new IcuRestoreSettingsViewModel(settings);
         Assert.True(viewModel.EmptyBranchUsesSource);
         Assert.True(viewModel.MismatchWarns);
 

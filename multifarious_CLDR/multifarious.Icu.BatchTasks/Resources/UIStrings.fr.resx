@@ -118,56 +118,83 @@
   <data name="Expand_ParseHelp2" xml:space="preserve">
     <value>La laisser intacte permet au reste du fichier d'avancer et marque le paragraphe d'un avertissement qui nomme la position du problème. Arrêter la tâche convient à une chaîne de production où un message défectueux ne doit jamais atteindre un traducteur sans être remarqué.</value>
   </data>
-  <data name="Finalise_Intro" xml:space="preserve">
-    <value>La finalisation réduit chaque message aux formes dont la langue cible a besoin, échappe les caractères spéciaux ICU saisis comme texte et vérifie les espaces réservés. Les avertissements vont dans le commentaire du segment source et dans le rapport de la tâche ; les commentaires cible ne sont jamais écrits.</value>
+  <data name="Expand_KeepHeader" xml:space="preserve">
+    <value>Messages déjà traduits</value>
   </data>
-  <data name="Finalise_EmptyHeader" xml:space="preserve">
+  <data name="Expand_KeepTranslated" xml:space="preserve">
+    <value>Conserver les messages déjà traduits</value>
+  </data>
+  <data name="Expand_KeepMinimumLabel" xml:space="preserve">
+    <value>Correspondance minimale :</value>
+  </data>
+  <data name="Expand_KeepMinimumInvalid" xml:space="preserve">
+    <value>Saisissez un nombre entier de 0 à 100.</value>
+  </data>
+  <data name="Expand_LockKept" xml:space="preserve">
+    <value>Verrouiller les segments conservés</value>
+  </data>
+  <data name="Expand_KeepHint" xml:space="preserve">
+    <value>Un message dont tous les segments correspondent déjà à ce pourcentage ou mieux est laissé tel quel et n'est pas développé. Perfect Match et correspondance de contexte comptent pour 100 %. Désactivé, chaque message est développé, de sorte qu'une correspondance à 100 % peut encore être vérifiée forme par forme.</value>
+  </data>
+  <data name="Expand_KeepHelpHeader" xml:space="preserve">
+    <value>Quand un message est-il déjà traduit ?</value>
+  </data>
+  <data name="Expand_KeepHelp1" xml:space="preserve">
+    <value>Un projet prétraduit avant cette tâche, à partir d'une mémoire contenant des messages entiers réassemblés par Restore ICU, arrive avec ces messages en correspondance. Les développer jetterait la correspondance et redemanderait chaque forme.</value>
+  </data>
+  <data name="Expand_KeepHelp2" xml:space="preserve">
+    <value>Les conserver laisse chaque message entier en un seul segment, que Restore ICU ignore et que Générer les traductions cible écrit tel quel. Le verrouillage le signale afin que le traducteur ne modifie pas un message que les tâches n'ont jamais restructuré. Laissez cette option désactivée quand un traducteur doit voir et confirmer chaque correspondance.</value>
+  </data>
+  <data name="Restore_Intro" xml:space="preserve">
+    <value>La restauration réassemble chaque message développé en un seul segment de chaque côté. Les formes que la langue cible n'utilise pas sont supprimées, les apostrophes et accolades saisies comme texte sont échappées, les espaces réservés sont vérifiés et une forme non traduite est remplie depuis la source avec un avertissement. Exécutez-la avant Générer les traductions cible, ou chaque fois que les messages entiers sont voulus ; Expand ICU les redéploie.</value>
+  </data>
+  <data name="Restore_EmptyHeader" xml:space="preserve">
     <value>Lorsqu'une forme n'a pas de traduction</value>
   </data>
-  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+  <data name="Restore_EmptyUseSource" xml:space="preserve">
     <value>Utiliser le texte source et ajouter un avertissement</value>
   </data>
-  <data name="Finalise_EmptyFail" xml:space="preserve">
+  <data name="Restore_EmptyFail" xml:space="preserve">
     <value>Arrêter la tâche</value>
   </data>
-  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+  <data name="Restore_EmptyHelpHeader" xml:space="preserve">
     <value>Qu'advient-il d'une forme que personne n'a traduite ?</value>
   </data>
-  <data name="Finalise_EmptyHelp1" xml:space="preserve">
-    <value>Chaque forme dont la langue cible a besoin doit figurer dans le fichier généré, sans quoi l'application n'affiche rien du tout pour les nombres qui la sélectionnent. Utiliser le texte source garde le fichier valide et marque le commentaire du segment source ainsi que le rapport, pour que la lacune puisse être retrouvée plus tard.</value>
+  <data name="Restore_EmptyHelp1" xml:space="preserve">
+    <value>Chaque forme dont la langue cible a besoin doit figurer dans le message restauré, sinon l'application n'affiche rien du tout pour les nombres qui la sélectionnent. Utiliser le texte source garde le message valide et consigne le manque dans un commentaire sur le segment et dans le rapport, pour le retrouver plus tard.</value>
   </data>
-  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+  <data name="Restore_EmptyHelp2" xml:space="preserve">
     <value>Arrêter la tâche convient à une livraison finale, où une forme non traduite ne doit pas passer dans la langue source.</value>
   </data>
-  <data name="Finalise_MismatchHeader" xml:space="preserve">
+  <data name="Restore_MismatchHeader" xml:space="preserve">
     <value>Lorsque les espaces réservés protégés diffèrent entre la source et la cible</value>
   </data>
-  <data name="Finalise_MismatchWarn" xml:space="preserve">
+  <data name="Restore_MismatchWarn" xml:space="preserve">
     <value>Ajouter un avertissement et continuer</value>
   </data>
-  <data name="Finalise_MismatchFail" xml:space="preserve">
+  <data name="Restore_MismatchFail" xml:space="preserve">
     <value>Arrêter la tâche</value>
   </data>
-  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+  <data name="Restore_MismatchHelpHeader" xml:space="preserve">
     <value>Qu'est-ce qu'une discordance d'espaces réservés ?</value>
   </data>
-  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+  <data name="Restore_MismatchHelp1" xml:space="preserve">
     <value>Les portions protégées d'un segment sont les arguments du message, tels que {name}, et le marqueur de nombre #. Une traduction qui en a perdu un, ou en a gagné un que la source n'a pas, échoue ou affiche un texte erroné à l'exécution de l'application.</value>
   </data>
-  <data name="Finalise_MismatchHelp2" xml:space="preserve">
-    <value>Un avertissement va dans le commentaire du segment source et dans le rapport, et le fichier est tout de même généré. Arrêter la tâche refuse la génération tant que la traduction n'est pas corrigée.</value>
+  <data name="Restore_MismatchHelp2" xml:space="preserve">
+    <value>Un avertissement est ajouté au segment en commentaire et au rapport, et le message reste développé avec ses espaces réservés sous forme de balises, afin de placer celui qui manque ; relancez Restore ICU une fois corrigé. Arrêter la tâche refuse de continuer tant que la traduction n'est pas corrigée.</value>
   </data>
   <data name="Report_ExpandName" xml:space="preserve">
-    <value>ICU Expand Plural Forms</value>
+    <value>Expand ICU</value>
   </data>
   <data name="Report_ExpandDescription" xml:space="preserve">
     <value>{0} message(s) ICU développé(s) dans {1} fichier(s) ; {2} avec un avertissement.</value>
   </data>
-  <data name="Report_FinaliseName" xml:space="preserve">
-    <value>ICU Finalise Messages</value>
+  <data name="Report_RestoreName" xml:space="preserve">
+    <value>Restore ICU</value>
   </data>
-  <data name="Report_FinaliseDescription" xml:space="preserve">
-    <value>{0} message(s) ICU finalisé(s) dans {1} fichier(s) ; {2} forme(s) supprimée(s), {3} segment(s) rempli(s) depuis la source, {4} avertissement(s).</value>
+  <data name="Report_RestoreDescription" xml:space="preserve">
+    <value>{0} message(s) ICU restauré(s) dans {1} fichier(s) ; {2} forme(s) supprimée(s), {3} segment(s) rempli(s) depuis la source, {4} avertissement(s).</value>
   </data>
   <data name="Report_Summary" xml:space="preserve">
     <value>Résumé</value>
@@ -235,6 +262,9 @@
   <data name="Report_Skipped" xml:space="preserve">
     <value>Déjà développé</value>
   </data>
+  <data name="Report_Kept" xml:space="preserve">
+    <value>Conservé</value>
+  </data>
   <data name="Report_Pruned" xml:space="preserve">
     <value>Formes supprimées</value>
   </data>
@@ -249,6 +279,12 @@
   </data>
   <data name="Report_Off" xml:space="preserve">
     <value>Désactivé</value>
+  </data>
+  <data name="Report_KeepAt" xml:space="preserve">
+    <value>À {0} % ou mieux</value>
+  </data>
+  <data name="Report_KeepLocked" xml:space="preserve">
+    <value>verrouillé</value>
   </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms affiche chaque forme plurielle, ordinale et select d'un message ICU MessageFormat avec des nombres d'exemple, ainsi que le message entier réassemblé, pour qu'une traduction puisse être vérifiée pendant la saisie.</value>
@@ -335,7 +371,7 @@
     <value>ICU Verifier</value>
   </data>
   <data name="Verifier_EmptyForm" xml:space="preserve">
-    <value>La forme « {0} » n'a pas de traduction ; la finalisation utilisera le texte source.</value>
+    <value>La forme « {0} » n'a pas de traduction ; Restore ICU utilisera le texte source.</value>
   </data>
   <data name="Verifier_Placeholders" xml:space="preserve">
     <value>Les espaces réservés protégés diffèrent de la source : {0}.</value>

@@ -130,44 +130,71 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Help paragraph.</summary>
         public static string Expand_ParseHelp2 { get { return Manager.GetString("Expand_ParseHelp2", Culture); } }
 
+        /// <summary>Group heading. Messages whose target arrived already translated, from pre-translation before this task.</summary>
+        public static string Expand_KeepHeader { get { return Manager.GetString("Expand_KeepHeader", Culture); } }
+
+        /// <summary>Tick box. Off by default.</summary>
+        public static string Expand_KeepTranslated { get { return Manager.GetString("Expand_KeepTranslated", Culture); } }
+
+        /// <summary>Label before a number box holding a percentage. The default is 100.</summary>
+        public static string Expand_KeepMinimumLabel { get { return Manager.GetString("Expand_KeepMinimumLabel", Culture); } }
+
+        /// <summary>Validation message shown when the number box holds something else.</summary>
+        public static string Expand_KeepMinimumInvalid { get { return Manager.GetString("Expand_KeepMinimumInvalid", Culture); } }
+
+        /// <summary>Tick box, enabled only when the first is on. On by default.</summary>
+        public static string Expand_LockKept { get { return Manager.GetString("Expand_LockKept", Culture); } }
+
+        /// <summary>Hint under the controls. "Perfect Match" and "Context Match" are Studio's feature names.</summary>
+        public static string Expand_KeepHint { get { return Manager.GetString("Expand_KeepHint", Culture); } }
+
+        /// <summary>Header of a collapsible help panel.</summary>
+        public static string Expand_KeepHelpHeader { get { return Manager.GetString("Expand_KeepHelpHeader", Culture); } }
+
+        /// <summary>Help paragraph. "Restore ICU" is the other task's name and is not translated.</summary>
+        public static string Expand_KeepHelp1 { get { return Manager.GetString("Expand_KeepHelp1", Culture); } }
+
+        /// <summary>Help paragraph. "Restore ICU" is a task name; "Generate Target Translations" is Studio's task name.</summary>
+        public static string Expand_KeepHelp2 { get { return Manager.GetString("Expand_KeepHelp2", Culture); } }
+
         /// <summary>Paragraph at the top of the page.</summary>
-        public static string Finalise_Intro { get { return Manager.GetString("Finalise_Intro", Culture); } }
+        public static string Restore_Intro { get { return Manager.GetString("Restore_Intro", Culture); } }
 
         /// <summary>Group heading. A required segment whose target is empty.</summary>
-        public static string Finalise_EmptyHeader { get { return Manager.GetString("Finalise_EmptyHeader", Culture); } }
+        public static string Restore_EmptyHeader { get { return Manager.GetString("Restore_EmptyHeader", Culture); } }
 
         /// <summary>Radio button, the default.</summary>
-        public static string Finalise_EmptyUseSource { get { return Manager.GetString("Finalise_EmptyUseSource", Culture); } }
+        public static string Restore_EmptyUseSource { get { return Manager.GetString("Restore_EmptyUseSource", Culture); } }
 
         /// <summary>Radio button. The whole batch task fails on the first empty form.</summary>
-        public static string Finalise_EmptyFail { get { return Manager.GetString("Finalise_EmptyFail", Culture); } }
+        public static string Restore_EmptyFail { get { return Manager.GetString("Restore_EmptyFail", Culture); } }
 
         /// <summary>Header of a collapsible help panel.</summary>
-        public static string Finalise_EmptyHelpHeader { get { return Manager.GetString("Finalise_EmptyHelpHeader", Culture); } }
+        public static string Restore_EmptyHelpHeader { get { return Manager.GetString("Restore_EmptyHelpHeader", Culture); } }
 
         /// <summary>Help paragraph.</summary>
-        public static string Finalise_EmptyHelp1 { get { return Manager.GetString("Finalise_EmptyHelp1", Culture); } }
+        public static string Restore_EmptyHelp1 { get { return Manager.GetString("Restore_EmptyHelp1", Culture); } }
 
         /// <summary>Help paragraph.</summary>
-        public static string Finalise_EmptyHelp2 { get { return Manager.GetString("Finalise_EmptyHelp2", Culture); } }
+        public static string Restore_EmptyHelp2 { get { return Manager.GetString("Restore_EmptyHelp2", Culture); } }
 
         /// <summary>Group heading. A placeholder such as {name} missing from the translation or added to it.</summary>
-        public static string Finalise_MismatchHeader { get { return Manager.GetString("Finalise_MismatchHeader", Culture); } }
+        public static string Restore_MismatchHeader { get { return Manager.GetString("Restore_MismatchHeader", Culture); } }
 
         /// <summary>Radio button, the default.</summary>
-        public static string Finalise_MismatchWarn { get { return Manager.GetString("Finalise_MismatchWarn", Culture); } }
+        public static string Restore_MismatchWarn { get { return Manager.GetString("Restore_MismatchWarn", Culture); } }
 
         /// <summary>Radio button. The whole batch task fails on the first mismatch.</summary>
-        public static string Finalise_MismatchFail { get { return Manager.GetString("Finalise_MismatchFail", Culture); } }
+        public static string Restore_MismatchFail { get { return Manager.GetString("Restore_MismatchFail", Culture); } }
 
         /// <summary>Header of a collapsible help panel.</summary>
-        public static string Finalise_MismatchHelpHeader { get { return Manager.GetString("Finalise_MismatchHelpHeader", Culture); } }
+        public static string Restore_MismatchHelpHeader { get { return Manager.GetString("Restore_MismatchHelpHeader", Culture); } }
 
         /// <summary>Help paragraph. "{name}" and "#" are ICU syntax and must not be translated.</summary>
-        public static string Finalise_MismatchHelp1 { get { return Manager.GetString("Finalise_MismatchHelp1", Culture); } }
+        public static string Restore_MismatchHelp1 { get { return Manager.GetString("Restore_MismatchHelp1", Culture); } }
 
         /// <summary>Help paragraph.</summary>
-        public static string Finalise_MismatchHelp2 { get { return Manager.GetString("Finalise_MismatchHelp2", Culture); } }
+        public static string Restore_MismatchHelp2 { get { return Manager.GetString("Restore_MismatchHelp2", Culture); } }
 
         /// <summary>Report name and title, one per language pair. Same wording as the task name in Studio's batch task list.</summary>
         public static string Report_ExpandName { get { return Manager.GetString("Report_ExpandName", Culture); } }
@@ -176,10 +203,10 @@ namespace multifarious.Icu.BatchTasks.Resources
         public static string Report_ExpandDescription { get { return Manager.GetString("Report_ExpandDescription", Culture); } }
 
         /// <summary>Report name and title, one per language pair. Same wording as the task name.</summary>
-        public static string Report_FinaliseName { get { return Manager.GetString("Report_FinaliseName", Culture); } }
+        public static string Report_RestoreName { get { return Manager.GetString("Report_RestoreName", Culture); } }
 
         /// <summary>One-line description shown beside the report. {0} messages, {1} files, {2} forms removed, {3} segments filled, {4} warnings; keep the placeholders.</summary>
-        public static string Report_FinaliseDescription { get { return Manager.GetString("Report_FinaliseDescription", Culture); } }
+        public static string Report_RestoreDescription { get { return Manager.GetString("Report_RestoreDescription", Culture); } }
 
         /// <summary>Report heading, as in Studio's own reports.</summary>
         public static string Report_Summary { get { return Manager.GetString("Report_Summary", Culture); } }
@@ -247,10 +274,13 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Outcome and column title: expanded by an earlier run and left alone.</summary>
         public static string Report_Skipped { get { return Manager.GetString("Report_Skipped", Culture); } }
 
-        /// <summary>Column title in the finalise report: plural forms removed because the target language does not use them.</summary>
+        /// <summary>Outcome and column title: the message was already translated at the keep threshold and left as it was.</summary>
+        public static string Report_Kept { get { return Manager.GetString("Report_Kept", Culture); } }
+
+        /// <summary>Column title in the restore report: plural forms removed because the target language does not use them.</summary>
         public static string Report_Pruned { get { return Manager.GetString("Report_Pruned", Culture); } }
 
-        /// <summary>Column title in the finalise report: untranslated segments filled with the source text.</summary>
+        /// <summary>Column title in the restore report: untranslated segments filled with the source text.</summary>
         public static string Report_Filled { get { return Manager.GetString("Report_Filled", Culture); } }
 
         /// <summary>Shown under the Warnings heading when there are none.</summary>
@@ -261,6 +291,12 @@ namespace multifarious.Icu.BatchTasks.Resources
 
         /// <summary>Value of a tick-box setting in the report's settings table.</summary>
         public static string Report_Off { get { return Manager.GetString("Report_Off", Culture); } }
+
+        /// <summary>Value of the keep setting in the report's settings table, where it is on. {0} is the minimum match percentage; keep the placeholder.</summary>
+        public static string Report_KeepAt { get { return Manager.GetString("Report_KeepAt", Culture); } }
+
+        /// <summary>Appended to the keep setting's value in the report where kept segments are locked.</summary>
+        public static string Report_KeepLocked { get { return Manager.GetString("Report_KeepLocked", Culture); } }
 
         /// <summary>Body of the empty states: what the window is for. "ICU MessageFormat" is a technology name and stays as it is.</summary>
         public static string Forms_Purpose { get { return Manager.GetString("Forms_Purpose", Culture); } }

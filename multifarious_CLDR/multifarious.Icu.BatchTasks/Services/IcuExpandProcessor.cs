@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Icu.Cldr;
 using multifarious.Icu.Expansion;
+using Sdl.Core.Globalization;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
 using Sdl.FileTypeSupport.Framework.NativeApi;
 
@@ -39,6 +40,12 @@ namespace multifarious.Icu.BatchTasks.Services
     /// paragraph unit, reconstruct the raw value, classify it, plan the expansion for the file's
     /// target language and rewrite the unit. Structure units, empty values, non-ICU values and
     /// units this plugin has already expanded are left exactly as they were.
+    ///
+    /// A unit the restore task has put back together is expanded again, with each form given
+    /// the translation and the state it had before, so expand and restore can alternate without
+    /// loss. A unit that arrives pre-translated as a whole message has that message split into
+    /// its forms the same way, or is kept as it stands when the task is set to keep matches at
+    /// or above its threshold (Paul, 11 October 2026).
     /// </summary>
     public class IcuExpandProcessor : AbstractBilingualContentProcessor
     {
@@ -54,6 +61,9 @@ namespace multifarious.Icu.BatchTasks.Services
         private ExpansionWriter _writer;
         private string _fileSourceLanguage;
         private string _fileTargetLanguage;
+
+        /// <summary>The next segment number in the file; see <see cref="SegmentNumbering"/>.</summary>
+        private int _nextSegmentNumber = 1;
 
         /// <param name="sourceLanguageTag">The project's source language, or null to take it from the file.</param>
         /// <param name="targetLanguageTag">The file's target language, or null to take it from the file.</param>
@@ -77,6 +87,12 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>Units skipped because this plugin had already expanded them.</summary>
         public int AlreadyExpanded { get; private set; }
 
+        /// <summary>Units left as they stood because their translation was already matched at the keep threshold or better.</summary>
+        public int Kept { get; private set; }
+
+        /// <summary>Units expanded again after a restore, with their translations handed back to the forms.</summary>
+        public int Reexpanded { get; private set; }
+
         public IReadOnlyList<ExpansionWarning> Warnings { get { return _warnings; } }
 
         /// <summary>What happened to every translatable unit that held ICU, in document order, for the report.</summary>
@@ -99,6 +115,11 @@ namespace multifarious.Icu.BatchTasks.Services
             if (paragraphUnit != null && !paragraphUnit.IsStructure && paragraphUnit.Source != null)
             {
                 Expand(paragraphUnit);
+
+                // The numbers run on through the file. A unit the writer laid out already
+                // carries them, since the writer started from the same count; the rest are
+                // renumbered here so the sequence has no gaps and no restarts.
+                SegmentNumbering.Renumber(paragraphUnit, ref _nextSegmentNumber);
             }
 
             base.ProcessParagraphUnit(paragraphUnit);
@@ -110,7 +131,9 @@ namespace multifarious.Icu.BatchTasks.Services
             var unitId = unit.Properties.ParagraphUnitId.Id;
 
             var key = ResourceKey.Of(unit);
-            if (ResourceKey.IsExpanded(unit))
+            var icuContext = ResourceKey.IcuContextOf(unit);
+            var restored = icuContext != null && ResourceKey.IsRestored(unit);
+            if (icuContext != null && !restored)
             {
                 AlreadyExpanded++;
                 _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Skipped, CountSegments(unit.Source), null));
@@ -120,6 +143,26 @@ namespace multifarious.Icu.BatchTasks.Services
 
             var raw = RawValueReconstruction.Reconstruct(unit.Source).RawValue;
             if (raw.Length == 0) return;
+
+            // What the unit already holds for its forms: the record a restore left, or the
+            // translation and match a pre-translated whole message arrived with.
+            var targetRaw = unit.Target == null ? string.Empty : RawValueReconstruction.Reconstruct(unit.Target).RawValue;
+            var seed = new ExpansionSeed { FirstSegmentNumber = _nextSegmentNumber };
+            if (restored)
+            {
+                seed.OriginalPattern = Metadata(icuContext, "icu:pattern");
+                seed.States = SegmentStates.Parse(Metadata(icuContext, Constants.SegmentStatesKey));
+            }
+            else if (!string.IsNullOrWhiteSpace(targetRaw))
+            {
+                var states = TargetStates(unit);
+                if (ShouldKeep(states))
+                {
+                    Keep(unit, unitId, key, states.Count);
+                    return;
+                }
+                seed.StateForAll = StateForAll(states);
+            }
 
             var classification = MessageClassifier.Classify(raw, _options);
             switch (classification.Kind)
@@ -138,9 +181,9 @@ namespace multifarious.Icu.BatchTasks.Services
                     return;
 
                 case MessageKind.Protect:
-                    Writer.Write(unit, _planner.PlanProtected(classification), key);
-                    Expanded++;
-                    _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Protected, 1, null));
+                    ReadTargetForms(unitId, targetRaw, seed);
+                    Record(unitId, key, ExpandOutcome.Protected, restored,
+                        Writer.Write(unit, _planner.PlanProtected(classification), key, seed), seed);
                     Diagnostics.Write("  unit " + unitId + ": arguments protected");
                     return;
 
@@ -153,20 +196,162 @@ namespace multifarious.Icu.BatchTasks.Services
                             "The target language is unknown: neither the task nor the file supplied one.");
                     }
 
+                    ReadTargetForms(unitId, targetRaw, seed);
                     var plan = _planner.Plan(classification, sourceLanguage, new[] { targetLanguage }, _options);
                     if (plan.ExceedsBudget)
                     {
-                        LayOutWalked(unit, unitId, key, classification, plan, sourceLanguage, targetLanguage);
+                        LayOutWalked(unit, unitId, key, classification, plan, sourceLanguage, targetLanguage, restored, seed);
                         return;
                     }
 
-                    Writer.Write(unit, plan, key);
-                    Expanded++;
-                    _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Expanded, plan.Segments.Count, null));
-                    Diagnostics.Write("  unit " + unitId + ": expanded to " + plan.Segments.Count
-                        + " segments for " + targetLanguage);
+                    var written = Writer.Write(unit, plan, key, seed);
+                    Record(unitId, key, ExpandOutcome.Expanded, restored, written, seed);
+                    Diagnostics.Write("  unit " + unitId + ": expanded to " + written.Segments + " segments for " + targetLanguage
+                        + (seed.TargetForms != null ? ", " + written.TargetFormsFilled + " forms filled from the target" : string.Empty));
                     return;
             }
+        }
+
+        /// <summary>Reads the target message into forms for the seed; a target that does not read leaves the forms empty and is reported.</summary>
+        private static void ReadTargetForms(string unitId, string targetRaw, ExpansionSeed seed)
+        {
+            if (string.IsNullOrWhiteSpace(targetRaw)) return;
+
+            string failure;
+            seed.TargetForms = TargetBranches.Read(targetRaw, out failure);
+            if (seed.TargetForms == null)
+            {
+                seed.TargetFailure = "The target held a message that could not be split into forms (" + failure + "); the forms start empty.";
+                Diagnostics.Write("  unit " + unitId + ": " + seed.TargetFailure);
+            }
+        }
+
+        /// <summary>
+        /// Records a written unit, with the seed's shortfalls as the detail: forms the target
+        /// message had nothing for, or a target that did not read. Those go to the report and
+        /// the task results, not onto the unit; the forms concerned are simply empty.
+        /// </summary>
+        private void Record(string unitId, string key, ExpandOutcome outcome, bool restored, WriteResult written, ExpansionSeed seed)
+        {
+            Expanded++;
+            if (restored) Reexpanded++;
+
+            string detail = null;
+            if (seed.TargetFailure != null)
+            {
+                detail = seed.TargetFailure;
+            }
+            else if (written.UnfilledPaths.Count > 0)
+            {
+                detail = "The target message had no translation for " + written.UnfilledPaths.Count + " of "
+                    + written.Segments + " forms (" + string.Join(", ", written.UnfilledPaths) + "); those start empty.";
+            }
+
+            if (detail != null)
+            {
+                _warnings.Add(new ExpansionWarning(unitId, detail));
+                Diagnostics.Write("  unit " + unitId + ": " + detail);
+            }
+
+            _outcomes.Add(new ExpandUnitOutcome(unitId, key, outcome, written.Segments, detail));
+        }
+
+        // ---- pre-translated messages ----------------------------------------------------------
+
+        /// <summary>The state of every target segment of a never-expanded unit, paths empty.</summary>
+        private static List<SegmentState> TargetStates(IParagraphUnit unit)
+        {
+            var states = new List<SegmentState>();
+            foreach (var segment in SegmentsOf(unit.Target))
+            {
+                states.Add(SegmentState.Capture(string.Empty, segment.Properties));
+            }
+            return states;
+        }
+
+        /// <summary>
+        /// Whether a pre-translated message stays as it is: the task is set to keep, and every
+        /// segment of it is matched at the threshold or better. One segment below, or with no
+        /// origin at all, and the message is expanded like any other.
+        /// </summary>
+        private bool ShouldKeep(List<SegmentState> states)
+        {
+            if (!_options.KeepTranslated || states.Count == 0) return false;
+            foreach (var state in states)
+            {
+                if (!state.HasOrigin || state.EffectiveMatch < _options.KeepMinimumMatch) return false;
+            }
+            return true;
+        }
+
+        private void Keep(IParagraphUnit unit, string unitId, string key, int segments)
+        {
+            if (_options.LockKept)
+            {
+                foreach (var segment in SegmentsOf(unit.Target))
+                {
+                    segment.Properties.IsLocked = true;
+                }
+            }
+
+            Kept++;
+            _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Kept, segments, null));
+            Diagnostics.Write("  unit " + unitId + ": kept, already translated at " + _options.KeepMinimumMatch
+                + "% or better" + (_options.LockKept ? ", locked" : string.Empty));
+        }
+
+        /// <summary>
+        /// The state every form of a pre-translated message starts with: the message's own where
+        /// its segments agree on it, else a draft with no origin, since one match figure cannot
+        /// stand for several. The lock is not carried: a locked whole message is the keep rule's
+        /// business, and a message being expanded is one the translator is to work on.
+        /// </summary>
+        private static SegmentState StateForAll(List<SegmentState> states)
+        {
+            if (states.Count == 0) return null;
+
+            var first = states[0];
+            var uniform = true;
+            foreach (var state in states)
+            {
+                if (state.ConfirmationLevel != first.ConfirmationLevel || state.OriginType != first.OriginType
+                    || state.OriginSystem != first.OriginSystem || state.MatchPercent != first.MatchPercent
+                    || state.TextContextMatchLevel != first.TextContextMatchLevel)
+                {
+                    uniform = false;
+                    break;
+                }
+            }
+
+            return uniform
+                ? new SegmentState(string.Empty, first.ConfirmationLevel, false, first.OriginType, first.OriginSystem,
+                    first.MatchPercent, first.TextContextMatchLevel)
+                : new SegmentState(string.Empty, ConfirmationLevel.Draft, false, null, null, 0, TextContextMatchLevel.None);
+        }
+
+        private static List<ISegment> SegmentsOf(IAbstractMarkupDataContainer container)
+        {
+            var segments = new List<ISegment>();
+            if (container == null) return segments;
+            for (var i = 0; i < container.Count; i++)
+            {
+                var segment = container[i] as ISegment;
+                if (segment != null)
+                {
+                    segments.Add(segment);
+                    continue;
+                }
+
+                if (container[i] is ILockedContent) continue;
+                var nested = container[i] as IAbstractMarkupDataContainer;
+                if (nested != null) segments.AddRange(SegmentsOf(nested));
+            }
+            return segments;
+        }
+
+        private static string Metadata(IContextInfo context, string key)
+        {
+            return context != null && context.MetaDataContainsKey(key) ? context.GetMetaData(key) : null;
         }
 
         private static int CountSegments(IAbstractMarkupDataContainer container)
@@ -189,7 +374,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// in translation like any plain text.
         /// </summary>
         private void LayOutWalked(IParagraphUnit unit, string unitId, string key, MessageClassification classification,
-            ExpansionPlan rejected, string sourceLanguage, string targetLanguage)
+            ExpansionPlan rejected, string sourceLanguage, string targetLanguage, bool restored, ExpansionSeed seed)
         {
             var size = rejected.Segments.Count + " segments needed, " + rejected.MaxUnitsPerMessage + " allowed";
             var plan = _planner.PlanWalked(classification, sourceLanguage, new[] { targetLanguage }, _options,
@@ -203,12 +388,18 @@ namespace multifarious.Icu.BatchTasks.Services
                 return;
             }
 
-            Writer.Write(unit, plan, key);
+            var written = Writer.Write(unit, plan, key, seed);
             Expanded++;
+            if (restored) Reexpanded++;
             var detail = "Expansion is over the branch budget (" + size
                 + "); the branches are the source's and " + targetLanguage + " may need forms the source does not have.";
             Warn(unit, unitId, detail, "ICU message laid out without category expansion: ");
-            _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Walked, plan.Segments.Count, detail));
+            if (seed.TargetFailure != null)
+            {
+                detail += " " + seed.TargetFailure;
+                _warnings.Add(new ExpansionWarning(unitId, seed.TargetFailure));
+            }
+            _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Walked, written.Segments, detail));
         }
 
         private ExpansionWriter Writer

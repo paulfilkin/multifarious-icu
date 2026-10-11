@@ -143,6 +143,38 @@
         </StackPanel>
       </GroupBox>
 
+      <GroupBox Header="{x:Static res:UIStrings.Expand_KeepHeader}">
+        <StackPanel>
+          <CheckBox TabIndex="45" Content="{x:Static res:UIStrings.Expand_KeepTranslated}" IsChecked="{Binding KeepTranslated}" />
+          <StackPanel Orientation="Horizontal" Margin="20,2,0,0" IsEnabled="{Binding KeepTranslated}">
+            <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" Text="{x:Static res:UIStrings.Expand_KeepMinimumLabel}" />
+            <TextBox TabIndex="46" Width="60" Padding="2" VerticalContentAlignment="Center"
+                     AutomationProperties.Name="{x:Static res:UIStrings.Expand_KeepMinimumLabel}"
+                     Text="{Binding KeepMinimumText, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock VerticalAlignment="Center" Margin="4,0,0,0" Text="%" />
+          </StackPanel>
+          <TextBlock Style="{StaticResource Invalid}" Margin="20,4,0,0" Text="{x:Static res:UIStrings.Expand_KeepMinimumInvalid}">
+            <TextBlock.Visibility>
+              <Binding Path="IsKeepMinimumValid">
+                <Binding.Converter>
+                  <views:InverseBooleanToVisibilityConverter />
+                </Binding.Converter>
+              </Binding>
+            </TextBlock.Visibility>
+          </TextBlock>
+          <CheckBox TabIndex="47" Margin="20,6,0,3" Content="{x:Static res:UIStrings.Expand_LockKept}" IsChecked="{Binding LockKept}" IsEnabled="{Binding KeepTranslated}" />
+          <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Expand_KeepHint}" />
+          <Expander Style="{StaticResource Help}" TabIndex="48" Header="{x:Static res:UIStrings.Expand_KeepHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_KeepHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_KeepHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
+        </StackPanel>
+      </GroupBox>
+
       <GroupBox Header="{x:Static res:UIStrings.Expand_ParseHeader}">
         <StackPanel>
           <RadioButton GroupName="Parse" TabIndex="50" Content="{x:Static res:UIStrings.Expand_ParsePassThrough}" IsChecked="{Binding ParseErrorPassesThrough}" />

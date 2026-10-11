@@ -54,7 +54,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
         /// <summary>
         /// True where the target text carries a '#' typed as text while the source form uses the
-        /// protected count marker: almost always a translator reaching for the count, and Finalise
+        /// protected count marker: almost always a translator reaching for the count, and Restore
         /// would quote it into a literal hash.
         /// </summary>
         public bool TypedPound { get; set; }
@@ -70,7 +70,7 @@ namespace multifarious.Icu.BatchTasks.Services
         public IReadOnlyList<string> ExpandedSelectors { get; set; }
         public IReadOnlyList<IcuFormRow> Rows { get; set; }
 
-        /// <summary>The target paragraph as Finalise will write it: syntax verbatim, text escaped.</summary>
+        /// <summary>The target paragraph as Restore will assemble it: syntax verbatim, text escaped.</summary>
         public string TargetProjection { get; set; }
 
         public bool TargetParses { get; set; }
@@ -84,7 +84,7 @@ namespace multifarious.Icu.BatchTasks.Services
     /// <summary>
     /// Reads an expanded paragraph unit back into rows for the ICU Forms view. The layout itself
     /// says what each segment is: the selector opens and branch opens between the segments give
-    /// the path and the category, the way Finalise reads them, and the CLDR data for the target
+    /// the path and the category, the way Restore reads them, and the CLDR data for the target
     /// language gives the counts. The segment's comment, where the expansion wrote one, is only
     /// the tooltip, so a file expanded without comments shows the same rows. '#' and the
     /// arguments are replaced by sample values so the translator sees a sentence rather than
@@ -315,7 +315,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// What the layout says about each selector: whether the task category expanded it, and
         /// which branch keys it has. A selector's path is its argument under the branches above
         /// it, <c>count</c> or <c>gender:female/count</c>, the form the expansion records under
-        /// <c>icu:expandedSelectors</c> and Finalise matches on.
+        /// <c>icu:expandedSelectors</c> and Restore matches on.
         /// </summary>
         private sealed class Layout
         {
@@ -654,7 +654,7 @@ namespace multifarious.Icu.BatchTasks.Services
             return sample;
         }
 
-        /// <summary>The target paragraph as Finalise will write it, so it can be parsed as ICU while the translator types.</summary>
+        /// <summary>The target paragraph as Restore will assemble it, so it can be parsed as ICU while the translator types.</summary>
         private static string EscapedProjection(IParagraph target, bool inPluralContext, string activeId, ISegment activeTarget)
         {
             var builder = new StringBuilder();
@@ -699,7 +699,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>
         /// Compares the placeholders by count, not as sets: a second copy of '#' in the target is
         /// an extra placeholder, and a set difference would not see it (Project 56, where the
-        /// verifier missed a duplicated count marker that the finalise task had reported).
+        /// verifier missed a duplicated count marker that the finalise task, now restore, had reported).
         /// </summary>
         private static string ParityProblem(ISegment source, ISegment target)
         {

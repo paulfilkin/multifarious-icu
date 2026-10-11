@@ -166,77 +166,113 @@
     <value>Leaving it untouched keeps the rest of the file moving and marks the paragraph with a warning that names the position of the problem. Stopping the task is for a pipeline where a broken message must never reach a translator unnoticed.</value>
     <comment>Help paragraph.</comment>
   </data>
+  <data name="Expand_KeepHeader" xml:space="preserve">
+    <value>Messages already translated</value>
+    <comment>Group heading. Messages whose target arrived already translated, from pre-translation before this task.</comment>
+  </data>
+  <data name="Expand_KeepTranslated" xml:space="preserve">
+    <value>Keep messages already translated</value>
+    <comment>Tick box. Off by default.</comment>
+  </data>
+  <data name="Expand_KeepMinimumLabel" xml:space="preserve">
+    <value>Minimum match:</value>
+    <comment>Label before a number box holding a percentage. The default is 100.</comment>
+  </data>
+  <data name="Expand_KeepMinimumInvalid" xml:space="preserve">
+    <value>Enter a whole number from 0 to 100.</value>
+    <comment>Validation message shown when the number box holds something else.</comment>
+  </data>
+  <data name="Expand_LockKept" xml:space="preserve">
+    <value>Lock kept segments</value>
+    <comment>Tick box, enabled only when the first is on. On by default.</comment>
+  </data>
+  <data name="Expand_KeepHint" xml:space="preserve">
+    <value>A message whose every segment is already matched at this percentage or better is left as it is and not expanded. Perfect Match and Context Match count as 100%. Off, every message is expanded, so a 100% match can still be checked form by form.</value>
+    <comment>Hint under the controls. "Perfect Match" and "Context Match" are Studio's feature names.</comment>
+  </data>
+  <data name="Expand_KeepHelpHeader" xml:space="preserve">
+    <value>When is a message already translated?</value>
+    <comment>Header of a collapsible help panel.</comment>
+  </data>
+  <data name="Expand_KeepHelp1" xml:space="preserve">
+    <value>A project pre-translated before this task runs, from a memory holding whole messages that Restore ICU put back together, arrives with those messages matched. Expanding them would throw the match away and ask for every form again.</value>
+    <comment>Help paragraph. "Restore ICU" is the other task's name and is not translated.</comment>
+  </data>
+  <data name="Expand_KeepHelp2" xml:space="preserve">
+    <value>Keeping them leaves each whole message as one segment, which Restore ICU ignores and Generate Target Translations writes as it stands. Locking marks it so the translator does not change a message the tasks never restructured. Leave this off when a translator should see and confirm every match.</value>
+    <comment>Help paragraph. "Restore ICU" is a task name; "Generate Target Translations" is Studio's task name.</comment>
+  </data>
 
-  <!-- The finalise page. -->
-  <data name="Finalise_Intro" xml:space="preserve">
-    <value>Finalise prunes each message to the forms the target language needs, escapes ICU special characters typed as text, and checks the placeholders. Warnings go on the source segment's comment and into the task report; target comments are never written.</value>
+  <!-- The restore page. -->
+  <data name="Restore_Intro" xml:space="preserve">
+    <value>Restore puts each expanded message back together as one segment on each side. The forms the target language does not use are removed, apostrophes and braces typed as text are escaped, the placeholders are checked, and an untranslated form is filled from the source with a warning. Run it before Generate Target Translations, or whenever the whole messages are wanted back; Expand ICU lays them out again.</value>
     <comment>Paragraph at the top of the page.</comment>
   </data>
-  <data name="Finalise_EmptyHeader" xml:space="preserve">
+  <data name="Restore_EmptyHeader" xml:space="preserve">
     <value>When a form has no translation</value>
     <comment>Group heading. A required segment whose target is empty.</comment>
   </data>
-  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+  <data name="Restore_EmptyUseSource" xml:space="preserve">
     <value>Use the source text and add a warning</value>
     <comment>Radio button, the default.</comment>
   </data>
-  <data name="Finalise_EmptyFail" xml:space="preserve">
+  <data name="Restore_EmptyFail" xml:space="preserve">
     <value>Stop the task</value>
     <comment>Radio button. The whole batch task fails on the first empty form.</comment>
   </data>
-  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+  <data name="Restore_EmptyHelpHeader" xml:space="preserve">
     <value>What happens to a form nobody translated?</value>
     <comment>Header of a collapsible help panel.</comment>
   </data>
-  <data name="Finalise_EmptyHelp1" xml:space="preserve">
-    <value>Every form the target language needs must be present in the generated file, or the application shows nothing at all for the counts that select it. Using the source text keeps the file valid and marks the source segment's comment and the report, so the gap can be found later.</value>
+  <data name="Restore_EmptyHelp1" xml:space="preserve">
+    <value>Every form the target language needs must be present in the restored message, or the application shows nothing at all for the counts that select it. Using the source text keeps the message valid and records the gap as a comment on the segment and in the report, so it can be found later.</value>
     <comment>Help paragraph.</comment>
   </data>
-  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+  <data name="Restore_EmptyHelp2" xml:space="preserve">
     <value>Stopping the task is for a final delivery, where an untranslated form must not slip through in the source language.</value>
     <comment>Help paragraph.</comment>
   </data>
-  <data name="Finalise_MismatchHeader" xml:space="preserve">
+  <data name="Restore_MismatchHeader" xml:space="preserve">
     <value>When the protected placeholders in source and target differ</value>
     <comment>Group heading. A placeholder such as {name} missing from the translation or added to it.</comment>
   </data>
-  <data name="Finalise_MismatchWarn" xml:space="preserve">
+  <data name="Restore_MismatchWarn" xml:space="preserve">
     <value>Add a warning and continue</value>
     <comment>Radio button, the default.</comment>
   </data>
-  <data name="Finalise_MismatchFail" xml:space="preserve">
+  <data name="Restore_MismatchFail" xml:space="preserve">
     <value>Stop the task</value>
     <comment>Radio button. The whole batch task fails on the first mismatch.</comment>
   </data>
-  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+  <data name="Restore_MismatchHelpHeader" xml:space="preserve">
     <value>What is a placeholder mismatch?</value>
     <comment>Header of a collapsible help panel.</comment>
   </data>
-  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+  <data name="Restore_MismatchHelp1" xml:space="preserve">
     <value>The protected spans in a segment are the message's arguments, such as {name}, and the count marker #. A translation that has lost one, or gained one the source does not have, fails or shows the wrong text when the application runs.</value>
     <comment>Help paragraph. "{name}" and "#" are ICU syntax and must not be translated.</comment>
   </data>
-  <data name="Finalise_MismatchHelp2" xml:space="preserve">
-    <value>A warning goes on the source segment's comment and into the report, and the file is still generated. Stopping the task refuses to generate until the translation is put right.</value>
+  <data name="Restore_MismatchHelp2" xml:space="preserve">
+    <value>A warning goes on the segment as a comment and into the report, and the message is left expanded with its placeholders as tags, so the missing one can be placed; run Restore ICU again once it is right. Stopping the task refuses to go on until the translation is put right.</value>
     <comment>Help paragraph.</comment>
   </data>
 
   <!-- The task reports. The names and descriptions appear in Studio's Reports view; the
        labels are the headings and column titles of the rendered report. -->
   <data name="Report_ExpandName" xml:space="preserve">
-    <value>ICU Expand Plural Forms</value>
+    <value>Expand ICU</value>
     <comment>Report name and title, one per language pair. Same wording as the task name in Studio's batch task list.</comment>
   </data>
   <data name="Report_ExpandDescription" xml:space="preserve">
     <value>{0} ICU message(s) expanded in {1} file(s); {2} with a warning.</value>
     <comment>One-line description shown beside the report in Studio's Reports view. {0} messages, {1} files, {2} warnings; keep the placeholders.</comment>
   </data>
-  <data name="Report_FinaliseName" xml:space="preserve">
-    <value>ICU Finalise Messages</value>
+  <data name="Report_RestoreName" xml:space="preserve">
+    <value>Restore ICU</value>
     <comment>Report name and title, one per language pair. Same wording as the task name.</comment>
   </data>
-  <data name="Report_FinaliseDescription" xml:space="preserve">
-    <value>{0} ICU message(s) finalised in {1} file(s); {2} form(s) removed, {3} segment(s) filled from the source, {4} warning(s).</value>
+  <data name="Report_RestoreDescription" xml:space="preserve">
+    <value>{0} ICU message(s) restored in {1} file(s); {2} form(s) removed, {3} segment(s) filled from the source, {4} warning(s).</value>
     <comment>One-line description shown beside the report. {0} messages, {1} files, {2} forms removed, {3} segments filled, {4} warnings; keep the placeholders.</comment>
   </data>
   <data name="Report_Summary" xml:space="preserve">
@@ -327,13 +363,17 @@
     <value>Already expanded</value>
     <comment>Outcome and column title: expanded by an earlier run and left alone.</comment>
   </data>
+  <data name="Report_Kept" xml:space="preserve">
+    <value>Kept</value>
+    <comment>Outcome and column title: the message was already translated at the keep threshold and left as it was.</comment>
+  </data>
   <data name="Report_Pruned" xml:space="preserve">
     <value>Forms removed</value>
-    <comment>Column title in the finalise report: plural forms removed because the target language does not use them.</comment>
+    <comment>Column title in the restore report: plural forms removed because the target language does not use them.</comment>
   </data>
   <data name="Report_Filled" xml:space="preserve">
     <value>Filled from source</value>
-    <comment>Column title in the finalise report: untranslated segments filled with the source text.</comment>
+    <comment>Column title in the restore report: untranslated segments filled with the source text.</comment>
   </data>
   <data name="Report_NoWarnings" xml:space="preserve">
     <value>No warnings.</value>
@@ -346,6 +386,14 @@
   <data name="Report_Off" xml:space="preserve">
     <value>Off</value>
     <comment>Value of a tick-box setting in the report's settings table.</comment>
+  </data>
+  <data name="Report_KeepAt" xml:space="preserve">
+    <value>At {0}% or better</value>
+    <comment>Value of the keep setting in the report's settings table, where it is on. {0} is the minimum match percentage; keep the placeholder.</comment>
+  </data>
+  <data name="Report_KeepLocked" xml:space="preserve">
+    <value>locked</value>
+    <comment>Appended to the keep setting's value in the report where kept segments are locked.</comment>
   </data>
 
   <!-- The ICU Forms window under the editor. The four empty states each have a title, a body
@@ -465,7 +513,7 @@
     <comment>The Origin column of the Messages window. Same wording as the verifier's name in the Verification settings.</comment>
   </data>
   <data name="Verifier_EmptyForm" xml:space="preserve">
-    <value>The form "{0}" has no translation; Finalise will use the source text.</value>
+    <value>The form "{0}" has no translation; Restore ICU will use the source text.</value>
     <comment>Warning. {0} is the form's path, such as "count:few"; keep the placeholder.</comment>
   </data>
   <data name="Verifier_Placeholders" xml:space="preserve">

@@ -16,19 +16,19 @@
     <value>multifariousICU Support</value>
   </data>
   <data name="Plugin_Description" xml:space="preserve">
-    <value>Batch tasks for ICU MessageFormat messages in JSON and Java properties files: expand plural forms into one segment per CLDR category the target language needs, and finalise the translated messages before target generation.</value>
+    <value>Batch tasks for ICU MessageFormat messages in JSON and Java properties files: expand plural forms into one segment per CLDR category the target language needs, and restore the translated forms to whole ICU messages.</value>
   </data>
   <data name="Task_Expand_Name" xml:space="preserve">
-    <value>ICU Expand Plural Forms</value>
+    <value>Expand ICU</value>
   </data>
   <data name="Task_Expand_Description" xml:space="preserve">
-    <value>Expands ICU plural and selectordinal arguments into one translatable segment per CLDR category required by the target language, each a complete sentence with a comment naming the counts that select it.</value>
+    <value>Expands ICU plural and selectordinal arguments into one translatable segment per CLDR category required by the target language, each a complete sentence. A restored message is laid out again with its translations.</value>
   </data>
-  <data name="Task_Finalise_Name" xml:space="preserve">
-    <value>ICU Finalise Messages</value>
+  <data name="Task_Restore_Name" xml:space="preserve">
+    <value>Restore ICU</value>
   </data>
-  <data name="Task_Finalise_Description" xml:space="preserve">
-    <value>Prunes plural branches to the target language's CLDR set, escapes ICU special characters typed as text and checks placeholder parity, ready for target generation.</value>
+  <data name="Task_Restore_Description" xml:space="preserve">
+    <value>Puts each expanded message back together as one segment: prunes plural branches to the target language's CLDR set, escapes ICU special characters typed as text and checks placeholder parity. Run before Generate Target Translations; Expand ICU lays the forms out again.</value>
   </data>
   <data name="ViewPart_Forms_Name" xml:space="preserve">
     <value>ICU Forms</value>

@@ -2,17 +2,17 @@ using multifarious.Icu.Expansion;
 
 namespace multifarious.Icu.BatchTasks.Settings.ViewModels
 {
-    /// <summary>The finalise page: two choices, on the pattern of the expand page.</summary>
-    public sealed class IcuFinaliseSettingsViewModel : ObservableObject
+    /// <summary>The restore page: two choices, on the pattern of the expand page.</summary>
+    public sealed class IcuRestoreSettingsViewModel : ObservableObject
     {
-        private readonly IcuFinaliseSettings _settings;
+        private readonly IcuRestoreSettings _settings;
 
         private EmptyBranchBehaviour _onEmptyBranch;
         private PlaceholderMismatchBehaviour _onPlaceholderMismatch;
 
-        public IcuFinaliseSettingsViewModel(IcuFinaliseSettings settings)
+        public IcuRestoreSettingsViewModel(IcuRestoreSettings settings)
         {
-            _settings = settings ?? new IcuFinaliseSettings();
+            _settings = settings ?? new IcuRestoreSettings();
             LoadFrom(_settings);
         }
 
@@ -50,14 +50,14 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             get { return _onPlaceholderMismatch; }
         }
 
-        public IcuFinaliseSettings Apply()
+        public IcuRestoreSettings Apply()
         {
             _settings.OnEmptyBranch = _onEmptyBranch;
             _settings.OnPlaceholderMismatch = _onPlaceholderMismatch;
             return _settings;
         }
 
-        public IcuFinaliseSettings ResetToDefaults()
+        public IcuRestoreSettings ResetToDefaults()
         {
             _settings.Reset();
             LoadFrom(_settings);
@@ -81,7 +81,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             Raise(nameof(MismatchFailsTask));
         }
 
-        private void LoadFrom(IcuFinaliseSettings settings)
+        private void LoadFrom(IcuRestoreSettings settings)
         {
             _onEmptyBranch = settings.OnEmptyBranch;
             _onPlaceholderMismatch = settings.OnPlaceholderMismatch;

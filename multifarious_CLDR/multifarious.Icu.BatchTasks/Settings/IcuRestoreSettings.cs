@@ -5,28 +5,28 @@ using Sdl.Core.Settings;
 namespace multifarious.Icu.BatchTasks.Settings
 {
     /// <summary>
-    /// The finalise task's settings, stored and defaulted exactly as <see cref="IcuExpandSettings"/>.
+    /// The restore task's settings, stored and defaulted exactly as <see cref="IcuExpandSettings"/>.
     /// </summary>
-    public class IcuFinaliseSettings : SettingsGroup
+    public class IcuRestoreSettings : SettingsGroup
     {
         private const string OnEmptyBranchId = "OnEmptyBranch";
         private const string OnPlaceholderMismatchId = "OnPlaceholderMismatch";
 
         public EmptyBranchBehaviour OnEmptyBranch
         {
-            get { return Parse(GetSetting<string>(OnEmptyBranchId).Value, FinaliseOptions.Default.OnEmptyBranch); }
+            get { return Parse(GetSetting<string>(OnEmptyBranchId).Value, RestoreOptions.Default.OnEmptyBranch); }
             set { GetSetting<string>(OnEmptyBranchId).Value = value.ToString(); }
         }
 
         public PlaceholderMismatchBehaviour OnPlaceholderMismatch
         {
-            get { return Parse(GetSetting<string>(OnPlaceholderMismatchId).Value, FinaliseOptions.Default.OnPlaceholderMismatch); }
+            get { return Parse(GetSetting<string>(OnPlaceholderMismatchId).Value, RestoreOptions.Default.OnPlaceholderMismatch); }
             set { GetSetting<string>(OnPlaceholderMismatchId).Value = value.ToString(); }
         }
 
-        public FinaliseOptions ToOptions()
+        public RestoreOptions ToOptions()
         {
-            return new FinaliseOptions
+            return new RestoreOptions
             {
                 OnEmptyBranch = OnEmptyBranch,
                 OnPlaceholderMismatch = OnPlaceholderMismatch,
@@ -37,8 +37,8 @@ namespace multifarious.Icu.BatchTasks.Settings
         {
             switch (settingId)
             {
-                case OnEmptyBranchId: return FinaliseOptions.Default.OnEmptyBranch.ToString();
-                case OnPlaceholderMismatchId: return FinaliseOptions.Default.OnPlaceholderMismatch.ToString();
+                case OnEmptyBranchId: return RestoreOptions.Default.OnEmptyBranch.ToString();
+                case OnPlaceholderMismatchId: return RestoreOptions.Default.OnPlaceholderMismatch.ToString();
             }
 
             return base.GetDefaultValue(settingId);

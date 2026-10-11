@@ -18,7 +18,10 @@ namespace multifarious.Icu.BatchTasks.Services
         PassedThrough,
 
         /// <summary>Already expanded by an earlier run and left alone.</summary>
-        Skipped
+        Skipped,
+
+        /// <summary>Left as it stood: already translated at the keep threshold or better, under the keep setting.</summary>
+        Kept
     }
 
     public sealed class ExpandUnitOutcome
@@ -46,9 +49,9 @@ namespace multifarious.Icu.BatchTasks.Services
         public string Detail { get; }
     }
 
-    public sealed class FinaliseUnitOutcome
+    public sealed class RestoreUnitOutcome
     {
-        public FinaliseUnitOutcome(string paragraphUnitId, string key, int segments, int pruned, int filled, IReadOnlyList<string> warnings)
+        public RestoreUnitOutcome(string paragraphUnitId, string key, int segments, int pruned, int filled, IReadOnlyList<string> warnings)
         {
             ParagraphUnitId = paragraphUnitId;
             Key = key ?? string.Empty;
@@ -62,7 +65,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
         public string Key { get; }
 
-        /// <summary>Segments left after pruning.</summary>
+        /// <summary>Forms left after pruning, before the message was put back together.</summary>
         public int Segments { get; }
 
         /// <summary>Branch triples removed.</summary>

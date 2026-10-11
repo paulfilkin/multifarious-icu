@@ -118,56 +118,83 @@
   <data name="Expand_ParseHelp2" xml:space="preserve">
     <value>그대로 두면 파일의 나머지 부분은 계속 처리되고, 단락에는 문제 위치를 알려 주는 경고가 붙습니다. 작업 중지는 손상된 메시지가 아무도 모르게 번역자에게 전달되어서는 안 되는 파이프라인을 위한 것입니다.</value>
   </data>
-  <data name="Finalise_Intro" xml:space="preserve">
-    <value>마무리 작업은 각 메시지를 대상 언어에 필요한 형태로만 줄이고, 텍스트로 입력된 ICU 특수 문자를 이스케이프하며, 자리 표시자를 검사합니다. 경고는 원본 세그먼트의 주석과 작업 보고서에 기록되며, 대상 주석은 절대 작성되지 않습니다.</value>
+  <data name="Expand_KeepHeader" xml:space="preserve">
+    <value>이미 번역된 메시지</value>
   </data>
-  <data name="Finalise_EmptyHeader" xml:space="preserve">
+  <data name="Expand_KeepTranslated" xml:space="preserve">
+    <value>이미 번역된 메시지 유지</value>
+  </data>
+  <data name="Expand_KeepMinimumLabel" xml:space="preserve">
+    <value>최소 일치율:</value>
+  </data>
+  <data name="Expand_KeepMinimumInvalid" xml:space="preserve">
+    <value>0에서 100 사이의 정수를 입력하십시오.</value>
+  </data>
+  <data name="Expand_LockKept" xml:space="preserve">
+    <value>유지한 세그먼트 잠금</value>
+  </data>
+  <data name="Expand_KeepHint" xml:space="preserve">
+    <value>모든 세그먼트가 이미 이 일치율 이상으로 일치하는 메시지는 확장하지 않고 그대로 둡니다. Perfect Match와 문맥 일치는 100%로 간주합니다. 끄면 모든 메시지가 확장되어 100% 일치도 형태별로 검토할 수 있습니다.</value>
+  </data>
+  <data name="Expand_KeepHelpHeader" xml:space="preserve">
+    <value>이미 번역된 메시지란 무엇입니까?</value>
+  </data>
+  <data name="Expand_KeepHelp1" xml:space="preserve">
+    <value>이 작업 전에 Restore ICU가 다시 합친 전체 메시지를 담은 메모리로 사전 번역된 프로젝트는 해당 메시지가 일치된 상태로 도착합니다. 이를 확장하면 일치가 버려지고 모든 형태를 다시 번역해야 합니다.</value>
+  </data>
+  <data name="Expand_KeepHelp2" xml:space="preserve">
+    <value>유지하면 전체 메시지가 하나의 세그먼트로 남고, Restore ICU는 이를 무시하며 대상 번역 생성은 그대로 기록합니다. 잠금은 작업이 재구성하지 않은 메시지를 번역가가 변경하지 않도록 표시합니다. 번역가가 모든 일치를 확인하고 승인해야 하는 경우에는 꺼 두십시오.</value>
+  </data>
+  <data name="Restore_Intro" xml:space="preserve">
+    <value>복원은 확장된 각 메시지를 양쪽 모두 하나의 세그먼트로 다시 합칩니다. 대상 언어에서 쓰지 않는 형태는 제거되고, 텍스트로 입력된 아포스트로피와 중괄호는 이스케이프되며, 자리 표시자를 검사하고, 번역되지 않은 형태는 경고와 함께 원본에서 채웁니다. 대상 번역 생성 전에, 또는 전체 메시지를 되돌리고 싶을 때 실행하십시오. Expand ICU로 다시 펼칠 수 있습니다.</value>
+  </data>
+  <data name="Restore_EmptyHeader" xml:space="preserve">
     <value>형태에 번역이 없는 경우</value>
   </data>
-  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+  <data name="Restore_EmptyUseSource" xml:space="preserve">
     <value>원본 텍스트를 사용하고 경고 추가</value>
   </data>
-  <data name="Finalise_EmptyFail" xml:space="preserve">
+  <data name="Restore_EmptyFail" xml:space="preserve">
     <value>작업 중지</value>
   </data>
-  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+  <data name="Restore_EmptyHelpHeader" xml:space="preserve">
     <value>아무도 번역하지 않은 형태는 어떻게 됩니까?</value>
   </data>
-  <data name="Finalise_EmptyHelp1" xml:space="preserve">
-    <value>대상 언어에 필요한 모든 형태가 생성된 파일에 있어야 합니다. 그렇지 않으면 애플리케이션은 그 형태를 선택하는 수에 대해 아무것도 표시하지 않습니다. 원본 텍스트를 사용하면 파일이 유효하게 유지되고 원본 세그먼트의 주석과 보고서에 표시되므로 나중에 빠진 부분을 찾을 수 있습니다.</value>
+  <data name="Restore_EmptyHelp1" xml:space="preserve">
+    <value>대상 언어에 필요한 모든 형태가 복원된 메시지에 있어야 합니다. 없으면 해당 형태를 선택하는 숫자에 대해 응용 프로그램이 아무것도 표시하지 않습니다. 원본 텍스트를 사용하면 메시지가 유효하게 유지되고, 누락은 세그먼트의 주석과 보고서에 기록되어 나중에 찾을 수 있습니다.</value>
   </data>
-  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+  <data name="Restore_EmptyHelp2" xml:space="preserve">
     <value>작업 중지는 번역되지 않은 형태가 원본 언어 그대로 통과해서는 안 되는 최종 납품을 위한 것입니다.</value>
   </data>
-  <data name="Finalise_MismatchHeader" xml:space="preserve">
+  <data name="Restore_MismatchHeader" xml:space="preserve">
     <value>보호된 자리 표시자가 원본과 대상에서 다른 경우</value>
   </data>
-  <data name="Finalise_MismatchWarn" xml:space="preserve">
+  <data name="Restore_MismatchWarn" xml:space="preserve">
     <value>경고를 추가하고 계속</value>
   </data>
-  <data name="Finalise_MismatchFail" xml:space="preserve">
+  <data name="Restore_MismatchFail" xml:space="preserve">
     <value>작업 중지</value>
   </data>
-  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+  <data name="Restore_MismatchHelpHeader" xml:space="preserve">
     <value>자리 표시자 불일치란 무엇입니까?</value>
   </data>
-  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+  <data name="Restore_MismatchHelp1" xml:space="preserve">
     <value>세그먼트의 보호된 범위는 {name}과 같은 메시지 인수와 수 표시자 #입니다. 그중 하나를 잃었거나 원본에 없는 것이 추가된 번역은 애플리케이션 실행 시 실패하거나 잘못된 텍스트를 표시합니다.</value>
   </data>
-  <data name="Finalise_MismatchHelp2" xml:space="preserve">
-    <value>경고는 원본 세그먼트의 주석과 보고서에 기록되고 파일은 그대로 생성됩니다. 작업 중지는 번역이 수정될 때까지 생성을 거부합니다.</value>
+  <data name="Restore_MismatchHelp2" xml:space="preserve">
+    <value>경고는 세그먼트의 주석과 보고서에 기록되고, 메시지는 자리 표시자가 태그인 상태로 확장된 채 남아 누락된 것을 배치할 수 있습니다. 바로잡은 뒤 Restore ICU를 다시 실행하십시오. 작업을 중지하면 번역이 수정될 때까지 진행하지 않습니다.</value>
   </data>
   <data name="Report_ExpandName" xml:space="preserve">
-    <value>ICU Expand Plural Forms</value>
+    <value>Expand ICU</value>
   </data>
   <data name="Report_ExpandDescription" xml:space="preserve">
     <value>파일 {1}개에서 ICU 메시지 {0}개를 확장했습니다. 경고 있음: {2}개.</value>
   </data>
-  <data name="Report_FinaliseName" xml:space="preserve">
-    <value>ICU Finalise Messages</value>
+  <data name="Report_RestoreName" xml:space="preserve">
+    <value>Restore ICU</value>
   </data>
-  <data name="Report_FinaliseDescription" xml:space="preserve">
-    <value>파일 {1}개에서 ICU 메시지 {0}개를 마무리했습니다. 제거된 형태 {2}개, 원본에서 채운 세그먼트 {3}개, 경고 {4}개.</value>
+  <data name="Report_RestoreDescription" xml:space="preserve">
+    <value>파일 {1}개에서 ICU 메시지 {0}개를 복원했습니다. 제거된 형태 {2}개, 원본에서 채운 세그먼트 {3}개, 경고 {4}개.</value>
   </data>
   <data name="Report_Summary" xml:space="preserve">
     <value>요약</value>
@@ -235,6 +262,9 @@
   <data name="Report_Skipped" xml:space="preserve">
     <value>이미 확장됨</value>
   </data>
+  <data name="Report_Kept" xml:space="preserve">
+    <value>유지됨</value>
+  </data>
   <data name="Report_Pruned" xml:space="preserve">
     <value>제거된 형태</value>
   </data>
@@ -249,6 +279,12 @@
   </data>
   <data name="Report_Off" xml:space="preserve">
     <value>꺼짐</value>
+  </data>
+  <data name="Report_KeepAt" xml:space="preserve">
+    <value>{0}% 이상</value>
+  </data>
+  <data name="Report_KeepLocked" xml:space="preserve">
+    <value>잠김</value>
   </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms는 ICU MessageFormat 메시지의 모든 복수형, 서수, select 형태를 수의 예와 함께 보여 주고 메시지 전체를 재조립하여 보여 주므로, 입력하면서 번역을 확인할 수 있습니다.</value>
@@ -335,7 +371,7 @@
     <value>ICU Verifier</value>
   </data>
   <data name="Verifier_EmptyForm" xml:space="preserve">
-    <value>"{0}" 형태에 번역이 없습니다. 마무리 작업에서 원본 텍스트가 사용됩니다.</value>
+    <value>"{0}" 형태에 번역이 없습니다. Restore ICU에서 원본 텍스트가 사용됩니다.</value>
   </data>
   <data name="Verifier_Placeholders" xml:space="preserve">
     <value>보호된 자리 표시자가 원본과 다릅니다: {0}.</value>

@@ -26,15 +26,15 @@ namespace multifarious.Icu.BatchTasks.Services
     /// (Paul, 6 September 2026): a tag is what QuickPlace, Ctrl+Alt+Down, tag verification and
     /// the translation memory's placeables work with, where a locked span cannot be placed by
     /// the translator at all. Optionally each tag is wrapped in locked content so it cannot be
-    /// moved or deleted. The finalise task turns the tags back into locked text before the
-    /// target file is generated.
+    /// moved or deleted. The restore task puts the message back together as plain text before
+    /// the target file is generated.
     ///
     /// No comment is written for a form (Paul, 6 September 2026): a comment marker inside a
     /// source segment is copied into the target by Studio's pseudo-translation and Copy Source
     /// to Target (Project 46), and target comments are the translator's; a marker around the
     /// segment fails SDLXLIFF validation (Project 47); and a comment on the unit repeats what
     /// the ICU Forms window shows per row, live. The layout, the unit context and CLDR say
-    /// everything the finalise task and the window need. Only warnings go on the unit.
+    /// everything the restore task and the window need. Only warnings go on the unit.
     /// </summary>
     public sealed class ExpansionWriter
     {
@@ -57,29 +57,49 @@ namespace multifarious.Icu.BatchTasks.Services
             _appVersion = appVersion ?? string.Empty;
         }
 
-        public void Write(IParagraphUnit unit, ExpansionPlan plan, string resourceKey)
+        public WriteResult Write(IParagraphUnit unit, ExpansionPlan plan, string resourceKey)
+        {
+            return Write(unit, plan, resourceKey, null);
+        }
+
+        /// <summary>
+        /// Writes the plan with what the unit already held: the translation of each form, where
+        /// the target carried a restored or pre-translated message, and the state each form
+        /// segment had before the message was collapsed. A form the seed has nothing for starts
+        /// empty, as on a first expansion.
+        /// </summary>
+        public WriteResult Write(IParagraphUnit unit, ExpansionPlan plan, string resourceKey, ExpansionSeed seed)
         {
             if (unit == null) throw new ArgumentNullException(nameof(unit));
             if (plan == null) throw new ArgumentNullException(nameof(plan));
 
             var source = new List<IAbstractMarkupData>();
             var target = new List<IAbstractMarkupData>();
-            var state = new WriteState();
+            var state = new WriteState { Seed = seed ?? new ExpansionSeed() };
+            state.NextSegmentNumber = Math.Max(1, state.Seed.FirstSegmentNumber);
             WriteNode(plan.Root, source, target, state);
 
             Refill(unit.Source, source);
             if (unit.Target != null) Refill(unit.Target, target);
 
             AddContext(unit, plan, resourceKey, state);
+            return new WriteResult(state.Written.Count, state.TargetFormsFilled, state.UnfilledPaths, state.NextSegmentNumber);
         }
 
         private sealed class WriteState
         {
-            /// <summary>Segment ids are per paragraph unit in SDLXLIFF, numbered from 1.</summary>
+            /// <summary>The next segment number: the seed's first, then on through the unit. The processor keeps the count running through the file (<see cref="SegmentNumbering"/>).</summary>
             public int NextSegmentNumber = 1;
 
             /// <summary>The segments written, in document order, for the seeding record on the unit context.</summary>
             public List<KeyValuePair<int, PlannedSegment>> Written = new List<KeyValuePair<int, PlannedSegment>>();
+
+            public ExpansionSeed Seed;
+
+            public int TargetFormsFilled;
+
+            /// <summary>Paths the seed had a target for none of, where it had a target message at all.</summary>
+            public List<string> UnfilledPaths = new List<string>();
         }
 
         private static void Refill(IParagraph paragraph, List<IAbstractMarkupData> content)
@@ -123,7 +143,7 @@ namespace multifarious.Icu.BatchTasks.Services
             }
 
             // Which selectors were category expanded is recorded on the unit context, not here:
-            // finalise prunes only expanded selectors, because a walked select or a disabled kind
+            // restore prunes only expanded selectors, because a walked select or a disabled kind
             // carries the developer's branches.
             AddSyntaxPair(openText.ToString(), source, target);
 
@@ -153,10 +173,33 @@ namespace multifarious.Icu.BatchTasks.Services
             source.Add(sourceSegment);
             state.Written.Add(new KeyValuePair<int, PlannedSegment>(state.NextSegmentNumber - 1, planned));
 
-            // The target segment is left empty for Copy Source to Target or pre-translation to
-            // fill. It shares the pair properties with the source, which is how the framework
-            // models a segment pair.
-            target.Add(_itemFactory.CreateSegment(properties));
+            // The target segment shares the pair properties with the source, which is how the
+            // framework models a segment pair. On a first expansion it is left empty for Copy
+            // Source to Target or pre-translation to fill; after a restore, or over a
+            // pre-translated message, it gets the form's translation back, with the state the
+            // form had.
+            var targetSegment = _itemFactory.CreateSegment(properties);
+            var seed = state.Seed;
+            if (seed.TargetForms != null)
+            {
+                IReadOnlyList<MessageNode> nodes;
+                if (seed.TargetForms.TryGetValue(planned.Path, out nodes))
+                {
+                    foreach (var item in BuildContent(nodes))
+                    {
+                        targetSegment.Add(item);
+                    }
+                    state.TargetFormsFilled++;
+                }
+                else
+                {
+                    state.UnfilledPaths.Add(planned.Path);
+                }
+            }
+            target.Add(targetSegment);
+
+            var segmentState = seed.StateOf(planned.Path);
+            if (segmentState != null) segmentState.Apply(properties, _itemFactory);
         }
 
         private IEnumerable<IAbstractMarkupData> BuildContent(IReadOnlyList<MessageNode> nodes)
@@ -250,7 +293,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// One piece of selector syntax between segments, added to both paragraphs as locked text.
         /// Each side gets its own object: the two paragraphs are separate documents to the writer.
         /// Locked content carries no metadata; the segment's comment and the unit context are the
-        /// machine-readable carriers, and finalise reads the branch path from the syntax itself.
+        /// machine-readable carriers, and restore reads the branch path from the syntax itself.
         /// </summary>
         private void AddSyntaxPair(string content, List<IAbstractMarkupData> source, List<IAbstractMarkupData> target)
         {
@@ -269,7 +312,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>
         /// The unit-level record: one context of this plugin's own type, alongside the filter's,
         /// so the Document Structure column shows the resource key and that the unit is an ICU
-        /// message, and the finalise task can find the units it owns. Context metadata persists
+        /// message, and the restore task can find the units it owns. Context metadata persists
         /// in SDLXLIFF.
         /// </summary>
         private void AddContext(IParagraphUnit unit, ExpansionPlan plan, string resourceKey, WriteState state)
@@ -280,8 +323,12 @@ namespace multifarious.Icu.BatchTasks.Services
             context.Purpose = ContextPurpose.Information;
             context.Description = string.IsNullOrEmpty(resourceKey) ? Constants.IcuContextDisplayName : resourceKey;
 
-            context.SetMetaData("icu:pattern", plan.RawValue);
+            // The pattern is the value as the file carried it. A unit expanded again after a
+            // restore is read in the hoisted shape, so the pattern recorded the first time is
+            // kept rather than overwritten with the hoisted text.
+            context.SetMetaData("icu:pattern", state.Seed.OriginalPattern ?? plan.RawValue);
             context.SetMetaData("icu:hoisted", plan.HoistedText);
+            context.SetMetaData(Constants.StateKey, Constants.StateExpanded);
             if (!string.IsNullOrEmpty(resourceKey))
             {
                 context.SetMetaData("icu:key", resourceKey);
@@ -291,7 +338,7 @@ namespace multifarious.Icu.BatchTasks.Services
             context.SetMetaData("icu:unitCount", plan.Segments.Count.ToString(CultureInfo.InvariantCulture));
 
             // Which selectors were category expanded, by path. Locked content carries no
-            // metadata, so finalise learns from here which selectors it may prune; a walked
+            // metadata, so restore learns from here which selectors it may prune; a walked
             // select or a disabled plural kind keeps the developer's branches.
             var expanded = new List<string>();
             CollectExpanded(plan.Root, expanded);
@@ -325,6 +372,18 @@ namespace multifarious.Icu.BatchTasks.Services
             var contexts = unit.Properties.Contexts == null
                 ? _propertiesFactory.CreateContextProperties()
                 : (IContextProperties)unit.Properties.Contexts.Clone();
+
+            // A unit expanded again after a restore already carries this plugin's context; the
+            // new one replaces it rather than sitting beside it.
+            for (var i = contexts.Contexts.Count - 1; i >= 0; i--)
+            {
+                var existing = contexts.Contexts[i];
+                if (existing != null && existing.ContextType == Constants.IcuContextType)
+                {
+                    contexts.Contexts.RemoveAt(i);
+                }
+            }
+
             contexts.Contexts.Add(context);
             unit.Properties.Contexts = contexts;
         }
@@ -340,5 +399,60 @@ namespace multifarious.Icu.BatchTasks.Services
                 CollectExpanded(branch.Content, paths);
             }
         }
+    }
+
+    /// <summary>
+    /// What a unit already holds when it is expanded: the forms of a target message by branch
+    /// path, the state each form had, and the pattern recorded by an earlier expansion. All
+    /// optional; an empty seed is a first expansion.
+    /// </summary>
+    public sealed class ExpansionSeed
+    {
+        /// <summary>The target's translation per form, from <see cref="TargetBranches"/>; null where the target was empty or did not read.</summary>
+        public IReadOnlyDictionary<string, IReadOnlyList<MessageNode>> TargetForms { get; set; }
+
+        /// <summary>The state each form had before the restore task collapsed the message, by path.</summary>
+        public IReadOnlyDictionary<string, SegmentState> States { get; set; }
+
+        /// <summary>One state for every form: a pre-translated whole message's, handed to each of its forms.</summary>
+        public SegmentState StateForAll { get; set; }
+
+        /// <summary>The pattern as the file carried it, recorded by the first expansion.</summary>
+        public string OriginalPattern { get; set; }
+
+        /// <summary>Why the target message gave no forms, where it did not read; the processor reports it.</summary>
+        public string TargetFailure { get; set; }
+
+        /// <summary>The number the unit's first segment takes, so the numbers run on from the units before it. 1 by default.</summary>
+        public int FirstSegmentNumber { get; set; } = 1;
+
+        public SegmentState StateOf(string path)
+        {
+            SegmentState state;
+            if (States != null && States.TryGetValue(path, out state)) return state;
+            return StateForAll == null ? null : StateForAll.At(path);
+        }
+    }
+
+    public sealed class WriteResult
+    {
+        public WriteResult(int segments, int targetFormsFilled, IReadOnlyList<string> unfilledPaths, int nextSegmentNumber)
+        {
+            Segments = segments;
+            TargetFormsFilled = targetFormsFilled;
+            UnfilledPaths = unfilledPaths ?? new List<string>();
+            NextSegmentNumber = nextSegmentNumber;
+        }
+
+        /// <summary>The number after the last segment written.</summary>
+        public int NextSegmentNumber { get; }
+
+        public int Segments { get; }
+
+        /// <summary>Target segments filled from the seed's target message.</summary>
+        public int TargetFormsFilled { get; }
+
+        /// <summary>Forms the seed's target message had nothing for; empty where there was no target message.</summary>
+        public IReadOnlyList<string> UnfilledPaths { get; }
     }
 }

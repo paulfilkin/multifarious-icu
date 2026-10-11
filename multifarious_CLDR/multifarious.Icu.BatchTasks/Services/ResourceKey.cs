@@ -45,20 +45,45 @@ namespace multifarious.Icu.BatchTasks.Services
             return null;
         }
 
-        /// <summary>Whether the unit already carries this plugin's own context, meaning it has been expanded.</summary>
-        public static bool IsExpanded(IParagraphUnit unit)
+        /// <summary>The plugin's own context on the unit, or null where the unit has never been expanded.</summary>
+        public static IContextInfo IcuContextOf(IParagraphUnit unit)
         {
-            if (unit == null || unit.Properties == null || unit.Properties.Contexts == null) return false;
+            if (unit == null || unit.Properties == null || unit.Properties.Contexts == null) return null;
 
             var contexts = unit.Properties.Contexts.Contexts;
-            if (contexts == null) return false;
+            if (contexts == null) return null;
 
             foreach (var context in contexts)
             {
-                if (context != null && context.ContextType == Constants.IcuContextType) return true;
+                if (context != null && context.ContextType == Constants.IcuContextType) return context;
             }
 
-            return false;
+            return null;
+        }
+
+        /// <summary>
+        /// Whether the unit is laid out one segment per form: it carries this plugin's context
+        /// and the state is not restored. This is the shape the restore task, the verifier and
+        /// the ICU Forms window read; a restored unit is one plain segment and none of them
+        /// applies to it.
+        /// </summary>
+        public static bool IsExpanded(IParagraphUnit unit)
+        {
+            var context = IcuContextOf(unit);
+            return context != null && !IsRestoredState(context);
+        }
+
+        /// <summary>Whether the restore task has put the unit back together: the context is there and says so.</summary>
+        public static bool IsRestored(IParagraphUnit unit)
+        {
+            var context = IcuContextOf(unit);
+            return context != null && IsRestoredState(context);
+        }
+
+        private static bool IsRestoredState(IContextInfo context)
+        {
+            return context.MetaDataContainsKey(Constants.StateKey)
+                && context.GetMetaData(Constants.StateKey) == Constants.StateRestored;
         }
     }
 }

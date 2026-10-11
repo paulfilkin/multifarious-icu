@@ -118,56 +118,83 @@
   <data name="Expand_ParseHelp2" xml:space="preserve">
     <value>Если оставить его без изменений, остальной файл обрабатывается дальше, а абзац получает предупреждение с указанием позиции ошибки. Остановка задачи нужна для конвейера, в котором повреждённое сообщение ни в коем случае не должно незаметно попасть к переводчику.</value>
   </data>
-  <data name="Finalise_Intro" xml:space="preserve">
-    <value>Завершение сокращает каждое сообщение до форм, нужных целевому языку, экранирует специальные символы ICU, введённые как текст, и проверяет заполнители. Предупреждения записываются в комментарий исходного сегмента и в отчёт задачи; комментарии к целевым сегментам никогда не создаются.</value>
+  <data name="Expand_KeepHeader" xml:space="preserve">
+    <value>Уже переведённые сообщения</value>
   </data>
-  <data name="Finalise_EmptyHeader" xml:space="preserve">
+  <data name="Expand_KeepTranslated" xml:space="preserve">
+    <value>Сохранять уже переведённые сообщения</value>
+  </data>
+  <data name="Expand_KeepMinimumLabel" xml:space="preserve">
+    <value>Минимальное совпадение:</value>
+  </data>
+  <data name="Expand_KeepMinimumInvalid" xml:space="preserve">
+    <value>Введите целое число от 0 до 100.</value>
+  </data>
+  <data name="Expand_LockKept" xml:space="preserve">
+    <value>Блокировать сохранённые сегменты</value>
+  </data>
+  <data name="Expand_KeepHint" xml:space="preserve">
+    <value>Сообщение, все сегменты которого уже совпадают на этот процент или выше, остаётся как есть и не разворачивается. Perfect Match и контекстное совпадение считаются за 100 %. Если выключено, разворачивается каждое сообщение, так что и 100%-ное совпадение можно проверить по формам.</value>
+  </data>
+  <data name="Expand_KeepHelpHeader" xml:space="preserve">
+    <value>Когда сообщение считается уже переведённым?</value>
+  </data>
+  <data name="Expand_KeepHelp1" xml:space="preserve">
+    <value>Проект, предварительно переведённый до этой задачи из памяти с целыми сообщениями, которые собрал Restore ICU, приходит с этими сообщениями как совпадениями. Их разворачивание отбросило бы совпадение и потребовало бы каждую форму заново.</value>
+  </data>
+  <data name="Expand_KeepHelp2" xml:space="preserve">
+    <value>При сохранении каждое целое сообщение остаётся одним сегментом, который Restore ICU пропускает, а создание целевых переводов записывает как есть. Блокировка помечает его, чтобы переводчик не менял сообщение, которое задачи не перестраивали. Оставьте выключенным, если переводчик должен видеть и подтверждать каждое совпадение.</value>
+  </data>
+  <data name="Restore_Intro" xml:space="preserve">
+    <value>Восстановление собирает каждое развёрнутое сообщение обратно в один сегмент с каждой стороны. Формы, которые целевой язык не использует, удаляются, введённые как текст апострофы и фигурные скобки экранируются, заполнители проверяются, а непереведённая форма заполняется из исходного текста с предупреждением. Запускайте задачу перед созданием целевых переводов или всякий раз, когда нужны целые сообщения; Expand ICU развернёт их снова.</value>
+  </data>
+  <data name="Restore_EmptyHeader" xml:space="preserve">
     <value>Если у формы нет перевода</value>
   </data>
-  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+  <data name="Restore_EmptyUseSource" xml:space="preserve">
     <value>Использовать исходный текст и добавить предупреждение</value>
   </data>
-  <data name="Finalise_EmptyFail" xml:space="preserve">
+  <data name="Restore_EmptyFail" xml:space="preserve">
     <value>Остановить задачу</value>
   </data>
-  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+  <data name="Restore_EmptyHelpHeader" xml:space="preserve">
     <value>Что происходит с формой, которую никто не перевёл?</value>
   </data>
-  <data name="Finalise_EmptyHelp1" xml:space="preserve">
-    <value>Каждая форма, нужная целевому языку, должна присутствовать в созданном файле, иначе приложение ничего не покажет для количеств, при которых она выбирается. Использование исходного текста сохраняет файл корректным и помечает комментарий исходного сегмента и отчёт, чтобы пропуск можно было найти позже.</value>
+  <data name="Restore_EmptyHelp1" xml:space="preserve">
+    <value>Каждая форма, нужная целевому языку, должна присутствовать в восстановленном сообщении, иначе приложение ничего не покажет для чисел, которые её выбирают. Использование исходного текста сохраняет сообщение корректным и фиксирует пропуск в комментарии к сегменту и в отчёте, чтобы его можно было найти позже.</value>
   </data>
-  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+  <data name="Restore_EmptyHelp2" xml:space="preserve">
     <value>Остановка задачи нужна для окончательной сдачи, когда непереведённая форма не должна проскочить на исходном языке.</value>
   </data>
-  <data name="Finalise_MismatchHeader" xml:space="preserve">
+  <data name="Restore_MismatchHeader" xml:space="preserve">
     <value>Если защищённые заполнители в исходном и целевом тексте различаются</value>
   </data>
-  <data name="Finalise_MismatchWarn" xml:space="preserve">
+  <data name="Restore_MismatchWarn" xml:space="preserve">
     <value>Добавить предупреждение и продолжить</value>
   </data>
-  <data name="Finalise_MismatchFail" xml:space="preserve">
+  <data name="Restore_MismatchFail" xml:space="preserve">
     <value>Остановить задачу</value>
   </data>
-  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+  <data name="Restore_MismatchHelpHeader" xml:space="preserve">
     <value>Что такое несовпадение заполнителей?</value>
   </data>
-  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+  <data name="Restore_MismatchHelp1" xml:space="preserve">
     <value>Защищённые участки сегмента — это аргументы сообщения, например {name}, и маркер количества #. Перевод, в котором один из них потерян или появился лишний, которого нет в исходном тексте, вызывает ошибку или показывает неверный текст при работе приложения.</value>
   </data>
-  <data name="Finalise_MismatchHelp2" xml:space="preserve">
-    <value>Предупреждение записывается в комментарий исходного сегмента и в отчёт, а файл всё равно создаётся. Остановка задачи запрещает создание файла, пока перевод не будет исправлен.</value>
+  <data name="Restore_MismatchHelp2" xml:space="preserve">
+    <value>Предупреждение записывается в комментарий к сегменту и в отчёт, а сообщение остаётся развёрнутым с заполнителями в виде тегов, чтобы недостающий можно было вставить; после исправления запустите Restore ICU снова. Остановка задачи не даёт продолжить, пока перевод не исправлен.</value>
   </data>
   <data name="Report_ExpandName" xml:space="preserve">
-    <value>ICU Expand Plural Forms</value>
+    <value>Expand ICU</value>
   </data>
   <data name="Report_ExpandDescription" xml:space="preserve">
     <value>ICU-сообщений развёрнуто: {0} в файлах: {1}; с предупреждением: {2}.</value>
   </data>
-  <data name="Report_FinaliseName" xml:space="preserve">
-    <value>ICU Finalise Messages</value>
+  <data name="Report_RestoreName" xml:space="preserve">
+    <value>Restore ICU</value>
   </data>
-  <data name="Report_FinaliseDescription" xml:space="preserve">
-    <value>ICU-сообщений завершено: {0} в файлах: {1}; форм удалено: {2}, сегментов заполнено из исходного текста: {3}, предупреждений: {4}.</value>
+  <data name="Report_RestoreDescription" xml:space="preserve">
+    <value>ICU-сообщений восстановлено: {0} в файлах: {1}; форм удалено: {2}, сегментов заполнено из исходного текста: {3}, предупреждений: {4}.</value>
   </data>
   <data name="Report_Summary" xml:space="preserve">
     <value>Сводка</value>
@@ -235,6 +262,9 @@
   <data name="Report_Skipped" xml:space="preserve">
     <value>Уже развёрнуто</value>
   </data>
+  <data name="Report_Kept" xml:space="preserve">
+    <value>Сохранено</value>
+  </data>
   <data name="Report_Pruned" xml:space="preserve">
     <value>Удалено форм</value>
   </data>
@@ -249,6 +279,12 @@
   </data>
   <data name="Report_Off" xml:space="preserve">
     <value>Выкл.</value>
+  </data>
+  <data name="Report_KeepAt" xml:space="preserve">
+    <value>От {0} %</value>
+  </data>
+  <data name="Report_KeepLocked" xml:space="preserve">
+    <value>заблокировано</value>
   </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms показывает все формы множественного числа, порядковые формы и ветви select ICU-сообщения MessageFormat с примерами количеств, а также собранное сообщение целиком, чтобы перевод можно было проверять прямо при вводе.</value>
@@ -335,7 +371,7 @@
     <value>ICU Verifier</value>
   </data>
   <data name="Verifier_EmptyForm" xml:space="preserve">
-    <value>У формы «{0}» нет перевода; при завершении будет использован исходный текст.</value>
+    <value>У формы «{0}» нет перевода; Restore ICU использует исходный текст.</value>
   </data>
   <data name="Verifier_Placeholders" xml:space="preserve">
     <value>Защищённые заполнители отличаются от исходного текста: {0}.</value>

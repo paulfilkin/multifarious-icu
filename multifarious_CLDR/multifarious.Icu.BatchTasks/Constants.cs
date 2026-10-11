@@ -9,8 +9,12 @@ namespace multifarious.Icu.BatchTasks
         /// </summary>
         public const string ExpandTaskId = "multifarious_Icu_ExpandTask";
 
-        /// <summary>Identifies the finalise task to Studio. Same rules as the expand id.</summary>
-        public const string FinaliseTaskId = "multifarious_Icu_FinaliseTask";
+        /// <summary>
+        /// Identifies the restore task to Studio. Same rules as the expand id. Release 2.0 replaced
+        /// the finalise task (id multifarious_Icu_FinaliseTask) with this one, by decision (Paul,
+        /// 11 October 2026); a template or sequence naming the old id no longer resolves.
+        /// </summary>
+        public const string RestoreTaskId = "multifarious_Icu_RestoreTask";
 
         /// <summary>The ICU Forms view part, its ribbon group and the action that shows it. Studio stores window layouts against the view part id.</summary>
         public const string FormsViewPartId = "multifarious_Icu_FormsViewPart";
@@ -54,7 +58,7 @@ namespace multifarious.Icu.BatchTasks
         /// <summary>
         /// The context type of the one context this plugin adds to every paragraph unit it
         /// expands. It carries the unit-level metadata (the original pattern, the hoisted form,
-        /// the resource key, the versions) and is how the finalise task finds the units it owns
+        /// the resource key, the versions) and is how the restore task finds the units it owns
         /// and how a second expand run knows to leave a unit alone.
         /// </summary>
         public const string IcuContextType = "multifarious:icu";
@@ -62,5 +66,24 @@ namespace multifarious.Icu.BatchTasks
         public const string IcuContextDisplayName = "ICU message";
 
         public const string IcuContextDisplayCode = "ICU";
+
+        /// <summary>
+        /// The context metadata key naming the unit's state: <see cref="StateExpanded"/> while the
+        /// message is laid out one segment per form, <see cref="StateRestored"/> once the restore
+        /// task has put it back together as one plain segment. Absent on a file expanded before
+        /// the key existed, which means expanded.
+        /// </summary>
+        public const string StateKey = "icu:state";
+
+        public const string StateExpanded = "expanded";
+
+        public const string StateRestored = "restored";
+
+        /// <summary>
+        /// The context metadata key under which the restore task records each form segment's
+        /// confirmation level, lock and translation origin by branch path, so the next expansion
+        /// puts them back. See <see cref="Services.SegmentStates"/> for the format.
+        /// </summary>
+        public const string SegmentStatesKey = "icu:segmentStates";
     }
 }

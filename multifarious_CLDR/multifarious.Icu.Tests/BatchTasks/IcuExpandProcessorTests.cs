@@ -3,7 +3,9 @@ using Icu.Core.Tests;
 using multifarious.Icu.BatchTasks;
 using multifarious.Icu.BatchTasks.Services;
 using multifarious.Icu.Expansion;
+using Sdl.Core.Globalization;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
+using Sdl.FileTypeSupport.Framework.NativeApi;
 
 namespace multifarious.Icu.Tests.BatchTasks;
 
@@ -415,5 +417,181 @@ public class IcuExpandProcessorTests
         Assert.Equal("['inbox.unreadCount']", processor.Outcomes[0].Key);
         Assert.Contains("does not parse", processor.Outcomes[2].Detail);
         Assert.Equal("", processor.Outcomes[0].Detail);
+    }
+
+    // ---- pre-translated messages and the keep rule ------------------------------------------
+
+    private const string RussianUnreadCount =
+        "Привет, {name}, у вас {count, plural, one {# непрочитанное сообщение} few {# непрочитанных сообщения} many {# непрочитанных сообщений} other {# непрочитанного сообщения}}!";
+
+    /// <summary>A unit as pre-translation leaves it: the whole target message in one segment, with the match it came with.</summary>
+    private static IParagraphUnit PreTranslated(string target, string? originType = "tm", byte percent = 100,
+        TextContextMatchLevel context = TextContextMatchLevel.None, ConfirmationLevel level = ConfirmationLevel.Translated)
+    {
+        var unit = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
+        var segment = SegmentsOf(unit.Target)[0];
+        segment.Add(ParagraphUnits.ItemFactory.CreateText(ParagraphUnits.PropertiesFactory.CreateTextProperties(target)));
+        segment.Properties.ConfirmationLevel = level;
+        if (originType != null)
+        {
+            var origin = ParagraphUnits.ItemFactory.CreateTranslationOrigin();
+            origin.OriginType = originType;
+            origin.OriginSystem = "Main TM";
+            origin.MatchPercent = percent;
+            origin.TextContextMatchLevel = context;
+            segment.Properties.TranslationOrigin = origin;
+        }
+        return unit;
+    }
+
+    private static ExpansionOptions Keep(int minimum = 100, bool lockKept = true) =>
+        ExpansionOptions.Default with { KeepTranslated = true, KeepMinimumMatch = minimum, LockKept = lockKept };
+
+    /// <summary>
+    /// A whole message pre-translated in the developer's shape is hoisted and split into its
+    /// forms like a restored one, each form starting with the message's own match and level.
+    /// </summary>
+    [Fact]
+    public void A_pre_translated_whole_message_is_split_into_its_forms_with_its_match()
+    {
+        var unit = PreTranslated(RussianUnreadCount, "tm", 85, TextContextMatchLevel.None, ConfirmationLevel.Draft);
+        var processor = Processor("ru-RU");
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(1, processor.Expanded);
+        Assert.Equal(0, processor.Kept);
+        Assert.Empty(processor.Warnings);
+        var targets = SegmentsOf(unit.Target);
+        Assert.Equal(4, targets.Count);
+        Assert.Equal("Привет, {name}, у вас # непрочитанное сообщение!", RawValueReconstruction.Reconstruct(targets[0]).RawValue);
+        Assert.Equal("Привет, {name}, у вас # непрочитанных сообщений!", RawValueReconstruction.Reconstruct(targets[2]).RawValue);
+        Assert.All(targets, t =>
+        {
+            Assert.Equal(ConfirmationLevel.Draft, t.Properties.ConfirmationLevel);
+            Assert.Equal("tm", t.Properties.TranslationOrigin.OriginType);
+            Assert.Equal(85, t.Properties.TranslationOrigin.MatchPercent);
+            Assert.False(t.Properties.IsLocked);
+        });
+        Assert.Equal(UnreadCount, ResourceKey.IcuContextOf(unit)!.GetMetaData("icu:pattern"));
+    }
+
+    [Fact]
+    public void A_pre_translated_message_that_does_not_parse_leaves_the_forms_empty_and_is_reported()
+    {
+        var unit = PreTranslated("Привет, {name}, у вас {count, plural, one {# сообщение}", "tm", 70);
+        var processor = Processor("ru-RU");
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(1, processor.Expanded);
+        Assert.All(SegmentsOf(unit.Target), t => Assert.Empty(ParagraphUnits.ItemsOf(t)));
+        var warning = Assert.Single(processor.Warnings);
+        Assert.Contains("could not be split into forms", warning.Reason);
+        Assert.Equal(warning.Reason, Assert.Single(processor.Outcomes).Detail);
+        Assert.Empty(ParagraphUnits.UnitComments(unit));
+    }
+
+    [Fact]
+    public void A_pre_translated_message_at_the_keep_threshold_is_kept_and_locked()
+    {
+        var unit = PreTranslated(RussianUnreadCount, "tm", 100);
+        var processor = Processor("ru-RU", Keep());
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(1, processor.Kept);
+        Assert.Equal(0, processor.Expanded);
+        Assert.Null(ResourceKey.IcuContextOf(unit));
+        var target = Assert.Single(SegmentsOf(unit.Target));
+        Assert.Equal(RussianUnreadCount, RawValueReconstruction.Reconstruct(target).RawValue);
+        Assert.True(target.Properties.IsLocked);
+        var outcome = Assert.Single(processor.Outcomes);
+        Assert.Equal(ExpandOutcome.Kept, outcome.Outcome);
+        Assert.Equal(1, outcome.Segments);
+    }
+
+    [Theory]
+    [InlineData("tm", 99, TextContextMatchLevel.None, 100, false)]
+    [InlineData("tm", 99, TextContextMatchLevel.None, 95, true)]
+    [InlineData("tm", 100, TextContextMatchLevel.SourceAndTarget, 100, true)]
+    [InlineData("tm", 0, TextContextMatchLevel.SourceAndTarget, 100, true)]
+    [InlineData("document-match", 0, TextContextMatchLevel.None, 100, true)]
+    [InlineData("mt", 0, TextContextMatchLevel.None, 0, true)]
+    [InlineData(null, 0, TextContextMatchLevel.None, 0, false)]
+    public void The_keep_rule_counts_perfect_and_context_matches_as_full_and_an_absent_origin_as_none(
+        string? originType, byte percent, TextContextMatchLevel context, int minimum, bool kept)
+    {
+        var unit = PreTranslated(RussianUnreadCount, originType, percent, context);
+        var processor = Processor("ru-RU", Keep(minimum));
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(kept ? 1 : 0, processor.Kept);
+        Assert.Equal(kept ? 1 : 4, SegmentsOf(unit.Target).Count);
+    }
+
+    [Fact]
+    public void Kept_segments_stay_unlocked_when_the_lock_setting_is_off_and_nothing_is_kept_when_keeping_is_off()
+    {
+        var unlocked = PreTranslated(RussianUnreadCount, "tm", 100);
+        Processor("ru-RU", Keep(lockKept: false)).ProcessParagraphUnit(unlocked);
+        Assert.False(Assert.Single(SegmentsOf(unlocked.Target)).Properties.IsLocked);
+
+        var expanded = PreTranslated(RussianUnreadCount, "tm", 100);
+        var processor = Processor("ru-RU");
+        processor.ProcessParagraphUnit(expanded);
+        Assert.Equal(0, processor.Kept);
+        Assert.Equal(4, SegmentsOf(expanded.Target).Count);
+        Assert.All(SegmentsOf(expanded.Target), t => Assert.Equal(100, t.Properties.TranslationOrigin.MatchPercent));
+    }
+
+    /// <summary>
+    /// Studio shows the segment id as the segment number, so the numbers must run on through
+    /// the file, through units the task lays out and units it leaves alone, as Studio's own
+    /// filters number them (Project 52, 11 October 2026).
+    /// </summary>
+    [Fact]
+    public void Segment_numbers_run_on_through_the_file_across_touched_and_untouched_units()
+    {
+        var processor = Processor("ru-RU");
+        var plain = ParagraphUnits.WithSegments("Message Centre", "Welcome.");
+        var expanded = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
+        var protectedUnit = ParagraphUnits.Json("Hello {name}!", "['app.greeting']");
+        var kept = PreTranslated(RussianUnreadCount, "tm", 100);
+
+        processor.ProcessParagraphUnit(plain);
+        processor.ProcessParagraphUnit(expanded);
+        processor.ProcessParagraphUnit(protectedUnit);
+        var keeping = Processor("ru-RU", Keep());
+
+        Assert.Equal(["1", "2"], SegmentsOf(plain.Source).Select(s => s.Properties.Id.Id));
+        Assert.Equal(["3", "4", "5", "6"], SegmentsOf(expanded.Source).Select(s => s.Properties.Id.Id));
+        Assert.Equal(["3", "4", "5", "6"], SegmentsOf(expanded.Target).Select(s => s.Properties.Id.Id));
+        Assert.Equal(["7"], SegmentsOf(protectedUnit.Source).Select(s => s.Properties.Id.Id));
+
+        // The seeding record on the context uses the file-wide numbers, which is what the
+        // ICU Forms reader matches rows on.
+        Assert.Equal("4:other,5:other", ResourceKey.IcuContextOf(expanded)!.GetMetaData("icu:seededFrom"));
+        var rows = Rows(expanded);
+        Assert.Equal("other", rows[1].SeededFrom);
+        Assert.Equal("", rows[0].SeededFrom);
+
+        // A kept unit is numbered too.
+        keeping.ProcessParagraphUnit(plain);
+        keeping.ProcessParagraphUnit(kept);
+        Assert.Equal(["3"], SegmentsOf(kept.Source).Select(s => s.Properties.Id.Id));
+    }
+
+    [Fact]
+    public void An_empty_target_is_never_kept()
+    {
+        var unit = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
+        var processor = Processor("ru-RU", Keep(0));
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(0, processor.Kept);
+        Assert.Equal(4, SegmentsOf(unit.Target).Count);
     }
 }

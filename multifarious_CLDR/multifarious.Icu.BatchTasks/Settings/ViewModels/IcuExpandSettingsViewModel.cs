@@ -18,6 +18,9 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         private bool _lockPlaceholders;
         private string _budgetText = string.Empty;
         private ParseErrorBehaviour _onParseError;
+        private bool _keepTranslated;
+        private string _keepMinimumText = string.Empty;
+        private bool _lockKept;
 
         public IcuExpandSettingsViewModel(IcuExpandSettings settings)
         {
@@ -77,10 +80,51 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             }
         }
 
-        /// <summary>Whether the page may be saved. Only the budget can be wrong.</summary>
+        /// <summary>Whether the page may be saved. Only the two number boxes can be wrong, and the match box only while it is in use.</summary>
         public bool IsValid
         {
-            get { return IsBudgetValid; }
+            get { return IsBudgetValid && (!_keepTranslated || IsKeepMinimumValid); }
+        }
+
+        public bool KeepTranslated
+        {
+            get { return _keepTranslated; }
+            set
+            {
+                if (Set(ref _keepTranslated, value))
+                {
+                    Raise(nameof(IsValid));
+                }
+            }
+        }
+
+        /// <summary>The minimum match as typed, a whole number from 0 to 100.</summary>
+        public string KeepMinimumText
+        {
+            get { return _keepMinimumText; }
+            set
+            {
+                if (Set(ref _keepMinimumText, value ?? string.Empty))
+                {
+                    Raise(nameof(IsKeepMinimumValid));
+                    Raise(nameof(IsValid));
+                }
+            }
+        }
+
+        public bool IsKeepMinimumValid
+        {
+            get
+            {
+                int parsed;
+                return TryParseKeepMinimum(out parsed);
+            }
+        }
+
+        public bool LockKept
+        {
+            get { return _lockKept; }
+            set { Set(ref _lockKept, value); }
         }
 
         public bool ParseErrorPassesThrough
@@ -110,6 +154,8 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         {
             int budget;
             if (!TryParseBudget(out budget)) budget = _settings.MaxUnitsPerMessage;
+            int minimum;
+            if (!TryParseKeepMinimum(out minimum)) minimum = _settings.KeepMinimumMatch;
 
             _settings.ExpandCardinal = _expandCardinal;
             _settings.ExpandOrdinal = _expandOrdinal;
@@ -117,6 +163,9 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             _settings.LockPlaceholders = _lockPlaceholders;
             _settings.MaxUnitsPerMessage = budget;
             _settings.OnParseError = _onParseError;
+            _settings.KeepTranslated = _keepTranslated;
+            _settings.KeepMinimumMatch = minimum;
+            _settings.LockKept = _lockKept;
             return _settings;
         }
 
@@ -133,6 +182,13 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             return int.TryParse(_budgetText.Trim(), NumberStyles.Integer, CultureInfo.CurrentCulture, out budget)
                 && budget >= IcuExpandSettings.MinimumBudget
                 && budget <= IcuExpandSettings.MaximumBudget;
+        }
+
+        private bool TryParseKeepMinimum(out int minimum)
+        {
+            return int.TryParse(_keepMinimumText.Trim(), NumberStyles.Integer, CultureInfo.CurrentCulture, out minimum)
+                && minimum >= IcuExpandSettings.MinimumMatch
+                && minimum <= IcuExpandSettings.MaximumMatch;
         }
 
         private void SetSeed(SourceSeedStrategy strategy)
@@ -159,6 +215,9 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             _lockPlaceholders = settings.LockPlaceholders;
             _budgetText = settings.MaxUnitsPerMessage.ToString(CultureInfo.CurrentCulture);
             _onParseError = settings.OnParseError;
+            _keepTranslated = settings.KeepTranslated;
+            _keepMinimumText = settings.KeepMinimumMatch.ToString(CultureInfo.CurrentCulture);
+            _lockKept = settings.LockKept;
         }
 
         private void RaiseAll()
@@ -173,6 +232,10 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             Raise(nameof(IsValid));
             Raise(nameof(ParseErrorPassesThrough));
             Raise(nameof(ParseErrorFailsTask));
+            Raise(nameof(KeepTranslated));
+            Raise(nameof(KeepMinimumText));
+            Raise(nameof(IsKeepMinimumValid));
+            Raise(nameof(LockKept));
         }
     }
 }

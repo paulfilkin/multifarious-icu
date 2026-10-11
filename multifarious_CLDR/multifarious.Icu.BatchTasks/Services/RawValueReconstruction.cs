@@ -36,7 +36,7 @@ namespace multifarious.Icu.BatchTasks.Services
     /// Resources configurations the value is plain text (Phase 0 evidence).
     ///
     /// The same walk over an expanded paragraph yields its native projection: the text Studio's
-    /// writer will emit, which is what the finalise checks parse.
+    /// writer will emit, which is what the restore checks parse.
     /// </summary>
     public static class RawValueReconstruction
     {

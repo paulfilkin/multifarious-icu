@@ -29,9 +29,9 @@ namespace multifarious.Icu.BatchTasks.Services
 
         /// <summary>
         /// Marks the start of one task run. The log accumulates across runs, so an expand and the
-        /// finalise that followed it can be read together; whoever reads it deletes it. It began
+        /// restore that followed it can be read together; whoever reads it deletes it. It began
         /// life truncating per run, and the first three-language Studio run (Project 41, 6
-        /// September 2026) lost its expand log to the finalise that followed.
+        /// September 2026) lost its expand log to the finalise that followed, as the restore task was then called.
         /// </summary>
         public static void Start(string what)
         {

@@ -118,56 +118,83 @@
   <data name="Expand_ParseHelp2" xml:space="preserve">
     <value>そのまま残せば、ファイルの残りの処理は続き、段落には問題の位置を示す警告が付きます。タスクの停止は、壊れたメッセージが気付かれないまま翻訳者に届いてはならないパイプライン向けです。</value>
   </data>
-  <data name="Finalise_Intro" xml:space="preserve">
-    <value>最終処理では、各メッセージを訳文言語に必要な形式だけに絞り込み、テキストとして入力された ICU の特殊文字をエスケープし、プレースホルダーを確認します。警告は原文セグメントのコメントとタスク レポートに記録されます。訳文のコメントが書き込まれることはありません。</value>
+  <data name="Expand_KeepHeader" xml:space="preserve">
+    <value>翻訳済みのメッセージ</value>
   </data>
-  <data name="Finalise_EmptyHeader" xml:space="preserve">
+  <data name="Expand_KeepTranslated" xml:space="preserve">
+    <value>翻訳済みのメッセージをそのまま残す</value>
+  </data>
+  <data name="Expand_KeepMinimumLabel" xml:space="preserve">
+    <value>最小一致率:</value>
+  </data>
+  <data name="Expand_KeepMinimumInvalid" xml:space="preserve">
+    <value>0 から 100 までの整数を入力してください。</value>
+  </data>
+  <data name="Expand_LockKept" xml:space="preserve">
+    <value>残したセグメントをロックする</value>
+  </data>
+  <data name="Expand_KeepHint" xml:space="preserve">
+    <value>すべてのセグメントがこの一致率以上で既に一致しているメッセージは、展開せずそのまま残します。Perfect Match と文脈一致は 100% として扱います。オフにするとすべてのメッセージが展開されるため、100% 一致も形式ごとに確認できます。</value>
+  </data>
+  <data name="Expand_KeepHelpHeader" xml:space="preserve">
+    <value>翻訳済みのメッセージとは?</value>
+  </data>
+  <data name="Expand_KeepHelp1" xml:space="preserve">
+    <value>このタスクの前に、Restore ICU が組み立て直したメッセージ全体を含むメモリから事前翻訳されたプロジェクトでは、それらのメッセージは一致済みで届きます。展開すると一致が失われ、形式ごとに翻訳をやり直すことになります。</value>
+  </data>
+  <data name="Expand_KeepHelp2" xml:space="preserve">
+    <value>そのまま残すと、メッセージ全体は 1 つのセグメントのまま保たれ、Restore ICU はこれを無視し、訳文の生成はそのまま書き出します。ロックすると、タスクが再構成していないメッセージを翻訳者が変更しないように印が付きます。翻訳者がすべての一致を確認して承認すべき場合はオフのままにしてください。</value>
+  </data>
+  <data name="Restore_Intro" xml:space="preserve">
+    <value>復元では、展開した各メッセージを両側とも 1 つのセグメントに組み立て直します。訳文言語で使わない形式は削除され、テキストとして入力されたアポストロフィと波かっこはエスケープされ、プレースホルダーが確認され、未翻訳の形式は警告付きで原文から補完されます。訳文の生成の前、またはメッセージ全体を戻したいときに実行してください。Expand ICU で再び展開できます。</value>
+  </data>
+  <data name="Restore_EmptyHeader" xml:space="preserve">
     <value>形式に訳文がない場合</value>
   </data>
-  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+  <data name="Restore_EmptyUseSource" xml:space="preserve">
     <value>原文テキストを使用して警告を追加する</value>
   </data>
-  <data name="Finalise_EmptyFail" xml:space="preserve">
+  <data name="Restore_EmptyFail" xml:space="preserve">
     <value>タスクを停止する</value>
   </data>
-  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+  <data name="Restore_EmptyHelpHeader" xml:space="preserve">
     <value>誰も翻訳しなかった形式はどうなりますか?</value>
   </data>
-  <data name="Finalise_EmptyHelp1" xml:space="preserve">
-    <value>訳文言語に必要なすべての形式が生成ファイルに存在しなければ、アプリケーションはその形式を選択する数に対して何も表示しません。原文テキストを使用すればファイルは有効なまま保たれ、原文セグメントのコメントとレポートに印が付くため、抜けを後で見つけられます。</value>
+  <data name="Restore_EmptyHelp1" xml:space="preserve">
+    <value>訳文言語に必要な形式はすべて復元後のメッセージに含まれていなければなりません。欠けていると、その形式を選ぶ数に対してアプリケーションは何も表示しません。原文テキストを使えばメッセージは有効なまま保たれ、欠落はセグメントのコメントとレポートに記録されるため、後から見つけられます。</value>
   </data>
-  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+  <data name="Restore_EmptyHelp2" xml:space="preserve">
     <value>タスクの停止は、未翻訳の形式が原文言語のまま通過してはならない最終納品向けです。</value>
   </data>
-  <data name="Finalise_MismatchHeader" xml:space="preserve">
+  <data name="Restore_MismatchHeader" xml:space="preserve">
     <value>保護されたプレースホルダーが原文と訳文で異なる場合</value>
   </data>
-  <data name="Finalise_MismatchWarn" xml:space="preserve">
+  <data name="Restore_MismatchWarn" xml:space="preserve">
     <value>警告を追加して続行する</value>
   </data>
-  <data name="Finalise_MismatchFail" xml:space="preserve">
+  <data name="Restore_MismatchFail" xml:space="preserve">
     <value>タスクを停止する</value>
   </data>
-  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+  <data name="Restore_MismatchHelpHeader" xml:space="preserve">
     <value>プレースホルダーの不一致とは何ですか?</value>
   </data>
-  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+  <data name="Restore_MismatchHelp1" xml:space="preserve">
     <value>セグメント内の保護された範囲は、{name} などのメッセージの引数と、数のマーカー # です。それらの 1 つが失われた訳文や、原文にないものが加わった訳文は、アプリケーションの実行時にエラーになるか、誤ったテキストを表示します。</value>
   </data>
-  <data name="Finalise_MismatchHelp2" xml:space="preserve">
-    <value>警告は原文セグメントのコメントとレポートに記録され、ファイルは生成されます。タスクを停止すると、訳文が修正されるまで生成を拒否します。</value>
+  <data name="Restore_MismatchHelp2" xml:space="preserve">
+    <value>警告はセグメントのコメントとレポートに記録され、メッセージは展開されたまま、プレースホルダーはタグとして残るため、欠けているものを配置できます。修正したら Restore ICU をもう一度実行してください。タスクを停止する設定では、翻訳が正されるまで先に進みません。</value>
   </data>
   <data name="Report_ExpandName" xml:space="preserve">
-    <value>ICU Expand Plural Forms</value>
+    <value>Expand ICU</value>
   </data>
   <data name="Report_ExpandDescription" xml:space="preserve">
     <value>{1} 個のファイルで {0} 件の ICU メッセージを展開しました。警告付き: {2} 件。</value>
   </data>
-  <data name="Report_FinaliseName" xml:space="preserve">
-    <value>ICU Finalise Messages</value>
+  <data name="Report_RestoreName" xml:space="preserve">
+    <value>Restore ICU</value>
   </data>
-  <data name="Report_FinaliseDescription" xml:space="preserve">
-    <value>{1} 個のファイルで {0} 件の ICU メッセージを最終処理しました。削除した形式: {2}、原文から補完したセグメント: {3}、警告: {4}。</value>
+  <data name="Report_RestoreDescription" xml:space="preserve">
+    <value>{1} 個のファイルで {0} 件の ICU メッセージを復元しました。削除した形式: {2}、原文から補完したセグメント: {3}、警告: {4}。</value>
   </data>
   <data name="Report_Summary" xml:space="preserve">
     <value>概要</value>
@@ -235,6 +262,9 @@
   <data name="Report_Skipped" xml:space="preserve">
     <value>展開済み (前回)</value>
   </data>
+  <data name="Report_Kept" xml:space="preserve">
+    <value>そのまま</value>
+  </data>
   <data name="Report_Pruned" xml:space="preserve">
     <value>削除した形式</value>
   </data>
@@ -249,6 +279,12 @@
   </data>
   <data name="Report_Off" xml:space="preserve">
     <value>オフ</value>
+  </data>
+  <data name="Report_KeepAt" xml:space="preserve">
+    <value>{0}% 以上</value>
+  </data>
+  <data name="Report_KeepLocked" xml:space="preserve">
+    <value>ロック済み</value>
   </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms は、ICU MessageFormat メッセージの複数形・序数・select の各形式を数の例とともに表示し、メッセージ全体を再構成して示すため、入力しながら訳文を確認できます。</value>
@@ -335,7 +371,7 @@
     <value>ICU Verifier</value>
   </data>
   <data name="Verifier_EmptyForm" xml:space="preserve">
-    <value>形式「{0}」に訳文がありません。最終処理では原文テキストが使用されます。</value>
+    <value>形式「{0}」に訳文がありません。Restore ICU では原文テキストが使用されます。</value>
   </data>
   <data name="Verifier_Placeholders" xml:space="preserve">
     <value>保護されたプレースホルダーが原文と異なります: {0}。</value>

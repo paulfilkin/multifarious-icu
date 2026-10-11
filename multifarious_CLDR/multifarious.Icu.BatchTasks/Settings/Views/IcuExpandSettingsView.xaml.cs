@@ -26,7 +26,7 @@ namespace multifarious.Icu.BatchTasks.Settings.Views
 
         public IcuExpandSettings Settings { get; set; }
 
-        /// <summary>The page refuses to save while the budget box holds something that is not a number in range.</summary>
+        /// <summary>The page refuses to save while a number box holds something that is not a number in range.</summary>
         public bool ValidateChildren()
         {
             var viewModel = DataContext as IcuExpandSettingsViewModel;

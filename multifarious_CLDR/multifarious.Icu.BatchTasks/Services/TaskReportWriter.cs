@@ -34,16 +34,16 @@ namespace multifarious.Icu.BatchTasks.Services
         public IReadOnlyList<ExpandUnitOutcome> Outcomes { get; }
     }
 
-    public sealed class FinaliseReportFile
+    public sealed class RestoreReportFile
     {
-        public FinaliseReportFile(string name, IReadOnlyList<FinaliseUnitOutcome> outcomes)
+        public RestoreReportFile(string name, IReadOnlyList<RestoreUnitOutcome> outcomes)
         {
             Name = name ?? string.Empty;
-            Outcomes = outcomes ?? new List<FinaliseUnitOutcome>();
+            Outcomes = outcomes ?? new List<RestoreUnitOutcome>();
         }
 
         public string Name { get; }
-        public IReadOnlyList<FinaliseUnitOutcome> Outcomes { get; }
+        public IReadOnlyList<RestoreUnitOutcome> Outcomes { get; }
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ namespace multifarious.Icu.BatchTasks.Services
     public static class TaskReportWriter
     {
         public const string ExpandTaskName = "expand";
-        public const string FinaliseTaskName = "finalise";
+        public const string RestoreTaskName = "restore";
 
         public static string Expand(ReportContext context, ExpansionOptions options, IReadOnlyList<ExpandReportFile> files)
         {
@@ -81,6 +81,10 @@ namespace multifarious.Icu.BatchTasks.Services
                 WriteSetting(writer, UIStrings.Expand_BudgetHeader, options.MaxUnitsPerMessage.ToString(CultureInfo.InvariantCulture));
                 WriteSetting(writer, UIStrings.Expand_ParseHeader,
                     options.OnParseError == ParseErrorBehaviour.FailTask ? UIStrings.Expand_ParseFail : UIStrings.Expand_ParsePassThrough);
+                WriteSetting(writer, UIStrings.Expand_KeepTranslated, options.KeepTranslated
+                    ? string.Format(CultureInfo.CurrentCulture, UIStrings.Report_KeepAt, options.KeepMinimumMatch)
+                        + (options.LockKept ? ", " + UIStrings.Report_KeepLocked : string.Empty)
+                    : UIStrings.Report_Off);
                 writer.WriteEndElement();
 
                 WriteLabels(writer, CommonLabels().Concat(new[]
@@ -91,6 +95,7 @@ namespace multifarious.Icu.BatchTasks.Services
                     Label("outcome_Walked", UIStrings.Report_Walked),
                     Label("outcome_PassedThrough", UIStrings.Report_PassedThrough),
                     Label("outcome_Skipped", UIStrings.Report_Skipped),
+                    Label("outcome_Kept", UIStrings.Report_Kept),
                     Label("outcome", UIStrings.Report_Outcome),
                     Label("note", UIStrings.Report_Note),
                 }));
@@ -121,7 +126,7 @@ namespace multifarious.Icu.BatchTasks.Services
             });
         }
 
-        public static string Finalise(ReportContext context, FinaliseOptions options, IReadOnlyList<FinaliseReportFile> files)
+        public static string Restore(ReportContext context, RestoreOptions options, IReadOnlyList<RestoreReportFile> files)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (options == null) throw new ArgumentNullException(nameof(options));
@@ -130,19 +135,19 @@ namespace multifarious.Icu.BatchTasks.Services
             return Write(writer =>
             {
                 writer.WriteStartElement("task");
-                writer.WriteAttributeString("name", FinaliseTaskName);
+                writer.WriteAttributeString("name", RestoreTaskName);
                 WriteTaskInfo(writer, context, files.Count);
 
                 writer.WriteStartElement("settings");
-                WriteSetting(writer, UIStrings.Finalise_EmptyHeader,
-                    options.OnEmptyBranch == EmptyBranchBehaviour.FailTask ? UIStrings.Finalise_EmptyFail : UIStrings.Finalise_EmptyUseSource);
-                WriteSetting(writer, UIStrings.Finalise_MismatchHeader,
-                    options.OnPlaceholderMismatch == PlaceholderMismatchBehaviour.FailTask ? UIStrings.Finalise_MismatchFail : UIStrings.Finalise_MismatchWarn);
+                WriteSetting(writer, UIStrings.Restore_EmptyHeader,
+                    options.OnEmptyBranch == EmptyBranchBehaviour.FailTask ? UIStrings.Restore_EmptyFail : UIStrings.Restore_EmptyUseSource);
+                WriteSetting(writer, UIStrings.Restore_MismatchHeader,
+                    options.OnPlaceholderMismatch == PlaceholderMismatchBehaviour.FailTask ? UIStrings.Restore_MismatchFail : UIStrings.Restore_MismatchWarn);
                 writer.WriteEndElement();
 
                 WriteLabels(writer, CommonLabels().Concat(new[]
                 {
-                    Label("title", UIStrings.Report_FinaliseName),
+                    Label("title", UIStrings.Report_RestoreName),
                     Label("pruned", UIStrings.Report_Pruned),
                     Label("filled", UIStrings.Report_Filled),
                     Label("noWarnings", UIStrings.Report_NoWarnings),
@@ -150,14 +155,14 @@ namespace multifarious.Icu.BatchTasks.Services
 
                 var all = files.SelectMany(file => file.Outcomes).ToList();
                 writer.WriteStartElement("totals");
-                WriteFinaliseCounts(writer, all);
+                WriteRestoreCounts(writer, all);
                 writer.WriteEndElement();
 
                 foreach (var file in files)
                 {
                     writer.WriteStartElement("file");
                     writer.WriteAttributeString("name", file.Name);
-                    WriteFinaliseCounts(writer, file.Outcomes);
+                    WriteRestoreCounts(writer, file.Outcomes);
                     foreach (var outcome in file.Outcomes)
                     {
                         writer.WriteStartElement("message");
@@ -267,11 +272,12 @@ namespace multifarious.Icu.BatchTasks.Services
             Count(writer, "walked", outcomes.Count(o => o.Outcome == ExpandOutcome.Walked));
             Count(writer, "passedThrough", outcomes.Count(o => o.Outcome == ExpandOutcome.PassedThrough));
             Count(writer, "skipped", outcomes.Count(o => o.Outcome == ExpandOutcome.Skipped));
+            Count(writer, "kept", outcomes.Count(o => o.Outcome == ExpandOutcome.Kept));
             Count(writer, "segments", outcomes.Sum(o => o.Segments));
             Count(writer, "warnings", outcomes.Count(o => o.Detail.Length > 0));
         }
 
-        private static void WriteFinaliseCounts(XmlWriter writer, IReadOnlyList<FinaliseUnitOutcome> outcomes)
+        private static void WriteRestoreCounts(XmlWriter writer, IReadOnlyList<RestoreUnitOutcome> outcomes)
         {
             Count(writer, "units", outcomes.Count);
             Count(writer, "segments", outcomes.Sum(o => o.Segments));

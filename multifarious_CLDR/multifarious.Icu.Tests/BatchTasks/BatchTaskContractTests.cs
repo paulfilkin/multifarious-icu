@@ -23,7 +23,7 @@ public class BatchTaskContractTests
     public static IEnumerable<object[]> Tasks =>
     [
         [typeof(IcuExpandTask), Constants.ExpandTaskId],
-        [typeof(IcuFinaliseTask), Constants.FinaliseTaskId],
+        [typeof(IcuRestoreTask), Constants.RestoreTaskId],
     ];
 
     private static AutomaticTaskAttribute AttributeOf(Type task) =>
@@ -74,16 +74,28 @@ public class BatchTaskContractTests
             $"PluginResources has no entry '{attribute.Description}'");
     }
 
+    /// <summary>
+    /// Studio keeps the converter's output over the project file only when the task says so;
+    /// the default says no, which is how an expanded file was lost to a following task in the
+    /// same pass (Project 51, 11 October 2026).
+    /// </summary>
+    [Fact]
+    public void Both_tasks_tell_studio_to_keep_the_converters_output()
+    {
+        Assert.True(new IcuExpandTask().OnFileComplete(null!, null!));
+        Assert.True(new IcuRestoreTask().OnFileComplete(null!, null!));
+    }
+
     [Fact]
     public void The_two_task_ids_differ()
     {
-        Assert.NotEqual(Constants.ExpandTaskId, Constants.FinaliseTaskId);
+        Assert.NotEqual(Constants.ExpandTaskId, Constants.RestoreTaskId);
     }
 
     public static IEnumerable<object[]> SettingsBindings =>
     [
         [typeof(IcuExpandTask), typeof(IcuExpandSettings), typeof(IcuExpandSettingsPage), typeof(IcuExpandSettingsView)],
-        [typeof(IcuFinaliseTask), typeof(IcuFinaliseSettings), typeof(IcuFinaliseSettingsPage), typeof(IcuFinaliseSettingsView)],
+        [typeof(IcuRestoreTask), typeof(IcuRestoreSettings), typeof(IcuRestoreSettingsPage), typeof(IcuRestoreSettingsView)],
     ];
 
     /// <summary>
@@ -121,6 +133,6 @@ public class BatchTaskContractTests
         var bundle = SettingsUtil.CreateSettingsBundle(null);
 
         Assert.Equal("IcuExpandSettings", bundle.GetSettingsGroup<IcuExpandSettings>().Id);
-        Assert.Equal("IcuFinaliseSettings", bundle.GetSettingsGroup<IcuFinaliseSettings>().Id);
+        Assert.Equal("IcuRestoreSettings", bundle.GetSettingsGroup<IcuRestoreSettings>().Id);
     }
 }

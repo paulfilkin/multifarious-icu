@@ -80,7 +80,7 @@ public class SatelliteLanguageTests
         foreach (var culture in TranslatedCultures())
         {
             var translated = Translated(culture);
-            foreach (var key in new[] { "Expand_KindsHeader", "Report_Summary", "Finalise_EmptyHeader" })
+            foreach (var key in new[] { "Expand_KindsHeader", "Report_Summary", "Restore_EmptyHeader" })
             {
                 Assert.Equal(translated[key], Lookup(culture, key));
             }
@@ -121,7 +121,9 @@ public class SatelliteLanguageTests
             ["Expand_SeedHelp1"] = ["one", "other", "few"],
             ["Expand_LockHint"] = ["QuickPlace"],
             ["Expand_PlaceholdersHelp1"] = ["{name}", "#", "QuickPlace"],
-            ["Finalise_MismatchHelp1"] = ["{name}", "#"],
+            ["Restore_MismatchHelp1"] = ["{name}", "#"],
+            ["Expand_KeepHelp1"] = ["Restore ICU"],
+            ["Expand_KeepHelp2"] = ["Restore ICU"],
         };
 
         foreach (var culture in TranslatedCultures())
@@ -146,8 +148,8 @@ public class SatelliteLanguageTests
         foreach (var culture in TranslatedCultures())
         {
             var translated = Translated(culture);
-            Assert.Equal("ICU Expand Plural Forms", translated["Report_ExpandName"]);
-            Assert.Equal("ICU Finalise Messages", translated["Report_FinaliseName"]);
+            Assert.Equal("Expand ICU", translated["Report_ExpandName"]);
+            Assert.Equal("Restore ICU", translated["Report_RestoreName"]);
         }
     }
 

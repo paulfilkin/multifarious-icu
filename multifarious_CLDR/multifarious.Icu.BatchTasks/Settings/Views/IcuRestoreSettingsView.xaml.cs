@@ -5,15 +5,15 @@ using Sdl.Desktop.IntegrationApi.Interfaces;
 
 namespace multifarious.Icu.BatchTasks.Settings.Views
 {
-    /// <summary>The control for the finalise task's settings page; see <see cref="IcuExpandSettingsView"/>.</summary>
-    public partial class IcuFinaliseSettingsView : UserControl, IUISettingsControl, ISettingsAware<IcuFinaliseSettings>
+    /// <summary>The control for the restore task's settings page; see <see cref="IcuExpandSettingsView"/>.</summary>
+    public partial class IcuRestoreSettingsView : UserControl, IUISettingsControl, ISettingsAware<IcuRestoreSettings>
     {
-        public IcuFinaliseSettingsView()
+        public IcuRestoreSettingsView()
         {
             InitializeComponent();
         }
 
-        public IcuFinaliseSettings Settings { get; set; }
+        public IcuRestoreSettings Settings { get; set; }
 
         public bool ValidateChildren()
         {

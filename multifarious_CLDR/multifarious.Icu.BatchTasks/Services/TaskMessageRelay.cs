@@ -9,14 +9,12 @@ namespace multifarious.Icu.BatchTasks.Services
     /// <summary>
     /// Puts a task's warnings in front of the user in Studio's Task Results window.
     ///
-    /// The tasks do their work through a converter of their own (see
-    /// <see cref="BilingualFileUpdater"/>), and nothing reported there reaches Studio. The
-    /// converter Studio hands the task in ConfigureConverter does run its processors, and a
-    /// message reported through one of them lands in the task's results, so a finalise run with
-    /// a placeholder mismatch says so in the dialog and not only in the report and on the unit
-    /// (Paul, 6 September 2026, Project 56). This processor is added to Studio's converter after
-    /// the file has been rewritten, with the warnings the rewrite collected, and reports each
-    /// one when the converter starts on the file.
+    /// A message reported through a processor in the converter Studio hands the task lands in
+    /// the task's results, so a restore run with a placeholder mismatch says so in the dialog
+    /// and not only in the report and on the unit (Paul, 6 September 2026, Project 56). The
+    /// task's own processor runs in that converter too, ahead of this one, so the warnings are
+    /// complete by the time the document ends; this processor reads them then and reports each
+    /// one.
     /// </summary>
     public sealed class TaskMessageRelay : AbstractBilingualContentProcessor
     {
@@ -25,10 +23,11 @@ namespace multifarious.Icu.BatchTasks.Services
 
         private readonly string _origin;
         private readonly string _fileName;
-        private readonly IReadOnlyList<string> _messages;
+        private readonly Func<IEnumerable<string>> _messages;
         private readonly ErrorLevel _level;
 
-        public TaskMessageRelay(string origin, string fileName, IReadOnlyList<string> messages, ErrorLevel level)
+        /// <param name="messages">Read when the document ends, so a list the task's processor is still filling is fine.</param>
+        public TaskMessageRelay(string origin, string fileName, Func<IEnumerable<string>> messages, ErrorLevel level)
         {
             if (messages == null) throw new ArgumentNullException(nameof(messages));
             _origin = origin ?? string.Empty;
@@ -50,15 +49,17 @@ namespace multifarious.Icu.BatchTasks.Services
             }
         }
 
-        public override void Initialize(IDocumentProperties documentInfo)
+        public override void Complete()
         {
-            base.Initialize(documentInfo);
-            foreach (var message in _messages)
+            var count = 0;
+            foreach (var message in _messages())
             {
                 ReportMessage(this, _origin, _level, message, _fileName);
+                count++;
             }
-            Diagnostics.Write("relay: " + _messages.Count + " message(s) for " + _fileName
+            Diagnostics.Write("relay: " + count + " message(s) for " + _fileName
                 + (MessageReporter == null ? " (no reporter)" : string.Empty));
+            base.Complete();
         }
     }
 }

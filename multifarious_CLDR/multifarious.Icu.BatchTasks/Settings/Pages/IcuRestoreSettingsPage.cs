@@ -8,12 +8,12 @@ using Sdl.Desktop.IntegrationApi;
 
 namespace multifarious.Icu.BatchTasks.Settings.Pages
 {
-    /// <summary>The finalise task's settings page; see <see cref="IcuExpandSettingsPage"/>.</summary>
-    public class IcuFinaliseSettingsPage : DefaultSettingsPage<IcuFinaliseSettingsView, IcuFinaliseSettings>
+    /// <summary>The restore task's settings page; see <see cref="IcuExpandSettingsPage"/>.</summary>
+    public class IcuRestoreSettingsPage : DefaultSettingsPage<IcuRestoreSettingsView, IcuRestoreSettings>
     {
-        private IcuFinaliseSettingsView _view;
-        private IcuFinaliseSettingsViewModel _viewModel;
-        private IcuFinaliseSettings _settings;
+        private IcuRestoreSettingsView _view;
+        private IcuRestoreSettingsViewModel _viewModel;
+        private IcuRestoreSettings _settings;
 
         public override object GetControl()
         {
@@ -21,11 +21,11 @@ namespace multifarious.Icu.BatchTasks.Settings.Pages
 
             Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                _settings = ((ISettingsBundle)DataSource).GetSettingsGroup<IcuFinaliseSettings>();
-                _view = base.GetControl() as IcuFinaliseSettingsView;
+                _settings = ((ISettingsBundle)DataSource).GetSettingsGroup<IcuRestoreSettings>();
+                _view = base.GetControl() as IcuRestoreSettingsView;
                 if (_view != null)
                 {
-                    _viewModel = new IcuFinaliseSettingsViewModel(_settings);
+                    _viewModel = new IcuRestoreSettingsViewModel(_settings);
                     _view.Loaded += OnViewLoaded;
                 }
             }));

@@ -1,4 +1,4 @@
-<UserControl x:Class="multifarious.Icu.BatchTasks.Settings.Views.IcuFinaliseSettingsView"
+<UserControl x:Class="multifarious.Icu.BatchTasks.Settings.Views.IcuRestoreSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:res="clr-namespace:multifarious.Icu.BatchTasks.Resources"
@@ -45,32 +45,32 @@
   <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
     <StackPanel>
 
-      <TextBlock Style="{StaticResource Intro}" Text="{x:Static res:UIStrings.Finalise_Intro}" />
+      <TextBlock Style="{StaticResource Intro}" Text="{x:Static res:UIStrings.Restore_Intro}" />
 
-      <GroupBox Header="{x:Static res:UIStrings.Finalise_EmptyHeader}">
+      <GroupBox Header="{x:Static res:UIStrings.Restore_EmptyHeader}">
         <StackPanel>
-          <RadioButton GroupName="Empty" TabIndex="10" Content="{x:Static res:UIStrings.Finalise_EmptyUseSource}" IsChecked="{Binding EmptyBranchUsesSource}" />
-          <RadioButton GroupName="Empty" TabIndex="11" Content="{x:Static res:UIStrings.Finalise_EmptyFail}" IsChecked="{Binding EmptyBranchFailsTask}" />
-          <Expander Style="{StaticResource Help}" TabIndex="12" Header="{x:Static res:UIStrings.Finalise_EmptyHelpHeader}">
+          <RadioButton GroupName="Empty" TabIndex="10" Content="{x:Static res:UIStrings.Restore_EmptyUseSource}" IsChecked="{Binding EmptyBranchUsesSource}" />
+          <RadioButton GroupName="Empty" TabIndex="11" Content="{x:Static res:UIStrings.Restore_EmptyFail}" IsChecked="{Binding EmptyBranchFailsTask}" />
+          <Expander Style="{StaticResource Help}" TabIndex="12" Header="{x:Static res:UIStrings.Restore_EmptyHelpHeader}">
             <Border Style="{StaticResource HelpBody}">
               <StackPanel>
-                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Finalise_EmptyHelp1}" />
-                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Finalise_EmptyHelp2}" Margin="0" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Restore_EmptyHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Restore_EmptyHelp2}" Margin="0" />
               </StackPanel>
             </Border>
           </Expander>
         </StackPanel>
       </GroupBox>
 
-      <GroupBox Header="{x:Static res:UIStrings.Finalise_MismatchHeader}">
+      <GroupBox Header="{x:Static res:UIStrings.Restore_MismatchHeader}">
         <StackPanel>
-          <RadioButton GroupName="Mismatch" TabIndex="20" Content="{x:Static res:UIStrings.Finalise_MismatchWarn}" IsChecked="{Binding MismatchWarns}" />
-          <RadioButton GroupName="Mismatch" TabIndex="21" Content="{x:Static res:UIStrings.Finalise_MismatchFail}" IsChecked="{Binding MismatchFailsTask}" />
-          <Expander Style="{StaticResource Help}" TabIndex="22" Header="{x:Static res:UIStrings.Finalise_MismatchHelpHeader}">
+          <RadioButton GroupName="Mismatch" TabIndex="20" Content="{x:Static res:UIStrings.Restore_MismatchWarn}" IsChecked="{Binding MismatchWarns}" />
+          <RadioButton GroupName="Mismatch" TabIndex="21" Content="{x:Static res:UIStrings.Restore_MismatchFail}" IsChecked="{Binding MismatchFailsTask}" />
+          <Expander Style="{StaticResource Help}" TabIndex="22" Header="{x:Static res:UIStrings.Restore_MismatchHelpHeader}">
             <Border Style="{StaticResource HelpBody}">
               <StackPanel>
-                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Finalise_MismatchHelp1}" />
-                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Finalise_MismatchHelp2}" Margin="0" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Restore_MismatchHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Restore_MismatchHelp2}" Margin="0" />
               </StackPanel>
             </Border>
           </Expander>

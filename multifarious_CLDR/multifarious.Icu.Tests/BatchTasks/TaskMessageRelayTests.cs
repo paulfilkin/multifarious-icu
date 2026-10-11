@@ -25,18 +25,22 @@ public class TaskMessageRelayTests
     public void Each_warning_is_reported_with_the_tasks_name_and_the_file_when_the_converter_starts()
     {
         var reporter = new Recording();
-        var relay = new TaskMessageRelay("ICU Finalise Messages", "messages.json.sdlxliff",
-            ["Segment 2: Placeholder mismatch: 1 placeholder(s) in the target with no source counterpart", "The message is left with its placeholders as tags"],
-            ErrorLevel.Warning)
+        var messages = new List<string>();
+        var relay = new TaskMessageRelay("Restore ICU", "messages.json.sdlxliff", () => messages, ErrorLevel.Warning)
         {
             MessageReporter = reporter,
         };
 
+        // Filled while the document is being processed, read when it ends.
         relay.Initialize(ParagraphUnits.ItemFactory.CreateDocumentProperties());
+        messages.Add("Segment 2: Placeholder mismatch: 1 placeholder(s) in the target with no source counterpart");
+        messages.Add("The message is left expanded with its placeholders as tags");
+        Assert.Empty(reporter.Messages);
+        relay.Complete();
 
         Assert.Equal(2, reporter.Messages.Count);
         Assert.All(reporter.Messages, m => Assert.Equal(ErrorLevel.Warning, m.Level));
-        Assert.All(reporter.Messages, m => Assert.Equal("ICU Finalise Messages", m.Origin));
+        Assert.All(reporter.Messages, m => Assert.Equal("Restore ICU", m.Origin));
         Assert.All(reporter.Messages, m => Assert.Equal("messages.json.sdlxliff", m.Where));
         Assert.StartsWith("Segment 2: Placeholder mismatch", reporter.Messages[0].Message);
     }
@@ -44,8 +48,8 @@ public class TaskMessageRelayTests
     [Fact]
     public void The_origin_is_the_tasks_name_from_the_plugin_resources()
     {
-        Assert.Equal("ICU Finalise Messages", TaskMessageRelay.OriginFor("Task_Finalise_Name"));
-        Assert.Equal("ICU Expand Plural Forms", TaskMessageRelay.OriginFor("Task_Expand_Name"));
+        Assert.Equal("Restore ICU", TaskMessageRelay.OriginFor("Task_Restore_Name"));
+        Assert.Equal("Expand ICU", TaskMessageRelay.OriginFor("Task_Expand_Name"));
         Assert.Equal("Task_Unknown", TaskMessageRelay.OriginFor("Task_Unknown"));
     }
 }

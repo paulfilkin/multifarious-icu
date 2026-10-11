@@ -96,12 +96,17 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
         }
 
         /// <summary>
-        /// Updates the project's bilingual file, and deliberately ignores the converter handed in.
+        /// Puts the processor into the converter Studio hands the task. Studio parses the file
+        /// through every processor the tasks of the pass added, in task order, writes the result
+        /// to a temporary file, and keeps it over the project's file when
+        /// <see cref="OnFileComplete"/> says so (Studio's ContentProcessingTaskImplementation,
+        /// decompiled 11 October 2026). Adjacent content-processing tasks in a sequence share
+        /// one pass, so Pseudo-translate placed after this task runs over the expanded forms.
         ///
-        /// A processor added to that converter runs over every unit and changes nothing on disk;
-        /// the YAML plugin established this. What works is a converter of our own from the
-        /// bilingual file to a new one with the processor in between, then the result put in
-        /// place of the original.
+        /// Until 2.0 the task rewrote the file itself and ignored this converter, on the YAML
+        /// plugin's finding that the converter changed nothing on disk. That finding was the
+        /// default OnFileComplete, which returns false. Alone, the rewrite held; followed by a
+        /// task that returns true, Studio's output, parsed before the rewrite, won (Project 51).
         /// </summary>
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter converter)
         {
@@ -117,20 +122,27 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
 
             var processor = new IcuExpandProcessor(_sourceLanguage, targetLanguage, _options, AppVersion);
             _processed.Add(new ProcessedFile { File = projectFile, Processor = processor });
+            converter.AddBilingualProcessor(processor);
 
-            if (BilingualFileUpdater.Update(projectFile.LocalFilePath, processor, "expand"))
-            {
-                Diagnostics.Write("expand: " + projectFile.Name + " units=" + processor.Units
-                    + " expanded=" + processor.Expanded + " warnings=" + processor.Warnings.Count);
-            }
+            // The warnings reach the Task Results window through the same converter, read once
+            // the processor has seen the whole document.
+            converter.AddBilingualProcessor(new TaskMessageRelay(
+                TaskMessageRelay.OriginFor("Task_Expand_Name"), projectFile.Name,
+                () => processor.Warnings.Select(w => w.Reason), ErrorLevel.Warning));
+            Diagnostics.Write("expand: " + projectFile.Name + " processor added to the task's converter");
+        }
 
-            // The warnings reach the Task Results window through Studio's own converter.
-            if (processor.Warnings.Count > 0)
+        /// <summary>Keep the converter's output: it is the expanded file. A processor failure never gets here; Studio reports it and keeps the original.</summary>
+        public override bool OnFileComplete(ProjectFile projectFile, IMultiFileConverter converter)
+        {
+            var processed = projectFile == null ? null : _processed.LastOrDefault(item => item.File.Id == projectFile.Id);
+            if (processed != null)
             {
-                var messages = processor.Warnings.Select(w => w.Reason).ToList();
-                converter.AddBilingualProcessor(new TaskMessageRelay(
-                    TaskMessageRelay.OriginFor("Task_Expand_Name"), projectFile.Name, messages, ErrorLevel.Warning));
+                Diagnostics.Write("expand: " + projectFile.Name + " units=" + processed.Processor.Units
+                    + " expanded=" + processed.Processor.Expanded + " kept=" + processed.Processor.Kept
+                    + " warnings=" + processed.Processor.Warnings.Count + " -> keep output");
             }
+            return true;
         }
 
         /// <summary>

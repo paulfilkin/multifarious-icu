@@ -16,42 +16,43 @@ using Sdl.ProjectAutomation.Core;
 namespace multifarious.Icu.BatchTasks.BatchTasks
 {
     /// <summary>
-    /// Finalises the expanded messages in a bilingual target file: prunes branches to the target
+    /// Restores the expanded messages in a bilingual target file: prunes branches to the target
     /// language's exact CLDR category set, escapes ICU special characters the translator typed
-    /// as text, checks placeholder parity and fills untranslated branches from the source with
-    /// a warning.
+    /// as text, checks placeholder parity, fills untranslated forms from the source with a
+    /// warning, and puts each message back together as one plain segment per side, the shape
+    /// Studio's writers emit as it stands.
     ///
-    /// Runs after Update Main Translation Memories and before Generate Target Translations, so
-    /// the translation memory stores the translator's clean text and only the generated file
-    /// carries the escaping.
+    /// Runs whenever the translator wants the whole messages back: before Generate Target
+    /// Translations, or to switch out of the expanded layout. ICU Expand on a restored file
+    /// lays the forms out again with their translations and states.
     /// </summary>
     [AutomaticTask(
-        Id = Constants.FinaliseTaskId,
-        Name = "Task_Finalise_Name",
-        Description = "Task_Finalise_Description",
+        Id = Constants.RestoreTaskId,
+        Name = "Task_Restore_Name",
+        Description = "Task_Restore_Description",
         GeneratedFileType = AutomaticTaskFileType.BilingualTarget,
         AllowMultiple = true)]
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
-    [RequiresSettings(typeof(IcuFinaliseSettings), typeof(IcuFinaliseSettingsPage))]
-    public class IcuFinaliseTask : AbstractFileContentProcessingAutomaticTask
+    [RequiresSettings(typeof(IcuRestoreSettings), typeof(IcuRestoreSettingsPage))]
+    public class IcuRestoreTask : AbstractFileContentProcessingAutomaticTask
     {
         private readonly List<ProcessedFile> _processed = new List<ProcessedFile>();
-        private FinaliseOptions _options;
+        private RestoreOptions _options;
         private int _filesSeen;
         private int _filesProcessed;
 
         private sealed class ProcessedFile
         {
             public ProjectFile File;
-            public IcuFinaliseProcessor Processor;
+            public IcuRestoreProcessor Processor;
         }
 
         protected override void OnInitializeTask()
         {
-            _options = GetSetting<IcuFinaliseSettings>().ToOptions();
+            _options = GetSetting<IcuRestoreSettings>().ToOptions();
 
             var info = Project != null ? Project.GetProjectInfo() : null;
-            Diagnostics.Start("finalise task");
+            Diagnostics.Start("restore task");
             Diagnostics.Write("project=" + (info != null ? info.Name : "<null>")
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
             Diagnostics.Write("settings: emptyBranch=" + _options.OnEmptyBranch
@@ -75,6 +76,7 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             return wanted;
         }
 
+        /// <summary>The processor goes into Studio's converter and the output is kept; see the expand task.</summary>
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter converter)
         {
             if (projectFile == null) return;
@@ -84,23 +86,27 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                 ? projectFile.Language.CultureInfo.Name
                 : null;
 
-            var processor = new IcuFinaliseProcessor(targetLanguage, _options);
+            var processor = new IcuRestoreProcessor(targetLanguage, _options);
             _processed.Add(new ProcessedFile { File = projectFile, Processor = processor });
+            converter.AddBilingualProcessor(processor);
 
-            if (BilingualFileUpdater.Update(projectFile.LocalFilePath, processor, "finalise"))
-            {
-                Diagnostics.Write("finalise: " + projectFile.Name + " units=" + processor.Units
-                    + " pruned=" + processor.Pruned + " filled=" + processor.Filled
-                    + " warnings=" + processor.Warnings.Count);
-            }
+            converter.AddBilingualProcessor(new TaskMessageRelay(
+                TaskMessageRelay.OriginFor("Task_Restore_Name"), projectFile.Name,
+                () => processor.Warnings.Select(w => w.Reason), ErrorLevel.Warning));
+            Diagnostics.Write("restore: " + projectFile.Name + " processor added to the task's converter");
+        }
 
-            // The warnings reach the Task Results window through Studio's own converter.
-            if (processor.Warnings.Count > 0)
+        public override bool OnFileComplete(ProjectFile projectFile, IMultiFileConverter converter)
+        {
+            var processed = projectFile == null ? null : _processed.LastOrDefault(item => item.File.Id == projectFile.Id);
+            if (processed != null)
             {
-                var messages = processor.Warnings.Select(w => w.Reason).ToList();
-                converter.AddBilingualProcessor(new TaskMessageRelay(
-                    TaskMessageRelay.OriginFor("Task_Finalise_Name"), projectFile.Name, messages, ErrorLevel.Warning));
+                Diagnostics.Write("restore: " + projectFile.Name + " units=" + processed.Processor.Units
+                    + " restored=" + processed.Processor.Restored + " pruned=" + processed.Processor.Pruned
+                    + " filled=" + processed.Processor.Filled + " warnings=" + processed.Processor.Warnings.Count
+                    + " -> keep output");
             }
+            return true;
         }
 
         /// <summary>One report per language direction; see the expand task.</summary>
@@ -118,14 +124,14 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                 warnings += item.Processor.Warnings.Count;
             }
 
-            Diagnostics.Write("finalise task complete: seen=" + _filesSeen + " processed=" + _filesProcessed
+            Diagnostics.Write("restore task complete: seen=" + _filesSeen + " processed=" + _filesProcessed
                 + " units=" + units + " pruned=" + pruned + " filled=" + filled + " warnings=" + warnings);
 
             var info = Project != null ? Project.GetProjectInfo() : null;
             foreach (var group in _processed.GroupBy(item => LanguageKey(item.File)))
             {
                 var direction = group.First().File.GetLanguageDirection();
-                var files = group.Select(item => new FinaliseReportFile(item.File.Name, item.Processor.Outcomes)).ToList();
+                var files = group.Select(item => new RestoreReportFile(item.File.Name, item.Processor.Outcomes)).ToList();
                 var context = new ReportContext
                 {
                     ProjectName = info != null ? info.Name : string.Empty,
@@ -136,19 +142,19 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                     AppVersion = AppVersion,
                 };
 
-                var description = string.Format(CultureInfo.CurrentCulture, UIStrings.Report_FinaliseDescription,
+                var description = string.Format(CultureInfo.CurrentCulture, UIStrings.Report_RestoreDescription,
                     group.Sum(item => item.Processor.Units), files.Count,
                     group.Sum(item => item.Processor.Pruned), group.Sum(item => item.Processor.Filled),
                     group.Sum(item => item.Processor.Warnings.Count));
-                var xml = TaskReportWriter.Finalise(context, _options, files);
+                var xml = TaskReportWriter.Restore(context, _options, files);
 
                 if (direction != null)
                 {
-                    CreateReport(UIStrings.Report_FinaliseName, description, xml, direction);
+                    CreateReport(UIStrings.Report_RestoreName, description, xml, direction);
                 }
                 else
                 {
-                    CreateReport(UIStrings.Report_FinaliseName, description, xml, TaskId);
+                    CreateReport(UIStrings.Report_RestoreName, description, xml, TaskId);
                 }
                 Diagnostics.Write("report: " + group.Key + " files=" + files.Count);
             }
@@ -165,7 +171,7 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
         {
             get
             {
-                var version = typeof(IcuFinaliseTask).Assembly.GetName().Version;
+                var version = typeof(IcuRestoreTask).Assembly.GetName().Version;
                 return version == null ? "0.0.0" : version.ToString(3);
             }
         }

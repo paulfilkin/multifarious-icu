@@ -47,12 +47,12 @@ public class TaskReportTests
         ]),
     ];
 
-    private static List<FinaliseReportFile> FinaliseFiles() =>
+    private static List<RestoreReportFile> RestoreFiles() =>
     [
         new("messages.json",
         [
-            new FinaliseUnitOutcome("u1", "inbox.unreadCount", 6, 0, 2, ["Segment 3: The segment was untranslated; the source text was used.", "Segment 4: The segment was untranslated; the source text was used."]),
-            new FinaliseUnitOutcome("u2", "party.guests", 3, 3, 0, []),
+            new RestoreUnitOutcome("u1", "inbox.unreadCount", 6, 0, 2, ["Segment 3: The segment was untranslated; the source text was used.", "Segment 4: The segment was untranslated; the source text was used."]),
+            new RestoreUnitOutcome("u2", "party.guests", 3, 3, 0, []),
         ]),
     ];
 
@@ -102,18 +102,18 @@ public class TaskReportTests
         Assert.Equal("broken & \"odd\" <key>", messages[3].Attribute("key")!.Value);
         Assert.Equal("Walked", messages[2].Attribute("outcome")!.Value);
 
-        Assert.Equal(6, task.Element("settings")!.Elements("setting").Count());
+        Assert.Equal(7, task.Element("settings")!.Elements("setting").Count());
         Assert.NotEmpty(task.Element("labels")!.Elements("label"));
         Assert.All(task.Element("labels")!.Elements("label"), label => Assert.False(string.IsNullOrWhiteSpace(label.Value)));
     }
 
     [Fact]
-    public void The_finalise_report_carries_the_warnings_per_message()
+    public void The_restore_report_carries_the_warnings_per_message()
     {
-        var xml = TaskReportWriter.Finalise(Context(), FinaliseOptions.Default, FinaliseFiles());
+        var xml = TaskReportWriter.Restore(Context(), RestoreOptions.Default, RestoreFiles());
         var task = XDocument.Parse(xml).Root!;
 
-        Assert.Equal("finalise", task.Attribute("name")!.Value);
+        Assert.Equal("restore", task.Attribute("name")!.Value);
         var totals = task.Element("totals")!;
         Assert.Equal("2", totals.Attribute("units")!.Value);
         Assert.Equal("9", totals.Attribute("segments")!.Value);
@@ -133,7 +133,7 @@ public class TaskReportTests
 
         Assert.Contains("studio.css", html);
         Assert.Contains("images/TradosStudio_Logo.svg", html);
-        Assert.Contains("ICU Expand Plural Forms", html);
+        Assert.Contains("Expand ICU", html);
         Assert.Contains("Project &lt;44&gt;", html);
         Assert.Contains("messages.json", html);
         Assert.Contains("inbox.unreadCount", html);
@@ -145,17 +145,17 @@ public class TaskReportTests
     }
 
     [Fact]
-    public void The_stylesheet_renders_the_finalise_report_with_its_warnings()
+    public void The_stylesheet_renders_the_restore_report_with_its_warnings()
     {
-        var html = Render(TaskReportWriter.Finalise(Context(), FinaliseOptions.Default, FinaliseFiles()));
+        var html = Render(TaskReportWriter.Restore(Context(), RestoreOptions.Default, RestoreFiles()));
 
-        Assert.Contains("ICU Finalise Messages", html);
+        Assert.Contains("Restore ICU", html);
         Assert.Contains("Forms removed", html);
         Assert.Contains("Segment 3: The segment was untranslated", html);
         Assert.DoesNotContain("No warnings.", html);
 
-        var quiet = Render(TaskReportWriter.Finalise(Context(), FinaliseOptions.Default,
-            [new FinaliseReportFile("simple.json", [new FinaliseUnitOutcome("u1", "rabbitWarning1", 6, 0, 0, [])])]));
+        var quiet = Render(TaskReportWriter.Restore(Context(), RestoreOptions.Default,
+            [new RestoreReportFile("simple.json", [new RestoreUnitOutcome("u1", "rabbitWarning1", 6, 0, 0, [])])]));
         Assert.Contains("No warnings.", quiet);
     }
 

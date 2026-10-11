@@ -1,5 +1,52 @@
 # multifariousICU Support for Trados Studio - Changelog
 
+## 2.0.0.0 (October 2026)
+
+Two batch tasks, **Expand ICU** and **Restore ICU**. ICU Finalise Messages is replaced by
+Restore, and a project template or task sequence that named it has to be re-saved with the new
+task.
+
+### Changed
+
+- **Restore ICU** replaces ICU Finalise Messages. It does everything Finalise did, removing the
+  forms the language does not use, escaping apostrophes and braces typed as text, checking the
+  placeholders and filling an untranslated form from the source with a warning, and then puts
+  each message back together as one plain segment on each side, with no tags and no locked
+  spans. The target comes back in the shape the translator worked in, with the shared text
+  inside every form, and so does the source, so the two line up. Run it before Generate Target
+  Translations, or whenever the whole messages are wanted back.
+- **Expand ICU** lays a restored message out again, each form with its translation, its
+  confirmation level, its lock and its match, so expanded and restored can be switched between
+  at will. The pattern as the file carried it stays in the file's metadata.
+- A message that arrives pre-translated as a whole, from a memory of restored messages, is
+  split into its forms with the match on every form.
+- The task names are Expand ICU and Restore ICU; the reports are named the same.
+
+### Added
+
+- Expand setting **Keep messages already translated**, off by default: a message whose every
+  segment is matched at the chosen percentage or better is left as it is, and locked if
+  **Lock kept segments** is on. Perfect Match and Context Match count as 100%. Restore ignores
+  a kept message and Generate Target Translations writes it as it stands.
+- The Expand report counts kept messages and shows the keep setting.
+
+### Fixed
+
+- Expand and Restore now run inside Studio's own task pass. Before, a task placed directly
+  after Expand in a task sequence, such as Pseudo-translate in a project template, saw the
+  file as it was before the expansion and wrote it back unexpanded.
+- Segment numbers run on through the file after Expand and Restore, as Studio's own filters
+  number them, instead of starting again at 1 for every message.
+
+### Notes
+
+- Studio's JSON writer does not write placeholder tags, so Restore must still run before
+  Generate Target Translations; it is what turns the forms back into one plain message.
+- A comment on a restored message does not come back through Expand. Comments on the forms
+  survive a Restore, around the text of the form they were on.
+- Update Main Translation Memories stores whatever shape the file is in when it runs: one unit
+  per form while expanded, one per whole message once restored. The tasks do not decide this.
+
 ## 1.0.2.0 (September 2026)
 
 ### Fixed

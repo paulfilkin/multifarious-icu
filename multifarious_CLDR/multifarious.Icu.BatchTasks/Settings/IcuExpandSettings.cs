@@ -22,9 +22,15 @@ namespace multifarious.Icu.BatchTasks.Settings
         private const string LockPlaceholdersId = "LockPlaceholders";
         private const string MaxUnitsPerMessageId = "MaxUnitsPerMessage";
         private const string OnParseErrorId = "OnParseError";
+        private const string KeepTranslatedId = "KeepTranslated";
+        private const string KeepMinimumMatchId = "KeepMinimumMatch";
+        private const string LockKeptId = "LockKept";
 
         public const int MinimumBudget = 1;
         public const int MaximumBudget = 999;
+
+        public const int MinimumMatch = 0;
+        public const int MaximumMatch = 100;
 
         public bool ExpandCardinal
         {
@@ -62,6 +68,24 @@ namespace multifarious.Icu.BatchTasks.Settings
             set { GetSetting<string>(OnParseErrorId).Value = value.ToString(); }
         }
 
+        public bool KeepTranslated
+        {
+            get { return GetSetting<bool>(KeepTranslatedId).Value; }
+            set { GetSetting<bool>(KeepTranslatedId).Value = value; }
+        }
+
+        public int KeepMinimumMatch
+        {
+            get { return GetSetting<int>(KeepMinimumMatchId).Value; }
+            set { GetSetting<int>(KeepMinimumMatchId).Value = value; }
+        }
+
+        public bool LockKept
+        {
+            get { return GetSetting<bool>(LockKeptId).Value; }
+            set { GetSetting<bool>(LockKeptId).Value = value; }
+        }
+
         /// <summary>
         /// The options record the processor runs on. The file types are not a setting: only the
         /// two proven ones are processed, by decision (Paul, 6 September 2026), and more join
@@ -78,6 +102,9 @@ namespace multifarious.Icu.BatchTasks.Settings
                 LockPlaceholders = LockPlaceholders,
                 MaxUnitsPerMessage = Math.Max(MinimumBudget, Math.Min(MaximumBudget, MaxUnitsPerMessage)),
                 OnParseError = OnParseError,
+                KeepTranslated = KeepTranslated,
+                KeepMinimumMatch = Math.Max(MinimumMatch, Math.Min(MaximumMatch, KeepMinimumMatch)),
+                LockKept = LockKept,
             };
         }
 
@@ -91,6 +118,9 @@ namespace multifarious.Icu.BatchTasks.Settings
                 case LockPlaceholdersId: return ExpansionOptions.Default.LockPlaceholders;
                 case MaxUnitsPerMessageId: return ExpansionOptions.Default.MaxUnitsPerMessage;
                 case OnParseErrorId: return ExpansionOptions.Default.OnParseError.ToString();
+                case KeepTranslatedId: return ExpansionOptions.Default.KeepTranslated;
+                case KeepMinimumMatchId: return ExpansionOptions.Default.KeepMinimumMatch;
+                case LockKeptId: return ExpansionOptions.Default.LockKept;
             }
 
             return base.GetDefaultValue(settingId);

@@ -50,4 +50,19 @@ public sealed record ExpansionOptions
     /// 2026).
     /// </summary>
     public bool LockPlaceholders { get; init; } = false;
+
+    /// <summary>
+    /// Whether a message whose target is already translated at <see cref="KeepMinimumMatch"/>
+    /// or better is left as it stands rather than expanded (Paul, 11 October 2026). A project
+    /// pre-translated from a memory of restored messages arrives with whole messages matched;
+    /// expanding them would throw the match away. Off by default: a translator may want to
+    /// see and change a 100% or context match, and the plugin hides nothing unless asked.
+    /// </summary>
+    public bool KeepTranslated { get; init; } = false;
+
+    /// <summary>The match percentage from which a translated message is kept. Perfect Match and Context Match count as 100.</summary>
+    public int KeepMinimumMatch { get; init; } = 100;
+
+    /// <summary>Whether the segments of a kept message are locked, so the translator cannot disturb a message the tasks never restructured.</summary>
+    public bool LockKept { get; init; } = true;
 }

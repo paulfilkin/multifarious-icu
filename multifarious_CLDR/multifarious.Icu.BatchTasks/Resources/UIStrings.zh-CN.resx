@@ -118,56 +118,83 @@
   <data name="Expand_ParseHelp2" xml:space="preserve">
     <value>保持原样可让文件的其余部分继续处理，并在段落上添加指明问题位置的警告。停止任务适用于绝不能让损坏的消息在无人察觉的情况下到达译员手中的流程。</value>
   </data>
-  <data name="Finalise_Intro" xml:space="preserve">
-    <value>完成处理会将每条消息裁剪为目标语言所需的形式，转义以文本形式输入的 ICU 特殊字符，并检查占位符。警告会写入源文句段的批注和任务报告；绝不会写入译文批注。</value>
+  <data name="Expand_KeepHeader" xml:space="preserve">
+    <value>已翻译的消息</value>
   </data>
-  <data name="Finalise_EmptyHeader" xml:space="preserve">
+  <data name="Expand_KeepTranslated" xml:space="preserve">
+    <value>保留已翻译的消息</value>
+  </data>
+  <data name="Expand_KeepMinimumLabel" xml:space="preserve">
+    <value>最低匹配率：</value>
+  </data>
+  <data name="Expand_KeepMinimumInvalid" xml:space="preserve">
+    <value>请输入 0 到 100 之间的整数。</value>
+  </data>
+  <data name="Expand_LockKept" xml:space="preserve">
+    <value>锁定保留的句段</value>
+  </data>
+  <data name="Expand_KeepHint" xml:space="preserve">
+    <value>所有句段均已达到此匹配率或更高的消息将保持原样，不再展开。Perfect Match 和上下文匹配按 100% 计。关闭时，每条消息都会展开，因此 100% 匹配也可以逐个形式检查。</value>
+  </data>
+  <data name="Expand_KeepHelpHeader" xml:space="preserve">
+    <value>什么情况下消息算已翻译？</value>
+  </data>
+  <data name="Expand_KeepHelp1" xml:space="preserve">
+    <value>在此任务之前，用包含由 Restore ICU 重新合并的完整消息的记忆库预翻译的项目，这些消息到达时已匹配。展开它们会丢弃匹配，并再次要求翻译每种形式。</value>
+  </data>
+  <data name="Expand_KeepHelp2" xml:space="preserve">
+    <value>保留时，每条完整消息保持为一个句段，Restore ICU 会忽略它，生成译文会原样写出。锁定会对其加以标记，使译员不会改动任务从未重构的消息。若译员应查看并确认每个匹配，请保持关闭。</value>
+  </data>
+  <data name="Restore_Intro" xml:space="preserve">
+    <value>还原会将每条已展开的消息重新合并为每侧一个句段。目标语言不使用的形式会被移除，以文本形式输入的撇号和花括号会被转义，占位符会被检查，未翻译的形式会从源文填充并附警告。请在生成译文之前运行，或在需要取回完整消息时运行；Expand ICU 可以再次展开它们。</value>
+  </data>
+  <data name="Restore_EmptyHeader" xml:space="preserve">
     <value>当某种形式没有译文时</value>
   </data>
-  <data name="Finalise_EmptyUseSource" xml:space="preserve">
+  <data name="Restore_EmptyUseSource" xml:space="preserve">
     <value>使用源文并添加警告</value>
   </data>
-  <data name="Finalise_EmptyFail" xml:space="preserve">
+  <data name="Restore_EmptyFail" xml:space="preserve">
     <value>停止任务</value>
   </data>
-  <data name="Finalise_EmptyHelpHeader" xml:space="preserve">
+  <data name="Restore_EmptyHelpHeader" xml:space="preserve">
     <value>没有人翻译的形式会怎样？</value>
   </data>
-  <data name="Finalise_EmptyHelp1" xml:space="preserve">
-    <value>目标语言所需的每种形式都必须出现在生成的文件中，否则应用程序对选中该形式的数量将什么也不显示。使用源文可保持文件有效，并在源文句段的批注和报告中做出标记，以便之后找到缺口。</value>
+  <data name="Restore_EmptyHelp1" xml:space="preserve">
+    <value>目标语言需要的每种形式都必须出现在还原后的消息中，否则应用程序对选择该形式的数字将不显示任何内容。使用源文可保持消息有效，并将缺口记录为句段批注和报告条目，以便日后查找。</value>
   </data>
-  <data name="Finalise_EmptyHelp2" xml:space="preserve">
+  <data name="Restore_EmptyHelp2" xml:space="preserve">
     <value>停止任务适用于最终交付，此时不允许未翻译的形式以源语言的样子漏过去。</value>
   </data>
-  <data name="Finalise_MismatchHeader" xml:space="preserve">
+  <data name="Restore_MismatchHeader" xml:space="preserve">
     <value>当源文与译文中受保护的占位符不一致时</value>
   </data>
-  <data name="Finalise_MismatchWarn" xml:space="preserve">
+  <data name="Restore_MismatchWarn" xml:space="preserve">
     <value>添加警告并继续</value>
   </data>
-  <data name="Finalise_MismatchFail" xml:space="preserve">
+  <data name="Restore_MismatchFail" xml:space="preserve">
     <value>停止任务</value>
   </data>
-  <data name="Finalise_MismatchHelpHeader" xml:space="preserve">
+  <data name="Restore_MismatchHelpHeader" xml:space="preserve">
     <value>什么是占位符不一致？</value>
   </data>
-  <data name="Finalise_MismatchHelp1" xml:space="preserve">
+  <data name="Restore_MismatchHelp1" xml:space="preserve">
     <value>句段中受保护的部分是消息的参数（如 {name}）和数量标记 #。如果译文丢失了其中一个，或多出了源文没有的一个，应用程序运行时就会出错或显示错误的文本。</value>
   </data>
-  <data name="Finalise_MismatchHelp2" xml:space="preserve">
-    <value>警告会写入源文句段的批注和报告，文件仍会生成。停止任务则在译文修正之前拒绝生成。</value>
+  <data name="Restore_MismatchHelp2" xml:space="preserve">
+    <value>警告会作为批注写入句段并记入报告，消息保持展开状态，占位符仍为标记，以便放入缺少的占位符；改正后请再次运行 Restore ICU。停止任务则在译文改正之前拒绝继续。</value>
   </data>
   <data name="Report_ExpandName" xml:space="preserve">
-    <value>ICU Expand Plural Forms</value>
+    <value>Expand ICU</value>
   </data>
   <data name="Report_ExpandDescription" xml:space="preserve">
     <value>已在 {1} 个文件中展开 {0} 条 ICU 消息；{2} 条带有警告。</value>
   </data>
-  <data name="Report_FinaliseName" xml:space="preserve">
-    <value>ICU Finalise Messages</value>
+  <data name="Report_RestoreName" xml:space="preserve">
+    <value>Restore ICU</value>
   </data>
-  <data name="Report_FinaliseDescription" xml:space="preserve">
-    <value>已在 {1} 个文件中完成 {0} 条 ICU 消息；移除 {2} 种形式，从源文填充 {3} 个句段，{4} 条警告。</value>
+  <data name="Report_RestoreDescription" xml:space="preserve">
+    <value>已在 {1} 个文件中还原 {0} 条 ICU 消息；移除 {2} 种形式，从源文填充 {3} 个句段，{4} 条警告。</value>
   </data>
   <data name="Report_Summary" xml:space="preserve">
     <value>摘要</value>
@@ -235,6 +262,9 @@
   <data name="Report_Skipped" xml:space="preserve">
     <value>先前已展开</value>
   </data>
+  <data name="Report_Kept" xml:space="preserve">
+    <value>已保留</value>
+  </data>
   <data name="Report_Pruned" xml:space="preserve">
     <value>移除的形式</value>
   </data>
@@ -249,6 +279,12 @@
   </data>
   <data name="Report_Off" xml:space="preserve">
     <value>关</value>
+  </data>
+  <data name="Report_KeepAt" xml:space="preserve">
+    <value>{0}% 或更高</value>
+  </data>
+  <data name="Report_KeepLocked" xml:space="preserve">
+    <value>已锁定</value>
   </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms 会显示 ICU MessageFormat 消息的每种复数、序数和 select 形式及示例数量，以及重新组合后的完整消息，这样在输入时就能检查译文。</value>
@@ -335,7 +371,7 @@
     <value>ICU Verifier</value>
   </data>
   <data name="Verifier_EmptyForm" xml:space="preserve">
-    <value>形式“{0}”没有译文；完成处理时将使用源文。</value>
+    <value>形式“{0}”没有译文；Restore ICU 将使用源文。</value>
   </data>
   <data name="Verifier_Placeholders" xml:space="preserve">
     <value>受保护的占位符与源文不一致：{0}。</value>
