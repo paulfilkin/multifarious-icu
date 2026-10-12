@@ -56,6 +56,14 @@ namespace multifarious.Icu.BatchTasks
         public const string CommentAuthor = "multifariousICU Support";
 
         /// <summary>
+        /// Metadata key on the placeholder tags the expansion writes for an argument or '#',
+        /// which tells them apart from a filter's own placeholder tags: the restore task turns
+        /// the former back into text and keeps the latter as tags. Tag metadata persists in
+        /// SDLXLIFF.
+        /// </summary>
+        public const string ArgumentTagKey = "multifarious:argument";
+
+        /// <summary>
         /// The context type of the one context this plugin adds to every paragraph unit it
         /// expands. It carries the unit-level metadata (the original pattern, the hoisted form,
         /// the resource key, the versions) and is how the restore task finds the units it owns

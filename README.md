@@ -51,6 +51,8 @@ The tasks process Studio's own JSON and Java Resources file types only.  Other f
 
 Both tasks run on bilingual target files, so each language in a multilingual project gets exactly its own set of forms.
 
+Markup opened as tags through a file type's Embedded Content settings is kept: Expand puts each tag into every form it belongs to and Restore puts the tags back.  A tag pair that opens in one branch and closes in another is left as it is with a warning, because Studio's writers drop a pair split across segments.
+
 ## Installing
 
 Install from the integrated AppStore inside Trados Studio, or download the `.sdlplugin` from the [AppStore record](https://appstore.rws.com/plugin/490) and double-click it.  Restart Studio.  The two tasks appear in the Batch Tasks list, ICU Forms on the editor's Add-ins tab in the multifarious ICU group, and ICU Verifier under Project Settings, Verification.
@@ -113,6 +115,7 @@ The design is recorded as it was made, in the handovers under `Documentation\Bui
 - **Restore reads the layout from the content.**  Locked syntax has three shapes (selector open, branch open, close brace), the expanded selectors are recorded in the paragraph unit's context, and escaping is unescape-then-escape, so a restored message is the same whether or not the translator typed ICU escapes.
 - **Restore collapses to plain text in the hoisted shape, on both sides.**  The target can only come back in the shape the translator worked in, with the shared text inside every form, so the source is put back the same way and the two line up form for form.  The pattern as the file carried it stays in the unit context.  Before the collapse, each form's confirmation level, lock and translation origin are recorded by branch path, and Expand hands them back.
 - **Over-budget messages are laid out walked, not passed through.**  Two independent plurals multiply: six forms times six is 36 segments for Arabic.  Above the branch budget the message keeps the source's own branches with the syntax protected, and the report says so.
+- **Filter tags travel as sentinels.**  A value is parsed with one private-use character in place of each of the filter's tags, so the ICU parser sees them as text and hoisting carries them into the forms with the text around them; the writer puts a clone of the tag where each character lands.  Studio's writers accept the same tag cloned into several segments and write each as markup, and drop a pair split across segments (Project 56 probes, 12 October 2026), so a form holding one half of a pair refuses and the unit passes through.
 - **No comments except warnings, and those on the paragraph unit.**  Studio copies a comment inside a source segment into the target.  Expand warnings go on the unit, which Studio never copies.  Restore findings go on the target segment concerned, as a reviewer would record them, and are removed at the start of the next run.
 - **Bilingual API, not BCM converters.**  Studio ships converters from SDLXLIFF to its Bilingual Content Model and back, which would have let the cloud app's code run unchanged.  They are undocumented and the fidelity of the regenerated SDLXLIFF is unproven, so the tasks operate on SDLXLIFF through the File Type Support Framework.
 

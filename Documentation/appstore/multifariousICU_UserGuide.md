@@ -84,6 +84,14 @@ The tasks work on Studio's **JSON** and **Java Resources** file types. Other fil
 
 A value is expanded when it contains a plural or ordinal message. A value with arguments but no plural, such as "Hello {name}, welcome back!", becomes one segment with the arguments protected. A value with no braces is not touched. A value with braces that is not valid ICU is left as it is, with a warning in the report.
 
+### Markup inside the values
+
+Values with HTML or other markup in them can be opened with the file type's **Embedded Content** settings, so that the markup becomes tags rather than text to translate. The JSON file type offers the HTML embedded content processor; the Java Resources file type takes tag definition rules, such as `<(b|i|a|span)[^>]*>` and `</(b|i|a|span)>` as a tag pair. Set them up before creating the project.
+
+Both tasks keep those tags. Expand puts each tag into every form it belongs to, so a `<b>` around the whole plural appears in each form around that form's text, and a `<b>` inside one branch appears in that form only. Restore puts the tags back into the restored message where each form held them. The generated file has the markup as the source had it.
+
+One shape cannot be laid out: a tag pair that opens in one branch and closes in another, such as `{count, plural, one {<b># file} other {# files</b>}}`. Studio's writers drop a tag pair split across segments, so the message is left as it is, with a warning in the report and on the message.
+
 ---
 
 ## Your first project
@@ -378,6 +386,7 @@ CLDR gives these languages, and Catalan, a `many` form for a round million and a
 - A message with `#` inside a nested plural that has an offset is left unexpanded with a warning; the plugin cannot rewrite it without changing its meaning.
 - Restore has to run before Generate Target Translations. Studio's JSON writer does not write placeholder tags, so a message that was never restored, or was left expanded after a placeholder warning, loses its arguments in the generated file.
 - A comment on an argument comes back around its placeholder tag, and a comment whose selection ran across the syntax between two forms comes back on both.
+- A markup tag pair that opens in one branch of a message and closes in another is not laid out; the message is left as it is with a warning.
 - Restore puts the source back in the hoisted shape, with the shared text inside every form, not as the developer wrote it. The original pattern is kept in the file's metadata, and the generated target file is unaffected.
 
 Feedback from anyone translating ICU messages is welcome: a message that lays out oddly, a language whose grammar hint is wrong or missing, a file type you need. A sample file with the report helps.

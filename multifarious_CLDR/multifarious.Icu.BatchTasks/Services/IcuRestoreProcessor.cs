@@ -33,7 +33,10 @@ namespace multifarious.Icu.BatchTasks.Services
     /// as one plain-text segment on each side, the shape the filter delivered and the shape
     /// Studio's writers emit as it stands (Paul, 11 October 2026). The target comes back in the
     /// hoisted shape the translator worked in, and so does the source, so the two line up form
-    /// for form; the pattern as the file carried it stays in the unit context.
+    /// for form; the pattern as the file carried it stays in the unit context. The filter's
+    /// own tags, where a configuration tags embedded content, stay tags: each is cloned into
+    /// the restored segment where its form held it, which the writers accept (Project 56
+    /// probes, 12 October 2026).
     ///
     /// Before the collapse, each form's confirmation level, lock and translation origin are
     /// recorded on the unit context by branch path, and the context's state becomes restored.
@@ -438,6 +441,7 @@ namespace multifarious.Icu.BatchTasks.Services
             }
         }
 
+        /// <summary>No text, no protected span and no argument tag: a filter's own tags with nothing between them are still empty.</summary>
         private static bool IsEmpty(ISegment segment)
         {
             var empty = true;
@@ -445,9 +449,23 @@ namespace multifarious.Icu.BatchTasks.Services
             {
                 var text = item as IText;
                 if (text != null && !string.IsNullOrWhiteSpace(text.Properties.Text)) empty = false;
-                if (item is ILockedContent || item is IPlaceholderTag) empty = false;
+                if (item is ILockedContent) empty = false;
+                var tag = item as IPlaceholderTag;
+                if (tag != null && IsArgumentTag(tag)) empty = false;
             });
             return empty;
+        }
+
+        /// <summary>
+        /// Whether a placeholder tag is one the expansion wrote for an argument or '#', as
+        /// against a filter's own placeholder. The expansion marks its tags; a file expanded
+        /// before the mark existed is read by the tag's content, which is ICU syntax.
+        /// </summary>
+        public static bool IsArgumentTag(IPlaceholderTag tag)
+        {
+            if (tag.Properties.MetaDataContainsKey(Constants.ArgumentTagKey)) return true;
+            var content = tag.Properties.TagContent ?? string.Empty;
+            return content == "#" || (content.StartsWith("{", StringComparison.Ordinal) && content.EndsWith("}", StringComparison.Ordinal));
         }
 
         /// <summary>Visits every leaf under a container, through markers, not into locked content.</summary>
@@ -466,19 +484,32 @@ namespace multifarious.Icu.BatchTasks.Services
         }
 
         /// <summary>
-        /// Fresh copies of the source segment's translatable content: text and protected spans
-        /// rebuilt, comment wrappers not carried over.
+        /// Fresh copies of the source segment's translatable content: text, protected spans and
+        /// the filter's tags rebuilt, a tag pair with its content inside it, comment wrappers
+        /// not carried over.
         /// </summary>
         private void FillFromSource(ISegment source, ISegment target)
         {
-            var copies = new List<IAbstractMarkupData>();
-            Walk(source, item =>
+            var copies = CopiesOf(source);
+            target.Clear();
+            foreach (var copy in copies)
             {
+                target.Add(copy);
+            }
+        }
+
+        private List<IAbstractMarkupData> CopiesOf(IAbstractMarkupDataContainer container)
+        {
+            var copies = new List<IAbstractMarkupData>();
+            for (var i = 0; i < container.Count; i++)
+            {
+                var item = container[i];
+
                 var text = item as IText;
                 if (text != null)
                 {
                     copies.Add(ItemFactory.CreateText(PropertiesFactory.CreateTextProperties(text.Properties.Text)));
-                    return;
+                    continue;
                 }
 
                 var locked = item as ILockedContent;
@@ -489,21 +520,39 @@ namespace multifarious.Icu.BatchTasks.Services
                     copy.Content.Add(ItemFactory.CreateText(PropertiesFactory.CreateTextProperties(
                         RawValueReconstruction.Reconstruct(locked.Content).RawValue)));
                     copies.Add(copy);
-                    return;
+                    continue;
                 }
 
-                var tag = item as IPlaceholderTag;
-                if (tag != null)
+                var pair = item as ITagPair;
+                if (pair != null)
                 {
-                    copies.Add((IPlaceholderTag)tag.Clone());
+                    var copy = ClonePair(pair);
+                    foreach (var child in CopiesOf(pair))
+                    {
+                        copy.Add(child);
+                    }
+                    copies.Add(copy);
+                    continue;
                 }
-            });
 
-            target.Clear();
-            foreach (var copy in copies)
-            {
-                target.Add(copy);
+                if (item is IPlaceholderTag || item is IStructureTag)
+                {
+                    copies.Add((IAbstractMarkupData)item.Clone());
+                    continue;
+                }
+
+                var nested = item as IAbstractMarkupDataContainer;
+                if (nested != null) copies.AddRange(CopiesOf(nested));
             }
+            return copies;
+        }
+
+        /// <summary>An empty pair with the filter's own start and end properties, tag id included.</summary>
+        private ITagPair ClonePair(ITagPair pair)
+        {
+            return ItemFactory.CreateTagPair(
+                (IStartTagProperties)pair.StartTagProperties.Clone(),
+                (IEndTagProperties)pair.EndTagProperties.Clone());
         }
 
         /// <summary>
@@ -610,10 +659,13 @@ namespace multifarious.Icu.BatchTasks.Services
             properties.IsLocked = allLocked;
 
             var source = ItemFactory.CreateSegment(properties);
-            source.Add(Text(RawValueReconstruction.Reconstruct(unit.Source).RawValue));
+            foreach (var item in Collapsed(unit.Source))
+            {
+                source.Add(item);
+            }
 
             var target = ItemFactory.CreateSegment(properties);
-            foreach (var item in CollapsedTarget(unit.Target))
+            foreach (var item in Collapsed(unit.Target))
             {
                 target.Add(item);
             }
@@ -660,12 +712,14 @@ namespace multifarious.Icu.BatchTasks.Services
         }
 
         /// <summary>
-        /// The target paragraph as one segment's content: text runs, with the syntax between and
-        /// inside the forms as text, and every comment marker rebuilt around the text of what it
-        /// wrapped, a marker inside another rebuilt inside its copy. Nothing else survives; a tag
-        /// has no place in a plain segment.
+        /// A paragraph as one segment's content: text runs, with the syntax between and inside
+        /// the forms as text; every comment marker rebuilt around the text of what it wrapped,
+        /// a marker inside another rebuilt inside its copy; and the filter's own tags cloned
+        /// where they stood, a pair around its collapsed content. The expansion's argument tags
+        /// and locked spans become their text: a restored segment is plain apart from what the
+        /// filter put there.
         /// </summary>
-        private List<IAbstractMarkupData> CollapsedTarget(IParagraph paragraph)
+        private List<IAbstractMarkupData> Collapsed(IParagraph paragraph)
         {
             var items = new List<IAbstractMarkupData>();
             var run = new StringBuilder();
@@ -684,6 +738,31 @@ namespace multifarious.Icu.BatchTasks.Services
                 if (text != null)
                 {
                     run.Append(text.Properties.Text);
+                    continue;
+                }
+
+                var pair = item as ITagPair;
+                if (pair != null)
+                {
+                    Flush(items, run);
+                    var copy = ClonePair(pair);
+                    var inner = new List<IAbstractMarkupData>();
+                    var innerRun = new StringBuilder();
+                    AppendCollapsed(pair, inner, innerRun);
+                    Flush(inner, innerRun);
+                    foreach (var child in inner)
+                    {
+                        copy.Add(child);
+                    }
+                    items.Add(copy);
+                    continue;
+                }
+
+                var placeholder = item as IPlaceholderTag;
+                if ((placeholder != null && !IsArgumentTag(placeholder)) || item is IStructureTag)
+                {
+                    Flush(items, run);
+                    items.Add((IAbstractMarkupData)item.Clone());
                     continue;
                 }
 
@@ -782,6 +861,7 @@ namespace multifarious.Icu.BatchTasks.Services
             var properties = PropertiesFactory.CreatePlaceholderTagProperties(syntax);
             properties.DisplayText = syntax;
             properties.SegmentationHint = SegmentationHint.Include;
+            properties.SetMetaData(Constants.ArgumentTagKey, "true");
             return ItemFactory.CreatePlaceholderTag(properties);
         }
 

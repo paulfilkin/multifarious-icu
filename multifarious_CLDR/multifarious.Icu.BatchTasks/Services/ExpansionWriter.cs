@@ -39,7 +39,16 @@ namespace multifarious.Icu.BatchTasks.Services
     /// A translator's comment on a restored or pre-translated target does come back, around
     /// the text it wrapped, in every form that text reaches: the seed carries each marker's
     /// range in the raw target, every parsed node carries its range, and hoisting reuses the
-    /// nodes, so the two line up (<see cref="CommentedContent"/>).
+    /// nodes, so the two line up (<see cref="Assemble"/>).
+    ///
+    /// The filter's own tags, where a configuration tags embedded content, survive the same
+    /// way: the value is parsed with a sentinel character in place of each tag
+    /// (<see cref="RawValueReconstruction.Encode"/>), hoisting carries the characters into the
+    /// forms with the text around them, and each form gets a clone of the tag where its
+    /// character lands. Studio's writers accept the same tag cloned into several segments and
+    /// write each as markup; a pair split across segments they drop (Project 56 probes,
+    /// 12 October 2026), so a form holding one half of a pair refuses, and the unit passes
+    /// through with a warning.
     /// </summary>
     public sealed class ExpansionWriter
     {
@@ -89,7 +98,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
             AddContext(unit, plan, resourceKey, state);
             return new WriteResult(state.Written.Count, state.TargetFormsFilled, state.UnfilledPaths, state.NextSegmentNumber,
-                state.CommentsCarried);
+                state.CommentsCarried, state.TagsCloned);
         }
 
         private sealed class WriteState
@@ -106,6 +115,9 @@ namespace multifarious.Icu.BatchTasks.Services
 
             /// <summary>Comment markers rebuilt in the target segments from the seed's ranges, counted per form they reach.</summary>
             public int CommentsCarried;
+
+            /// <summary>Filter tags cloned into the segments, both sides, one count per clone.</summary>
+            public int TagsCloned;
 
             /// <summary>Paths the seed had a target for none of, where it had a target message at all.</summary>
             public List<string> UnfilledPaths = new List<string>();
@@ -175,7 +187,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
             // The segment holds text and tags only; the ICU Forms window is its note.
             var sourceSegment = _itemFactory.CreateSegment(properties);
-            foreach (var item in BuildContent(planned.Nodes))
+            foreach (var item in Content(planned.Nodes, state.Seed.SourceTags, null, planned.Path, state))
             {
                 sourceSegment.Add(item);
             }
@@ -194,7 +206,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 IReadOnlyList<MessageNode> nodes;
                 if (seed.TargetForms.TryGetValue(planned.Path, out nodes))
                 {
-                    foreach (var item in CommentedContent(nodes, seed.TargetComments, state))
+                    foreach (var item in Content(nodes, seed.TargetTags, seed.TargetComments, planned.Path, state))
                     {
                         targetSegment.Add(item);
                     }
@@ -211,137 +223,30 @@ namespace multifarious.Icu.BatchTasks.Services
             if (segmentState != null) segmentState.Apply(properties, _itemFactory);
         }
 
-        private IEnumerable<IAbstractMarkupData> BuildContent(IReadOnlyList<MessageNode> nodes)
-        {
-            var text = new StringBuilder();
-
-            foreach (var node in nodes)
-            {
-                var literal = node as TextNode;
-                if (literal != null)
-                {
-                    text.Append(literal.Value);
-                    continue;
-                }
-
-                // The decoded value is the unescaping of design 5.8: the translator sees clean text.
-                var quoted = node as QuotedTextNode;
-                if (quoted != null)
-                {
-                    text.Append(quoted.Value);
-                    continue;
-                }
-
-                if (text.Length > 0)
-                {
-                    yield return Text(text.ToString());
-                    text.Clear();
-                }
-
-                var argument = node as ArgumentNode;
-                if (argument != null)
-                {
-                    yield return ArgumentMarkup("{" + argument.Name + "}");
-                    continue;
-                }
-
-                var typed = node as TypedArgumentNode;
-                if (typed != null)
-                {
-                    yield return ArgumentMarkup(TypedArgumentText(typed));
-                    continue;
-                }
-
-                if (node is PoundNode)
-                {
-                    yield return ArgumentMarkup("#");
-                    continue;
-                }
-
-                throw new InvalidOperationException(
-                    "A planned segment may not contain a '" + node.GetType().Name + "'.");
-            }
-
-            if (text.Length > 0)
-            {
-                yield return Text(text.ToString());
-            }
-        }
-
-        // ---- comments carried from the seed's target ------------------------------------------
+        // ---- a form's content: text, arguments, the filter's tags and the seed's comments -----
 
         /// <summary>
-        /// A form's content with the seed's comment markers rebuilt around the text they wrapped.
-        /// The content is first laid out as pieces with their offsets in the raw target: a text
-        /// node's characters one to one, a quoted text node and an argument tag as one piece
-        /// each. Text is split at every comment boundary, then the pieces are walked with the
-        /// open markers as a stack; a comment whose range touches a piece wraps it, a comment
-        /// that touches nothing in this form is not written in it, and a comment that touches
-        /// only part of an atomic piece wraps the whole piece. Comments are ordered by start
-        /// then longest first, so one inside another nests as it did.
+        /// A form's content as markup. Text and quoted text become text runs; an argument or '#'
+        /// becomes a placeholder tag; a sentinel character becomes a clone of the filter tag it
+        /// stands for, a pair's start and end becoming one cloned pair around the content
+        /// between them; and the comment markers are rebuilt around the text they wrapped.
+        /// A pair with only one half in the form has crossed the message's branch structure,
+        /// which Studio's writers drop, so the form refuses with
+        /// <see cref="TagPairSplitException"/>.
         /// </summary>
-        private IEnumerable<IAbstractMarkupData> CommentedContent(IReadOnlyList<MessageNode> nodes,
-            IReadOnlyList<CommentRange> comments, WriteState state)
+        private List<IAbstractMarkupData> Content(IReadOnlyList<MessageNode> nodes, EncodedValue tags,
+            IReadOnlyList<CommentRange> comments, string path, WriteState state)
         {
-            if (comments == null || comments.Count == 0) return BuildContent(nodes);
-
-            var pieces = Split(Pieces(nodes), comments);
-            var ordered = new List<CommentRange>(comments);
-            ordered.Sort((a, b) =>
-            {
-                var byStart = a.Start.CompareTo(b.Start);
-                if (byStart != 0) return byStart;
-                var byLength = b.End.CompareTo(a.End);
-                return byLength != 0 ? byLength : IndexOf(comments, a).CompareTo(IndexOf(comments, b));
-            });
+            var pieces = Pieces(nodes, tags);
+            if (comments != null && comments.Count > 0) pieces = Split(pieces, comments);
 
             var output = new List<IAbstractMarkupData>();
-            var open = new List<KeyValuePair<CommentRange, ICommentMarker>>();
-            foreach (var piece in pieces)
-            {
-                var wanted = new List<CommentRange>();
-                foreach (var comment in ordered)
-                {
-                    if (comment.Overlaps(piece.Start, piece.End)) wanted.Add(comment);
-                }
-
-                // Keep the open markers that are still wanted, in order; close the rest and
-                // open what the piece needs below them.
-                var kept = 0;
-                while (kept < open.Count && kept < wanted.Count && ReferenceEquals(open[kept].Key, wanted[kept])) kept++;
-                open.RemoveRange(kept, open.Count - kept);
-                for (var i = kept; i < wanted.Count; i++)
-                {
-                    var marker = _itemFactory.CreateCommentMarker((ICommentProperties)wanted[i].Comments.Clone());
-                    Add(output, open, marker);
-                    open.Add(new KeyValuePair<CommentRange, ICommentMarker>(wanted[i], marker));
-                    state.CommentsCarried++;
-                }
-
-                Add(output, open, piece.Markup ?? Text(piece.Text));
-            }
-
-            MergeText(output);
+            var consumed = Assemble(pieces, 0, -1, path, Ordered(comments), state, output);
+            if (consumed != pieces.Count) throw new TagPairSplitException(path);
             return output;
         }
 
-        private static int IndexOf(IReadOnlyList<CommentRange> comments, CommentRange comment)
-        {
-            for (var i = 0; i < comments.Count; i++)
-            {
-                if (ReferenceEquals(comments[i], comment)) return i;
-            }
-            return -1;
-        }
-
-        private static void Add(List<IAbstractMarkupData> output, List<KeyValuePair<CommentRange, ICommentMarker>> open,
-            IAbstractMarkupData item)
-        {
-            if (open.Count == 0) output.Add(item);
-            else open[open.Count - 1].Value.Add(item);
-        }
-
-        /// <summary>One run of a form's content: text with its raw range, or an argument's markup.</summary>
+        /// <summary>One run of a form's content with its offsets in the raw value: text, an argument's markup, or one half of a filter tag pair.</summary>
         private sealed class Piece
         {
             public int Start;
@@ -351,9 +256,23 @@ namespace multifarious.Icu.BatchTasks.Services
 
             /// <summary>Text that cannot be cut at a raw offset: a quoted node, whose value is shorter than its syntax.</summary>
             public bool Atomic;
+
+            /// <summary>The pair this piece opens or closes, else -1.</summary>
+            public int PairOpen = -1;
+            public int PairClose = -1;
+            public TagSentinel Sentinel;
         }
 
-        private List<Piece> Pieces(IReadOnlyList<MessageNode> nodes)
+        /// <summary>An item built for one level of the content, with the raw range it covers; a container is wrapped by a comment only when the comment covers all of it.</summary>
+        private sealed class Entry
+        {
+            public IAbstractMarkupData Item;
+            public int Start;
+            public int End;
+            public bool Container;
+        }
+
+        private List<Piece> Pieces(IReadOnlyList<MessageNode> nodes, EncodedValue tags)
         {
             var pieces = new List<Piece>();
             foreach (var node in nodes)
@@ -361,18 +280,16 @@ namespace multifarious.Icu.BatchTasks.Services
                 var literal = node as TextNode;
                 if (literal != null)
                 {
-                    pieces.Add(new Piece
-                    {
-                        Start = literal.Span.Start, End = literal.Span.End, Text = literal.Value,
-                        Atomic = literal.Value.Length != literal.Span.Length,
-                    });
+                    AddTextPieces(pieces, literal.Value, literal.Span.Start, literal.Span.End,
+                        literal.Value.Length != literal.Span.Length, tags);
                     continue;
                 }
 
+                // The decoded value is the unescaping of design 5.8: the translator sees clean text.
                 var quoted = node as QuotedTextNode;
                 if (quoted != null)
                 {
-                    pieces.Add(new Piece { Start = quoted.Span.Start, End = quoted.Span.End, Text = quoted.Value, Atomic = true });
+                    AddTextPieces(pieces, quoted.Value, quoted.Span.Start, quoted.Span.End, true, tags);
                     continue;
                 }
 
@@ -389,6 +306,60 @@ namespace multifarious.Icu.BatchTasks.Services
             return pieces;
         }
 
+        /// <summary>
+        /// A text value as pieces: runs of ordinary characters, and one piece per sentinel
+        /// character. A plain text node's characters map one to one onto the raw value, so a
+        /// run's offsets are exact; a quoted node's runs are atomic and share its span.
+        /// </summary>
+        private static void AddTextPieces(List<Piece> pieces, string value, int spanStart, int spanEnd, bool atomic, EncodedValue tags)
+        {
+            if (tags == null || !tags.HasTags)
+            {
+                if (value.Length > 0) pieces.Add(new Piece { Start = spanStart, End = spanEnd, Text = value, Atomic = atomic });
+                return;
+            }
+
+            var run = new StringBuilder();
+            var runStart = spanStart;
+            for (var i = 0; i < value.Length; i++)
+            {
+                var sentinel = tags.SentinelOf(value[i]);
+                if (sentinel == null)
+                {
+                    if (run.Length == 0) runStart = atomic ? spanStart : spanStart + i;
+                    run.Append(value[i]);
+                    continue;
+                }
+
+                if (run.Length > 0)
+                {
+                    pieces.Add(new Piece { Start = runStart, End = atomic ? spanEnd : spanStart + i, Text = run.ToString(), Atomic = atomic });
+                    run.Clear();
+                }
+
+                var at = atomic ? spanStart : spanStart + i;
+                var piece = new Piece { Start = at, End = atomic ? spanEnd : at + 1, Atomic = true, Sentinel = sentinel };
+                switch (sentinel.Kind)
+                {
+                    case SentinelKind.PairStart:
+                        piece.PairOpen = sentinel.PairIndex;
+                        break;
+                    case SentinelKind.PairEnd:
+                        piece.PairClose = sentinel.PairIndex;
+                        break;
+                    default:
+                        piece.Markup = (IAbstractMarkupData)sentinel.Tag.Clone();
+                        break;
+                }
+                pieces.Add(piece);
+            }
+
+            if (run.Length > 0)
+            {
+                pieces.Add(new Piece { Start = runStart, End = spanEnd, Text = run.ToString(), Atomic = atomic });
+            }
+        }
+
         /// <summary>Cuts every non-atomic text piece at each comment boundary that falls inside it.</summary>
         private static List<Piece> Split(List<Piece> pieces, IReadOnlyList<CommentRange> comments)
         {
@@ -402,7 +373,7 @@ namespace multifarious.Icu.BatchTasks.Services
             var result = new List<Piece>();
             foreach (var piece in pieces)
             {
-                if (piece.Atomic || piece.Markup != null)
+                if (piece.Atomic || piece.Text == null)
                 {
                     result.Add(piece);
                     continue;
@@ -422,6 +393,153 @@ namespace multifarious.Icu.BatchTasks.Services
                 }
             }
             return result;
+        }
+
+        /// <summary>The comments by start, then longest first, then as listed, so one inside another nests as it did.</summary>
+        private static List<CommentRange> Ordered(IReadOnlyList<CommentRange> comments)
+        {
+            var ordered = new List<CommentRange>();
+            if (comments == null) return ordered;
+            ordered.AddRange(comments);
+            ordered.Sort((a, b) =>
+            {
+                var byStart = a.Start.CompareTo(b.Start);
+                if (byStart != 0) return byStart;
+                var byLength = b.End.CompareTo(a.End);
+                return byLength != 0 ? byLength : IndexOf(comments, a).CompareTo(IndexOf(comments, b));
+            });
+            return ordered;
+        }
+
+        private static int IndexOf(IReadOnlyList<CommentRange> comments, CommentRange comment)
+        {
+            for (var i = 0; i < comments.Count; i++)
+            {
+                if (ReferenceEquals(comments[i], comment)) return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Builds one level of content from the pieces: a leaf per text or markup piece, and a
+        /// cloned pair per pair start, filled by building the pieces up to its end at the next
+        /// level. Returns the index after the last piece consumed, which for a nested level is
+        /// the one after the pair's end; a level that runs out of pieces before its pair closes,
+        /// or meets a close it did not open, stops short, which the caller treats as a split
+        /// pair. The level's comment markers are then put around its entries: a leaf is
+        /// wrapped by every comment touching it, a pair only by a comment covering all of it,
+        /// so a comment that reaches into a pair wraps the text inside the pair at that level.
+        /// </summary>
+        private int Assemble(List<Piece> pieces, int from, int closingPair, string path, List<CommentRange> comments,
+            WriteState state, List<IAbstractMarkupData> into)
+        {
+            var entries = new List<Entry>();
+            var i = from;
+            var closed = false;
+            while (i < pieces.Count)
+            {
+                var piece = pieces[i];
+                if (piece.PairClose >= 0)
+                {
+                    if (piece.PairClose != closingPair) throw new TagPairSplitException(path);
+                    closed = true;
+                    i++;
+                    break;
+                }
+
+                if (piece.PairOpen >= 0)
+                {
+                    var close = IndexOfClose(pieces, i + 1, piece.PairOpen);
+                    if (close < 0) throw new TagPairSplitException(path);
+
+                    // A comment covering the whole pair wraps the pair at this level and is
+                    // not applied again to the content inside it.
+                    var innerComments = new List<CommentRange>();
+                    foreach (var comment in comments)
+                    {
+                        if (!(comment.Start <= piece.Start && comment.End >= pieces[close].End)) innerComments.Add(comment);
+                    }
+
+                    var clone = ClonePair((ITagPair)piece.Sentinel.Tag);
+                    state.TagsCloned++;
+                    var inner = new List<IAbstractMarkupData>();
+                    var next = Assemble(pieces, i + 1, piece.PairOpen, path, innerComments, state, inner);
+                    foreach (var child in inner)
+                    {
+                        clone.Add(child);
+                    }
+                    entries.Add(new Entry { Item = clone, Start = piece.Start, End = pieces[next - 1].End, Container = true });
+                    i = next;
+                    continue;
+                }
+
+                if (piece.Markup != null && piece.Sentinel != null) state.TagsCloned++;
+                entries.Add(new Entry { Item = piece.Markup ?? Text(piece.Text), Start = piece.Start, End = piece.End });
+                i++;
+            }
+
+            if (closingPair >= 0 && !closed) throw new TagPairSplitException(path);
+
+            Wrap(entries, comments, state, into);
+            MergeText(into);
+            return i;
+        }
+
+        /// <summary>The index of the piece closing the given pair, or -1 where the form does not hold it.</summary>
+        private static int IndexOfClose(List<Piece> pieces, int from, int pair)
+        {
+            for (var i = from; i < pieces.Count; i++)
+            {
+                if (pieces[i].PairClose == pair) return i;
+            }
+            return -1;
+        }
+
+        /// <summary>Puts the comment markers around a level's entries, the open markers kept as a stack.</summary>
+        private void Wrap(List<Entry> entries, List<CommentRange> comments, WriteState state, List<IAbstractMarkupData> into)
+        {
+            var open = new List<KeyValuePair<CommentRange, ICommentMarker>>();
+            foreach (var entry in entries)
+            {
+                var wanted = new List<CommentRange>();
+                foreach (var comment in comments)
+                {
+                    var applies = entry.Container
+                        ? comment.Start <= entry.Start && comment.End >= entry.End && entry.End > entry.Start
+                        : comment.Overlaps(entry.Start, entry.End);
+                    if (applies) wanted.Add(comment);
+                }
+
+                // Keep the open markers that are still wanted, in order; close the rest and
+                // open what the entry needs below them.
+                var kept = 0;
+                while (kept < open.Count && kept < wanted.Count && ReferenceEquals(open[kept].Key, wanted[kept])) kept++;
+                open.RemoveRange(kept, open.Count - kept);
+                for (var c = kept; c < wanted.Count; c++)
+                {
+                    var marker = _itemFactory.CreateCommentMarker((ICommentProperties)wanted[c].Comments.Clone());
+                    Add(into, open, marker);
+                    open.Add(new KeyValuePair<CommentRange, ICommentMarker>(wanted[c], marker));
+                    state.CommentsCarried++;
+                }
+
+                Add(into, open, entry.Item);
+            }
+        }
+
+        private static void Add(List<IAbstractMarkupData> output, List<KeyValuePair<CommentRange, ICommentMarker>> open,
+            IAbstractMarkupData item)
+        {
+            if (open.Count == 0) output.Add(item);
+            else open[open.Count - 1].Value.Add(item);
+        }
+
+        /// <summary>An empty pair with the filter's own start and end properties, tag id included, so the writer sees the same tag again.</summary>
+        private ITagPair ClonePair(ITagPair pair)
+        {
+            return _itemFactory.CreateTagPair(
+                (IStartTagProperties)pair.StartTagProperties.Clone(),
+                (IEndTagProperties)pair.EndTagProperties.Clone());
         }
 
         /// <summary>Joins adjacent text items, at every level, so a form reads as the runs the translator typed.</summary>
@@ -469,6 +587,7 @@ namespace multifarious.Icu.BatchTasks.Services
             var properties = _propertiesFactory.CreatePlaceholderTagProperties(content);
             properties.DisplayText = content;
             properties.SegmentationHint = SegmentationHint.Include;
+            properties.SetMetaData(Constants.ArgumentTagKey, "true");
             var tag = _itemFactory.CreatePlaceholderTag(properties);
             if (!_lockPlaceholders) return tag;
 
@@ -515,8 +634,10 @@ namespace multifarious.Icu.BatchTasks.Services
             // The pattern is the value as the file carried it. A unit expanded again after a
             // restore is read in the hoisted shape, so the pattern recorded the first time is
             // kept rather than overwritten with the hoisted text.
-            context.SetMetaData("icu:pattern", state.Seed.OriginalPattern ?? plan.RawValue);
-            context.SetMetaData("icu:hoisted", plan.HoistedText);
+            // Readable: with the filter's tags as their native text, not as sentinels.
+            var tags = state.Seed.SourceTags;
+            context.SetMetaData("icu:pattern", state.Seed.OriginalPattern ?? (tags == null ? plan.RawValue : tags.Decode(plan.RawValue)));
+            context.SetMetaData("icu:hoisted", tags == null ? plan.HoistedText : tags.Decode(plan.HoistedText));
             context.SetMetaData(Constants.StateKey, Constants.StateExpanded);
             if (!string.IsNullOrEmpty(resourceKey))
             {
@@ -591,6 +712,24 @@ namespace multifarious.Icu.BatchTasks.Services
     }
 
     /// <summary>
+    /// A filter tag pair with one half in a form and the other outside it: the pair crosses the
+    /// message's branch structure, and Studio's writers drop a pair split across segments. The
+    /// unit is left as it stands and the processor says why.
+    /// </summary>
+    public sealed class TagPairSplitException : Exception
+    {
+        public TagPairSplitException(string path)
+            : base("A filter tag pair crosses the message's branch structure"
+                   + (string.IsNullOrEmpty(path) ? string.Empty : " at form '" + path + "'")
+                   + "; the message is left as it is, because a tag pair split across segments would be lost on output.")
+        {
+            Path = path ?? string.Empty;
+        }
+
+        public string Path { get; }
+    }
+
+    /// <summary>
     /// What a unit already holds when it is expanded: the forms of a target message by branch
     /// path, the state each form had, and the pattern recorded by an earlier expansion. All
     /// optional; an empty seed is a first expansion.
@@ -602,6 +741,12 @@ namespace multifarious.Icu.BatchTasks.Services
 
         /// <summary>The comment markers on the target and the ranges of the raw target they wrapped; null or empty where there were none.</summary>
         public IReadOnlyList<CommentRange> TargetComments { get; set; }
+
+        /// <summary>The source as encoded for the plan, with the table from sentinel character to filter tag; null where the source holds no tags.</summary>
+        public EncodedValue SourceTags { get; set; }
+
+        /// <summary>The same for the target the forms were read from; null where it holds no tags.</summary>
+        public EncodedValue TargetTags { get; set; }
 
         /// <summary>The state each form had before the restore task collapsed the message, by path.</summary>
         public IReadOnlyDictionary<string, SegmentState> States { get; set; }
@@ -635,13 +780,23 @@ namespace multifarious.Icu.BatchTasks.Services
 
         public WriteResult(int segments, int targetFormsFilled, IReadOnlyList<string> unfilledPaths, int nextSegmentNumber,
             int commentsCarried)
+            : this(segments, targetFormsFilled, unfilledPaths, nextSegmentNumber, commentsCarried, 0)
+        {
+        }
+
+        public WriteResult(int segments, int targetFormsFilled, IReadOnlyList<string> unfilledPaths, int nextSegmentNumber,
+            int commentsCarried, int tagsCloned)
         {
             Segments = segments;
             TargetFormsFilled = targetFormsFilled;
             UnfilledPaths = unfilledPaths ?? new List<string>();
             NextSegmentNumber = nextSegmentNumber;
             CommentsCarried = commentsCarried;
+            TagsCloned = tagsCloned;
         }
+
+        /// <summary>Filter tags cloned into the segments on both sides.</summary>
+        public int TagsCloned { get; }
 
         /// <summary>Comment markers rebuilt in the target segments from the seed's target, one count per form a comment reached.</summary>
         public int CommentsCarried { get; }

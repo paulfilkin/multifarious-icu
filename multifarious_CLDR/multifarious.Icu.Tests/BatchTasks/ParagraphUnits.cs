@@ -170,4 +170,49 @@ internal static class ParagraphUnits
     /// <summary>The comment markers among a container's top-level items, in order.</summary>
     public static List<ICommentMarker> MarkersOf(IAbstractMarkupDataContainer container) =>
         ItemsOf(container).OfType<ICommentMarker>().ToList();
+
+    public static IText Text(string value) => ItemFactory.CreateText(PropertiesFactory.CreateTextProperties(value));
+
+    /// <summary>A filter's tag pair with the given native start and end text and tag id, holding the content.</summary>
+    public static ITagPair Pair(string start, string end, string id, params IAbstractMarkupData[] content)
+    {
+        var startProperties = PropertiesFactory.CreateStartTagProperties(start);
+        startProperties.DisplayText = start;
+        startProperties.TagId = new TagId(id);
+        var endProperties = PropertiesFactory.CreateEndTagProperties(end);
+        endProperties.DisplayText = end;
+        var pair = ItemFactory.CreateTagPair(startProperties, endProperties);
+        foreach (var item in content) pair.Add(item);
+        return pair;
+    }
+
+    /// <summary>A filter's placeholder tag with the given native text.</summary>
+    public static IPlaceholderTag Placeholder(string content)
+    {
+        var properties = PropertiesFactory.CreatePlaceholderTagProperties(content);
+        properties.DisplayText = content;
+        return ItemFactory.CreatePlaceholderTag(properties);
+    }
+
+    /// <summary>A JSON filter unit whose one source segment holds the given items, text and the filter's tags, as a configuration that tags embedded content leaves it.</summary>
+    public static IParagraphUnit JsonMarkup(string jsonPath, params IAbstractMarkupData[] items)
+    {
+        var unit = Json(string.Empty, jsonPath);
+        var segment = (ISegment)unit.Source[0];
+        segment.Clear();
+        foreach (var item in items) segment.Add(item);
+        return unit;
+    }
+
+    /// <summary>Copies every source segment's content into its target segment, as Copy Source to Target does: the forms count as translated.</summary>
+    public static void CopySourceToTargets(IParagraphUnit unit)
+    {
+        var sources = SegmentsOf(unit.Source);
+        var targets = SegmentsOf(unit.Target);
+        for (var i = 0; i < sources.Count; i++)
+        {
+            targets[i].Clear();
+            foreach (var item in ItemsOf(sources[i])) targets[i].Add((IAbstractMarkupData)item.Clone());
+        }
+    }
 }

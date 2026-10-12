@@ -103,6 +103,9 @@ A8: That is the default: every message is expanded so a translator can check a m
 **Q9: A Spanish, French, Italian or Portuguese file has a "many" form I have never seen.**
 A9: CLDR gives these languages, and Catalan, a `many` form for a round million and above. The application uses it, so the form is needed. The ICU Forms window shows the numbers: 1000000, 2000000, 3000000.
 
+**Q10: My values contain HTML. Can the markup be tags?**
+A10: Yes. Turn on the file type's Embedded Content settings before creating the project: the HTML embedded content processor on JSON, or tag definition rules on Java Resources. Expand puts each tag into every form it belongs to and Restore puts them back, so the generated file carries the markup as the source did. A tag pair that opens in one branch and closes in another cannot be laid out, and that message is left as it is with a warning.
+
 > **Tip**: Full documentation in detail is maintained at <https://multifarious.filkin.com/product/icu-support/>.
 
 ---

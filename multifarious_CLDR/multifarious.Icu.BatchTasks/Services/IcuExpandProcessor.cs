@@ -141,14 +141,18 @@ namespace multifarious.Icu.BatchTasks.Services
                 return;
             }
 
-            var raw = RawValueReconstruction.Reconstruct(unit.Source).RawValue;
+            // The value with the filter's tags, if any, as sentinel characters: the parser and
+            // the planner see them as text, and the writer puts a clone of each tag back.
+            var sourceValue = RawValueReconstruction.Encode(unit.Source);
+            var raw = sourceValue.RawValue;
             if (raw.Length == 0) return;
 
             // What the unit already holds for its forms: the record a restore left, or the
             // translation and match a pre-translated whole message arrived with.
-            var targetValue = unit.Target == null ? null : RawValueReconstruction.Reconstruct(unit.Target);
+            var targetValue = unit.Target == null ? null : RawValueReconstruction.Encode(unit.Target);
             var targetRaw = targetValue == null ? string.Empty : targetValue.RawValue;
             var seed = new ExpansionSeed { FirstSegmentNumber = _nextSegmentNumber };
+            if (sourceValue.HasTags) seed.SourceTags = sourceValue;
             if (restored)
             {
                 seed.OriginalPattern = Metadata(icuContext, "icu:pattern");
@@ -183,9 +187,10 @@ namespace multifarious.Icu.BatchTasks.Services
 
                 case MessageKind.Protect:
                     ReadTargetForms(unitId, targetValue, seed);
-                    Record(unitId, key, ExpandOutcome.Protected, restored,
-                        Writer.Write(unit, _planner.PlanProtected(classification), key, seed), seed);
-                    Diagnostics.Write("  unit " + unitId + ": arguments protected");
+                    WriteResult protected_;
+                    if (!TryWrite(unit, unitId, key, _planner.PlanProtected(classification), seed, out protected_)) return;
+                    Record(unitId, key, ExpandOutcome.Protected, restored, protected_, seed);
+                    Diagnostics.Write("  unit " + unitId + ": arguments protected" + TagNote(protected_));
                     return;
 
                 case MessageKind.Expand:
@@ -205,21 +210,51 @@ namespace multifarious.Icu.BatchTasks.Services
                         return;
                     }
 
-                    var written = Writer.Write(unit, plan, key, seed);
+                    WriteResult written;
+                    if (!TryWrite(unit, unitId, key, plan, seed, out written)) return;
                     Record(unitId, key, ExpandOutcome.Expanded, restored, written, seed);
                     Diagnostics.Write("  unit " + unitId + ": expanded to " + written.Segments + " segments for " + targetLanguage
                         + (seed.TargetForms != null ? ", " + written.TargetFormsFilled + " forms filled from the target" : string.Empty)
-                        + (written.CommentsCarried > 0 ? ", " + written.CommentsCarried + " comment markers carried" : string.Empty));
+                        + (written.CommentsCarried > 0 ? ", " + written.CommentsCarried + " comment markers carried" : string.Empty)
+                        + TagNote(written));
                     return;
             }
         }
 
         /// <summary>
-        /// Reads the target message into forms for the seed, with the ranges of its comment
-        /// markers so the writer can put each back around the text it wrapped; a target that
-        /// does not read leaves the forms empty and is reported.
+        /// Writes the plan, or leaves the unit as it stands where a filter tag pair would be
+        /// split by the layout (<see cref="TagPairSplitException"/>): the unit gets the
+        /// warning, as a pass-through does, and nothing in it is changed.
         /// </summary>
-        private static void ReadTargetForms(string unitId, ReconstructedValue target, ExpansionSeed seed)
+        private bool TryWrite(IParagraphUnit unit, string unitId, string key, ExpansionPlan plan, ExpansionSeed seed,
+            out WriteResult written)
+        {
+            try
+            {
+                written = Writer.Write(unit, plan, key, seed);
+                return true;
+            }
+            catch (TagPairSplitException exception)
+            {
+                written = null;
+                Warn(unit, unitId, exception.Message);
+                _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.PassedThrough, 0, exception.Message));
+                return false;
+            }
+        }
+
+        private static string TagNote(WriteResult written)
+        {
+            return written.TagsCloned > 0 ? ", " + written.TagsCloned + " filter tags kept" : string.Empty;
+        }
+
+        /// <summary>
+        /// Reads the target message into forms for the seed, with the ranges of its comment
+        /// markers so the writer can put each back around the text it wrapped, and the table
+        /// of its filter tags; a target that does not read leaves the forms empty and is
+        /// reported.
+        /// </summary>
+        private static void ReadTargetForms(string unitId, EncodedValue target, ExpansionSeed seed)
         {
             if (target == null || string.IsNullOrWhiteSpace(target.RawValue)) return;
 
@@ -232,6 +267,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 return;
             }
             seed.TargetComments = target.Comments;
+            if (target.HasTags) seed.TargetTags = target;
         }
 
         /// <summary>
@@ -396,7 +432,8 @@ namespace multifarious.Icu.BatchTasks.Services
                 return;
             }
 
-            var written = Writer.Write(unit, plan, key, seed);
+            WriteResult written;
+            if (!TryWrite(unit, unitId, key, plan, seed, out written)) return;
             Expanded++;
             if (restored) Reexpanded++;
             var detail = "Expansion is over the branch budget (" + size

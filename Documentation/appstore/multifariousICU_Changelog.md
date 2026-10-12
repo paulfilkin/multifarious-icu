@@ -29,6 +29,14 @@ task.
   **Lock kept segments** is on. Perfect Match and Context Match count as 100%. Restore ignores
   a kept message and Generate Target Translations writes it as it stands.
 - The Expand report counts kept messages and shows the keep setting.
+- Markup opened as tags through the file type's Embedded Content settings survives both tasks.
+  Expand puts each tag into every form it belongs to, and Restore puts the tags back where
+  each form held them, so the generated file carries the markup as the source did. A tag pair
+  that opens in one branch and closes in another is not laid out; the message is left as it is
+  with a warning.
+- Comments survive both tasks. A comment on a form comes back after Restore around the text
+  of the form it was on; a comment on a restored message comes back after Expand on every
+  form that holds the text it was on.
 
 ### Fixed
 
@@ -42,9 +50,6 @@ task.
 
 - Studio's JSON writer does not write placeholder tags, so Restore must still run before
   Generate Target Translations; it is what turns the forms back into one plain message.
-- Comments survive both tasks. A comment on a form comes back after Restore around the text
-  of the form it was on; a comment on a restored message comes back after Expand on every
-  form that holds the text it was on.
 - Update Main Translation Memories stores whatever shape the file is in when it runs: one unit
   per form while expanded, one per whole message once restored. The tasks do not decide this.
 
