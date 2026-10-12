@@ -165,12 +165,20 @@ choice, not a runtime argument.  Four phases, starting with a neutral corpus fil
 its own examples (a travel app's vehicles) and names no source; the source material under
 `Documentation\CustomDictionaries` is local and must not be named in anything published.
 
+Decisions taken the same evening (Paul): the shipped default spells keys as upper-case English
+words; the dictionary lives in the project settings, imported from a developer's file in a
+template we publish and exported back for the round trip; and a dependent selector is inserted
+only for a base argument whose developer's file declares the dependent argument supplied for
+that language, never from the shipped default alone, since inserting one changes what the
+application must pass at runtime.  Where a language needs a dependent kind the application does
+not supply, the forms are laid out without it and the report and the row hint say so.  Still to
+list: the languages the shipped default covers, at Phase 0.
+
 ## Open items
 
 - Stage 1 run 2, the keep settings, as above.
-- Grammar dictionaries, after the release: agree the open questions in the design note (shipped
-  default languages and key spelling, whether dependent selectors are inserted by default, where
-  the dictionary lives), then Phase 0.
+- Grammar dictionaries, after the release: Phase 0 on a neutral corpus file, and the list of
+  languages the shipped default covers.
 - The release: merge `release/2.0` to `main`, the version is already 2.0.0.0, build the store
   package in Release configuration, retake user guide screenshots 4, 11 and 12 (they show
   Finalise), and have a native reader check the eight translations of the new strings.
