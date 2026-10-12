@@ -126,7 +126,7 @@ Open the Arabic file and the same message is six segments. Japanese has one. Eac
 
 Expand runs on the target files, so it must come after Copy to Target Languages. Put it before Analyse Files and Pre-translate, so word counts and translation memory matches see whole sentences. Either run it as a batch task straight after the project is created, or add it to a custom task sequence after Copy to Target Languages.
 
-Restore belongs before Generate Target Translations. Where it sits relative to Update Main Translation Memories is your choice: the memory stores the file as it is at the time, one unit per form while expanded, one unit per whole message once restored. Form units leverage across messages that share a sentence; whole-message units pre-translate a repeated message in one go. Some teams update twice and keep both.
+Restore belongs before Generate Target Translations. Where it sits relative to Update Main Translation Memories is your choice: the memory stores the file as it is at the time, one unit per form while expanded, one unit per whole message once restored, the source as the developer wrote it. Form units leverage across messages that share a sentence; whole-message units pre-translate a repeated message in one go, in the next project that carries it. Some teams update twice and keep both.
 
 ![A custom task sequence with the ICU tasks placed](multifarious_images/12.png)
 *Screenshot 4: a task sequence with Expand after Copy to Target Languages and Restore before Generate Target Translations.*
@@ -217,7 +217,7 @@ A message with two independent plurals multiplies: six forms times six is 36 seg
 
 ### Messages already translated
 
-Off by default. A project pre-translated before Expand runs, from a memory that holds whole messages Restore put back together, arrives with those messages matched. Expanded, such a message is split into its forms, each carrying the message's match and confirmation level, so the translator can check it form by form. With **Keep messages already translated** on, a message whose every segment is matched at the **Minimum match** or better is left as it is instead; Perfect Match and Context Match count as 100%. **Lock kept segments**, on by default, locks it so nobody changes a message the tasks never restructured. Restore ignores a kept message and Generate Target Translations writes it as it stands.
+Off by default. A project pre-translated before Expand runs, from a memory that holds whole messages Restore put back together, arrives with those messages matched. Expanded, such a message is split into its forms, each carrying the message's match and confirmation level, so the translator can check it form by form. With **Keep messages already translated** on, a message whose every segment is matched at the **Minimum match** or better is left as it is instead; Perfect Match and Context Match count as 100%. **Lock kept segments**, on by default, locks it so nobody changes a message the tasks never restructured. Restore ignores a kept message and Generate Target Translations writes it as it stands. A restored message counts too: Expand with the setting on leaves it restored when every form it had was matched at the minimum or better, and locks its one segment. A value with no ICU message in it is never kept or locked.
 
 ### When a value does not parse as an ICU message
 
@@ -245,7 +245,7 @@ Warn and continue, the default, leaves that message expanded with its placeholde
 ![The Reports view with a Restore ICU report open](multifarious_images/11.png)
 *Screenshot 12: a restore report in the Reports view.*
 
-After Restore each message is one segment on each side, plain text, no tags and no locked spans. The source is shown in the same shape as the target, with the shared text inside every form, so the two line up. A restored message's confirmation level is the one its forms shared, or Draft where they differed, and it is locked only if every form was.
+After Restore each message is one segment on each side, plain text, no tags and no locked spans. The target is in the shape the translator worked in, with the shared text inside every form; the source is back as the developer wrote it, so a memory updated from the file matches the same message in the next project. A restored message's confirmation level is the one its forms shared, or Draft where they differed, and it is locked only if every form was.
 
 ### Switching back to the forms
 
@@ -387,7 +387,7 @@ CLDR gives these languages, and Catalan, a `many` form for a round million and a
 - Restore has to run before Generate Target Translations. Studio's JSON writer does not write placeholder tags, so a message that was never restored, or was left expanded after a placeholder warning, loses its arguments in the generated file.
 - A comment on an argument comes back around its placeholder tag, and a comment whose selection ran across the syntax between two forms comes back on both.
 - A markup tag pair that opens in one branch of a message and closes in another is not laid out; the message is left as it is with a warning.
-- Restore puts the source back in the hoisted shape, with the shared text inside every form, not as the developer wrote it. The original pattern is kept in the file's metadata, and the generated target file is unaffected.
+- Restore puts the source back from the pattern the file's metadata kept at the first expansion. A comment on a source segment does not survive it.
 
 Feedback from anyone translating ICU messages is welcome: a message that lays out oddly, a language whose grammar hint is wrong or missing, a file type you need. A sample file with the report helps.
 

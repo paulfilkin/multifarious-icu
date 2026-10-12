@@ -32,11 +32,12 @@ namespace multifarious.Icu.BatchTasks.Services
     /// protected span in the source is in the target; and then put the message back together
     /// as one plain-text segment on each side, the shape the filter delivered and the shape
     /// Studio's writers emit as it stands (Paul, 11 October 2026). The target comes back in the
-    /// hoisted shape the translator worked in, and so does the source, so the two line up form
-    /// for form; the pattern as the file carried it stays in the unit context. The filter's
-    /// own tags, where a configuration tags embedded content, stay tags: each is cloned into
-    /// the restored segment where its form held it, which the writers accept (Project 56
-    /// probes, 12 October 2026).
+    /// hoisted shape the translator worked in; the source comes back as the developer wrote
+    /// it, from the pattern the unit context kept, so a memory updated from the restored file
+    /// matches a new project's source (Project 59, 12 October 2026). The filter's own tags,
+    /// where a configuration tags embedded content, stay tags: each is cloned into the
+    /// restored segment where its form held it, which the writers accept (Project 56 probes,
+    /// 12 October 2026).
     ///
     /// Before the collapse, each form's confirmation level, lock and translation origin are
     /// recorded on the unit context by branch path, and the context's state becomes restored.
@@ -631,12 +632,13 @@ namespace multifarious.Icu.BatchTasks.Services
         // ---- the collapse -----------------------------------------------------------------
 
         /// <summary>
-        /// Puts the message back together: one segment on each side, plain text, in the hoisted
-        /// shape the forms were laid out in. The source is the text of its paragraph; the target
-        /// is the text of its paragraph with each translator's comment rebuilt around the text
-        /// it wrapped. The pair's confirmation level is the forms' common one or Draft, and it
-        /// is locked only where every form was. First the forms' states go on the unit context
-        /// by path, and the state becomes restored, for the next expansion to read.
+        /// Puts the message back together: one segment on each side, plain text. The source is
+        /// the pattern as the developer wrote it (<see cref="OriginalSource"/>); the target is
+        /// the text of its paragraph in the hoisted shape the forms were laid out in, with each
+        /// translator's comment rebuilt around the text it wrapped. The pair's confirmation
+        /// level is the forms' common one or Draft, and it is locked only where every form was.
+        /// First the forms' states go on the unit context by path, and the state becomes
+        /// restored, for the next expansion to read.
         /// </summary>
         private void Collapse(IParagraphUnit unit, List<ISegment> targetSegments)
         {
@@ -659,7 +661,7 @@ namespace multifarious.Icu.BatchTasks.Services
             properties.IsLocked = allLocked;
 
             var source = ItemFactory.CreateSegment(properties);
-            foreach (var item in Collapsed(unit.Source))
+            foreach (var item in OriginalSource(unit))
             {
                 source.Add(item);
             }
@@ -800,6 +802,190 @@ namespace multifarious.Icu.BatchTasks.Services
             if (run.Length == 0) return;
             items.Add(Text(run.ToString()));
             run.Clear();
+        }
+
+        // ---- the source as the developer wrote it ------------------------------------------
+
+        /// <summary>
+        /// The restored source: the pattern as the file carried it, from the unit context, with
+        /// the filter's own tags where they stood in it. A memory updated from the restored
+        /// file then matches the message as a new project's source carries it; the hoisted
+        /// source of 2.0.0 matched nothing (Project 59, 12 October 2026). The pattern is
+        /// readable, each tag as its native text, so the tags are found by that text, longest
+        /// first, an end closing the innermost open pair. The clones come from the expanded
+        /// source, one per tag id in document order, so a second pair with the same text keeps
+        /// its own id. A unit without the pattern collapses as the target does.
+        /// </summary>
+        private List<IAbstractMarkupData> OriginalSource(IParagraphUnit unit)
+        {
+            var pattern = IcuMetadata(unit, "icu:pattern");
+            if (pattern == null) return Collapsed(unit.Source);
+
+            var tags = FilterTagsOf(unit.Source);
+            if (tags.Count == 0) return new List<IAbstractMarkupData> { Text(pattern) };
+
+            var used = new HashSet<IAbstractMarkupData>();
+            var levels = new Stack<OpenPair>();
+            var level = new OpenPair(null);
+            var index = 0;
+            while (index < pattern.Length)
+            {
+                int length;
+                if (level.Pair != null && Matches(pattern, index, level.Pair.EndTagProperties.TagContent, out length))
+                {
+                    level.Close(this);
+                    var closed = level;
+                    level = levels.Pop();
+                    level.Items.Add(closed.Pair);
+                    index += length;
+                    continue;
+                }
+
+                var tag = LongestTagAt(pattern, index, tags, used, out length);
+                if (tag == null)
+                {
+                    level.Run.Append(pattern[index]);
+                    index++;
+                    continue;
+                }
+
+                level.Flush(this);
+                index += length;
+                var pair = tag as ITagPair;
+                if (pair != null)
+                {
+                    levels.Push(level);
+                    level = new OpenPair(ClonePair(pair));
+                }
+                else
+                {
+                    level.Items.Add((IAbstractMarkupData)tag.Clone());
+                }
+            }
+
+            // A pair the pattern opened and never closed keeps its content, as it stands.
+            level.Flush(this);
+            while (level.Pair != null)
+            {
+                level.Close(this);
+                var closed = level;
+                level = levels.Pop();
+                level.Flush(this);
+                level.Items.Add(closed.Pair);
+            }
+            return level.Items;
+        }
+
+        /// <summary>One nesting level of the rebuilt source: the pair being filled, or the segment itself, with its items and open text run.</summary>
+        private sealed class OpenPair
+        {
+            public OpenPair(ITagPair pair)
+            {
+                Pair = pair;
+            }
+
+            public ITagPair Pair { get; }
+
+            public List<IAbstractMarkupData> Items { get; } = new List<IAbstractMarkupData>();
+
+            public StringBuilder Run { get; } = new StringBuilder();
+
+            public void Flush(IcuRestoreProcessor owner)
+            {
+                owner.Flush(Items, Run);
+            }
+
+            /// <summary>Moves the level's content into its pair, the open run first.</summary>
+            public void Close(IcuRestoreProcessor owner)
+            {
+                Flush(owner);
+                foreach (var item in Items)
+                {
+                    Pair.Add(item);
+                }
+                Items.Clear();
+            }
+        }
+
+        /// <summary>
+        /// The filter's tags under the expanded source, one per tag id in document order: tag
+        /// pairs, placeholders that are not the expansion's own, and structure tags.
+        /// </summary>
+        private static List<IAbstractMarkupData> FilterTagsOf(IParagraph paragraph)
+        {
+            var tags = new List<IAbstractMarkupData>();
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            Walk(paragraph, item =>
+            {
+                string id = null;
+                var pair = item as ITagPair;
+                var placeholder = item as IPlaceholderTag;
+                var structure = item as IStructureTag;
+                if (pair != null) id = pair.StartTagProperties.TagId == null ? null : pair.StartTagProperties.TagId.Id;
+                else if (placeholder != null && !IsArgumentTag(placeholder)) id = placeholder.Properties.TagId == null ? null : placeholder.Properties.TagId.Id;
+                else if (structure != null) id = structure.Properties.TagId == null ? null : structure.Properties.TagId.Id;
+                else return;
+
+                if (!string.IsNullOrEmpty(id) && !ids.Add(id)) return;
+                tags.Add(item);
+            });
+            return tags;
+        }
+
+        /// <summary>
+        /// The tag whose native text stands at the index, the longest where several do and the
+        /// first not yet used among those with the same text, or null for an ordinary character.
+        /// </summary>
+        private static IAbstractMarkupData LongestTagAt(string pattern, int index, List<IAbstractMarkupData> tags,
+            HashSet<IAbstractMarkupData> used, out int length)
+        {
+            IAbstractMarkupData best = null;
+            length = 0;
+            foreach (var tag in tags)
+            {
+                int candidate;
+                if (!Matches(pattern, index, NativeTextOf(tag), out candidate)) continue;
+                var longer = candidate > length;
+                var fresher = candidate == length && best != null && used.Contains(best) && !used.Contains(tag);
+                if (longer || fresher)
+                {
+                    best = tag;
+                    length = candidate;
+                }
+            }
+            if (best != null) used.Add(best);
+            return best;
+        }
+
+        private static string NativeTextOf(IAbstractMarkupData tag)
+        {
+            var pair = tag as ITagPair;
+            if (pair != null) return pair.StartTagProperties.TagContent;
+            var placeholder = tag as IPlaceholderTag;
+            if (placeholder != null) return placeholder.Properties.TagContent;
+            var structure = tag as IStructureTag;
+            return structure == null ? null : structure.Properties.TagContent;
+        }
+
+        private static bool Matches(string pattern, int index, string text, out int length)
+        {
+            length = 0;
+            if (string.IsNullOrEmpty(text) || index + text.Length > pattern.Length) return false;
+            if (string.CompareOrdinal(pattern, index, text, 0, text.Length) != 0) return false;
+            length = text.Length;
+            return true;
+        }
+
+        private static string IcuMetadata(IParagraphUnit unit, string key)
+        {
+            foreach (var context in unit.Properties.Contexts.Contexts)
+            {
+                if (context != null && context.ContextType == Constants.IcuContextType && context.MetaDataContainsKey(key))
+                {
+                    return context.GetMetaData(key);
+                }
+            }
+            return null;
         }
 
         /// <summary>

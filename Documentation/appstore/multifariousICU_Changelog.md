@@ -13,8 +13,9 @@ task.
   placeholders and filling an untranslated form from the source with a warning, and then puts
   each message back together as one plain segment on each side, with no tags and no locked
   spans. The target comes back in the shape the translator worked in, with the shared text
-  inside every form, and so does the source, so the two line up. Run it before Generate Target
-  Translations, or whenever the whole messages are wanted back.
+  inside every form; the source comes back as the developer wrote it, so a memory updated from
+  the restored file matches the same message in the next project. Run it before Generate
+  Target Translations, or whenever the whole messages are wanted back.
 - **Expand ICU** lays a restored message out again, each form with its translation, its
   confirmation level, its lock and its match, so expanded and restored can be switched between
   at will. The pattern as the file carried it stays in the file's metadata.
@@ -26,8 +27,9 @@ task.
 
 - Expand setting **Keep messages already translated**, off by default: a message whose every
   segment is matched at the chosen percentage or better is left as it is, and locked if
-  **Lock kept segments** is on. Perfect Match and Context Match count as 100%. Restore ignores
-  a kept message and Generate Target Translations writes it as it stands.
+  **Lock kept segments** is on. Perfect Match and Context Match count as 100%. A restored
+  message is kept the same way when every form it had was matched. Restore ignores a kept
+  message and Generate Target Translations writes it as it stands.
 - The Expand report counts kept messages and shows the keep setting.
 - Markup opened as tags through the file type's Embedded Content settings survives both tasks.
   Expand puts each tag into every form it belongs to, and Restore puts the tags back where

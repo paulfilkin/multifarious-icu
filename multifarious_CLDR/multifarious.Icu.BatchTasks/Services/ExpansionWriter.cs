@@ -632,8 +632,8 @@ namespace multifarious.Icu.BatchTasks.Services
             context.Description = string.IsNullOrEmpty(resourceKey) ? Constants.IcuContextDisplayName : resourceKey;
 
             // The pattern is the value as the file carried it. A unit expanded again after a
-            // restore is read in the hoisted shape, so the pattern recorded the first time is
-            // kept rather than overwritten with the hoisted text.
+            // restore is read from the source the restore rebuilt out of this pattern, so the
+            // one recorded the first time is kept rather than taken from the content again.
             // Readable: with the filter's tags as their native text, not as sentinels.
             var tags = state.Seed.SourceTags;
             context.SetMetaData("icu:pattern", state.Seed.OriginalPattern ?? (tags == null ? plan.RawValue : tags.Decode(plan.RawValue)));

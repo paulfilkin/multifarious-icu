@@ -256,9 +256,11 @@ public class FilterTagTests
         var target = Assert.Single(SegmentsOf(unit.Target));
         const string expected =
             "{count, plural, one {You have <b># unread message</b> today.} few {You have <b># unread messages</b> today.} many {You have <b># unread messages</b> today.} other {You have <b># unread messages</b> today.}}";
-        Assert.Equal(expected, Projection(source));
+        Assert.Equal(BoldCount, Projection(source));
         Assert.Equal(expected, Projection(target));
-        Assert.Equal(4, PairsOf(source).Count);
+        var sourcePair = Assert.Single(PairsOf(source));
+        Assert.Equal("18", sourcePair.StartTagProperties.TagId.Id);
+        Assert.Equal("{count, plural, one {# unread message} other {# unread messages}}", Projection(sourcePair));
         Assert.Equal(4, PairsOf(target).Count);
         Assert.All(PairsOf(target), p => Assert.Equal("18", p.StartTagProperties.TagId.Id));
         Assert.All(PairsOf(target), p => Assert.Equal("# unread message", Projection(p).Substring(0, 16)));
@@ -294,7 +296,48 @@ public class FilterTagTests
 
         Restorer().ProcessParagraphUnit(unit);
         Assert.Equal(restored, Projection(unit.Target));
-        Assert.Equal(restored, Projection(unit.Source));
+        Assert.Equal(BoldCount, Projection(unit.Source));
+        Assert.Equal("18", Assert.Single(PairsOf(SegmentsOf(unit.Source)[0])).StartTagProperties.TagId.Id);
+    }
+
+    /// <summary>
+    /// The restored source is rebuilt from the recorded pattern, so each of the filter's tags
+    /// has to be found again by its native text: a pair inside a branch is nested back inside
+    /// the outer pair, a second pair with the same text keeps its own id, and a placeholder
+    /// comes back where it stood.
+    /// </summary>
+    [Fact]
+    public void The_restored_source_puts_each_tag_back_where_the_developer_had_it_with_its_own_id()
+    {
+        var unit = ParagraphUnits.JsonMarkup("['count.html']",
+            Pair("<b>", "</b>", "3", Text("Hello")),
+            Text(" "), ParagraphUnits.Placeholder("<br/>"), Text(" you have "),
+            Pair("<b>", "</b>", "7",
+                Text("{count, plural, one {# "), Pair("<i>", "</i>", "9", Text("unread")), Text(" message} other {# unread messages}}")),
+            Text(" today."));
+        var original = Projection(unit.Source);
+        Expander().ProcessParagraphUnit(unit);
+        ParagraphUnits.CopySourceToTargets(unit);
+        var restorer = Restorer();
+
+        restorer.ProcessParagraphUnit(unit);
+
+        Assert.Equal(1, restorer.Restored);
+        Assert.True(restorer.Warnings.Count == 0, string.Join(" | ", restorer.Warnings.Select(w => w.Reason)));
+        var source = Assert.Single(SegmentsOf(unit.Source));
+        Assert.Equal(original, Projection(source));
+        var items = ParagraphUnits.ItemsOf(source);
+        var pairs = items.OfType<ITagPair>().ToList();
+        Assert.Equal(2, pairs.Count);
+        Assert.Equal("3", pairs[0].StartTagProperties.TagId.Id);
+        Assert.Equal("Hello", Projection(pairs[0]));
+        Assert.Equal("7", pairs[1].StartTagProperties.TagId.Id);
+        var inner = Assert.Single(PairsOf(pairs[1]));
+        Assert.Equal("9", inner.StartTagProperties.TagId.Id);
+        Assert.Equal("unread", Projection(inner));
+        Assert.Equal("<br/>", Assert.Single(items.OfType<IPlaceholderTag>()).Properties.TagContent);
+        AssertNoSentinels(unit.Source);
+        Assert.Equal(4, PairsOf(Assert.Single(SegmentsOf(unit.Target))).Count(p => p.StartTagProperties.TagId.Id == "7"));
     }
 
     [Fact]

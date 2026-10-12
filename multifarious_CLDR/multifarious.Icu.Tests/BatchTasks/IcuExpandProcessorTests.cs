@@ -476,6 +476,45 @@ public class IcuExpandProcessorTests
         Assert.Equal(UnreadCount, ResourceKey.IcuContextOf(unit)!.GetMetaData("icu:pattern"));
     }
 
+    /// <summary>
+    /// What a memory updated from a restored file delivers: the source as the developer wrote
+    /// it, matched, and the target in the hoisted shape Restore wrote. The forms are read from
+    /// the target by branch path, whatever shape the source is in; and at the keep threshold
+    /// the message stays as it is.
+    /// </summary>
+    [Fact]
+    public void A_message_pre_translated_from_a_memory_of_restored_messages_is_split_by_path_or_kept()
+    {
+        const string hoistedRussian =
+            "{count, plural, one {Привет, {name}, у вас # непрочитанное сообщение!} few {Привет, {name}, у вас # непрочитанных сообщения!} "
+            + "many {Привет, {name}, у вас # непрочитанных сообщений!} other {Привет, {name}, у вас # непрочитанного сообщения!}}";
+
+        var split = PreTranslated(hoistedRussian, "tm", 100, TextContextMatchLevel.SourceAndTarget);
+        var processor = Processor("ru-RU");
+        processor.ProcessParagraphUnit(split);
+
+        Assert.Equal(1, processor.Expanded);
+        Assert.Empty(processor.Warnings);
+        var targets = SegmentsOf(split.Target);
+        Assert.Equal(4, targets.Count);
+        Assert.Equal("Привет, {name}, у вас # непрочитанное сообщение!", RawValueReconstruction.Reconstruct(targets[0]).RawValue);
+        Assert.Equal("Привет, {name}, у вас # непрочитанных сообщения!", RawValueReconstruction.Reconstruct(targets[1]).RawValue);
+        Assert.Equal("Привет, {name}, у вас # непрочитанных сообщений!", RawValueReconstruction.Reconstruct(targets[2]).RawValue);
+        Assert.Equal("Привет, {name}, у вас # непрочитанного сообщения!", RawValueReconstruction.Reconstruct(targets[3]).RawValue);
+        Assert.All(targets, t => Assert.Equal(100, t.Properties.TranslationOrigin.MatchPercent));
+        Assert.Equal(UnreadCount, ResourceKey.IcuContextOf(split)!.GetMetaData("icu:pattern"));
+
+        var kept = PreTranslated(hoistedRussian, "tm", 100, TextContextMatchLevel.SourceAndTarget);
+        var keeper = Processor("ru-RU", Keep());
+        keeper.ProcessParagraphUnit(kept);
+
+        Assert.Equal(1, keeper.Kept);
+        Assert.Equal(0, keeper.Expanded);
+        var target = Assert.Single(SegmentsOf(kept.Target));
+        Assert.Equal(hoistedRussian, RawValueReconstruction.Reconstruct(target).RawValue);
+        Assert.True(target.Properties.IsLocked);
+    }
+
     [Fact]
     public void A_pre_translated_message_that_does_not_parse_leaves_the_forms_empty_and_is_reported()
     {
@@ -593,6 +632,79 @@ public class IcuExpandProcessorTests
 
         Assert.Equal(0, processor.Kept);
         Assert.Equal(4, SegmentsOf(unit.Target).Count);
+    }
+
+    /// <summary>
+    /// The keep rule applies to messages the task would lay out, nothing else: a value with no
+    /// ICU matched at 100 is neither kept, locked nor counted (Project 61, 13 October 2026,
+    /// where two comment lines were).
+    /// </summary>
+    [Fact]
+    public void A_value_with_no_icu_is_never_kept_or_locked()
+    {
+        var unit = ParagraphUnits.Json("Message Centre", "['title']");
+        var target = SegmentsOf(unit.Target)[0];
+        target.Add(ParagraphUnits.Text("Центр сообщений"));
+        var origin = ParagraphUnits.ItemFactory.CreateTranslationOrigin();
+        origin.OriginType = "tm";
+        origin.MatchPercent = 100;
+        target.Properties.TranslationOrigin = origin;
+        var processor = Processor("ru-RU", Keep());
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(0, processor.Kept);
+        Assert.Empty(processor.Outcomes);
+        Assert.False(target.Properties.IsLocked);
+        Assert.Null(ResourceKey.IcuContextOf(unit));
+    }
+
+    /// <summary>
+    /// A restored message is judged on the forms' states the restore recorded: every form at
+    /// the threshold and it stays restored, its one segment locked and its context kept, so a
+    /// later Expand with keep off still lays it out; one form below and it is laid out.
+    /// </summary>
+    [Theory]
+    [InlineData(100, true)]
+    [InlineData(99, false)]
+    public void A_restored_message_whose_forms_were_all_matched_is_kept_restored(byte lowest, bool kept)
+    {
+        var unit = ParagraphUnits.Json(UnreadCount, "['inbox.unreadCount']");
+        Processor("ru-RU").ProcessParagraphUnit(unit);
+        ParagraphUnits.CopySourceToTargets(unit);
+        var forms = SegmentsOf(unit.Target);
+        Assert.Equal(4, forms.Count);
+        for (var i = 0; i < forms.Count; i++)
+        {
+            var origin = ParagraphUnits.ItemFactory.CreateTranslationOrigin();
+            origin.OriginType = "tm";
+            origin.MatchPercent = i == 1 ? lowest : (byte)100;
+            forms[i].Properties.TranslationOrigin = origin;
+            forms[i].Properties.ConfirmationLevel = ConfirmationLevel.Translated;
+        }
+        new IcuRestoreProcessor("ru-RU", RestoreOptions.Default) { ItemFactory = ParagraphUnits.ItemFactory }.ProcessParagraphUnit(unit);
+        Assert.True(ResourceKey.IsRestored(unit));
+        var restored = RawValueReconstruction.Reconstruct(unit.Target).RawValue;
+        var processor = Processor("ru-RU", Keep());
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(kept ? 1 : 0, processor.Kept);
+        Assert.Equal(kept ? 0 : 1, processor.Reexpanded);
+        if (kept)
+        {
+            var target = Assert.Single(SegmentsOf(unit.Target));
+            Assert.Equal(restored, RawValueReconstruction.Reconstruct(target).RawValue);
+            Assert.True(target.Properties.IsLocked);
+            Assert.True(ResourceKey.IsRestored(unit));
+            Assert.Equal(ExpandOutcome.Kept, Assert.Single(processor.Outcomes).Outcome);
+        }
+        else
+        {
+            Assert.Equal(4, SegmentsOf(unit.Target).Count);
+            Assert.True(ResourceKey.IsExpanded(unit));
+            Assert.Equal(99, SegmentsOf(unit.Target)[1].Properties.TranslationOrigin.MatchPercent);
+        }
     }
 
     /// <summary>

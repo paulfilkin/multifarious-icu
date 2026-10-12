@@ -174,7 +174,7 @@ public class IcuRestoreProcessorTests
 
         Assert.Equal(3, restorer.Pruned);
         AssertRestoredShape(unit);
-        Assert.Equal(Projection(unit.Source), Projection(unit.Target));
+        Assert.Equal(UnreadCount, Projection(unit.Source));
         AssertRendersLikeSource(UnreadCount, Projection(unit.Target), "ja",
             new Dictionary<string, string> { ["name"] = "Anna" }, "0", "1", "2", "5", "1.5");
     }
@@ -255,8 +255,9 @@ public class IcuRestoreProcessorTests
 
     /// <summary>
     /// The expansion writes placeholder tags inside the segments and locked syntax between
-    /// them. Restore turns the lot into the text of one segment per side, in the hoisted shape
-    /// the forms were laid out in, and the projection is unchanged.
+    /// them. Restore turns the lot into the text of one segment per side: the target in the
+    /// hoisted shape the forms were laid out in, its projection unchanged, and the source as
+    /// the developer wrote it, so a memory updated from the file matches a new project.
     /// </summary>
     [Fact]
     public void The_tags_and_the_locked_syntax_become_the_text_of_one_segment_per_side()
@@ -272,9 +273,7 @@ public class IcuRestoreProcessorTests
         Assert.Empty(restorer.Warnings);
         AssertRestoredShape(unit);
         Assert.Equal(expandedProjection, Projection(unit.Target));
-        Assert.Equal("{count, plural, one {Hello {name}, you have # unread message!} few {Hello {name}, you have # unread messages!} "
-            + "many {Hello {name}, you have # unread messages!} other {Hello {name}, you have # unread messages!}}",
-            Projection(unit.Source));
+        Assert.Equal(UnreadCount, Projection(unit.Source));
         Assert.Contains("one {Привет, {name}, у вас # непрочитанное сообщение!}", Projection(unit.Target));
         Assert.Equal("Привет, Anna, у вас 1 непрочитанное сообщение!",
             MessageRenderer.Render(IcuMessage.Parse(Projection(unit.Target)).Nodes,
@@ -705,7 +704,7 @@ public class IcuRestoreProcessorTests
         Assert.Equal(0, restorer.Pruned);
         Assert.Equal(4, restorer.Filled);
         AssertRestoredShape(unit);
-        Assert.Equal(Projection(unit.Source), Projection(unit.Target));
+        Assert.Equal(sync, Projection(unit.Source));
         Assert.Equal("1 file synchronised across 2 devices.",
             MessageRenderer.Render(IcuMessage.Parse(Projection(unit.Target)).Nodes,
                 new Dictionary<string, string> { ["files"] = "1", ["devices"] = "2" }, CldrCategories.For("en")));

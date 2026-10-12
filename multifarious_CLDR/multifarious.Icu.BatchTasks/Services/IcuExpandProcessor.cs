@@ -44,8 +44,9 @@ namespace multifarious.Icu.BatchTasks.Services
     /// A unit the restore task has put back together is expanded again, with each form given
     /// the translation and the state it had before, so expand and restore can alternate without
     /// loss. A unit that arrives pre-translated as a whole message has that message split into
-    /// its forms the same way, or is kept as it stands when the task is set to keep matches at
-    /// or above its threshold (Paul, 11 October 2026).
+    /// its forms the same way. Either is kept as it stands when the task is set to keep matches
+    /// at or above its threshold and every state the unit holds, its segments' or the forms'
+    /// the restore recorded, is at that match (Paul, 11 and 13 October 2026).
     /// </summary>
     public class IcuExpandProcessor : AbstractBilingualContentProcessor
     {
@@ -148,24 +149,25 @@ namespace multifarious.Icu.BatchTasks.Services
             if (raw.Length == 0) return;
 
             // What the unit already holds for its forms: the record a restore left, or the
-            // translation and match a pre-translated whole message arrived with.
+            // translation and match a pre-translated whole message arrived with. The states
+            // are also what the keep rule judges, once the value is known to be a message the
+            // task would lay out: a value with no ICU is never kept or locked (Project 61,
+            // 13 October 2026, where two comment lines matched at 100 were).
             var targetValue = unit.Target == null ? null : RawValueReconstruction.Encode(unit.Target);
             var targetRaw = targetValue == null ? string.Empty : targetValue.RawValue;
             var seed = new ExpansionSeed { FirstSegmentNumber = _nextSegmentNumber };
             if (sourceValue.HasTags) seed.SourceTags = sourceValue;
+            var states = new List<SegmentState>();
             if (restored)
             {
                 seed.OriginalPattern = Metadata(icuContext, "icu:pattern");
-                seed.States = SegmentStates.Parse(Metadata(icuContext, Constants.SegmentStatesKey));
+                var recorded = SegmentStates.Parse(Metadata(icuContext, Constants.SegmentStatesKey));
+                seed.States = recorded;
+                if (recorded != null) states.AddRange(recorded.Values);
             }
             else if (!string.IsNullOrWhiteSpace(targetRaw))
             {
-                var states = TargetStates(unit);
-                if (ShouldKeep(states))
-                {
-                    Keep(unit, unitId, key, states.Count);
-                    return;
-                }
+                states = TargetStates(unit);
                 seed.StateForAll = StateForAll(states);
             }
 
@@ -186,6 +188,11 @@ namespace multifarious.Icu.BatchTasks.Services
                     return;
 
                 case MessageKind.Protect:
+                    if (ShouldKeep(states))
+                    {
+                        Keep(unit, unitId, key);
+                        return;
+                    }
                     ReadTargetForms(unitId, targetValue, seed);
                     WriteResult protected_;
                     if (!TryWrite(unit, unitId, key, _planner.PlanProtected(classification), seed, out protected_)) return;
@@ -202,6 +209,11 @@ namespace multifarious.Icu.BatchTasks.Services
                             "The target language is unknown: neither the task nor the file supplied one.");
                     }
 
+                    if (ShouldKeep(states))
+                    {
+                        Keep(unit, unitId, key);
+                        return;
+                    }
                     ReadTargetForms(unitId, targetValue, seed);
                     var plan = _planner.Plan(classification, sourceLanguage, new[] { targetLanguage }, _options);
                     if (plan.ExceedsBudget)
@@ -314,9 +326,12 @@ namespace multifarious.Icu.BatchTasks.Services
         }
 
         /// <summary>
-        /// Whether a pre-translated message stays as it is: the task is set to keep, and every
-        /// segment of it is matched at the threshold or better. One segment below, or with no
-        /// origin at all, and the message is expanded like any other.
+        /// Whether a message stays as it is: the task is set to keep, and every state it holds
+        /// is matched at the threshold or better. For a pre-translated whole message the states
+        /// are its segments'; for a restored message they are the forms' states the restore
+        /// recorded, so a message whose every form was matched stays restored (Paul, 13 October
+        /// 2026). One below, or with no origin at all, or no states at all, and the message is
+        /// expanded like any other.
         /// </summary>
         private bool ShouldKeep(List<SegmentState> states)
         {
@@ -328,18 +343,20 @@ namespace multifarious.Icu.BatchTasks.Services
             return true;
         }
 
-        private void Keep(IParagraphUnit unit, string unitId, string key, int segments)
+        /// <summary>Leaves the unit as it stands, its context included, locking its target segments where the task says so.</summary>
+        private void Keep(IParagraphUnit unit, string unitId, string key)
         {
+            var segments = SegmentsOf(unit.Target);
             if (_options.LockKept)
             {
-                foreach (var segment in SegmentsOf(unit.Target))
+                foreach (var segment in segments)
                 {
                     segment.Properties.IsLocked = true;
                 }
             }
 
             Kept++;
-            _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Kept, segments, null));
+            _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Kept, segments.Count, null));
             Diagnostics.Write("  unit " + unitId + ": kept, already translated at " + _options.KeepMinimumMatch
                 + "% or better" + (_options.LockKept ? ", locked" : string.Empty));
         }
