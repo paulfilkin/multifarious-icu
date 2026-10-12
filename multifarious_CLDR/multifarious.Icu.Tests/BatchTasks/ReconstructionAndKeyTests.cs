@@ -74,4 +74,23 @@ public class ReconstructionAndKeyTests
         Assert.Null(ResourceKey.Of(unit));
         Assert.False(ResourceKey.IsExpanded(unit));
     }
+
+    [Fact]
+    public void Comment_markers_are_noted_with_the_range_of_raw_text_they_wrap()
+    {
+        var unit = ParagraphUnits.WithSegments("You have # messages.");
+        var segment = (Sdl.FileTypeSupport.Framework.BilingualApi.ISegment)unit.Source[0];
+        var outer = ParagraphUnits.WrapPhrase(segment, "have # messages", "outer");
+        ParagraphUnits.WrapPhrase(outer, "#", "inner");
+
+        var reconstructed = RawValueReconstruction.Reconstruct(unit.Source);
+
+        Assert.Equal("You have # messages.", reconstructed.RawValue);
+        Assert.Equal(2, reconstructed.Comments.Count);
+        Assert.Equal("outer", reconstructed.Comments[0].Comments.GetItem(0).Text);
+        Assert.Equal((4, 19), (reconstructed.Comments[0].Start, reconstructed.Comments[0].End));
+        Assert.Equal("inner", reconstructed.Comments[1].Comments.GetItem(0).Text);
+        Assert.Equal((9, 10), (reconstructed.Comments[1].Start, reconstructed.Comments[1].End));
+        Assert.Empty(RawValueReconstruction.Reconstruct(ParagraphUnits.WithSegments("plain").Source).Comments);
+    }
 }

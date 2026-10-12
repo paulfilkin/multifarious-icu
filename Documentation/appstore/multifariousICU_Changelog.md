@@ -42,8 +42,9 @@ task.
 
 - Studio's JSON writer does not write placeholder tags, so Restore must still run before
   Generate Target Translations; it is what turns the forms back into one plain message.
-- A comment on a restored message does not come back through Expand. Comments on the forms
-  survive a Restore, around the text of the form they were on.
+- Comments survive both tasks. A comment on a form comes back after Restore around the text
+  of the form it was on; a comment on a restored message comes back after Expand on every
+  form that holds the text it was on.
 - Update Main Translation Memories stores whatever shape the file is in when it runs: one unit
   per form while expanded, one per whole message once restored. The tasks do not decide this.
 

@@ -116,4 +116,58 @@ internal static class ParagraphUnits
         }
         return items;
     }
+
+    /// <summary>
+    /// A translator's comment marker put around the given occurrence of a phrase, counted over
+    /// the container's text items in order: the text item is cut around the phrase and the
+    /// marker takes its place, as adding a comment to a selection does in the editor.
+    /// </summary>
+    public static ICommentMarker WrapPhrase(IAbstractMarkupDataContainer container, string phrase, string comment,
+        int occurrence = 1)
+    {
+        var items = ItemsOf(container);
+        var seen = 0;
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (items[i] is not IText text) continue;
+            var value = text.Properties.Text;
+            var at = value.IndexOf(phrase, StringComparison.Ordinal);
+            while (at >= 0)
+            {
+                if (++seen == occurrence)
+                {
+                    var marker = TranslatorComment(comment);
+                    marker.Add(ItemFactory.CreateText(PropertiesFactory.CreateTextProperties(phrase)));
+                    var replacement = new List<IAbstractMarkupData>();
+                    if (at > 0) replacement.Add(ItemFactory.CreateText(PropertiesFactory.CreateTextProperties(value.Substring(0, at))));
+                    replacement.Add(marker);
+                    var rest = value.Substring(at + phrase.Length);
+                    if (rest.Length > 0) replacement.Add(ItemFactory.CreateText(PropertiesFactory.CreateTextProperties(rest)));
+                    items.RemoveAt(i);
+                    items.InsertRange(i, replacement);
+                    container.Clear();
+                    foreach (var item in items) container.Add(item);
+                    return marker;
+                }
+                at = value.IndexOf(phrase, at + 1, StringComparison.Ordinal);
+            }
+        }
+        throw new InvalidOperationException("Phrase not found: " + phrase);
+    }
+
+    /// <summary>An empty marker holding one comment by a translator.</summary>
+    public static ICommentMarker TranslatorComment(string text)
+    {
+        var comment = PropertiesFactory.CreateComment(text, "Anna", Severity.Low);
+        var properties = PropertiesFactory.CreateCommentProperties();
+        properties.Add(comment);
+        return ItemFactory.CreateCommentMarker(properties);
+    }
+
+    /// <summary>The text of a marker's first comment.</summary>
+    public static string CommentText(ICommentMarker marker) => marker.Comments.GetItem(0).Text;
+
+    /// <summary>The comment markers among a container's top-level items, in order.</summary>
+    public static List<ICommentMarker> MarkersOf(IAbstractMarkupDataContainer container) =>
+        ItemsOf(container).OfType<ICommentMarker>().ToList();
 }

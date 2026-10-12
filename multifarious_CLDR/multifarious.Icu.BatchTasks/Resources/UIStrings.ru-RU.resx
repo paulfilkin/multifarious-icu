@@ -293,7 +293,7 @@
     <value>Документ не открыт</value>
   </data>
   <data name="Forms_NoDocument" xml:space="preserve">
-    <value>Откройте файл JSON или Java properties, обработанный задачей ICU Expand Plural Forms, и перейдите к сегменту сообщения с множественным числом.</value>
+    <value>Откройте файл JSON или Java properties, обработанный задачей Expand ICU, и перейдите к сегменту сообщения с множественным числом.</value>
   </data>
   <data name="Forms_UnsupportedTitle" xml:space="preserve">
     <value>Недоступно для этого файла</value>
@@ -308,7 +308,7 @@
     <value>В этом файле нет перестроенных ICU-сообщений</value>
   </data>
   <data name="Forms_NotExpanded" xml:space="preserve">
-    <value>Перед переводом выполните для этого файла задачу ICU Expand Plural Forms, затем откройте его снова. До этого сообщения с множественным числом остаются одиночными сегментами с синтаксисом в фигурных скобках.</value>
+    <value>Перед переводом выполните для этого файла задачу Expand ICU, затем откройте его снова. До этого сообщения с множественным числом остаются одиночными сегментами с синтаксисом в фигурных скобках.</value>
   </data>
   <data name="Forms_NotIcuTitle" xml:space="preserve">
     <value>Не ICU-сообщение</value>

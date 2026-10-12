@@ -293,7 +293,7 @@
     <value>文書が開かれていません</value>
   </data>
   <data name="Forms_NoDocument" xml:space="preserve">
-    <value>ICU Expand Plural Forms で処理した JSON または Java properties ファイルを開き、複数形メッセージのセグメントに移動してください。</value>
+    <value>Expand ICU で処理した JSON または Java properties ファイルを開き、複数形メッセージのセグメントに移動してください。</value>
   </data>
   <data name="Forms_UnsupportedTitle" xml:space="preserve">
     <value>このファイルでは使用できません</value>
@@ -308,7 +308,7 @@
     <value>このファイルには再構成された ICU メッセージがありません</value>
   </data>
   <data name="Forms_NotExpanded" xml:space="preserve">
-    <value>翻訳の前にこのファイルに対して ICU Expand Plural Forms を実行し、開き直してください。それまでは、複数形メッセージは波かっこ構文の単一セグメントのままです。</value>
+    <value>翻訳の前にこのファイルに対して Expand ICU を実行し、開き直してください。それまでは、複数形メッセージは波かっこ構文の単一セグメントのままです。</value>
   </data>
   <data name="Forms_NotIcuTitle" xml:space="preserve">
     <value>ICU メッセージではありません</value>

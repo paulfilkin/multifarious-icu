@@ -171,7 +171,7 @@ public class IcuFormsViewTests
 
         viewModel.ShowNotExpanded();
         Assert.Equal("No ICU messages expanded in this file", viewModel.EmptyTitle);
-        Assert.Contains("ICU Expand Plural Forms", viewModel.EmptyNote);
+        Assert.Contains("Expand ICU", viewModel.EmptyNote);
 
         viewModel.ShowNoDocument();
         Assert.Equal("No document open", viewModel.EmptyTitle);

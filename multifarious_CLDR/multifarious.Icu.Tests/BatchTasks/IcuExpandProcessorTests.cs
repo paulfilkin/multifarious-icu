@@ -594,4 +594,35 @@ public class IcuExpandProcessorTests
         Assert.Equal(0, processor.Kept);
         Assert.Equal(4, SegmentsOf(unit.Target).Count);
     }
+
+    /// <summary>
+    /// A comment on text the developer wrote once, outside the plural, reaches every form the
+    /// hoisting copies that text into; a comment inside one branch reaches that form alone.
+    /// </summary>
+    [Fact]
+    public void A_comment_on_a_pre_translated_messages_shared_text_comes_back_on_every_form()
+    {
+        var unit = PreTranslated(RussianUnreadCount, "tm", 100);
+        var segment = SegmentsOf(unit.Target)[0];
+        ParagraphUnits.WrapPhrase(segment, "Привет", "greeting");
+        ParagraphUnits.WrapPhrase(segment, "сообщений", "genitive plural");
+        var processor = Processor("ru-RU");
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Empty(processor.Warnings);
+        var targets = SegmentsOf(unit.Target);
+        Assert.Equal(4, targets.Count);
+        Assert.All(targets, t =>
+        {
+            var greeting = ParagraphUnits.MarkersOf(t)[0];
+            Assert.Equal("greeting", ParagraphUnits.CommentText(greeting));
+            Assert.Equal("Привет", RawValueReconstruction.Reconstruct(greeting).RawValue);
+        });
+        Assert.Equal(new[] { 1, 1, 2, 1 }, targets.Select(t => ParagraphUnits.MarkersOf(t).Count));
+        var many = ParagraphUnits.MarkersOf(targets[2])[1];
+        Assert.Equal("genitive plural", ParagraphUnits.CommentText(many));
+        Assert.Equal("сообщений", RawValueReconstruction.Reconstruct(many).RawValue);
+        Assert.Equal("Привет, {name}, у вас # непрочитанных сообщений!", RawValueReconstruction.Reconstruct(targets[2]).RawValue);
+    }
 }

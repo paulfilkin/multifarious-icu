@@ -18,7 +18,8 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>
         /// The forms by path, or null with the reason where the text does not parse or cannot
         /// be hoisted. Text and quoted-text nodes carry decoded values, so a target written
-        /// with ICU escaping comes back as the plain text the translator typed.
+        /// with ICU escaping comes back as the plain text the translator typed; every node's
+        /// span is an offset into <paramref name="rawTarget"/>.
         /// </summary>
         public static Dictionary<string, IReadOnlyList<MessageNode>> Read(string rawTarget, out string failure)
         {
@@ -32,10 +33,14 @@ namespace multifarious.Icu.BatchTasks.Services
                 return null;
             }
 
-            IcuMessage hoisted;
+            // The node-level hoist, which reuses the parsed nodes: their spans still point
+            // into the raw target, which is how the writer puts a comment back around the
+            // text it wrapped. The message-level hoist re-parses its own serialisation and
+            // would give spans into that text instead.
+            IReadOnlyList<MessageNode> hoisted;
             try
             {
-                hoisted = Hoister.Hoist(message);
+                hoisted = Hoister.Hoist(message.Nodes);
             }
             catch (IcuHoistException exception)
             {
@@ -44,7 +49,7 @@ namespace multifarious.Icu.BatchTasks.Services
             }
 
             var forms = new Dictionary<string, IReadOnlyList<MessageNode>>(StringComparer.Ordinal);
-            Collect(hoisted.Nodes, string.Empty, forms);
+            Collect(hoisted, string.Empty, forms);
             failure = null;
             return forms;
         }

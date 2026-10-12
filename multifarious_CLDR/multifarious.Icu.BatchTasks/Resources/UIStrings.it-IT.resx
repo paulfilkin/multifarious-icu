@@ -293,7 +293,7 @@
     <value>Nessun documento aperto</value>
   </data>
   <data name="Forms_NoDocument" xml:space="preserve">
-    <value>Aprire un file JSON o Java properties elaborato da ICU Expand Plural Forms e spostarsi su un segmento di un messaggio plurale.</value>
+    <value>Aprire un file JSON o Java properties elaborato da Expand ICU e spostarsi su un segmento di un messaggio plurale.</value>
   </data>
   <data name="Forms_UnsupportedTitle" xml:space="preserve">
     <value>Non disponibile per questo file</value>
@@ -308,7 +308,7 @@
     <value>Nessun messaggio ICU ristrutturato in questo file</value>
   </data>
   <data name="Forms_NotExpanded" xml:space="preserve">
-    <value>Eseguire ICU Expand Plural Forms su questo file prima di tradurlo, poi riaprirlo. Fino ad allora i messaggi plurali sono singoli segmenti di sintassi tra parentesi graffe.</value>
+    <value>Eseguire Expand ICU su questo file prima di tradurlo, poi riaprirlo. Fino ad allora i messaggi plurali sono singoli segmenti di sintassi tra parentesi graffe.</value>
   </data>
   <data name="Forms_NotIcuTitle" xml:space="preserve">
     <value>Non è un messaggio ICU</value>

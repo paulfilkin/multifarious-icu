@@ -35,6 +35,11 @@ namespace multifarious.Icu.BatchTasks.Services
     /// segment fails SDLXLIFF validation (Project 47); and a comment on the unit repeats what
     /// the ICU Forms window shows per row, live. The layout, the unit context and CLDR say
     /// everything the restore task and the window need. Only warnings go on the unit.
+    ///
+    /// A translator's comment on a restored or pre-translated target does come back, around
+    /// the text it wrapped, in every form that text reaches: the seed carries each marker's
+    /// range in the raw target, every parsed node carries its range, and hoisting reuses the
+    /// nodes, so the two line up (<see cref="CommentedContent"/>).
     /// </summary>
     public sealed class ExpansionWriter
     {
@@ -83,7 +88,8 @@ namespace multifarious.Icu.BatchTasks.Services
             if (unit.Target != null) Refill(unit.Target, target);
 
             AddContext(unit, plan, resourceKey, state);
-            return new WriteResult(state.Written.Count, state.TargetFormsFilled, state.UnfilledPaths, state.NextSegmentNumber);
+            return new WriteResult(state.Written.Count, state.TargetFormsFilled, state.UnfilledPaths, state.NextSegmentNumber,
+                state.CommentsCarried);
         }
 
         private sealed class WriteState
@@ -97,6 +103,9 @@ namespace multifarious.Icu.BatchTasks.Services
             public ExpansionSeed Seed;
 
             public int TargetFormsFilled;
+
+            /// <summary>Comment markers rebuilt in the target segments from the seed's ranges, counted per form they reach.</summary>
+            public int CommentsCarried;
 
             /// <summary>Paths the seed had a target for none of, where it had a target message at all.</summary>
             public List<string> UnfilledPaths = new List<string>();
@@ -185,7 +194,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 IReadOnlyList<MessageNode> nodes;
                 if (seed.TargetForms.TryGetValue(planned.Path, out nodes))
                 {
-                    foreach (var item in BuildContent(nodes))
+                    foreach (var item in CommentedContent(nodes, seed.TargetComments, state))
                     {
                         targetSegment.Add(item);
                     }
@@ -256,6 +265,186 @@ namespace multifarious.Icu.BatchTasks.Services
             if (text.Length > 0)
             {
                 yield return Text(text.ToString());
+            }
+        }
+
+        // ---- comments carried from the seed's target ------------------------------------------
+
+        /// <summary>
+        /// A form's content with the seed's comment markers rebuilt around the text they wrapped.
+        /// The content is first laid out as pieces with their offsets in the raw target: a text
+        /// node's characters one to one, a quoted text node and an argument tag as one piece
+        /// each. Text is split at every comment boundary, then the pieces are walked with the
+        /// open markers as a stack; a comment whose range touches a piece wraps it, a comment
+        /// that touches nothing in this form is not written in it, and a comment that touches
+        /// only part of an atomic piece wraps the whole piece. Comments are ordered by start
+        /// then longest first, so one inside another nests as it did.
+        /// </summary>
+        private IEnumerable<IAbstractMarkupData> CommentedContent(IReadOnlyList<MessageNode> nodes,
+            IReadOnlyList<CommentRange> comments, WriteState state)
+        {
+            if (comments == null || comments.Count == 0) return BuildContent(nodes);
+
+            var pieces = Split(Pieces(nodes), comments);
+            var ordered = new List<CommentRange>(comments);
+            ordered.Sort((a, b) =>
+            {
+                var byStart = a.Start.CompareTo(b.Start);
+                if (byStart != 0) return byStart;
+                var byLength = b.End.CompareTo(a.End);
+                return byLength != 0 ? byLength : IndexOf(comments, a).CompareTo(IndexOf(comments, b));
+            });
+
+            var output = new List<IAbstractMarkupData>();
+            var open = new List<KeyValuePair<CommentRange, ICommentMarker>>();
+            foreach (var piece in pieces)
+            {
+                var wanted = new List<CommentRange>();
+                foreach (var comment in ordered)
+                {
+                    if (comment.Overlaps(piece.Start, piece.End)) wanted.Add(comment);
+                }
+
+                // Keep the open markers that are still wanted, in order; close the rest and
+                // open what the piece needs below them.
+                var kept = 0;
+                while (kept < open.Count && kept < wanted.Count && ReferenceEquals(open[kept].Key, wanted[kept])) kept++;
+                open.RemoveRange(kept, open.Count - kept);
+                for (var i = kept; i < wanted.Count; i++)
+                {
+                    var marker = _itemFactory.CreateCommentMarker((ICommentProperties)wanted[i].Comments.Clone());
+                    Add(output, open, marker);
+                    open.Add(new KeyValuePair<CommentRange, ICommentMarker>(wanted[i], marker));
+                    state.CommentsCarried++;
+                }
+
+                Add(output, open, piece.Markup ?? Text(piece.Text));
+            }
+
+            MergeText(output);
+            return output;
+        }
+
+        private static int IndexOf(IReadOnlyList<CommentRange> comments, CommentRange comment)
+        {
+            for (var i = 0; i < comments.Count; i++)
+            {
+                if (ReferenceEquals(comments[i], comment)) return i;
+            }
+            return -1;
+        }
+
+        private static void Add(List<IAbstractMarkupData> output, List<KeyValuePair<CommentRange, ICommentMarker>> open,
+            IAbstractMarkupData item)
+        {
+            if (open.Count == 0) output.Add(item);
+            else open[open.Count - 1].Value.Add(item);
+        }
+
+        /// <summary>One run of a form's content: text with its raw range, or an argument's markup.</summary>
+        private sealed class Piece
+        {
+            public int Start;
+            public int End;
+            public string Text;
+            public IAbstractMarkupData Markup;
+
+            /// <summary>Text that cannot be cut at a raw offset: a quoted node, whose value is shorter than its syntax.</summary>
+            public bool Atomic;
+        }
+
+        private List<Piece> Pieces(IReadOnlyList<MessageNode> nodes)
+        {
+            var pieces = new List<Piece>();
+            foreach (var node in nodes)
+            {
+                var literal = node as TextNode;
+                if (literal != null)
+                {
+                    pieces.Add(new Piece
+                    {
+                        Start = literal.Span.Start, End = literal.Span.End, Text = literal.Value,
+                        Atomic = literal.Value.Length != literal.Span.Length,
+                    });
+                    continue;
+                }
+
+                var quoted = node as QuotedTextNode;
+                if (quoted != null)
+                {
+                    pieces.Add(new Piece { Start = quoted.Span.Start, End = quoted.Span.End, Text = quoted.Value, Atomic = true });
+                    continue;
+                }
+
+                string syntax;
+                var argument = node as ArgumentNode;
+                var typed = node as TypedArgumentNode;
+                if (argument != null) syntax = "{" + argument.Name + "}";
+                else if (typed != null) syntax = TypedArgumentText(typed);
+                else if (node is PoundNode) syntax = "#";
+                else throw new InvalidOperationException("A planned segment may not contain a '" + node.GetType().Name + "'.");
+
+                pieces.Add(new Piece { Start = node.Span.Start, End = node.Span.End, Markup = ArgumentMarkup(syntax), Atomic = true });
+            }
+            return pieces;
+        }
+
+        /// <summary>Cuts every non-atomic text piece at each comment boundary that falls inside it.</summary>
+        private static List<Piece> Split(List<Piece> pieces, IReadOnlyList<CommentRange> comments)
+        {
+            var boundaries = new SortedSet<int>();
+            foreach (var comment in comments)
+            {
+                boundaries.Add(comment.Start);
+                boundaries.Add(comment.End);
+            }
+
+            var result = new List<Piece>();
+            foreach (var piece in pieces)
+            {
+                if (piece.Atomic || piece.Markup != null)
+                {
+                    result.Add(piece);
+                    continue;
+                }
+
+                var at = piece.Start;
+                foreach (var boundary in boundaries)
+                {
+                    if (boundary <= at) continue;
+                    if (boundary >= piece.End) break;
+                    result.Add(new Piece { Start = at, End = boundary, Text = piece.Text.Substring(at - piece.Start, boundary - at) });
+                    at = boundary;
+                }
+                if (at < piece.End)
+                {
+                    result.Add(new Piece { Start = at, End = piece.End, Text = piece.Text.Substring(at - piece.Start) });
+                }
+            }
+            return result;
+        }
+
+        /// <summary>Joins adjacent text items, at every level, so a form reads as the runs the translator typed.</summary>
+        private static void MergeText(List<IAbstractMarkupData> items)
+        {
+            for (var i = items.Count - 1; i > 0; i--)
+            {
+                var current = items[i] as IText;
+                var previous = items[i - 1] as IText;
+                if (current == null || previous == null) continue;
+                previous.Properties.Text += current.Properties.Text;
+                items.RemoveAt(i);
+            }
+
+            foreach (var item in items)
+            {
+                var marker = item as ICommentMarker;
+                if (marker == null) continue;
+                var inner = new List<IAbstractMarkupData>();
+                for (var i = 0; i < marker.Count; i++) inner.Add(marker[i]);
+                MergeText(inner);
+                marker.Clear();
+                foreach (var child in inner) marker.Add(child);
             }
         }
 
@@ -411,6 +600,9 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>The target's translation per form, from <see cref="TargetBranches"/>; null where the target was empty or did not read.</summary>
         public IReadOnlyDictionary<string, IReadOnlyList<MessageNode>> TargetForms { get; set; }
 
+        /// <summary>The comment markers on the target and the ranges of the raw target they wrapped; null or empty where there were none.</summary>
+        public IReadOnlyList<CommentRange> TargetComments { get; set; }
+
         /// <summary>The state each form had before the restore task collapsed the message, by path.</summary>
         public IReadOnlyDictionary<string, SegmentState> States { get; set; }
 
@@ -437,12 +629,22 @@ namespace multifarious.Icu.BatchTasks.Services
     public sealed class WriteResult
     {
         public WriteResult(int segments, int targetFormsFilled, IReadOnlyList<string> unfilledPaths, int nextSegmentNumber)
+            : this(segments, targetFormsFilled, unfilledPaths, nextSegmentNumber, 0)
+        {
+        }
+
+        public WriteResult(int segments, int targetFormsFilled, IReadOnlyList<string> unfilledPaths, int nextSegmentNumber,
+            int commentsCarried)
         {
             Segments = segments;
             TargetFormsFilled = targetFormsFilled;
             UnfilledPaths = unfilledPaths ?? new List<string>();
             NextSegmentNumber = nextSegmentNumber;
+            CommentsCarried = commentsCarried;
         }
+
+        /// <summary>Comment markers rebuilt in the target segments from the seed's target, one count per form a comment reached.</summary>
+        public int CommentsCarried { get; }
 
         /// <summary>The number after the last segment written.</summary>
         public int NextSegmentNumber { get; }

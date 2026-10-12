@@ -662,7 +662,8 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>
         /// The target paragraph as one segment's content: text runs, with the syntax between and
         /// inside the forms as text, and every comment marker rebuilt around the text of what it
-        /// wrapped. Nothing else survives; a tag has no place in a plain segment.
+        /// wrapped, a marker inside another rebuilt inside its copy. Nothing else survives; a tag
+        /// has no place in a plain segment.
         /// </summary>
         private List<IAbstractMarkupData> CollapsedTarget(IParagraph paragraph)
         {
@@ -698,7 +699,14 @@ namespace multifarious.Icu.BatchTasks.Services
                 {
                     Flush(items, run);
                     var copy = ItemFactory.CreateCommentMarker((ICommentProperties)marker.Comments.Clone());
-                    copy.Add(Text(RawValueReconstruction.Reconstruct(marker).RawValue));
+                    var inner = new List<IAbstractMarkupData>();
+                    var innerRun = new StringBuilder();
+                    AppendCollapsed(marker, inner, innerRun);
+                    Flush(inner, innerRun);
+                    foreach (var child in inner)
+                    {
+                        copy.Add(child);
+                    }
                     items.Add(copy);
                     continue;
                 }

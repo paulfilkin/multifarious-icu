@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
+using Sdl.FileTypeSupport.Framework.NativeApi;
 
 namespace multifarious.Icu.BatchTasks.Services
 {
@@ -8,10 +10,23 @@ namespace multifarious.Icu.BatchTasks.Services
     public sealed class ReconstructedValue
     {
         public ReconstructedValue(string rawValue, bool usedFilterTags)
+            : this(rawValue, usedFilterTags, null)
+        {
+        }
+
+        public ReconstructedValue(string rawValue, bool usedFilterTags, IReadOnlyList<CommentRange> comments)
         {
             RawValue = rawValue;
             UsedFilterTags = usedFilterTags;
+            Comments = comments ?? new List<CommentRange>();
         }
+
+        /// <summary>
+        /// Every comment marker met on the walk, in document order, with the range of
+        /// <see cref="RawValue"/> its content amounts to. A marker inside another is listed
+        /// after it, and a marker wrapping nothing has an empty range.
+        /// </summary>
+        public IReadOnlyList<CommentRange> Comments { get; }
 
         /// <summary>The native value: text and tag content concatenated in document order.</summary>
         public string RawValue { get; }
@@ -21,6 +36,30 @@ namespace multifarious.Icu.BatchTasks.Services
         /// expanded those tags are discarded, because the expansion's layout supersedes them.
         /// </summary>
         public bool UsedFilterTags { get; }
+    }
+
+    /// <summary>A comment marker's comments and the half-open range of raw text it wrapped.</summary>
+    public sealed class CommentRange
+    {
+        public CommentRange(ICommentProperties comments, int start, int end)
+        {
+            if (comments == null) throw new ArgumentNullException(nameof(comments));
+            Comments = comments;
+            Start = start;
+            End = end;
+        }
+
+        public ICommentProperties Comments { get; }
+
+        public int Start { get; }
+
+        public int End { get; }
+
+        /// <summary>True where the range shares at least one character with [start, end).</summary>
+        public bool Overlaps(int start, int end)
+        {
+            return Start < end && End > start;
+        }
     }
 
     /// <summary>
@@ -46,11 +85,13 @@ namespace multifarious.Icu.BatchTasks.Services
 
             var builder = new StringBuilder();
             var usedTags = false;
-            Append(paragraph, builder, ref usedTags);
-            return new ReconstructedValue(builder.ToString(), usedTags);
+            var comments = new List<CommentRange>();
+            Append(paragraph, builder, comments, ref usedTags);
+            return new ReconstructedValue(builder.ToString(), usedTags, comments);
         }
 
-        private static void Append(IAbstractMarkupDataContainer container, StringBuilder builder, ref bool usedTags)
+        private static void Append(IAbstractMarkupDataContainer container, StringBuilder builder,
+            List<CommentRange> comments, ref bool usedTags)
         {
             // Indexed rather than enumerated: at least one ISegment implementation in the framework
             // throws NotImplementedException from GetEnumerator.
@@ -86,7 +127,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 {
                     builder.Append(pair.StartTagProperties.TagContent);
                     usedTags = true;
-                    Append(pair, builder, ref usedTags);
+                    Append(pair, builder, comments, ref usedTags);
                     builder.Append(pair.EndTagProperties.TagContent);
                     continue;
                 }
@@ -94,14 +135,27 @@ namespace multifarious.Icu.BatchTasks.Services
                 var locked = item as ILockedContent;
                 if (locked != null)
                 {
-                    Append(locked.Content, builder, ref usedTags);
+                    Append(locked.Content, builder, comments, ref usedTags);
+                    continue;
+                }
+
+                // A comment marker's range is noted before its content is walked, so an outer
+                // marker precedes the markers inside it.
+                var marker = item as ICommentMarker;
+                if (marker != null)
+                {
+                    var index = comments.Count;
+                    comments.Add(null);
+                    var start = builder.Length;
+                    Append(marker, builder, comments, ref usedTags);
+                    comments[index] = new CommentRange(marker.Comments, start, builder.Length);
                     continue;
                 }
 
                 var nested = item as IAbstractMarkupDataContainer;
                 if (nested != null)
                 {
-                    Append(nested, builder, ref usedTags);
+                    Append(nested, builder, comments, ref usedTags);
                 }
             }
         }

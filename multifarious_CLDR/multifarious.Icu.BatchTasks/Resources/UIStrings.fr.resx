@@ -293,7 +293,7 @@
     <value>Aucun document ouvert</value>
   </data>
   <data name="Forms_NoDocument" xml:space="preserve">
-    <value>Ouvrez un fichier JSON ou Java properties traité par ICU Expand Plural Forms, puis placez-vous sur un segment d'un message pluriel.</value>
+    <value>Ouvrez un fichier JSON ou Java properties traité par Expand ICU, puis placez-vous sur un segment d'un message pluriel.</value>
   </data>
   <data name="Forms_UnsupportedTitle" xml:space="preserve">
     <value>Non disponible pour ce fichier</value>
@@ -308,7 +308,7 @@
     <value>Aucun message ICU restructuré dans ce fichier</value>
   </data>
   <data name="Forms_NotExpanded" xml:space="preserve">
-    <value>Exécutez ICU Expand Plural Forms sur ce fichier avant de le traduire, puis rouvrez-le. D'ici là, les messages pluriels sont des segments uniques de syntaxe à accolades.</value>
+    <value>Exécutez Expand ICU sur ce fichier avant de le traduire, puis rouvrez-le. D'ici là, les messages pluriels sont des segments uniques de syntaxe à accolades.</value>
   </data>
   <data name="Forms_NotIcuTitle" xml:space="preserve">
     <value>Pas un message ICU</value>

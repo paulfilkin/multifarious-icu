@@ -146,7 +146,8 @@ namespace multifarious.Icu.BatchTasks.Services
 
             // What the unit already holds for its forms: the record a restore left, or the
             // translation and match a pre-translated whole message arrived with.
-            var targetRaw = unit.Target == null ? string.Empty : RawValueReconstruction.Reconstruct(unit.Target).RawValue;
+            var targetValue = unit.Target == null ? null : RawValueReconstruction.Reconstruct(unit.Target);
+            var targetRaw = targetValue == null ? string.Empty : targetValue.RawValue;
             var seed = new ExpansionSeed { FirstSegmentNumber = _nextSegmentNumber };
             if (restored)
             {
@@ -181,7 +182,7 @@ namespace multifarious.Icu.BatchTasks.Services
                     return;
 
                 case MessageKind.Protect:
-                    ReadTargetForms(unitId, targetRaw, seed);
+                    ReadTargetForms(unitId, targetValue, seed);
                     Record(unitId, key, ExpandOutcome.Protected, restored,
                         Writer.Write(unit, _planner.PlanProtected(classification), key, seed), seed);
                     Diagnostics.Write("  unit " + unitId + ": arguments protected");
@@ -196,7 +197,7 @@ namespace multifarious.Icu.BatchTasks.Services
                             "The target language is unknown: neither the task nor the file supplied one.");
                     }
 
-                    ReadTargetForms(unitId, targetRaw, seed);
+                    ReadTargetForms(unitId, targetValue, seed);
                     var plan = _planner.Plan(classification, sourceLanguage, new[] { targetLanguage }, _options);
                     if (plan.ExceedsBudget)
                     {
@@ -207,23 +208,30 @@ namespace multifarious.Icu.BatchTasks.Services
                     var written = Writer.Write(unit, plan, key, seed);
                     Record(unitId, key, ExpandOutcome.Expanded, restored, written, seed);
                     Diagnostics.Write("  unit " + unitId + ": expanded to " + written.Segments + " segments for " + targetLanguage
-                        + (seed.TargetForms != null ? ", " + written.TargetFormsFilled + " forms filled from the target" : string.Empty));
+                        + (seed.TargetForms != null ? ", " + written.TargetFormsFilled + " forms filled from the target" : string.Empty)
+                        + (written.CommentsCarried > 0 ? ", " + written.CommentsCarried + " comment markers carried" : string.Empty));
                     return;
             }
         }
 
-        /// <summary>Reads the target message into forms for the seed; a target that does not read leaves the forms empty and is reported.</summary>
-        private static void ReadTargetForms(string unitId, string targetRaw, ExpansionSeed seed)
+        /// <summary>
+        /// Reads the target message into forms for the seed, with the ranges of its comment
+        /// markers so the writer can put each back around the text it wrapped; a target that
+        /// does not read leaves the forms empty and is reported.
+        /// </summary>
+        private static void ReadTargetForms(string unitId, ReconstructedValue target, ExpansionSeed seed)
         {
-            if (string.IsNullOrWhiteSpace(targetRaw)) return;
+            if (target == null || string.IsNullOrWhiteSpace(target.RawValue)) return;
 
             string failure;
-            seed.TargetForms = TargetBranches.Read(targetRaw, out failure);
+            seed.TargetForms = TargetBranches.Read(target.RawValue, out failure);
             if (seed.TargetForms == null)
             {
                 seed.TargetFailure = "The target held a message that could not be split into forms (" + failure + "); the forms start empty.";
                 Diagnostics.Write("  unit " + unitId + ": " + seed.TargetFailure);
+                return;
             }
+            seed.TargetComments = target.Comments;
         }
 
         /// <summary>

@@ -304,7 +304,7 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Title of the empty state when the editor has no document.</summary>
         public static string Forms_NoDocumentTitle { get { return Manager.GetString("Forms_NoDocumentTitle", Culture); } }
 
-        /// <summary>Note of the empty state when the editor has no document. "ICU Expand Plural Forms" is the batch task's name as Studio lists it.</summary>
+        /// <summary>Note of the empty state when the editor has no document. "Expand ICU" is the batch task's name as Studio lists it.</summary>
         public static string Forms_NoDocument { get { return Manager.GetString("Forms_NoDocument", Culture); } }
 
         /// <summary>Title of the empty state when the open file is of a file type the plugin does not handle.</summary>
@@ -319,7 +319,7 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Title of the empty state when the file is a supported type but the expand task has not run on it.</summary>
         public static string Forms_NotExpandedTitle { get { return Manager.GetString("Forms_NotExpandedTitle", Culture); } }
 
-        /// <summary>Note of the not-expanded state. "ICU Expand Plural Forms" is the batch task's name.</summary>
+        /// <summary>Note of the not-expanded state. "Expand ICU" is the batch task's name.</summary>
         public static string Forms_NotExpanded { get { return Manager.GetString("Forms_NotExpanded", Culture); } }
 
         /// <summary>Title of the empty state when the selected segment belongs to an ordinary paragraph of an expanded file.</summary>

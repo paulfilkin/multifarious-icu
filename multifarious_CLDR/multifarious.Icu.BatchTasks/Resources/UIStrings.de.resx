@@ -293,7 +293,7 @@
     <value>Kein Dokument geöffnet</value>
   </data>
   <data name="Forms_NoDocument" xml:space="preserve">
-    <value>Öffnen Sie eine JSON- oder Java-Properties-Datei, die ICU Expand Plural Forms verarbeitet hat, und wechseln Sie zu einem Segment einer Pluralnachricht.</value>
+    <value>Öffnen Sie eine JSON- oder Java-Properties-Datei, die Expand ICU verarbeitet hat, und wechseln Sie zu einem Segment einer Pluralnachricht.</value>
   </data>
   <data name="Forms_UnsupportedTitle" xml:space="preserve">
     <value>Für diese Datei nicht verfügbar</value>
@@ -308,7 +308,7 @@
     <value>Keine ICU-Nachrichten in dieser Datei umgegliedert</value>
   </data>
   <data name="Forms_NotExpanded" xml:space="preserve">
-    <value>Führen Sie ICU Expand Plural Forms für diese Datei aus, bevor Sie sie übersetzen, und öffnen Sie sie dann erneut. Bis dahin sind die Pluralnachrichten einzelne Segmente mit Klammersyntax.</value>
+    <value>Führen Sie Expand ICU für diese Datei aus, bevor Sie sie übersetzen, und öffnen Sie sie dann erneut. Bis dahin sind die Pluralnachrichten einzelne Segmente mit Klammersyntax.</value>
   </data>
   <data name="Forms_NotIcuTitle" xml:space="preserve">
     <value>Keine ICU-Nachricht</value>

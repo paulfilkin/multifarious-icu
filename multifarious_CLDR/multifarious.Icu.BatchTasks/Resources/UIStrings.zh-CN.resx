@@ -293,7 +293,7 @@
     <value>未打开文档</value>
   </data>
   <data name="Forms_NoDocument" xml:space="preserve">
-    <value>请打开经 ICU Expand Plural Forms 处理过的 JSON 或 Java properties 文件，并移到复数消息的某个句段。</value>
+    <value>请打开经 Expand ICU 处理过的 JSON 或 Java properties 文件，并移到复数消息的某个句段。</value>
   </data>
   <data name="Forms_UnsupportedTitle" xml:space="preserve">
     <value>此文件不可用</value>
@@ -308,7 +308,7 @@
     <value>此文件中没有重构过的 ICU 消息</value>
   </data>
   <data name="Forms_NotExpanded" xml:space="preserve">
-    <value>请在翻译前对此文件运行 ICU Expand Plural Forms，然后重新打开。在此之前，复数消息只是带花括号语法的单个句段。</value>
+    <value>请在翻译前对此文件运行 Expand ICU，然后重新打开。在此之前，复数消息只是带花括号语法的单个句段。</value>
   </data>
   <data name="Forms_NotIcuTitle" xml:space="preserve">
     <value>不是 ICU 消息</value>

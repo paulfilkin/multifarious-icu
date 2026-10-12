@@ -293,7 +293,7 @@
     <value>열린 문서 없음</value>
   </data>
   <data name="Forms_NoDocument" xml:space="preserve">
-    <value>ICU Expand Plural Forms로 처리한 JSON 또는 Java properties 파일을 열고 복수형 메시지의 세그먼트로 이동하십시오.</value>
+    <value>Expand ICU로 처리한 JSON 또는 Java properties 파일을 열고 복수형 메시지의 세그먼트로 이동하십시오.</value>
   </data>
   <data name="Forms_UnsupportedTitle" xml:space="preserve">
     <value>이 파일에서는 사용할 수 없음</value>
@@ -308,7 +308,7 @@
     <value>이 파일에 재구성된 ICU 메시지가 없음</value>
   </data>
   <data name="Forms_NotExpanded" xml:space="preserve">
-    <value>번역하기 전에 이 파일에 ICU Expand Plural Forms를 실행한 다음 다시 여십시오. 그때까지 복수형 메시지는 중괄호 구문으로 된 단일 세그먼트입니다.</value>
+    <value>번역하기 전에 이 파일에 Expand ICU를 실행한 다음 다시 여십시오. 그때까지 복수형 메시지는 중괄호 구문으로 된 단일 세그먼트입니다.</value>
   </data>
   <data name="Forms_NotIcuTitle" xml:space="preserve">
     <value>ICU 메시지가 아님</value>

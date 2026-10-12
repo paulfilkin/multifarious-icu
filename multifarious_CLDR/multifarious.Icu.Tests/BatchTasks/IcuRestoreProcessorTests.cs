@@ -483,13 +483,11 @@ public class IcuRestoreProcessorTests
         segment.Add(marker);
     }
 
-    private static ICommentMarker TranslatorComment(string text)
-    {
-        var comment = ParagraphUnits.PropertiesFactory.CreateComment(text, "Anna", Severity.Low);
-        var properties = ParagraphUnits.PropertiesFactory.CreateCommentProperties();
-        properties.Add(comment);
-        return ParagraphUnits.ItemFactory.CreateCommentMarker(properties);
-    }
+    private static ICommentMarker TranslatorComment(string text) => ParagraphUnits.TranslatorComment(text);
+
+    private static string CommentText(ICommentMarker marker) => ParagraphUnits.CommentText(marker);
+
+    private static List<ICommentMarker> MarkersOf(IAbstractMarkupDataContainer container) => ParagraphUnits.MarkersOf(container);
 
     /// <summary>
     /// Studio's pseudo-translation and Copy Source to Target copy the source segment's content
@@ -740,5 +738,115 @@ public class IcuRestoreProcessorTests
         var warning = Assert.Single(outcome.Warnings);
         Assert.StartsWith("Segment ", warning);
         Assert.Contains("untranslated", warning);
+    }
+
+    // ---- comments through the round trip ----------------------------------------------------
+
+    /// <summary>
+    /// A translator's comments on a restored message come back through Expand on the forms
+    /// whose text they wrapped, around that text, one inside another where they were nested;
+    /// and the next Restore puts them back around the same text.
+    /// </summary>
+    [Fact]
+    public void Comments_on_a_restored_target_come_back_on_the_forms_whose_text_they_wrapped()
+    {
+        var unit = Expanded(UnreadCount);
+        TranslateUnreadCount(unit);
+        Restorer("ru-RU").ProcessParagraphUnit(unit);
+        var restoredTarget = Projection(unit.Target);
+        var segment = SegmentsOf(unit.Target)[0];
+
+        // A word in the one branch, the argument in the few branch, and in the many branch the
+        // greeting with the argument commented on again inside it.
+        ParagraphUnits.WrapPhrase(segment, "сообщение!", "singular?");
+        ParagraphUnits.WrapPhrase(segment, "{name}", "use the full name", 2);
+        var outer = ParagraphUnits.WrapPhrase(segment, "Привет, {name}", "too informal", 2);
+        ParagraphUnits.WrapPhrase(outer, "{name}", "the argument");
+        Assert.Equal(restoredTarget, Projection(unit.Target));
+
+        var expander = Expander();
+        expander.ProcessParagraphUnit(unit);
+
+        Assert.Empty(expander.Warnings);
+        var targets = SegmentsOf(unit.Target);
+        Assert.Equal(4, targets.Count);
+        Assert.Equal("Привет, {name}, у вас # непрочитанное сообщение!", RawValueReconstruction.Reconstruct(targets[0]).RawValue);
+        Assert.Equal(8, TagsUnder(unit.Target));
+
+        var one = Assert.Single(MarkersOf(targets[0]));
+        Assert.Equal("singular?", CommentText(one));
+        Assert.Equal("сообщение!", RawValueReconstruction.Reconstruct(one).RawValue);
+        Assert.IsAssignableFrom<IText>(Assert.Single(ParagraphUnits.ItemsOf(one)));
+
+        var few = Assert.Single(MarkersOf(targets[1]));
+        Assert.Equal("use the full name", CommentText(few));
+        Assert.IsAssignableFrom<IPlaceholderTag>(Assert.Single(ParagraphUnits.ItemsOf(few)));
+
+        var many = Assert.Single(MarkersOf(targets[2]));
+        Assert.Equal("too informal", CommentText(many));
+        Assert.Equal("Привет, {name}", RawValueReconstruction.Reconstruct(many).RawValue);
+        var inner = Assert.Single(MarkersOf(many));
+        Assert.Equal("the argument", CommentText(inner));
+        Assert.IsAssignableFrom<IPlaceholderTag>(Assert.Single(ParagraphUnits.ItemsOf(inner)));
+
+        Assert.Empty(MarkersOf(targets[3]));
+
+        // Restored again: the same message, the three markers back around their text, the
+        // nested one inside its outer.
+        Restorer("ru-RU").ProcessParagraphUnit(unit);
+        Assert.Equal(restoredTarget, Projection(unit.Target));
+        var markers = MarkersOf(SegmentsOf(unit.Target)[0]);
+        Assert.Equal(3, markers.Count);
+        Assert.Equal("Привет, {name}", RawValueReconstruction.Reconstruct(markers[2]).RawValue);
+        Assert.Equal("the argument", CommentText(Assert.Single(MarkersOf(markers[2]))));
+    }
+
+    /// <summary>A comment whose selection ran across the syntax between two forms comes back on both, around the part of its text each form holds.</summary>
+    [Fact]
+    public void A_comment_across_two_forms_comes_back_split_between_them()
+    {
+        var unit = Expanded(UnreadCount);
+        TranslateUnreadCount(unit);
+        Restorer("ru-RU").ProcessParagraphUnit(unit);
+        var restoredTarget = Projection(unit.Target);
+        ParagraphUnits.WrapPhrase(SegmentsOf(unit.Target)[0], "сообщение!} few {Привет", "check both");
+
+        Expander().ProcessParagraphUnit(unit);
+
+        var targets = SegmentsOf(unit.Target);
+        var one = Assert.Single(MarkersOf(targets[0]));
+        Assert.Equal("сообщение!", RawValueReconstruction.Reconstruct(one).RawValue);
+        var few = Assert.Single(MarkersOf(targets[1]));
+        Assert.Equal("Привет", RawValueReconstruction.Reconstruct(few).RawValue);
+        Assert.Equal("check both", CommentText(few));
+        Assert.Empty(MarkersOf(targets[2]));
+        Assert.Empty(MarkersOf(targets[3]));
+
+        Restorer("ru-RU").ProcessParagraphUnit(unit);
+        Assert.Equal(restoredTarget, Projection(unit.Target));
+        Assert.Equal(2, MarkersOf(SegmentsOf(unit.Target)[0]).Count);
+    }
+
+    [Fact]
+    public void A_comment_on_a_restored_protected_message_comes_back_around_its_text()
+    {
+        var unit = Expanded("Hello {name}, welcome back!");
+        var target = SegmentsOf(unit.Target)[0];
+        target.Add(Text("Привет, "));
+        target.Add(Tag("{name}"));
+        target.Add(Text(", с возвращением!"));
+        Restorer("ru-RU").ProcessParagraphUnit(unit);
+        ParagraphUnits.WrapPhrase(SegmentsOf(unit.Target)[0], "с возвращением", "tone");
+
+        var expander = Expander();
+        expander.ProcessParagraphUnit(unit);
+
+        Assert.Empty(expander.Warnings);
+        var segment = Assert.Single(SegmentsOf(unit.Target));
+        Assert.Equal("Привет, {name}, с возвращением!", RawValueReconstruction.Reconstruct(segment).RawValue);
+        var marker = Assert.Single(MarkersOf(segment));
+        Assert.Equal("tone", CommentText(marker));
+        Assert.Equal("с возвращением", RawValueReconstruction.Reconstruct(marker).RawValue);
+        Assert.Equal(1, TagsUnder(unit.Target));
     }
 }

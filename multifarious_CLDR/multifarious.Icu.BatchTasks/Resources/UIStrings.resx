@@ -407,8 +407,8 @@
     <comment>Title of the empty state when the editor has no document.</comment>
   </data>
   <data name="Forms_NoDocument" xml:space="preserve">
-    <value>Open a JSON or Java properties file that ICU Expand Plural Forms has processed, and move to a segment of a plural message.</value>
-    <comment>Note of the empty state when the editor has no document. "ICU Expand Plural Forms" is the batch task's name as Studio lists it.</comment>
+    <value>Open a JSON or Java properties file that Expand ICU has processed, and move to a segment of a plural message.</value>
+    <comment>Note of the empty state when the editor has no document. "Expand ICU" is the batch task's name as Studio lists it.</comment>
   </data>
   <data name="Forms_UnsupportedTitle" xml:space="preserve">
     <value>Not available for this file</value>
@@ -427,8 +427,8 @@
     <comment>Title of the empty state when the file is a supported type but the expand task has not run on it.</comment>
   </data>
   <data name="Forms_NotExpanded" xml:space="preserve">
-    <value>Run ICU Expand Plural Forms on this file before translating it, then open it again. Until then the plural messages are single segments of brace syntax.</value>
-    <comment>Note of the not-expanded state. "ICU Expand Plural Forms" is the batch task's name.</comment>
+    <value>Run Expand ICU on this file before translating it, then open it again. Until then the plural messages are single segments of brace syntax.</value>
+    <comment>Note of the not-expanded state. "Expand ICU" is the batch task's name.</comment>
   </data>
   <data name="Forms_NotIcuTitle" xml:space="preserve">
     <value>Not an ICU message</value>

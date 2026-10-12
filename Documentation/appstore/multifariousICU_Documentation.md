@@ -92,7 +92,7 @@ A4: Every form the language needs must be present. Translate it, or let Restore 
 A5: The count marker in the source is a tag; use that one, with QuickPlace or by copying the source. A `#` typed as text is shown literally in the application.
 
 **Q6: Can I go back to the forms after Restore?**
-A6: Yes. Run Expand ICU on the restored file. Each form comes back with its translation, its confirmation state and its match, and a Restore after that gives the same message again. A comment left on a restored message does not come back through Expand.
+A6: Yes. Run Expand ICU on the restored file. Each form comes back with its translation, its confirmation state and its match, and a Restore after that gives the same message again. Comments come back too, around the text they were on: a comment on a restored message appears on every form that holds that text.
 
 **Q7: Restore left a message expanded with a comment about its placeholders.**
 A7: A target form has lost a placeholder the source has, or gained one. The message stays expanded with its placeholders as tags so the missing one can be placed with QuickPlace. Once corrected, run Restore ICU again: the comment goes and the message is put back together.

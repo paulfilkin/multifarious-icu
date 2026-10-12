@@ -241,7 +241,7 @@ After Restore each message is one segment on each side, plain text, no tags and 
 
 ### Switching back to the forms
 
-Run **Expand ICU** on the restored file. Each form comes back with its translation, its confirmation level, its lock and its match, and a Restore after that gives the same message as before. Expand and Restore can alternate as often as the work needs: restore to see or deliver whole messages, expand to work on the forms. A comment left on a restored message does not come back through Expand; comments on the forms do survive a Restore, around the text of the form they were on.
+Run **Expand ICU** on the restored file. Each form comes back with its translation, its confirmation level, its lock and its match, and a Restore after that gives the same message as before. Expand and Restore can alternate as often as the work needs: restore to see or deliver whole messages, expand to work on the forms. Comments survive both ways, around the text they were on. A comment on a form comes back in the restored message; a comment on a restored message comes back on every form that holds the text it was on, so a comment on text shared by all the forms appears on each of them.
 
 ### What the generated file looks like
 
@@ -377,7 +377,7 @@ CLDR gives these languages, and Catalan, a `many` form for a round million and a
 - Studio's JSON and Java Resources file types only. Others follow once they have been tested end to end.
 - A message with `#` inside a nested plural that has an offset is left unexpanded with a warning; the plugin cannot rewrite it without changing its meaning.
 - Restore has to run before Generate Target Translations. Studio's JSON writer does not write placeholder tags, so a message that was never restored, or was left expanded after a placeholder warning, loses its arguments in the generated file.
-- A comment on a restored message does not come back through Expand. Comments on the forms survive a Restore.
+- A comment on an argument comes back around its placeholder tag, and a comment whose selection ran across the syntax between two forms comes back on both.
 - Restore puts the source back in the hoisted shape, with the shared text inside every form, not as the developer wrote it. The original pattern is kept in the file's metadata, and the generated target file is unaffected.
 
 Feedback from anyone translating ICU messages is welcome: a message that lays out oddly, a language whose grammar hint is wrong or missing, a file type you need. A sample file with the report helps.
