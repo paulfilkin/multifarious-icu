@@ -15,7 +15,9 @@ run (stage 1, run 2) is still open.
 > surviving both tasks, and filter tags kept through both tasks (1,484 tests).  Open: the keep
 > settings run in Studio (pre-translate from a memory of restored messages, Expand with keep off
 > and on), the user guide screenshots, a native read of the eight translations, and the release
-> itself (merge to `main`, version, store package).
+> itself (merge to `main`, version, store package).  Proposed for after the release: grammar
+> dictionaries for select messages, design note
+> `Documentation\Design\Grammar-Dictionary-Design-v1.md` (local, not published).
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -143,9 +145,32 @@ elements with the filter's ids cloned per form, no `bx`/`ex`, no sentinel charac
 patterns; the generated JSON and properties files carry the markup in every form of every
 message with the arguments intact and no entities.
 
+## Grammar dictionaries (design note, not started)
+
+Paul raised a case from a past voice assistant project: messages whose `select` keys are grammar
+rather than application states, a gender argument with MASCULINE, FEMININE, NEUTER and `other`,
+nested with a plural and, in French and Italian, a further select on the article form the next
+word's initial sound demands.  The key set a language needs for one argument differs per
+language, as CLDR categories do for plurals, and some languages need selectors the source does
+not have.  The plugin today walks a select as the source wrote it and cannot add a branch or a
+selector.
+
+`Documentation\Design\Grammar-Dictionary-Design-v1.md` proposes a per-project grammar
+dictionary of selector kinds: how the argument is recognised (name suffix or list), the key set
+per language with hints and samples, and dependent kinds a language needs nested under given
+branches.  A recognised select is category expanded like a plural, pruned on restore to the key
+set recorded on the unit context, with the hints in the ICU Forms window.  CLDR's grammatical
+features data supplies the shipped default.  Case is left to the translator as an authoring
+choice, not a runtime argument.  Four phases, starting with a neutral corpus file.  The note uses
+its own examples (a travel app's vehicles) and names no source; the source material under
+`Documentation\CustomDictionaries` is local and must not be named in anything published.
+
 ## Open items
 
 - Stage 1 run 2, the keep settings, as above.
+- Grammar dictionaries, after the release: agree the open questions in the design note (shipped
+  default languages and key spelling, whether dependent selectors are inserted by default, where
+  the dictionary lives), then Phase 0.
 - The release: merge `release/2.0` to `main`, the version is already 2.0.0.0, build the store
   package in Release configuration, retake user guide screenshots 4, 11 and 12 (they show
   Finalise), and have a native reader check the eight translations of the new strings.
