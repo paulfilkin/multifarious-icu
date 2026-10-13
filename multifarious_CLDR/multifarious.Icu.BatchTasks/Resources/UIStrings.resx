@@ -578,4 +578,76 @@
     <value>Do not report</value>
     <comment>A severity choice that drops the finding.</comment>
   </data>
+  <data name="Expand_GrammarHeader" xml:space="preserve">
+    <value>Grammar dictionary</value>
+    <comment>Group heading. The dictionary of selector kinds beyond plural and ordinal.</comment>
+  </data>
+  <data name="Expand_GrammarDefault" xml:space="preserve">
+    <value>Shipped default: CLDR {0}, gender forms for {1} languages, article forms for French and Italian.</value>
+    <comment>{0} is the CLDR version, {1} a count of languages. CLDR is the Unicode Common Locale Data Repository.</comment>
+  </data>
+  <data name="Expand_GrammarNone" xml:space="preserve">
+    <value>No developer's file imported; the shipped default applies.</value>
+    <comment>Status line when no developer's file has been imported.</comment>
+  </data>
+  <data name="Expand_GrammarImported" xml:space="preserve">
+    <value>Developer's file {0}, imported {1}.</value>
+    <comment>Status line. {0} is the file name, {1} the date and time it was imported.</comment>
+  </data>
+  <data name="Expand_GrammarImport" xml:space="preserve">
+    <value>Import…</value>
+    <comment>Button; opens a file dialog.</comment>
+  </data>
+  <data name="Expand_GrammarExport" xml:space="preserve">
+    <value>Export…</value>
+    <comment>Button; opens a save dialog.</comment>
+  </data>
+  <data name="Expand_GrammarTemplate" xml:space="preserve">
+    <value>Save template…</value>
+    <comment>Button; saves the template file a developer fills in.</comment>
+  </data>
+  <data name="Expand_GrammarRemove" xml:space="preserve">
+    <value>Remove</value>
+    <comment>Button; drops the imported file so the shipped default applies again.</comment>
+  </data>
+  <data name="Expand_GrammarHint" xml:space="preserve">
+    <value>A select message whose argument name ends in Gender or Article is laid out with the forms the target language needs. A developer's file names the application's arguments, respells the keys and declares which dependent arguments the application supplies.</value>
+    <comment>Hint under the controls. "select" is the ICU keyword; "Gender" and "Article" are argument name suffixes and must not be translated.</comment>
+  </data>
+  <data name="Expand_GrammarHelpHeader" xml:space="preserve">
+    <value>What is a grammar dictionary?</value>
+    <comment>Header of a collapsible help panel. Phrased as the question a puzzled user would ask.</comment>
+  </data>
+  <data name="Expand_GrammarHelp1" xml:space="preserve">
+    <value>An ICU select message chooses a branch by a value the application passes. When that value is grammatical, the gender of a thing named in the sentence for instance, the branches a language needs differ: German needs masculine, feminine and neuter, French needs an article form as well, Japanese needs one form. The dictionary lists what each language needs, and the task lays out one form per key, as it does for plurals.</value>
+    <comment>Help paragraph. "select" is the ICU keyword.</comment>
+  </data>
+  <data name="Expand_GrammarHelp2" xml:space="preserve">
+    <value>The shipped default covers the languages for which CLDR publishes grammatical gender. A developer's file, written to the template, adds the project's own argument names and key spelling, and says for which languages the application supplies a dependent argument such as an article form; only then is a selector the source does not have inserted. Export writes the imported file back unchanged.</value>
+    <comment>Help paragraph. CLDR is the Unicode Common Locale Data Repository.</comment>
+  </data>
+  <data name="Expand_GrammarFileFilter" xml:space="preserve">
+    <value>JSON files (*.json)|*.json|All files (*.*)|*.*</value>
+    <comment>A Windows file dialog filter: pairs of description and pattern separated by '|'. Translate the descriptions only.</comment>
+  </data>
+  <data name="Expand_GrammarInvalid" xml:space="preserve">
+    <value>The file was not imported. {0}</value>
+    <comment>Shown on the page when an import fails. {0} is the reason, in English from the plugin.</comment>
+  </data>
+  <data name="Expand_GrammarImportTitle" xml:space="preserve">
+    <value>Import a grammar dictionary file</value>
+    <comment>Title of the open file dialog.</comment>
+  </data>
+  <data name="Expand_GrammarExportTitle" xml:space="preserve">
+    <value>Export the grammar dictionary file</value>
+    <comment>Title of the save file dialog.</comment>
+  </data>
+  <data name="Expand_GrammarTemplateTitle" xml:space="preserve">
+    <value>Save the grammar dictionary template</value>
+    <comment>Title of the save file dialog for the template.</comment>
+  </data>
+  <data name="Report_GrammarDefault" xml:space="preserve">
+    <value>shipped default</value>
+    <comment>Value in the report's settings table when no developer's file is in force. Lower case; follows the setting name.</comment>
+  </data>
 </root>

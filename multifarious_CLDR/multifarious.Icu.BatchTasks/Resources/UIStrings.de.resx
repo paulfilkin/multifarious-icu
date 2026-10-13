@@ -418,4 +418,58 @@
   <data name="Severity_Ignore" xml:space="preserve">
     <value>Nicht melden</value>
   </data>
+  <data name="Expand_GrammarHeader" xml:space="preserve">
+    <value>Grammatikwörterbuch</value>
+  </data>
+  <data name="Expand_GrammarDefault" xml:space="preserve">
+    <value>Mitgelieferter Standard: CLDR {0}, Genusformen für {1} Sprachen, Artikelformen für Französisch und Italienisch.</value>
+  </data>
+  <data name="Expand_GrammarNone" xml:space="preserve">
+    <value>Keine Entwicklerdatei importiert; der mitgelieferte Standard gilt.</value>
+  </data>
+  <data name="Expand_GrammarImported" xml:space="preserve">
+    <value>Entwicklerdatei {0}, importiert am {1}.</value>
+  </data>
+  <data name="Expand_GrammarImport" xml:space="preserve">
+    <value>Importieren…</value>
+  </data>
+  <data name="Expand_GrammarExport" xml:space="preserve">
+    <value>Exportieren…</value>
+  </data>
+  <data name="Expand_GrammarTemplate" xml:space="preserve">
+    <value>Vorlage speichern…</value>
+  </data>
+  <data name="Expand_GrammarRemove" xml:space="preserve">
+    <value>Entfernen</value>
+  </data>
+  <data name="Expand_GrammarHint" xml:space="preserve">
+    <value>Eine select-Nachricht, deren Argumentname auf Gender oder Article endet, wird mit den Formen ausgelegt, die die Zielsprache braucht. Eine Entwicklerdatei benennt die Argumente der Anwendung, legt die Schreibweise der Schlüssel fest und erklärt, welche abhängigen Argumente die Anwendung liefert.</value>
+  </data>
+  <data name="Expand_GrammarHelpHeader" xml:space="preserve">
+    <value>Was ist ein Grammatikwörterbuch?</value>
+  </data>
+  <data name="Expand_GrammarHelp1" xml:space="preserve">
+    <value>Eine ICU-select-Nachricht wählt einen Zweig nach einem Wert, den die Anwendung übergibt. Ist dieser Wert grammatisch, etwa das Genus einer im Satz genannten Sache, brauchen die Sprachen verschiedene Zweige: Deutsch braucht Maskulinum, Femininum und Neutrum, Französisch zusätzlich eine Artikelform, Japanisch eine einzige Form. Das Wörterbuch führt auf, was jede Sprache braucht, und die Aufgabe legt je Schlüssel eine Form aus, wie bei Pluralen.</value>
+  </data>
+  <data name="Expand_GrammarHelp2" xml:space="preserve">
+    <value>Der mitgelieferte Standard deckt die Sprachen ab, für die CLDR ein grammatisches Genus veröffentlicht. Eine nach der Vorlage geschriebene Entwicklerdatei ergänzt die Argumentnamen und die Schlüsselschreibweise des Projekts und sagt, für welche Sprachen die Anwendung ein abhängiges Argument wie eine Artikelform liefert; nur dann wird ein Selektor eingefügt, den die Quelle nicht hat. Der Export schreibt die importierte Datei unverändert zurück.</value>
+  </data>
+  <data name="Expand_GrammarFileFilter" xml:space="preserve">
+    <value>JSON-Dateien (*.json)|*.json|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="Expand_GrammarInvalid" xml:space="preserve">
+    <value>Die Datei wurde nicht importiert. {0}</value>
+  </data>
+  <data name="Expand_GrammarImportTitle" xml:space="preserve">
+    <value>Grammatikwörterbuch-Datei importieren</value>
+  </data>
+  <data name="Expand_GrammarExportTitle" xml:space="preserve">
+    <value>Grammatikwörterbuch-Datei exportieren</value>
+  </data>
+  <data name="Expand_GrammarTemplateTitle" xml:space="preserve">
+    <value>Vorlage für das Grammatikwörterbuch speichern</value>
+  </data>
+  <data name="Report_GrammarDefault" xml:space="preserve">
+    <value>mitgelieferter Standard</value>
+  </data>
 </root>

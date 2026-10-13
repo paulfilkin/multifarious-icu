@@ -25,9 +25,12 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
             Form = components.Length > 1
                 ? string.Join(" / ", components.Select(c => c.Substring(c.IndexOf(':') + 1)))
                 : row.Category.Length > 0 ? row.Category : string.Empty;
-            Counts = row.Counts.Count == 0
-                ? string.Empty
-                : string.Join(", ", row.Counts) + (row.FractionalOnly ? " (" + UIStrings.Forms_FractionalOnly + ")" : string.Empty);
+            // A grammar form shows the dictionary's hint where a plural form shows its counts.
+            Counts = row.Counts.Count > 0
+                ? string.Join(", ", row.Counts) + (row.FractionalOnly ? " (" + UIStrings.Forms_FractionalOnly + ")" : string.Empty)
+                : row.GrammarHint.Length > 0
+                    ? row.GrammarHint + (row.GrammarSample.Length > 0 ? ", e.g. " + row.GrammarSample : string.Empty)
+                    : string.Empty;
             Source = row.SourceRendered;
             Target = row.TargetEmpty ? UIStrings.Forms_EmptyTarget : row.TargetRendered;
             Warning = row.PlaceholderWarning == null

@@ -418,4 +418,58 @@
   <data name="Severity_Ignore" xml:space="preserve">
     <value>報告しない</value>
   </data>
+  <data name="Expand_GrammarHeader" xml:space="preserve">
+    <value>文法辞書</value>
+  </data>
+  <data name="Expand_GrammarDefault" xml:space="preserve">
+    <value>付属の既定値: CLDR {0}、{1} 言語の性の形、フランス語とイタリア語の冠詞の形。</value>
+  </data>
+  <data name="Expand_GrammarNone" xml:space="preserve">
+    <value>開発者ファイルは読み込まれていません。付属の既定値が適用されます。</value>
+  </data>
+  <data name="Expand_GrammarImported" xml:space="preserve">
+    <value>開発者ファイル {0}、{1} に読み込み。</value>
+  </data>
+  <data name="Expand_GrammarImport" xml:space="preserve">
+    <value>読み込み…</value>
+  </data>
+  <data name="Expand_GrammarExport" xml:space="preserve">
+    <value>書き出し…</value>
+  </data>
+  <data name="Expand_GrammarTemplate" xml:space="preserve">
+    <value>テンプレートを保存…</value>
+  </data>
+  <data name="Expand_GrammarRemove" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Expand_GrammarHint" xml:space="preserve">
+    <value>引数名が Gender または Article で終わる select メッセージは、ターゲット言語に必要な形で展開されます。開発者ファイルはアプリケーションの引数を指定し、キーの表記を定め、アプリケーションが供給する従属引数を宣言します。</value>
+  </data>
+  <data name="Expand_GrammarHelpHeader" xml:space="preserve">
+    <value>文法辞書とは</value>
+  </data>
+  <data name="Expand_GrammarHelp1" xml:space="preserve">
+    <value>ICU の select メッセージは、アプリケーションが渡す値によって分岐を選びます。その値が文法的なもの、たとえば文中で名指しされる物の性である場合、言語ごとに必要な分岐が異なります。ドイツ語には男性、女性、中性が、フランス語にはさらに冠詞の形が、日本語には一つの形だけが必要です。辞書は各言語に必要なものを列挙し、タスクは複数形と同じようにキーごとに一つの形を展開します。</value>
+  </data>
+  <data name="Expand_GrammarHelp2" xml:space="preserve">
+    <value>付属の既定値は、CLDR が文法性を公開している言語を対象とします。テンプレートに沿って書かれた開発者ファイルは、プロジェクト固有の引数名とキーの表記を加え、冠詞の形のような従属引数をアプリケーションがどの言語に供給するかを示します。そのときに限り、ソースにないセレクターが挿入されます。書き出しは読み込んだファイルをそのまま書き戻します。</value>
+  </data>
+  <data name="Expand_GrammarFileFilter" xml:space="preserve">
+    <value>JSON ファイル (*.json)|*.json|すべてのファイル (*.*)|*.*</value>
+  </data>
+  <data name="Expand_GrammarInvalid" xml:space="preserve">
+    <value>ファイルは読み込まれませんでした。{0}</value>
+  </data>
+  <data name="Expand_GrammarImportTitle" xml:space="preserve">
+    <value>文法辞書ファイルの読み込み</value>
+  </data>
+  <data name="Expand_GrammarExportTitle" xml:space="preserve">
+    <value>文法辞書ファイルの書き出し</value>
+  </data>
+  <data name="Expand_GrammarTemplateTitle" xml:space="preserve">
+    <value>文法辞書テンプレートの保存</value>
+  </data>
+  <data name="Report_GrammarDefault" xml:space="preserve">
+    <value>付属の既定値</value>
+  </data>
 </root>

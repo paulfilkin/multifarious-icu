@@ -42,6 +42,9 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
     {
         private readonly List<ProcessedFile> _processed = new List<ProcessedFile>();
         private ExpansionOptions _options;
+        private GrammarDictionary _dictionary;
+        private string _dictionaryName;
+        private string _dictionaryFailure;
         private string _sourceLanguage;
         private int _filesSeen;
         private int _filesProcessed;
@@ -57,7 +60,19 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
         {
             // The settings Studio stores in the project; a project that has never seen the page
             // yields the design's defaults.
-            _options = GetSetting<IcuExpandSettings>().ToOptions();
+            var settings = GetSetting<IcuExpandSettings>();
+            _options = settings.ToOptions();
+
+            // The grammar dictionary: the shipped default with the project's imported file over
+            // it. A file that no longer validates is reported once and the default runs.
+            _dictionary = settings.ToDictionary(out _dictionaryFailure);
+            _dictionaryName = settings.HasGrammarDictionaryFile && _dictionaryFailure == null
+                ? settings.GrammarDictionaryName
+                : null;
+            if (_dictionaryFailure != null)
+            {
+                _dictionaryFailure = string.Format(CultureInfo.CurrentCulture, UIStrings.Expand_GrammarInvalid, _dictionaryFailure);
+            }
 
             var info = Project != null ? Project.GetProjectInfo() : null;
             _sourceLanguage = info != null && info.SourceLanguage != null && info.SourceLanguage.CultureInfo != null
@@ -70,7 +85,8 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
             Diagnostics.Write("settings: cardinal=" + _options.ExpandCardinal + " ordinal=" + _options.ExpandOrdinal
                 + " seed=" + _options.SourceSeedStrategy + " lock=" + _options.LockPlaceholders
-                + " budget=" + _options.MaxUnitsPerMessage + " parseError=" + _options.OnParseError);
+                + " budget=" + _options.MaxUnitsPerMessage + " parseError=" + _options.OnParseError
+                + " dictionary=" + (_dictionaryName ?? "default") + (_dictionaryFailure != null ? " (" + _dictionaryFailure + ")" : string.Empty));
         }
 
         /// <summary>
@@ -120,15 +136,22 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                 ? projectFile.Language.CultureInfo.Name
                 : null;
 
-            var processor = new IcuExpandProcessor(_sourceLanguage, targetLanguage, _options, AppVersion);
+            var processor = new IcuExpandProcessor(_sourceLanguage, targetLanguage, _options, AppVersion, _dictionary);
             _processed.Add(new ProcessedFile { File = projectFile, Processor = processor });
             converter.AddBilingualProcessor(processor);
 
             // The warnings reach the Task Results window through the same converter, read once
-            // the processor has seen the whole document.
-            converter.AddBilingualProcessor(new TaskMessageRelay(
-                TaskMessageRelay.OriginFor("Task_Expand_Name"), projectFile.Name,
-                () => processor.Warnings.Select(w => w.Reason), ErrorLevel.Warning));
+            // the processor has seen the whole document. A dictionary file that failed to load
+            // is said once, with the first file. The grammar notes go in at Note level: the
+            // unit was expanded, and the translator reads them on the form as well.
+            var dictionaryFailure = _processed.Count == 1 && _dictionaryFailure != null
+                ? new[] { _dictionaryFailure }
+                : new string[0];
+            var origin = TaskMessageRelay.OriginFor("Task_Expand_Name");
+            converter.AddBilingualProcessor(new TaskMessageRelay(origin, projectFile.Name,
+                () => dictionaryFailure.Concat(processor.Warnings.Select(w => w.Reason)), ErrorLevel.Warning));
+            converter.AddBilingualProcessor(new TaskMessageRelay(origin, projectFile.Name,
+                () => processor.Notes.Select(n => n.Reason).Distinct(), ErrorLevel.Note));
             Diagnostics.Write("expand: " + projectFile.Name + " processor added to the task's converter");
         }
 
@@ -181,6 +204,7 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                     RunAt = DateTime.Now,
                     CldrVersion = CldrPlurals.Default.VersionDescription,
                     AppVersion = AppVersion,
+                    GrammarDictionary = _dictionaryName ?? UIStrings.Report_GrammarDefault,
                 };
 
                 var description = string.Format(CultureInfo.CurrentCulture, UIStrings.Report_ExpandDescription,

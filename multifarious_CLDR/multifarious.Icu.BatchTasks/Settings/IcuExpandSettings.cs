@@ -25,6 +25,9 @@ namespace multifarious.Icu.BatchTasks.Settings
         private const string KeepTranslatedId = "KeepTranslated";
         private const string KeepMinimumMatchId = "KeepMinimumMatch";
         private const string LockKeptId = "LockKept";
+        private const string GrammarDictionaryTextId = "GrammarDictionaryText";
+        private const string GrammarDictionaryNameId = "GrammarDictionaryName";
+        private const string GrammarDictionaryImportedAtId = "GrammarDictionaryImportedAt";
 
         public const int MinimumBudget = 1;
         public const int MaximumBudget = 999;
@@ -87,6 +90,59 @@ namespace multifarious.Icu.BatchTasks.Settings
         }
 
         /// <summary>
+        /// The developer's grammar dictionary file as imported, kept as text so export writes
+        /// it back unchanged and the effective dictionary is always the shipped default plus
+        /// this (grammar dictionary design v2, 13 October 2026). Empty means the default alone.
+        /// </summary>
+        public string GrammarDictionaryText
+        {
+            get { return GetSetting<string>(GrammarDictionaryTextId).Value ?? string.Empty; }
+            set { GetSetting<string>(GrammarDictionaryTextId).Value = value ?? string.Empty; }
+        }
+
+        /// <summary>The imported file's name, for the page and the report.</summary>
+        public string GrammarDictionaryName
+        {
+            get { return GetSetting<string>(GrammarDictionaryNameId).Value ?? string.Empty; }
+            set { GetSetting<string>(GrammarDictionaryNameId).Value = value ?? string.Empty; }
+        }
+
+        /// <summary>When the file was imported, as an ISO 8601 date and time; empty where none is.</summary>
+        public string GrammarDictionaryImportedAt
+        {
+            get { return GetSetting<string>(GrammarDictionaryImportedAtId).Value ?? string.Empty; }
+            set { GetSetting<string>(GrammarDictionaryImportedAtId).Value = value ?? string.Empty; }
+        }
+
+        public bool HasGrammarDictionaryFile
+        {
+            get { return GrammarDictionaryText.Trim().Length > 0; }
+        }
+
+        /// <summary>
+        /// The dictionary in force: the shipped default with the imported file merged over
+        /// it, or the default alone where there is no file or it no longer validates. A file
+        /// that validated on import can fail here only if it was edited by hand in the project
+        /// file or the shipped default changed under it; the failure is returned, not thrown,
+        /// so the task runs on the default and says so.
+        /// </summary>
+        public GrammarDictionary ToDictionary(out string failure)
+        {
+            failure = null;
+            if (!HasGrammarDictionaryFile) return GrammarDictionary.Default;
+
+            try
+            {
+                return GrammarDictionary.Default.WithDeveloperFile(DeveloperFile.Parse(GrammarDictionaryText));
+            }
+            catch (GrammarDictionaryException exception)
+            {
+                failure = exception.Message;
+                return GrammarDictionary.Default;
+            }
+        }
+
+        /// <summary>
         /// The options record the processor runs on. The file types are not a setting: only the
         /// two proven ones are processed, by decision (Paul, 6 September 2026), and more join
         /// under a controlled change. An out-of-range budget is clamped rather than refused, in
@@ -121,6 +177,9 @@ namespace multifarious.Icu.BatchTasks.Settings
                 case KeepTranslatedId: return ExpansionOptions.Default.KeepTranslated;
                 case KeepMinimumMatchId: return ExpansionOptions.Default.KeepMinimumMatch;
                 case LockKeptId: return ExpansionOptions.Default.LockKept;
+                case GrammarDictionaryTextId: return string.Empty;
+                case GrammarDictionaryNameId: return string.Empty;
+                case GrammarDictionaryImportedAtId: return string.Empty;
             }
 
             return base.GetDefaultValue(settingId);

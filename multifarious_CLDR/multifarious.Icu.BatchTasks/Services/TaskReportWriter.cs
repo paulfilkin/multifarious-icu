@@ -19,6 +19,9 @@ namespace multifarious.Icu.BatchTasks.Services
         public DateTime RunAt { get; set; }
         public string CldrVersion { get; set; }
         public string AppVersion { get; set; }
+
+        /// <summary>The grammar dictionary in force for the expand report: the imported file's name, or the shipped default; null to leave it out.</summary>
+        public string GrammarDictionary { get; set; }
     }
 
     /// <summary>One processed file and what happened in it.</summary>
@@ -85,6 +88,10 @@ namespace multifarious.Icu.BatchTasks.Services
                     ? string.Format(CultureInfo.CurrentCulture, UIStrings.Report_KeepAt, options.KeepMinimumMatch)
                         + (options.LockKept ? ", " + UIStrings.Report_KeepLocked : string.Empty)
                     : UIStrings.Report_Off);
+                if (context.GrammarDictionary != null)
+                {
+                    WriteSetting(writer, UIStrings.Expand_GrammarHeader, context.GrammarDictionary);
+                }
                 writer.WriteEndElement();
 
                 WriteLabels(writer, CommonLabels().Concat(new[]
@@ -117,6 +124,7 @@ namespace multifarious.Icu.BatchTasks.Services
                         writer.WriteAttributeString("outcome", outcome.Outcome.ToString());
                         writer.WriteAttributeString("segments", outcome.Segments.ToString(CultureInfo.InvariantCulture));
                         if (outcome.Detail.Length > 0) writer.WriteAttributeString("detail", outcome.Detail);
+                        if (outcome.Notes.Count > 0) writer.WriteAttributeString("notes", string.Join(" ", outcome.Notes));
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();

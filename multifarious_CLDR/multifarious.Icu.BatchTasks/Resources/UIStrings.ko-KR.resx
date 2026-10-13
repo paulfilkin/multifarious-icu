@@ -418,4 +418,58 @@
   <data name="Severity_Ignore" xml:space="preserve">
     <value>보고 안 함</value>
   </data>
+  <data name="Expand_GrammarHeader" xml:space="preserve">
+    <value>문법 사전</value>
+  </data>
+  <data name="Expand_GrammarDefault" xml:space="preserve">
+    <value>기본 제공 사전: CLDR {0}, {1}개 언어의 성 형태, 프랑스어와 이탈리아어의 관사 형태.</value>
+  </data>
+  <data name="Expand_GrammarNone" xml:space="preserve">
+    <value>가져온 개발자 파일이 없습니다. 기본 제공 사전이 적용됩니다.</value>
+  </data>
+  <data name="Expand_GrammarImported" xml:space="preserve">
+    <value>개발자 파일 {0}, {1}에 가져옴.</value>
+  </data>
+  <data name="Expand_GrammarImport" xml:space="preserve">
+    <value>가져오기…</value>
+  </data>
+  <data name="Expand_GrammarExport" xml:space="preserve">
+    <value>내보내기…</value>
+  </data>
+  <data name="Expand_GrammarTemplate" xml:space="preserve">
+    <value>템플릿 저장…</value>
+  </data>
+  <data name="Expand_GrammarRemove" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="Expand_GrammarHint" xml:space="preserve">
+    <value>인수 이름이 Gender 또는 Article로 끝나는 select 메시지는 대상 언어에 필요한 형태로 펼쳐집니다. 개발자 파일은 애플리케이션의 인수를 지정하고 키의 표기를 정하며 애플리케이션이 제공하는 종속 인수를 선언합니다.</value>
+  </data>
+  <data name="Expand_GrammarHelpHeader" xml:space="preserve">
+    <value>문법 사전이란?</value>
+  </data>
+  <data name="Expand_GrammarHelp1" xml:space="preserve">
+    <value>ICU select 메시지는 애플리케이션이 전달하는 값에 따라 분기를 고릅니다. 그 값이 문법적인 것, 예컨대 문장에서 이름이 불리는 사물의 성이라면 언어마다 필요한 분기가 다릅니다. 독일어는 남성, 여성, 중성이, 프랑스어는 거기에 관사 형태가, 일본어는 한 가지 형태만 필요합니다. 사전은 각 언어에 필요한 것을 나열하고, 작업은 복수형과 마찬가지로 키마다 한 형태를 펼칩니다.</value>
+  </data>
+  <data name="Expand_GrammarHelp2" xml:space="preserve">
+    <value>기본 제공 사전은 CLDR이 문법적 성을 공개한 언어를 다룹니다. 템플릿에 맞춰 작성한 개발자 파일은 프로젝트 고유의 인수 이름과 키 표기를 더하고, 관사 형태 같은 종속 인수를 애플리케이션이 어느 언어에 제공하는지 밝힙니다. 그때에만 소스에 없는 선택자가 삽입됩니다. 내보내기는 가져온 파일을 그대로 다시 씁니다.</value>
+  </data>
+  <data name="Expand_GrammarFileFilter" xml:space="preserve">
+    <value>JSON 파일 (*.json)|*.json|모든 파일 (*.*)|*.*</value>
+  </data>
+  <data name="Expand_GrammarInvalid" xml:space="preserve">
+    <value>파일을 가져오지 못했습니다. {0}</value>
+  </data>
+  <data name="Expand_GrammarImportTitle" xml:space="preserve">
+    <value>문법 사전 파일 가져오기</value>
+  </data>
+  <data name="Expand_GrammarExportTitle" xml:space="preserve">
+    <value>문법 사전 파일 내보내기</value>
+  </data>
+  <data name="Expand_GrammarTemplateTitle" xml:space="preserve">
+    <value>문법 사전 템플릿 저장</value>
+  </data>
+  <data name="Report_GrammarDefault" xml:space="preserve">
+    <value>기본 제공 사전</value>
+  </data>
 </root>

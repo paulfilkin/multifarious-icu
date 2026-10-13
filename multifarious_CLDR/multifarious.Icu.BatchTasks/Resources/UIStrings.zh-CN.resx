@@ -418,4 +418,58 @@
   <data name="Severity_Ignore" xml:space="preserve">
     <value>不报告</value>
   </data>
+  <data name="Expand_GrammarHeader" xml:space="preserve">
+    <value>语法词典</value>
+  </data>
+  <data name="Expand_GrammarDefault" xml:space="preserve">
+    <value>内置默认词典：CLDR {0}，{1} 种语言的性别形式，法语和意大利语的冠词形式。</value>
+  </data>
+  <data name="Expand_GrammarNone" xml:space="preserve">
+    <value>未导入开发者文件；使用内置默认词典。</value>
+  </data>
+  <data name="Expand_GrammarImported" xml:space="preserve">
+    <value>开发者文件 {0}，导入于 {1}。</value>
+  </data>
+  <data name="Expand_GrammarImport" xml:space="preserve">
+    <value>导入…</value>
+  </data>
+  <data name="Expand_GrammarExport" xml:space="preserve">
+    <value>导出…</value>
+  </data>
+  <data name="Expand_GrammarTemplate" xml:space="preserve">
+    <value>保存模板…</value>
+  </data>
+  <data name="Expand_GrammarRemove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="Expand_GrammarHint" xml:space="preserve">
+    <value>参数名以 Gender 或 Article 结尾的 select 消息会按目标语言所需的形式展开。开发者文件指定应用程序的参数、键的写法，并声明应用程序提供哪些从属参数。</value>
+  </data>
+  <data name="Expand_GrammarHelpHeader" xml:space="preserve">
+    <value>什么是语法词典？</value>
+  </data>
+  <data name="Expand_GrammarHelp1" xml:space="preserve">
+    <value>ICU 的 select 消息根据应用程序传入的值选择分支。当该值是语法性质的，例如句中所提事物的性别，各语言所需的分支就不同：德语需要阳性、阴性和中性，法语还需要冠词形式，日语只需一种形式。词典列出每种语言所需的内容，任务按每个键展开一种形式，与复数的处理方式相同。</value>
+  </data>
+  <data name="Expand_GrammarHelp2" xml:space="preserve">
+    <value>内置默认词典涵盖 CLDR 发布了语法性别的语言。按模板编写的开发者文件可加入项目自己的参数名和键的写法，并说明应用程序为哪些语言提供从属参数（例如冠词形式）；只有这样，才会插入源文本中没有的选择器。导出会将导入的文件原样写回。</value>
+  </data>
+  <data name="Expand_GrammarFileFilter" xml:space="preserve">
+    <value>JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*</value>
+  </data>
+  <data name="Expand_GrammarInvalid" xml:space="preserve">
+    <value>文件未导入。{0}</value>
+  </data>
+  <data name="Expand_GrammarImportTitle" xml:space="preserve">
+    <value>导入语法词典文件</value>
+  </data>
+  <data name="Expand_GrammarExportTitle" xml:space="preserve">
+    <value>导出语法词典文件</value>
+  </data>
+  <data name="Expand_GrammarTemplateTitle" xml:space="preserve">
+    <value>保存语法词典模板</value>
+  </data>
+  <data name="Report_GrammarDefault" xml:space="preserve">
+    <value>内置默认词典</value>
+  </data>
 </root>

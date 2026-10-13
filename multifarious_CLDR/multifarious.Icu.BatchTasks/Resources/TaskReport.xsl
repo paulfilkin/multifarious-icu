@@ -125,7 +125,7 @@
               <td class="File" align="left"><xsl:value-of select="@key" /></td>
               <td align="left"><xsl:value-of select="key('label', concat('outcome_', @outcome))" /></td>
               <td class="Unit"><xsl:value-of select="@segments" /></td>
-              <td align="left"><xsl:value-of select="@detail" /></td>
+              <td align="left"><xsl:value-of select="@detail" /><xsl:if test="@detail and @notes"><xsl:text> </xsl:text></xsl:if><xsl:value-of select="@notes" /></td>
             </tr>
           </xsl:for-each>
         </tbody>

@@ -418,4 +418,58 @@
   <data name="Severity_Ignore" xml:space="preserve">
     <value>Не сообщать</value>
   </data>
+  <data name="Expand_GrammarHeader" xml:space="preserve">
+    <value>Грамматический словарь</value>
+  </data>
+  <data name="Expand_GrammarDefault" xml:space="preserve">
+    <value>Встроенный словарь: CLDR {0}, формы рода для {1} языков, формы артикля для французского и итальянского.</value>
+  </data>
+  <data name="Expand_GrammarNone" xml:space="preserve">
+    <value>Файл разработчика не импортирован; действует встроенный словарь.</value>
+  </data>
+  <data name="Expand_GrammarImported" xml:space="preserve">
+    <value>Файл разработчика {0}, импортирован {1}.</value>
+  </data>
+  <data name="Expand_GrammarImport" xml:space="preserve">
+    <value>Импортировать…</value>
+  </data>
+  <data name="Expand_GrammarExport" xml:space="preserve">
+    <value>Экспортировать…</value>
+  </data>
+  <data name="Expand_GrammarTemplate" xml:space="preserve">
+    <value>Сохранить шаблон…</value>
+  </data>
+  <data name="Expand_GrammarRemove" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Expand_GrammarHint" xml:space="preserve">
+    <value>Сообщение select, имя аргумента которого оканчивается на Gender или Article, раскладывается на формы, нужные целевому языку. Файл разработчика называет аргументы приложения, задаёт написание ключей и объявляет, какие зависимые аргументы приложение передаёт.</value>
+  </data>
+  <data name="Expand_GrammarHelpHeader" xml:space="preserve">
+    <value>Что такое грамматический словарь?</value>
+  </data>
+  <data name="Expand_GrammarHelp1" xml:space="preserve">
+    <value>Сообщение select в ICU выбирает ветвь по значению, которое передаёт приложение. Если это значение грамматическое, например род предмета, названного в предложении, то нужные ветви различаются по языкам: немецкому нужны мужской, женский и средний род, французскому ещё и форма артикля, японскому одна форма. Словарь перечисляет, что нужно каждому языку, и задача раскладывает по одной форме на ключ, как для множественного числа.</value>
+  </data>
+  <data name="Expand_GrammarHelp2" xml:space="preserve">
+    <value>Встроенный словарь охватывает языки, для которых CLDR публикует грамматический род. Файл разработчика, написанный по шаблону, добавляет имена аргументов и написание ключей проекта и указывает, для каких языков приложение передаёт зависимый аргумент, например форму артикля; только тогда вставляется селектор, которого нет в исходном тексте. Экспорт записывает импортированный файл без изменений.</value>
+  </data>
+  <data name="Expand_GrammarFileFilter" xml:space="preserve">
+    <value>Файлы JSON (*.json)|*.json|Все файлы (*.*)|*.*</value>
+  </data>
+  <data name="Expand_GrammarInvalid" xml:space="preserve">
+    <value>Файл не импортирован. {0}</value>
+  </data>
+  <data name="Expand_GrammarImportTitle" xml:space="preserve">
+    <value>Импорт файла грамматического словаря</value>
+  </data>
+  <data name="Expand_GrammarExportTitle" xml:space="preserve">
+    <value>Экспорт файла грамматического словаря</value>
+  </data>
+  <data name="Expand_GrammarTemplateTitle" xml:space="preserve">
+    <value>Сохранение шаблона грамматического словаря</value>
+  </data>
+  <data name="Report_GrammarDefault" xml:space="preserve">
+    <value>встроенный словарь</value>
+  </data>
 </root>

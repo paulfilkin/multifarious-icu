@@ -177,7 +177,8 @@ namespace multifarious.Icu.BatchTasks.Verification
 
         private static string FormName(IcuFormRow row)
         {
-            return row.Path.Length > 0 ? row.Path : row.Category;
+            var name = row.Path.Length > 0 ? row.Path : row.Category;
+            return row.GrammarHint.Length > 0 ? name + " (" + row.GrammarHint + ")" : name;
         }
 
         private static List<ISegment> TargetSegments(IParagraphUnit unit)

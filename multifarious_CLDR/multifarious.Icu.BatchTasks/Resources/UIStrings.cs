@@ -429,5 +429,59 @@ namespace multifarious.Icu.BatchTasks.Resources
 
         /// <summary>A severity choice that drops the finding.</summary>
         public static string Severity_Ignore { get { return Manager.GetString("Severity_Ignore", Culture); } }
+
+        /// <summary>Group heading. The dictionary of selector kinds beyond plural and ordinal.</summary>
+        public static string Expand_GrammarHeader { get { return Manager.GetString("Expand_GrammarHeader", Culture); } }
+
+        /// <summary>{0} is the CLDR version, {1} a count of languages. CLDR is the Unicode Common Locale Data Repository.</summary>
+        public static string Expand_GrammarDefault { get { return Manager.GetString("Expand_GrammarDefault", Culture); } }
+
+        /// <summary>Status line when no developer's file has been imported.</summary>
+        public static string Expand_GrammarNone { get { return Manager.GetString("Expand_GrammarNone", Culture); } }
+
+        /// <summary>Status line. {0} is the file name, {1} the date and time it was imported.</summary>
+        public static string Expand_GrammarImported { get { return Manager.GetString("Expand_GrammarImported", Culture); } }
+
+        /// <summary>Button; opens a file dialog.</summary>
+        public static string Expand_GrammarImport { get { return Manager.GetString("Expand_GrammarImport", Culture); } }
+
+        /// <summary>Button; opens a save dialog.</summary>
+        public static string Expand_GrammarExport { get { return Manager.GetString("Expand_GrammarExport", Culture); } }
+
+        /// <summary>Button; saves the template file a developer fills in.</summary>
+        public static string Expand_GrammarTemplate { get { return Manager.GetString("Expand_GrammarTemplate", Culture); } }
+
+        /// <summary>Button; drops the imported file so the shipped default applies again.</summary>
+        public static string Expand_GrammarRemove { get { return Manager.GetString("Expand_GrammarRemove", Culture); } }
+
+        /// <summary>Hint under the controls. "select" is the ICU keyword; "Gender" and "Article" are argument name suffixes and must not be translated.</summary>
+        public static string Expand_GrammarHint { get { return Manager.GetString("Expand_GrammarHint", Culture); } }
+
+        /// <summary>Header of a collapsible help panel. Phrased as the question a puzzled user would ask.</summary>
+        public static string Expand_GrammarHelpHeader { get { return Manager.GetString("Expand_GrammarHelpHeader", Culture); } }
+
+        /// <summary>Help paragraph. "select" is the ICU keyword.</summary>
+        public static string Expand_GrammarHelp1 { get { return Manager.GetString("Expand_GrammarHelp1", Culture); } }
+
+        /// <summary>Help paragraph. CLDR is the Unicode Common Locale Data Repository.</summary>
+        public static string Expand_GrammarHelp2 { get { return Manager.GetString("Expand_GrammarHelp2", Culture); } }
+
+        /// <summary>A Windows file dialog filter: pairs of description and pattern separated by '|'. Translate the descriptions only.</summary>
+        public static string Expand_GrammarFileFilter { get { return Manager.GetString("Expand_GrammarFileFilter", Culture); } }
+
+        /// <summary>Shown on the page when an import fails. {0} is the reason, in English from the plugin.</summary>
+        public static string Expand_GrammarInvalid { get { return Manager.GetString("Expand_GrammarInvalid", Culture); } }
+
+        /// <summary>Title of the open file dialog.</summary>
+        public static string Expand_GrammarImportTitle { get { return Manager.GetString("Expand_GrammarImportTitle", Culture); } }
+
+        /// <summary>Title of the save file dialog.</summary>
+        public static string Expand_GrammarExportTitle { get { return Manager.GetString("Expand_GrammarExportTitle", Culture); } }
+
+        /// <summary>Title of the save file dialog for the template.</summary>
+        public static string Expand_GrammarTemplateTitle { get { return Manager.GetString("Expand_GrammarTemplateTitle", Culture); } }
+
+        /// <summary>Value in the report's settings table when no developer's file is in force. Lower case; follows the setting name.</summary>
+        public static string Report_GrammarDefault { get { return Manager.GetString("Report_GrammarDefault", Culture); } }
     }
 }

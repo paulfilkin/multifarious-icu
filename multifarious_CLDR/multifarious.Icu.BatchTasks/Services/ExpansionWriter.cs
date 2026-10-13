@@ -673,6 +673,27 @@ namespace multifarious.Icu.BatchTasks.Services
             context.SetMetaData("icu:seededFrom", string.Join(",", seeded));
             context.SetMetaData("icu:syntheticSource", string.Join(",", synthetic));
 
+            // The grammar dictionary's part of the layout: which selects it category expanded,
+            // with the kind and the key set, and per segment the hint, the sample and the
+            // dependent forms the language needs that the application does not supply. The
+            // ICU Forms window reads these, so the file says what it was laid out with on a
+            // machine without the project's dictionary. One entry per line, fields tab-separated.
+            var grammar = new List<string>();
+            CollectGrammar(plan.Root, grammar);
+            context.SetMetaData(Constants.GrammarKey, string.Join("\n", grammar));
+
+            var forms = new List<string>();
+            foreach (var pair in state.Written)
+            {
+                var kind = MetadataOf(pair.Value, "icu:kind");
+                var hint = MetadataOf(pair.Value, "icu:hint");
+                var sample = MetadataOf(pair.Value, "icu:sample");
+                var needs = MetadataOf(pair.Value, "icu:needs").Replace("\n", " | ");
+                if (kind.Length == 0 && hint.Length == 0 && needs.Length == 0) continue;
+                forms.Add(pair.Key.ToString(CultureInfo.InvariantCulture) + "\t" + kind + "\t" + hint + "\t" + sample + "\t" + needs);
+            }
+            context.SetMetaData(Constants.GrammarFormsKey, string.Join("\n", forms));
+
             // The unit gets its own context properties, never an addition to the object it
             // arrived with. The SDLXLIFF reader hands every paragraph unit in a group the same
             // IContextProperties instance, and the Java Resources filter groups the value with
@@ -696,6 +717,27 @@ namespace multifarious.Icu.BatchTasks.Services
 
             contexts.Contexts.Add(context);
             unit.Properties.Contexts = contexts;
+        }
+
+        private static string MetadataOf(PlannedSegment segment, string key)
+        {
+            string value;
+            return segment.Metadata.TryGetValue(key, out value) && value != null ? value : string.Empty;
+        }
+
+        private static void CollectGrammar(PlannedNode node, List<string> entries)
+        {
+            var selector = node as PlannedSelector;
+            if (selector == null) return;
+
+            if (selector.Kind != null)
+            {
+                entries.Add(selector.Path + "\t" + selector.Kind + "\t" + string.Join(",", selector.Keys ?? new string[0]));
+            }
+            foreach (var branch in selector.Branches)
+            {
+                CollectGrammar(branch.Content, entries);
+            }
         }
 
         private static void CollectExpanded(PlannedNode node, List<string> paths)

@@ -44,6 +44,8 @@
          through the first .xsl resource it finds in the task assembly, so there is exactly one
          and it serves both tasks. -->
     <EmbeddedResource Include="Resources\TaskReport.xsl" />
+    <!-- The grammar dictionary developer's file template the Expand page saves for a project. -->
+    <EmbeddedResource Include="Resources\grammar-dictionary-template.json" />
   </ItemGroup>
 
   <ItemGroup>

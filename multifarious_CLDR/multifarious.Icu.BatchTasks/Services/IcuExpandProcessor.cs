@@ -68,16 +68,26 @@ namespace multifarious.Icu.BatchTasks.Services
 
         /// <param name="sourceLanguageTag">The project's source language, or null to take it from the file.</param>
         /// <param name="targetLanguageTag">The file's target language, or null to take it from the file.</param>
+        /// <param name="dictionary">The grammar dictionary in force, or null to walk every select as the source wrote it.</param>
         public IcuExpandProcessor(string sourceLanguageTag, string targetLanguageTag, ExpansionOptions options,
-            string appVersion)
+            string appVersion, GrammarDictionary dictionary = null)
         {
             _sourceLanguageTag = sourceLanguageTag;
             _targetLanguageTag = targetLanguageTag;
             _options = options ?? ExpansionOptions.Default;
             _appVersion = appVersion ?? string.Empty;
             _plurals = CldrPlurals.Default;
-            _planner = new ExpansionPlanner(_plurals, GrammaticalHints.Embedded);
+            _planner = new ExpansionPlanner(_plurals, GrammaticalHints.Embedded, dictionary);
         }
+
+        private readonly List<ExpansionWarning> _notes = new List<ExpansionWarning>();
+
+        /// <summary>
+        /// What the planner could not do with a grammar select and the translator should know:
+        /// a dependent form the language needs that the application does not supply, or a
+        /// target language the dictionary does not know. Not warnings: the unit was expanded.
+        /// </summary>
+        public IReadOnlyList<ExpansionWarning> Notes { get { return _notes; } }
 
         /// <summary>Translatable units seen.</summary>
         public int Units { get; private set; }
@@ -224,7 +234,12 @@ namespace multifarious.Icu.BatchTasks.Services
 
                     WriteResult written;
                     if (!TryWrite(unit, unitId, key, plan, seed, out written)) return;
-                    Record(unitId, key, ExpandOutcome.Expanded, restored, written, seed);
+                    foreach (var note in plan.Notes)
+                    {
+                        _notes.Add(new ExpansionWarning(unitId, note));
+                        Diagnostics.Write("  unit " + unitId + ": note: " + note);
+                    }
+                    Record(unitId, key, ExpandOutcome.Expanded, restored, written, seed, plan.Notes);
                     Diagnostics.Write("  unit " + unitId + ": expanded to " + written.Segments + " segments for " + targetLanguage
                         + (seed.TargetForms != null ? ", " + written.TargetFormsFilled + " forms filled from the target" : string.Empty)
                         + (written.CommentsCarried > 0 ? ", " + written.CommentsCarried + " comment markers carried" : string.Empty)
@@ -287,7 +302,8 @@ namespace multifarious.Icu.BatchTasks.Services
         /// message had nothing for, or a target that did not read. Those go to the report and
         /// the task results, not onto the unit; the forms concerned are simply empty.
         /// </summary>
-        private void Record(string unitId, string key, ExpandOutcome outcome, bool restored, WriteResult written, ExpansionSeed seed)
+        private void Record(string unitId, string key, ExpandOutcome outcome, bool restored, WriteResult written, ExpansionSeed seed,
+            IReadOnlyList<string> notes = null)
         {
             Expanded++;
             if (restored) Reexpanded++;
@@ -309,7 +325,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 Diagnostics.Write("  unit " + unitId + ": " + detail);
             }
 
-            _outcomes.Add(new ExpandUnitOutcome(unitId, key, outcome, written.Segments, detail));
+            _outcomes.Add(new ExpandUnitOutcome(unitId, key, outcome, written.Segments, detail, notes));
         }
 
         // ---- pre-translated messages ----------------------------------------------------------

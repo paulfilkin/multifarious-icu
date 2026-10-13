@@ -502,6 +502,28 @@
               "LA",
               "L",
               "other"
+            ],
+            "MASCULINE/one": [
+              "LE",
+              "L",
+              "other"
+            ],
+            "MASCULINE/many": [
+              "other"
+            ],
+            "MASCULINE/other": [
+              "other"
+            ],
+            "FEMININE/one": [
+              "LA",
+              "L",
+              "other"
+            ],
+            "FEMININE/many": [
+              "other"
+            ],
+            "FEMININE/other": [
+              "other"
             ]
           }
         },

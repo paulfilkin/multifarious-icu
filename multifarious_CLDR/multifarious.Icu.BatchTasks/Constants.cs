@@ -93,5 +93,26 @@ namespace multifarious.Icu.BatchTasks
         /// puts them back. See <see cref="Services.SegmentStates"/> for the format.
         /// </summary>
         public const string SegmentStatesKey = "icu:segmentStates";
+
+        /// <summary>
+        /// The context metadata key recording every select the grammar dictionary category
+        /// expanded: one entry per line, the selector path, the kind and the comma-separated
+        /// key set, tab-separated. Beside <c>icu:expandedSelectors</c>, which lists the paths
+        /// alone. The ICU Forms window reads it so a file says what it was laid out with on a
+        /// machine without the project's dictionary.
+        /// </summary>
+        public const string GrammarKey = "icu:grammar";
+
+        /// <summary>
+        /// The context metadata key recording, per segment number, the dictionary's hint, the
+        /// sample noun and the dependent forms the language needs that the application does
+        /// not supply: one entry per line, tab-separated, only for segments that have any.
+        /// </summary>
+        public const string GrammarFormsKey = "icu:grammarForms";
+
+        /// <summary>The developer's file template the Expand page saves for a project to fill in.</summary>
+        public const string GrammarTemplateResource = "multifarious.Icu.BatchTasks.Resources.grammar-dictionary-template.json";
+
+        public const string GrammarTemplateFileName = "grammar-dictionary.json";
     }
 }

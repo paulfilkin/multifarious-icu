@@ -418,4 +418,58 @@
   <data name="Severity_Ignore" xml:space="preserve">
     <value>Non segnalare</value>
   </data>
+  <data name="Expand_GrammarHeader" xml:space="preserve">
+    <value>Dizionario grammaticale</value>
+  </data>
+  <data name="Expand_GrammarDefault" xml:space="preserve">
+    <value>Impostazione predefinita fornita: CLDR {0}, forme di genere per {1} lingue, forme di articolo per francese e italiano.</value>
+  </data>
+  <data name="Expand_GrammarNone" xml:space="preserve">
+    <value>Nessun file dello sviluppatore importato; si applica l'impostazione predefinita fornita.</value>
+  </data>
+  <data name="Expand_GrammarImported" xml:space="preserve">
+    <value>File dello sviluppatore {0}, importato il {1}.</value>
+  </data>
+  <data name="Expand_GrammarImport" xml:space="preserve">
+    <value>Importa…</value>
+  </data>
+  <data name="Expand_GrammarExport" xml:space="preserve">
+    <value>Esporta…</value>
+  </data>
+  <data name="Expand_GrammarTemplate" xml:space="preserve">
+    <value>Salva modello…</value>
+  </data>
+  <data name="Expand_GrammarRemove" xml:space="preserve">
+    <value>Rimuovi</value>
+  </data>
+  <data name="Expand_GrammarHint" xml:space="preserve">
+    <value>Un messaggio select il cui nome di argomento termina in Gender o Article viene presentato con le forme di cui la lingua di destinazione ha bisogno. Un file dello sviluppatore nomina gli argomenti dell'applicazione, definisce la grafia delle chiavi e dichiara quali argomenti dipendenti l'applicazione fornisce.</value>
+  </data>
+  <data name="Expand_GrammarHelpHeader" xml:space="preserve">
+    <value>Che cos'è un dizionario grammaticale?</value>
+  </data>
+  <data name="Expand_GrammarHelp1" xml:space="preserve">
+    <value>Un messaggio select ICU sceglie un ramo in base a un valore passato dall'applicazione. Quando quel valore è grammaticale, per esempio il genere di una cosa nominata nella frase, i rami necessari cambiano da lingua a lingua: il tedesco ha bisogno di maschile, femminile e neutro, il francese anche di una forma di articolo, il giapponese di una sola forma. Il dizionario elenca ciò di cui ogni lingua ha bisogno e l'attività presenta una forma per chiave, come fa per i plurali.</value>
+  </data>
+  <data name="Expand_GrammarHelp2" xml:space="preserve">
+    <value>L'impostazione predefinita fornita copre le lingue per cui CLDR pubblica il genere grammaticale. Un file dello sviluppatore, scritto secondo il modello, aggiunge i nomi di argomento e la grafia delle chiavi del progetto e indica per quali lingue l'applicazione fornisce un argomento dipendente, come una forma di articolo; solo allora viene inserito un selettore che l'origine non ha. L'esportazione riscrive il file importato senza modifiche.</value>
+  </data>
+  <data name="Expand_GrammarFileFilter" xml:space="preserve">
+    <value>File JSON (*.json)|*.json|Tutti i file (*.*)|*.*</value>
+  </data>
+  <data name="Expand_GrammarInvalid" xml:space="preserve">
+    <value>Il file non è stato importato. {0}</value>
+  </data>
+  <data name="Expand_GrammarImportTitle" xml:space="preserve">
+    <value>Importa un file di dizionario grammaticale</value>
+  </data>
+  <data name="Expand_GrammarExportTitle" xml:space="preserve">
+    <value>Esporta il file di dizionario grammaticale</value>
+  </data>
+  <data name="Expand_GrammarTemplateTitle" xml:space="preserve">
+    <value>Salva il modello di dizionario grammaticale</value>
+  </data>
+  <data name="Report_GrammarDefault" xml:space="preserve">
+    <value>impostazione predefinita fornita</value>
+  </data>
 </root>

@@ -26,8 +26,10 @@ namespace multifarious.Icu.BatchTasks.Services
 
     public sealed class ExpandUnitOutcome
     {
-        public ExpandUnitOutcome(string paragraphUnitId, string key, ExpandOutcome outcome, int segments, string detail)
+        public ExpandUnitOutcome(string paragraphUnitId, string key, ExpandOutcome outcome, int segments, string detail,
+            IReadOnlyList<string> notes = null)
         {
+            Notes = notes ?? new string[0];
             ParagraphUnitId = paragraphUnitId;
             Key = key ?? string.Empty;
             Outcome = outcome;
@@ -47,6 +49,9 @@ namespace multifarious.Icu.BatchTasks.Services
 
         /// <summary>The warning text where there is one.</summary>
         public string Detail { get; }
+
+        /// <summary>What the grammar dictionary could not do for the unit, one line each; empty for most units.</summary>
+        public IReadOnlyList<string> Notes { get; }
     }
 
     public sealed class RestoreUnitOutcome

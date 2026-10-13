@@ -52,6 +52,18 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>The parity problem, or null.</summary>
         public string PlaceholderWarning { get; set; }
 
+        /// <summary>The grammar dictionary kind of the innermost selector where it category expanded a select; empty otherwise.</summary>
+        public string GrammarKind { get; set; } = string.Empty;
+
+        /// <summary>The dictionary's hint for the form's key, "masculine"; empty for a plural form, a walked select or the developer's own key.</summary>
+        public string GrammarHint { get; set; } = string.Empty;
+
+        /// <summary>The dictionary's sample noun for the key, "der Zug"; empty where none is shipped.</summary>
+        public string GrammarSample { get; set; } = string.Empty;
+
+        /// <summary>The dependent forms the language needs here that the application does not supply, as the expansion recorded; empty where none.</summary>
+        public string Needs { get; set; } = string.Empty;
+
         /// <summary>
         /// True where the target text carries a '#' typed as text while the source form uses the
         /// protected count marker: almost always a translator reaching for the count, and Restore
@@ -139,6 +151,7 @@ namespace multifarious.Icu.BatchTasks.Services
             }
             var synthetic = new HashSet<string>(
                 Metadata(context, "icu:syntheticSource").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.Ordinal);
+            var grammarForms = GrammarForms(Metadata(context, Constants.GrammarFormsKey));
 
             var samples = new Dictionary<string, string>(StringComparer.Ordinal);
             var nameOrdinal = 0;
@@ -153,7 +166,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 var place = placed[index];
                 var target = index < targetSegments.Count ? targetSegments[index] : null;
                 if (target != null && activeId != null && target.Properties.Id.Id == activeId) target = activeTarget;
-                rows.Add(Row(place, target, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic, layout));
+                rows.Add(Row(place, target, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic, layout, grammarForms));
             }
 
             var projection = EscapedProjection(unit.Target, inPluralContext, activeId, activeTarget);
@@ -362,8 +375,31 @@ namespace multifarious.Icu.BatchTasks.Services
             }
         }
 
+        /// <summary>What the expansion recorded for a grammar form under <see cref="Constants.GrammarFormsKey"/>.</summary>
+        private sealed class GrammarFormRecord
+        {
+            public string Kind = string.Empty;
+            public string Hint = string.Empty;
+            public string Sample = string.Empty;
+            public string Needs = string.Empty;
+        }
+
+        /// <summary>The grammar form records by segment number: one per line, segment, kind, hint, sample and needs, tab-separated.</summary>
+        private static Dictionary<string, GrammarFormRecord> GrammarForms(string metadata)
+        {
+            var records = new Dictionary<string, GrammarFormRecord>(StringComparer.Ordinal);
+            foreach (var line in metadata.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var fields = line.Split('\t');
+                if (fields.Length < 5) continue;
+                records[fields[0]] = new GrammarFormRecord { Kind = fields[1], Hint = fields[2], Sample = fields[3], Needs = fields[4] };
+            }
+            return records;
+        }
+
         private IcuFormRow Row(PlacedSegment place, ISegment target, string language, Dictionary<string, string> samples,
-            ref int nameOrdinal, bool inPluralContext, Dictionary<string, string> seededFrom, HashSet<string> synthetic, Layout layout)
+            ref int nameOrdinal, bool inPluralContext, Dictionary<string, string> seededFrom, HashSet<string> synthetic, Layout layout,
+            Dictionary<string, GrammarFormRecord> grammarForms)
         {
             var source = place.Segment;
             var row = new IcuFormRow
@@ -375,6 +411,15 @@ namespace multifarious.Icu.BatchTasks.Services
                 SeededFrom = string.Empty,
                 Comment = string.Empty,
             };
+
+            GrammarFormRecord grammar;
+            if (grammarForms.TryGetValue(row.SegmentId, out grammar))
+            {
+                row.GrammarKind = grammar.Kind;
+                row.GrammarHint = grammar.Hint;
+                row.GrammarSample = grammar.Sample;
+                row.Needs = grammar.Needs;
+            }
 
             // The counts from CLDR: the explicit value itself, the category's samples, nothing
             // for a select key.
@@ -448,7 +493,7 @@ namespace multifarious.Icu.BatchTasks.Services
             }
             else
             {
-                row.Comment = ComposedComment(place, counts, row.FractionalOnly, note, hint, row.SeededFrom);
+                row.Comment = ComposedComment(place, row, counts, row.FractionalOnly, note, hint, row.SeededFrom);
             }
 
             var pound = row.SampleCount.Length == 0 ? "#" : row.SampleCount;
@@ -507,12 +552,28 @@ namespace multifarious.Icu.BatchTasks.Services
             return values.Take(ExampleCount).ToList();
         }
 
-        private static string ComposedComment(PlacedSegment place, List<string> counts, bool fractionalOnly, string note, string hint, string seededFrom)
+        private static string ComposedComment(PlacedSegment place, IcuFormRow row, List<string> counts, bool fractionalOnly, string note, string hint, string seededFrom)
         {
             if (place.Selector == "none") return string.Empty;
 
             var builder = new StringBuilder();
-            if (place.Selector == "select")
+            if (place.Selector == "select" && row.GrammarKind.Length > 0)
+            {
+                // A select the grammar dictionary category expanded: the key with the
+                // dictionary's hint and sample, or the developer's own key outside its set.
+                builder.Append("Grammar form: ").Append(place.Key);
+                if (row.GrammarHint.Length == 0)
+                {
+                    builder.Append(" (the developer's own key)");
+                }
+                else
+                {
+                    builder.Append(" (").Append(row.GrammarHint);
+                    if (row.GrammarSample.Length > 0) builder.Append(", e.g. ").Append(row.GrammarSample);
+                    builder.Append(')');
+                }
+            }
+            else if (place.Selector == "select")
             {
                 builder.Append("Select branch: ").Append(place.Key);
             }
@@ -537,6 +598,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 builder.Append('\n').Append("Source form: seeded from \"").Append(seededFrom).Append('"');
             }
             if (hint != null) builder.Append('\n').Append("Grammar: ").Append(hint);
+            if (row.Needs.Length > 0) builder.Append('\n').Append("Needs: ").Append(row.Needs);
             return builder.ToString();
         }
 
