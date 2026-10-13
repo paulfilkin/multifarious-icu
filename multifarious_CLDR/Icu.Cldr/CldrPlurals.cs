@@ -10,9 +10,10 @@ public sealed class CldrPlurals
 {
     /// <summary>
     /// Language codes that were renamed and whose old form is still in circulation.
-    /// Applied before lookup, because CLDR publishes only the current code.
+    /// Applied before lookup, because CLDR publishes only the current code. Internal so
+    /// <see cref="LocaleChain"/> runs the same replacement (Studio, 13 October 2026).
     /// </summary>
-    private static readonly IReadOnlyDictionary<string, string> LegacyLanguageCodes =
+    internal static readonly IReadOnlyDictionary<string, string> LegacyLanguageCodes =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["iw"] = "he",

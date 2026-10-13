@@ -1,0 +1,13 @@
+{
+  "_comment": "Grammar dictionary Phase 0: select messages whose keys are grammar, in a travel app's wording. Source English; targets German, French, Italian, Spanish, Japanese.",
+  "boarding": {
+    "readyMinimal": "{vehicleGender, select, other {Your {vehicle} is ready to board.}}",
+    "ready": "{vehicleGender, select, MASCULINE {Your {vehicle} is ready to board.} FEMININE {Your {vehicle} is ready to board.} NEUTER {Your {vehicle} is ready to board.} other {Your {vehicle} is ready to board.}}",
+    "waiting": "{vehicleGender, select, MASCULINE {{vehicleCount, plural, one {Your {vehicle} is waiting at the platform.} other {Your # {vehicle}s are waiting at the platform.}}} FEMININE {{vehicleCount, plural, one {Your {vehicle} is waiting at the platform.} other {Your # {vehicle}s are waiting at the platform.}}} other {{vehicleCount, plural, one {Your {vehicle} is waiting at the platform.} other {Your # {vehicle}s are waiting at the platform.}}}}",
+    "readyWithArticle": "{vehicleGender, select, MASCULINE {{vehicleArticle, select, other {The {vehicle} is ready to board.}}} FEMININE {{vehicleArticle, select, other {The {vehicle} is ready to board.}}} other {The {vehicle} is ready to board.}}",
+    "fragment": "{vehicleGender, select, MASCULINE {your {vehicle}} FEMININE {your {vehicle}} NEUTER {your {vehicle}} other {your {vehicle}s}}",
+    "readyExtraKey": "{vehicleGender, select, MASCULINE {Your {vehicle} is ready to board.} FEMININE {Your {vehicle} is ready to board.} NEUTER {Your {vehicle} is ready to board.} UNKNOWN {Your transport is ready to board.} other {Your {vehicle} is ready to board.}}",
+    "countAsSelect": "{vehicleCount, select, one {Your {vehicle} is ready to board.} other {Your {vehicle}s are ready to board.}}",
+    "status": "{status, select, DELAYED {Your {vehicle} is delayed.} CANCELLED {Your {vehicle} has been cancelled.} other {Your {vehicle} is on time.}}"
+  }
+}

@@ -1,0 +1,551 @@
+{
+  "_note": [
+    "The shipped grammar dictionary: selector kinds beyond plural and ordinal, with the key",
+    "set each target language needs. The gender sets are CLDR's grammaticalFeatures.json",
+    "(the targets-nominal entries, the nominal gender values in upper case, 'other' added,",
+    "a locale with no gender listed as 'other' only). CLDR publishes nothing about article",
+    "forms; the article sets, the hints and the sample nouns are editorial. Sample nouns are",
+    "shipped only for languages a native reader has checked. A language not listed under a",
+    "kind is unknown to the dictionary and its selects are walked as the source wrote them.",
+    "",
+    "Keys are a CLDR locale key. Lookup runs down the same chain as the plural tables: the",
+    "whole tag, then language and script, then the language, so an entry under 'de' covers",
+    "'de-AT'. A project's developer file respells keys and replaces sets; this file is never",
+    "edited for a project."
+  ],
+  "version": 1,
+  "cldr": "48",
+  "kinds": {
+    "gender": {
+      "match": {
+        "suffix": "Gender"
+      },
+      "hints": {
+        "MASCULINE": "masculine",
+        "FEMININE": "feminine",
+        "NEUTER": "neuter",
+        "COMMON": "common gender",
+        "ANIMATE": "masculine animate",
+        "INANIMATE": "masculine inanimate",
+        "PERSONAL": "masculine personal",
+        "other": "any other value"
+      },
+      "languages": {
+        "af": {
+          "keys": [
+            "other"
+          ]
+        },
+        "am": {
+          "keys": [
+            "other"
+          ]
+        },
+        "ar": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "az": {
+          "keys": [
+            "other"
+          ]
+        },
+        "bn": {
+          "keys": [
+            "other"
+          ]
+        },
+        "ca": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "cs": {
+          "keys": [
+            "ANIMATE",
+            "INANIMATE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "da": {
+          "keys": [
+            "COMMON",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "de": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ],
+          "samples": {
+            "MASCULINE": "der Zug",
+            "FEMININE": "die Fähre",
+            "NEUTER": "das Taxi"
+          }
+        },
+        "el": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "en": {
+          "keys": [
+            "other"
+          ]
+        },
+        "es": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ],
+          "samples": {
+            "MASCULINE": "el tren",
+            "FEMININE": "la furgoneta"
+          }
+        },
+        "fa": {
+          "keys": [
+            "other"
+          ]
+        },
+        "fi": {
+          "keys": [
+            "other"
+          ]
+        },
+        "fil": {
+          "keys": [
+            "other"
+          ]
+        },
+        "fr": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ],
+          "samples": {
+            "MASCULINE": "le train",
+            "FEMININE": "la voiture"
+          },
+          "needs": [
+            {
+              "kind": "article",
+              "under": [
+                "MASCULINE",
+                "FEMININE"
+              ]
+            }
+          ]
+        },
+        "gu": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "he": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "hi": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "hr": {
+          "keys": [
+            "ANIMATE",
+            "INANIMATE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "hu": {
+          "keys": [
+            "other"
+          ]
+        },
+        "hy": {
+          "keys": [
+            "other"
+          ]
+        },
+        "id": {
+          "keys": [
+            "other"
+          ]
+        },
+        "is": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "it": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ],
+          "samples": {
+            "MASCULINE": "il treno",
+            "FEMININE": "la nave"
+          },
+          "needs": [
+            {
+              "kind": "article",
+              "under": [
+                "MASCULINE",
+                "FEMININE"
+              ]
+            }
+          ]
+        },
+        "ja": {
+          "keys": [
+            "other"
+          ]
+        },
+        "kk": {
+          "keys": [
+            "other"
+          ]
+        },
+        "kn": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "ko": {
+          "keys": [
+            "other"
+          ]
+        },
+        "ky": {
+          "keys": [
+            "other"
+          ]
+        },
+        "lo": {
+          "keys": [
+            "other"
+          ]
+        },
+        "lt": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "lv": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "ml": {
+          "keys": [
+            "ANIMATE",
+            "INANIMATE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "mr": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "ms": {
+          "keys": [
+            "other"
+          ]
+        },
+        "my": {
+          "keys": [
+            "other"
+          ]
+        },
+        "nb": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "ne": {
+          "keys": [
+            "other"
+          ]
+        },
+        "nl": {
+          "keys": [
+            "COMMON",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "nn": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "no": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "pa": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "pl": {
+          "keys": [
+            "ANIMATE",
+            "INANIMATE",
+            "PERSONAL",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "pt": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "ro": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "ru": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "si": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "sk": {
+          "keys": [
+            "ANIMATE",
+            "INANIMATE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "sl": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "sr": {
+          "keys": [
+            "ANIMATE",
+            "INANIMATE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "sv": {
+          "keys": [
+            "COMMON",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "ta": {
+          "keys": [
+            "other"
+          ]
+        },
+        "te": {
+          "keys": [
+            "other"
+          ]
+        },
+        "th": {
+          "keys": [
+            "other"
+          ]
+        },
+        "tr": {
+          "keys": [
+            "other"
+          ]
+        },
+        "uk": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "NEUTER",
+            "other"
+          ]
+        },
+        "ur": {
+          "keys": [
+            "MASCULINE",
+            "FEMININE",
+            "other"
+          ]
+        },
+        "uz": {
+          "keys": [
+            "other"
+          ]
+        },
+        "vi": {
+          "keys": [
+            "other"
+          ]
+        },
+        "zh": {
+          "keys": [
+            "other"
+          ]
+        }
+      }
+    },
+    "article": {
+      "match": {
+        "suffix": "Article"
+      },
+      "hints": {
+        "LE": "masculine singular before a consonant",
+        "LA": "feminine singular before a consonant",
+        "L": "singular before a vowel sound",
+        "IL": "masculine singular before most consonants",
+        "LO": "masculine singular before s + consonant, z, gn, ps, x, y",
+        "I": "masculine plural before most consonants",
+        "GLI": "masculine plural before a vowel, s + consonant, z, gn, ps, x, y",
+        "other": "any other value"
+      },
+      "languages": {
+        "fr": {
+          "keys": [
+            "LE",
+            "LA",
+            "L",
+            "other"
+          ],
+          "within": {
+            "MASCULINE": [
+              "LE",
+              "L",
+              "other"
+            ],
+            "FEMININE": [
+              "LA",
+              "L",
+              "other"
+            ]
+          }
+        },
+        "it": {
+          "keys": [
+            "IL",
+            "LO",
+            "L",
+            "I",
+            "GLI",
+            "LA",
+            "other"
+          ],
+          "within": {
+            "MASCULINE/one": [
+              "IL",
+              "LO",
+              "L",
+              "other"
+            ],
+            "MASCULINE/many": [
+              "I",
+              "GLI",
+              "other"
+            ],
+            "MASCULINE/other": [
+              "I",
+              "GLI",
+              "other"
+            ],
+            "FEMININE/one": [
+              "LA",
+              "L",
+              "other"
+            ],
+            "FEMININE/many": [
+              "other"
+            ],
+            "FEMININE/other": [
+              "other"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
