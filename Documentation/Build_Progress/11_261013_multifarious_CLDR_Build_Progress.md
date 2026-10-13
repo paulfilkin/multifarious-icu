@@ -1,7 +1,7 @@
 # 11 - multifarious_CLDR Build Progress - 2026-10-13
 
 Eleventh session.  The grammar dictionary for select messages: design note v2 agreed, Phases
-0 to 3 built and tested (1,638 tests), all three committed on `release/2.0` and the package
+0 to 3 built and tested, then the ICU Settings dialog (1,639 tests), all three committed on `release/2.0` and the package
 deployed to Studio's Packages folder for the Phase 3 run.  Nothing of
 it is in the 2.0 package or the published documentation yet.
 
@@ -18,7 +18,10 @@ it is in the 2.0 package or the published documentation yet.
 >
 > On top of it, the grammar dictionary for select messages
 > (`Documentation\Design\Grammar-Dictionary-Design-v2.md`, local): Phases 0 to 3 are built and
-> committed, 1,638 tests.  The Phase 3 Studio run is the next step: Project 63 from
+> committed, 1,639 tests, plus the ICU Settings dialog on the Projects view (Studio shows a
+> plugin task's page only inside its wizards).  The Studio test plan
+> `Documentation\Testing\Grammar-Dictionary-Studio-Test-Plan.md` (local) is the next step, Paul
+> working through it; its Project 63 run is from
 > `test-corpus\grammar.json`, targets German, French, Italian, Japanese and American English,
 > the template saved from the Expand page and imported back, Expand, pseudo-translate, Restore,
 > Generate Target, the restored JSON checked per language, Expand again over the restored file,
@@ -109,6 +112,26 @@ gives Italian 18 forms, not 16.  32 tests.
   source coming back as written.
 - `Resources\grammar-dictionary-template.json`, embedded, with a `_note` the parser ignores.
 - 12 tests in `BatchTasks\GrammarStudioTests.cs`, 1,638 in all.
+
+## The ICU Settings dialog (after the Phase 3 commit)
+
+Paul's first look at Studio showed the Expand ICU page absent from Project Settings.
+Decompiling `BatchProcessingSettingsPageCategory` (Sdl.TranslationStudio.ProjectManagement)
+settled it: the category adds a plugin task's `RequiresSettings` page only when a wizard hands
+it a start task template, so the page exists in the New Project and batch task wizards and
+nowhere else; the template editor and File > Options never show it, and the API has no
+extension point for a batch task page or a settings category (the categories come from
+Studio's internal container; only Verification has a public page extension point, which is
+why the verifier page shows there).  Paul wanted this fixed before testing.
+
+Built: `Projects\IcuProjectsRibbonGroup.cs`, a "multifarious ICU" group on the Projects view's
+Add-ins tab with an "ICU Settings" action, and `Settings\Views\IcuSettingsWindow`, a WPF
+dialog hosting the existing Expand and Restore views and view models over the selected
+project's settings bundle, saved through `FileBasedProject.UpdateSettings` and `Save`, then
+`RefreshProjects`.  Cancel discards because the view models hold edits until Apply.  Seven UI
+strings in nine languages, three plugin resource entries, one contract test, 1,639 tests.  The
+test plan gained section S for it.  Studio was open throughout, so the package was not yet
+deployed when this was written.
 
 ## The Studio run to do (Project 63)
 

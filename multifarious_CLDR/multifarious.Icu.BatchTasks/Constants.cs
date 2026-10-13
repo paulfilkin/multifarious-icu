@@ -23,6 +23,16 @@ namespace multifarious.Icu.BatchTasks
 
         public const string ShowFormsActionId = "multifarious_Icu_ShowFormsAction";
 
+        /// <summary>
+        /// The group on the Projects view's Add-ins tab and its one action, the ICU Settings
+        /// dialog (13 October 2026). Studio shows a plugin batch task's settings page only inside
+        /// its two wizards, never in Project Settings or the template editor, so this is the
+        /// route to the Expand and Restore settings of an existing project.
+        /// </summary>
+        public const string ProjectsRibbonGroupId = "multifarious_Icu_ProjectsRibbonGroup";
+
+        public const string ShowSettingsActionId = "multifarious_Icu_ShowSettingsAction";
+
         /// <summary>The ICU verifier Studio lists under Verification.</summary>
         public const string VerifierId = "multifarious_Icu_Verifier";
 

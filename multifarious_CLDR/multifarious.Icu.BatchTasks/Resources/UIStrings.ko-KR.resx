@@ -472,4 +472,25 @@
   <data name="Report_GrammarDefault" xml:space="preserve">
     <value>기본 제공 사전</value>
   </data>
+  <data name="Settings_WindowTitle" xml:space="preserve">
+    <value>ICU 설정: {0}</value>
+  </data>
+  <data name="Settings_ExpandTab" xml:space="preserve">
+    <value>Expand ICU</value>
+  </data>
+  <data name="Settings_RestoreTab" xml:space="preserve">
+    <value>Restore ICU</value>
+  </data>
+  <data name="Settings_NoProject" xml:space="preserve">
+    <value>먼저 프로젝트 보기에서 프로젝트를 선택하세요.</value>
+  </data>
+  <data name="Settings_OK" xml:space="preserve">
+    <value>확인</value>
+  </data>
+  <data name="Settings_Cancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="Settings_SaveFailed" xml:space="preserve">
+    <value>설정이 저장되지 않았습니다. {0}</value>
+  </data>
 </root>

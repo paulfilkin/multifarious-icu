@@ -64,4 +64,13 @@
   <data name="IcuForms_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\Images\icu-expansion-tile.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="RibbonGroup_IcuProjects_Name" xml:space="preserve">
+    <value>multifarious ICU</value>
+  </data>
+  <data name="Action_ShowSettings_Name" xml:space="preserve">
+    <value>ICU Settings</value>
+  </data>
+  <data name="Action_ShowSettings_Description" xml:space="preserve">
+    <value>Open the Expand ICU and Restore ICU settings of the selected project.</value>
+  </data>
 </root>

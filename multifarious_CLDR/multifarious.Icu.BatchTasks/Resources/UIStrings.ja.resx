@@ -472,4 +472,25 @@
   <data name="Report_GrammarDefault" xml:space="preserve">
     <value>付属の既定値</value>
   </data>
+  <data name="Settings_WindowTitle" xml:space="preserve">
+    <value>ICU 設定: {0}</value>
+  </data>
+  <data name="Settings_ExpandTab" xml:space="preserve">
+    <value>Expand ICU</value>
+  </data>
+  <data name="Settings_RestoreTab" xml:space="preserve">
+    <value>Restore ICU</value>
+  </data>
+  <data name="Settings_NoProject" xml:space="preserve">
+    <value>先にプロジェクト ビューでプロジェクトを選択してください。</value>
+  </data>
+  <data name="Settings_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Settings_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Settings_SaveFailed" xml:space="preserve">
+    <value>設定は保存されませんでした。{0}</value>
+  </data>
 </root>

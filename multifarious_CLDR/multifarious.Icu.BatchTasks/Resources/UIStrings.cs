@@ -483,5 +483,26 @@ namespace multifarious.Icu.BatchTasks.Resources
 
         /// <summary>Value in the report's settings table when no developer's file is in force. Lower case; follows the setting name.</summary>
         public static string Report_GrammarDefault { get { return Manager.GetString("Report_GrammarDefault", Culture); } }
+
+        /// <summary>Title of the ICU settings dialog opened from the Projects view. {0} is the project name.</summary>
+        public static string Settings_WindowTitle { get { return Manager.GetString("Settings_WindowTitle", Culture); } }
+
+        /// <summary>Tab holding the Expand ICU task's settings. The task name as Studio lists it; keep in English.</summary>
+        public static string Settings_ExpandTab { get { return Manager.GetString("Settings_ExpandTab", Culture); } }
+
+        /// <summary>Tab holding the Restore ICU task's settings. The task name as Studio lists it; keep in English.</summary>
+        public static string Settings_RestoreTab { get { return Manager.GetString("Settings_RestoreTab", Culture); } }
+
+        /// <summary>Shown when the ICU Settings button is pressed with no project selected.</summary>
+        public static string Settings_NoProject { get { return Manager.GetString("Settings_NoProject", Culture); } }
+
+        /// <summary>Dialog button.</summary>
+        public static string Settings_OK { get { return Manager.GetString("Settings_OK", Culture); } }
+
+        /// <summary>Dialog button.</summary>
+        public static string Settings_Cancel { get { return Manager.GetString("Settings_Cancel", Culture); } }
+
+        /// <summary>Shown when the project's settings could not be written. {0} is the reason.</summary>
+        public static string Settings_SaveFailed { get { return Manager.GetString("Settings_SaveFailed", Culture); } }
     }
 }

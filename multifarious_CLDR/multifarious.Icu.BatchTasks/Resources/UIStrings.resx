@@ -650,4 +650,32 @@
     <value>shipped default</value>
     <comment>Value in the report's settings table when no developer's file is in force. Lower case; follows the setting name.</comment>
   </data>
+  <data name="Settings_WindowTitle" xml:space="preserve">
+    <value>ICU settings: {0}</value>
+    <comment>Title of the ICU settings dialog opened from the Projects view. {0} is the project name.</comment>
+  </data>
+  <data name="Settings_ExpandTab" xml:space="preserve">
+    <value>Expand ICU</value>
+    <comment>Tab holding the Expand ICU task's settings. The task name as Studio lists it; keep in English.</comment>
+  </data>
+  <data name="Settings_RestoreTab" xml:space="preserve">
+    <value>Restore ICU</value>
+    <comment>Tab holding the Restore ICU task's settings. The task name as Studio lists it; keep in English.</comment>
+  </data>
+  <data name="Settings_NoProject" xml:space="preserve">
+    <value>Select a project in the Projects view first.</value>
+    <comment>Shown when the ICU Settings button is pressed with no project selected.</comment>
+  </data>
+  <data name="Settings_OK" xml:space="preserve">
+    <value>OK</value>
+    <comment>Dialog button.</comment>
+  </data>
+  <data name="Settings_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>Dialog button.</comment>
+  </data>
+  <data name="Settings_SaveFailed" xml:space="preserve">
+    <value>The settings were not saved. {0}</value>
+    <comment>Shown when the project's settings could not be written. {0} is the reason.</comment>
+  </data>
 </root>

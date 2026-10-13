@@ -100,6 +100,10 @@
     <Reference Include="Sdl.ProjectAutomation.Core">
       <HintPath>$(TradosFolder)\Sdl.ProjectAutomation.Core.dll</HintPath>
     </Reference>
+    <!-- The project the Projects view's ICU Settings dialog reads and updates. -->
+    <Reference Include="Sdl.ProjectAutomation.FileBased">
+      <HintPath>$(TradosFolder)\Sdl.ProjectAutomation.FileBased.dll</HintPath>
+    </Reference>
     <!-- The editor: the ICU Forms view part docks under it and follows its active segment. -->
     <Reference Include="Sdl.TranslationStudioAutomation.IntegrationApi">
       <HintPath>$(TradosFolder)\Sdl.TranslationStudioAutomation.IntegrationApi.dll</HintPath>

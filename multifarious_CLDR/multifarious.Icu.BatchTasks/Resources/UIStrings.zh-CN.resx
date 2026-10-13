@@ -472,4 +472,25 @@
   <data name="Report_GrammarDefault" xml:space="preserve">
     <value>内置默认词典</value>
   </data>
+  <data name="Settings_WindowTitle" xml:space="preserve">
+    <value>ICU 设置：{0}</value>
+  </data>
+  <data name="Settings_ExpandTab" xml:space="preserve">
+    <value>Expand ICU</value>
+  </data>
+  <data name="Settings_RestoreTab" xml:space="preserve">
+    <value>Restore ICU</value>
+  </data>
+  <data name="Settings_NoProject" xml:space="preserve">
+    <value>请先在“项目”视图中选择一个项目。</value>
+  </data>
+  <data name="Settings_OK" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="Settings_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Settings_SaveFailed" xml:space="preserve">
+    <value>设置未保存。{0}</value>
+  </data>
 </root>

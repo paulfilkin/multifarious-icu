@@ -1,0 +1,42 @@
+<Window x:Class="multifarious.Icu.BatchTasks.Settings.Views.IcuSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="clr-namespace:multifarious.Icu.BatchTasks.Resources"
+        xmlns:views="clr-namespace:multifarious.Icu.BatchTasks.Settings.Views"
+        Width="760" Height="720" MinWidth="560" MinHeight="420"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="White">
+  <!-- The two batch task pages as the wizards show them, for the project selected in the
+       Projects view. The views and their view models are the wizard pages' own; this window
+       only hosts them and applies both on OK. -->
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/buttonresources.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
+
+  <Grid Margin="12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <TabControl Grid.Row="0">
+      <TabItem Header="{x:Static res:UIStrings.Settings_ExpandTab}">
+        <views:IcuExpandSettingsView x:Name="ExpandView" />
+      </TabItem>
+      <TabItem Header="{x:Static res:UIStrings.Settings_RestoreTab}">
+        <views:IcuRestoreSettingsView x:Name="RestoreView" />
+      </TabItem>
+    </TabControl>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button x:Name="OkButton" Style="{StaticResource Sdl.Button.PrimaryStyle}" MinWidth="90" Margin="0,0,8,0" IsDefault="True"
+              Content="{x:Static res:UIStrings.Settings_OK}" Click="OnOk" />
+      <Button Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="90" IsCancel="True"
+              Content="{x:Static res:UIStrings.Settings_Cancel}" />
+    </StackPanel>
+  </Grid>
+</Window>

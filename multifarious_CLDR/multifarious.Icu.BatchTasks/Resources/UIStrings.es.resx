@@ -472,4 +472,25 @@
   <data name="Report_GrammarDefault" xml:space="preserve">
     <value>valor predeterminado incluido</value>
   </data>
+  <data name="Settings_WindowTitle" xml:space="preserve">
+    <value>Configuración de ICU: {0}</value>
+  </data>
+  <data name="Settings_ExpandTab" xml:space="preserve">
+    <value>Expand ICU</value>
+  </data>
+  <data name="Settings_RestoreTab" xml:space="preserve">
+    <value>Restore ICU</value>
+  </data>
+  <data name="Settings_NoProject" xml:space="preserve">
+    <value>Seleccione primero un proyecto en la vista Proyectos.</value>
+  </data>
+  <data name="Settings_OK" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="Settings_Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Settings_SaveFailed" xml:space="preserve">
+    <value>La configuración no se ha guardado. {0}</value>
+  </data>
 </root>
