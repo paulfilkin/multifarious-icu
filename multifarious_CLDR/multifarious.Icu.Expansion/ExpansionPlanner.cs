@@ -21,6 +21,12 @@ namespace multifarious.Icu.Expansion;
 /// ever select it. A select, or a plural kind whose expansion is disabled, is walked:
 /// its source branches pass through as path components (5.6).
 ///
+/// A select whose argument the grammar dictionary recognises is category expanded the
+/// same way, with the key set the target language needs for the kind in place of the
+/// CLDR categories, and a dependent selector the language needs inserted where the
+/// developer's file declares the application supplies it (grammar dictionary design
+/// v2, 13 October 2026). Without a dictionary every select is walked.
+///
 /// Example counts and the locale named in metadata come from the first target
 /// language, in project order, whose category set contains the segment's category.
 /// A union expansion serves several languages whose samples differ; picking the
@@ -32,11 +38,14 @@ public sealed class ExpansionPlanner
 
     private readonly CldrPlurals _plurals;
     private readonly GrammaticalHints _hints;
+    private readonly GrammarDictionary? _dictionary;
 
-    public ExpansionPlanner(CldrPlurals? plurals = null, GrammaticalHints? hints = null)
+    /// <param name="dictionary">The grammar dictionary in force, or null to walk every select as the source wrote it.</param>
+    public ExpansionPlanner(CldrPlurals? plurals = null, GrammaticalHints? hints = null, GrammarDictionary? dictionary = null)
     {
         _plurals = plurals ?? CldrPlurals.Default;
         _hints = hints ?? GrammaticalHints.Embedded;
+        _dictionary = dictionary;
     }
 
     public ExpansionPlan Plan(
@@ -91,14 +100,15 @@ public sealed class ExpansionPlanner
 
         var hoisted = classification.Hoisted!;
         var state = new PlanningState(sourceLanguageTag, targetLanguageTags, options, walkedNote);
-        var root = PlanSequence(hoisted.Nodes, path: "", context: null, walked: null, state);
+        var root = PlanSequence(hoisted.Nodes, path: "", context: null, walked: null, GrammarScope.None, state);
 
         return new ExpansionPlan(
             classification.RawValue,
             IcuSerialiser.Serialise(hoisted),
             root,
             state.Segments,
-            options.MaxUnitsPerMessage);
+            options.MaxUnitsPerMessage,
+            state.Notes);
     }
 
     /// <summary>
@@ -159,6 +169,17 @@ public sealed class ExpansionPlanner
 
         public string SourceLanguageDisplay { get; }
         public List<PlannedSegment> Segments { get; } = [];
+
+        /// <summary>The plan's notes, each once; see <see cref="ExpansionPlan.Notes"/>.</summary>
+        public List<string> Notes { get; } = [];
+
+        public void Note(string note)
+        {
+            if (!Notes.Contains(note))
+            {
+                Notes.Add(note);
+            }
+        }
     }
 
     /// <summary>The innermost expanded selector component above a leaf, which is what the comment and metadata describe.</summary>
@@ -168,7 +189,11 @@ public sealed class ExpansionPlanner
         PluralCategory? Category,
         string? ExplicitValueText,
         string? SeededFrom,
-        bool SyntheticSource);
+        bool SyntheticSource,
+        GrammarForm? Grammar = null);
+
+    /// <summary>A grammar select's key as laid out: the kind, and the hint and sample the dictionary gives it, or none for the developer's own key.</summary>
+    private sealed record GrammarForm(string Kind, string? LocaleKey, string? Hint, string? Sample);
 
     /// <summary>
     /// The innermost walked selector component above a leaf. Annotates a leaf that
@@ -177,24 +202,135 @@ public sealed class ExpansionPlanner
     /// </summary>
     private sealed record WalkedContext(SelectorNode Selector, string KeyText);
 
+    /// <summary>
+    /// A grammar select above a leaf: what the dictionary recognised it as, the entry
+    /// per target language, and the branch key the leaf sits under. The frames are
+    /// what dependent insertion consults.
+    /// </summary>
+    private sealed record GrammarFrame(ArgumentRecognition Recognition, IReadOnlyList<GrammarLanguage> Languages, string KeyText);
+
+    /// <summary>
+    /// What the walk carries for the grammar dictionary: the frames above a leaf, and
+    /// per base argument the branch path that a dependent kind narrows its keys by,
+    /// <c>MASCULINE/one</c>. A base's path collects the keys of the recognised selectors
+    /// with that base and of the plural kinds beneath them; an unrelated select does not
+    /// enter it, and a second base argument keeps its own.
+    /// </summary>
+    private sealed record GrammarScope(IReadOnlyList<GrammarFrame> Frames, IReadOnlyDictionary<string, string> WithinPaths)
+    {
+        public static GrammarScope None { get; } = new([], new Dictionary<string, string>(StringComparer.Ordinal));
+
+        public string WithinPath(string baseArgument) =>
+            WithinPaths.TryGetValue(baseArgument, out var path) ? path : "";
+
+        public GrammarScope EnterGrammar(GrammarFrame frame)
+        {
+            var frames = new List<GrammarFrame>(Frames) { frame };
+            var paths = WithinPaths.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
+            var baseArgument = frame.Recognition.BaseArgument;
+            paths[baseArgument] = Append(WithinPath(baseArgument), frame.KeyText);
+            return new GrammarScope(frames, paths);
+        }
+
+        public GrammarScope EnterPlural(string keyText)
+        {
+            if (WithinPaths.Count == 0)
+            {
+                return this;
+            }
+
+            var paths = WithinPaths.ToDictionary(pair => pair.Key, pair => Append(pair.Value, keyText), StringComparer.Ordinal);
+            return new GrammarScope(Frames, paths);
+        }
+
+        private static string Append(string path, string keyText) =>
+            path.Length == 0 ? keyText : $"{path}/{keyText}";
+    }
+
     private PlannedNode PlanSequence(
-        IReadOnlyList<MessageNode> nodes, string path, SegmentContext? context, WalkedContext? walked, PlanningState state)
+        IReadOnlyList<MessageNode> nodes, string path, SegmentContext? context, WalkedContext? walked,
+        GrammarScope scope, PlanningState state)
     {
         // A hoisted sequence containing a selector is exactly that selector; anything
         // else is a leaf sentence.
         if (nodes.Count == 1 && nodes[0] is SelectorNode selector)
         {
-            return PlanSelector(selector, path, context, walked, state);
+            return PlanSelector(selector, path, context, walked, scope, state);
         }
 
-        var segment = BuildSegment(path, nodes, context, walked, state);
+        // A dependent kind a grammar select above needs under this branch is inserted
+        // here, at the leaf, so it lands under the gender directly or under the plural
+        // beneath it alike; where the application does not supply it the leaf says so.
+        var needs = new List<string>();
+        foreach (var frame in scope.Frames)
+        {
+            foreach (var need in frame.Languages.SelectMany(language => language.Needs)
+                         .Where(need => need.Under.Contains(frame.KeyText, StringComparer.Ordinal))
+                         .GroupBy(need => need.Kind, StringComparer.Ordinal)
+                         .Select(group => group.First()))
+            {
+                var baseArgument = frame.Recognition.BaseArgument;
+                if (scope.Frames.Any(above => above.Recognition.Kind == need.Kind && above.Recognition.BaseArgument == baseArgument))
+                {
+                    // The source has the dependent select already, or it was inserted above.
+                    continue;
+                }
+
+                var dependentName = _dictionary!.DependentArgumentName(baseArgument, need.Kind);
+                var supplied = dependentName is not null
+                    && state.TargetLanguageTags.Any(target => _dictionary.Supplies(baseArgument, target, need.Kind));
+                if (supplied)
+                {
+                    var synthetic = new SelectorNode(
+                        SelectorType.Select, dependentName!, null, 0,
+                        [new Branch(BranchKey.Keyword(GrammarDictionary.OtherKey), nodes, default)],
+                        default);
+                    return PlanSelector(synthetic, path, context, walked, scope, state);
+                }
+
+                var languageTag = state.TargetLanguageTags[0];
+                for (var index = 0; index < frame.Languages.Count; index++)
+                {
+                    if (frame.Languages[index].Needs.Any(entryNeed => entryNeed.Kind == need.Kind))
+                    {
+                        languageTag = state.TargetLanguageTags[index];
+                        break;
+                    }
+                }
+
+                var note = $"{DisplayNameOf(languageTag, languageTag)} needs {Article(need.Kind)} {need.Kind} form for {{{baseArgument}}}; " +
+                           $"the application does not supply {dependentName ?? ConventionalName(baseArgument, need.Kind)}";
+                needs.Add(note);
+                state.Note(note);
+            }
+        }
+
+        var segment = BuildSegment(path, nodes, context, walked, needs, state);
         state.Segments.Add(segment);
         return segment;
     }
 
     private PlannedSelector PlanSelector(
-        SelectorNode selector, string path, SegmentContext? context, WalkedContext? walked, PlanningState state)
+        SelectorNode selector, string path, SegmentContext? context, WalkedContext? walked,
+        GrammarScope scope, PlanningState state)
     {
+        if (selector.Type == SelectorType.Select && state.WalkedNote is null && _dictionary is not null
+            && _dictionary.Recognise(selector.ArgumentName) is { } recognition)
+        {
+            var resolved = state.TargetLanguageTags
+                .Select(target => _dictionary.Resolve(recognition.Kind, target, recognition.BaseArgument))
+                .ToList();
+            var unknown = state.TargetLanguageTags.Where((_, index) => resolved[index] is null).ToList();
+            if (unknown.Count == 0)
+            {
+                var languages = resolved.Select(language => language!).ToList();
+                return PlanGrammarSelector(selector, recognition, languages, path, context, walked, scope, state);
+            }
+
+            state.Note($"{string.Join(", ", unknown.Select(tag => DisplayNameOf(tag, tag)))} is not in the grammar dictionary for {recognition.Kind}; " +
+                       $"{{{selector.ArgumentName}}} is laid out as written");
+        }
+
         var expanded = state.WalkedNote is null && selector.IsPluralKind && (selector.Type == SelectorType.Plural
             ? state.Options.ExpandCardinal
             : state.Options.ExpandOrdinal);
@@ -210,8 +346,9 @@ public sealed class ExpansionPlanner
             foreach (var branch in selector.Branches)
             {
                 var branchPath = Join(path, selector.ArgumentName, branch.Key.Text);
+                var branchScope = selector.IsPluralKind ? scope.EnterPlural(branch.Key.Text) : scope;
                 var content = PlanSequence(branch.Nodes, branchPath, context,
-                    new WalkedContext(selector, branch.Key.Text), state);
+                    new WalkedContext(selector, branch.Key.Text), branchScope, state);
                 branches.Add(new PlannedBranch(
                     branch.Key.Text, branch.Key.IsExplicit, null, false, branchPath, content));
             }
@@ -230,7 +367,7 @@ public sealed class ExpansionPlanner
             var branchPath = Join(path, selector.ArgumentName, branch.Key.Text);
             var branchContext = new SegmentContext(
                 selector, branch.Key.Text, null, branch.Key.Text[1..], null, false);
-            var content = PlanSequence(branch.Nodes, branchPath, branchContext, walked, state);
+            var content = PlanSequence(branch.Nodes, branchPath, branchContext, walked, scope.EnterPlural(branch.Key.Text), state);
             branches.Add(new PlannedBranch(branch.Key.Text, true, null, false, branchPath, content));
         }
 
@@ -247,7 +384,7 @@ public sealed class ExpansionPlanner
 
             var branchPath = Join(path, selector.ArgumentName, keyword);
             var branchContext = new SegmentContext(selector, keyword, category, null, seededFrom, synthetic);
-            var content = PlanSequence(seed.Nodes, branchPath, branchContext, walked, state);
+            var content = PlanSequence(seed.Nodes, branchPath, branchContext, walked, scope.EnterPlural(keyword), state);
             branches.Add(new PlannedBranch(keyword, false, seededFrom, synthetic, branchPath, content));
         }
 
@@ -255,8 +392,90 @@ public sealed class ExpansionPlanner
             selector.Type, selector.ArgumentName, selector.OffsetRaw, true, selectorPath, branches);
     }
 
+    /// <summary>
+    /// A select the dictionary recognised, category expanded: the developer's own keys
+    /// first, kept as explicit values are on a plural, then the keys the target
+    /// language needs for the kind, narrowed by the branch path within the base
+    /// argument, each seeded from its own source branch or from <c>other</c>.
+    /// </summary>
+    private PlannedSelector PlanGrammarSelector(
+        SelectorNode selector, ArgumentRecognition recognition, IReadOnlyList<GrammarLanguage> languages,
+        string path, SegmentContext? context, WalkedContext? walked, GrammarScope scope, PlanningState state)
+    {
+        var withinPath = scope.WithinPath(recognition.BaseArgument);
+        var keys = UnionOfKeys(languages.Select(language => language.KeysWithin(withinPath)));
+        var known = new HashSet<string>(_dictionary!.KnownKeys(recognition.Kind, recognition.BaseArgument), StringComparer.Ordinal);
+        var other = selector.Branches.First(branch => branch.Key.Text == GrammarDictionary.OtherKey);
+
+        var selectorPath = path.Length == 0 ? selector.ArgumentName : $"{path}/{selector.ArgumentName}";
+        var branches = new List<PlannedBranch>();
+
+        // A source key no language of the kind uses is the developer's own; one the kind
+        // knows but this language does not need is pruned by not being laid out.
+        foreach (var branch in selector.Branches.Where(branch => !known.Contains(branch.Key.Text)))
+        {
+            var branchPath = Join(path, selector.ArgumentName, branch.Key.Text);
+            var branchContext = new SegmentContext(
+                selector, branch.Key.Text, null, null, null, false, new GrammarForm(recognition.Kind, null, null, null));
+            var branchScope = scope.EnterGrammar(new GrammarFrame(recognition, languages, branch.Key.Text));
+            var content = PlanSequence(branch.Nodes, branchPath, branchContext, walked, branchScope, state);
+            branches.Add(new PlannedBranch(branch.Key.Text, false, null, false, branchPath, content));
+        }
+
+        foreach (var key in keys)
+        {
+            var own = selector.Branches.FirstOrDefault(branch => branch.Key.Text == key);
+            var seed = state.Options.SourceSeedStrategy == SourceSeedStrategy.AlwaysOther
+                ? other
+                : own ?? other;
+            var seededFrom = ReferenceEquals(seed, own) ? null : seed.Key.Text;
+            var synthetic = own is null;
+
+            // The hint and sample come from the first target language whose set has the
+            // key, as the plural samples do.
+            var language = languages.First(language => language.Keys.Contains(key, StringComparer.Ordinal));
+            var form = new GrammarForm(recognition.Kind, language.LocaleKey, language.Hint(key), language.Sample(key));
+
+            var branchPath = Join(path, selector.ArgumentName, key);
+            var branchContext = new SegmentContext(selector, key, null, null, seededFrom, synthetic, form);
+            var branchScope = scope.EnterGrammar(new GrammarFrame(recognition, languages, key));
+            var content = PlanSequence(seed.Nodes, branchPath, branchContext, walked, branchScope, state);
+            branches.Add(new PlannedBranch(key, false, seededFrom, synthetic, branchPath, content));
+        }
+
+        return new PlannedSelector(
+            selector.Type, selector.ArgumentName, selector.OffsetRaw, true, selectorPath, branches,
+            recognition.Kind, keys);
+    }
+
+    /// <summary>The keys of several languages in first-seen order, <c>other</c> last.</summary>
+    private static IReadOnlyList<string> UnionOfKeys(IEnumerable<IReadOnlyList<string>> keySets)
+    {
+        var union = new List<string>();
+        foreach (var key in keySets.SelectMany(keys => keys))
+        {
+            if (key != GrammarDictionary.OtherKey && !union.Contains(key, StringComparer.Ordinal))
+            {
+                union.Add(key);
+            }
+        }
+
+        union.Add(GrammarDictionary.OtherKey);
+        return union;
+    }
+
+    /// <summary>The name an undeclared dependent argument would have by the suffix convention, for the note.</summary>
+    private string ConventionalName(string baseArgument, string kindName) =>
+        _dictionary!.Kinds.TryGetValue(kindName, out var kind) && kind.Suffix is { Length: > 0 } suffix
+            ? baseArgument + suffix
+            : baseArgument + char.ToUpperInvariant(kindName[0]) + kindName[1..];
+
+    private static string Article(string word) =>
+        "aeiou".IndexOf(char.ToLowerInvariant(word[0])) >= 0 ? "an" : "a";
+
     private PlannedSegment BuildSegment(
-        string path, IReadOnlyList<MessageNode> nodes, SegmentContext? context, WalkedContext? walked, PlanningState state)
+        string path, IReadOnlyList<MessageNode> nodes, SegmentContext? context, WalkedContext? walked,
+        IReadOnlyList<string> needs, PlanningState state)
     {
         if (context is null)
         {
@@ -267,7 +486,12 @@ public sealed class ExpansionPlanner
                 throw new InvalidOperationException($"Segment '{path}' has no selector above it.");
             }
 
-            return BuildWalkedSegment(path, nodes, walked, state.WalkedNote);
+            return BuildWalkedSegment(path, nodes, walked, needs, state.WalkedNote);
+        }
+
+        if (context.Grammar is { } grammar)
+        {
+            return BuildGrammarSegment(path, nodes, context, grammar, needs);
         }
 
         var kind = context.Selector.Type == SelectorType.Plural ? SelectorKind.Cardinal : SelectorKind.Ordinal;
@@ -326,6 +550,58 @@ public sealed class ExpansionPlanner
             metadata["icu:exampleDecimals"] = string.Join(",", decimals);
         }
 
+        AppendNeeds(comment, metadata, needs);
+        return new PlannedSegment(path, nodes, comment.ToString(), metadata);
+    }
+
+    /// <summary>
+    /// A leaf whose innermost expanded selector is a grammar select: the key, the
+    /// dictionary's hint and sample for it, and where it was seeded from. The developer's
+    /// own key, outside the dictionary's set, is named as such.
+    /// </summary>
+    private static PlannedSegment BuildGrammarSegment(
+        string path, IReadOnlyList<MessageNode> nodes, SegmentContext context, GrammarForm grammar, IReadOnlyList<string> needs)
+    {
+        var comment = new StringBuilder();
+        comment.Append($"Grammar form: {context.KeyText}");
+        if (grammar.Hint is null)
+        {
+            comment.Append(" (the developer's own key)");
+        }
+        else
+        {
+            comment.Append($" ({grammar.Hint}");
+            if (grammar.Sample is not null)
+            {
+                comment.Append($", e.g. {grammar.Sample}");
+            }
+
+            comment.Append(')');
+        }
+
+        if (context.SeededFrom is not null)
+        {
+            comment.Append('\n');
+            comment.Append($"Source form: seeded from \"{context.SeededFrom}\"");
+        }
+
+        var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["icu:path"] = path,
+            ["icu:selector"] = SelectorType.Select.ToKeyword(),
+            ["icu:category"] = context.KeyText,
+            ["icu:kind"] = grammar.Kind,
+            ["icu:locale"] = grammar.LocaleKey ?? "",
+            ["icu:hint"] = grammar.Hint ?? "",
+            ["icu:sample"] = grammar.Sample ?? "",
+            ["icu:exampleIntegers"] = "",
+            ["icu:exampleDecimals"] = "",
+            ["icu:syntheticSource"] = context.SyntheticSource ? "true" : "false",
+            ["icu:seededFrom"] = context.SeededFrom ?? "",
+            ["icu:offset"] = "0"
+        };
+
+        AppendNeeds(comment, metadata, needs);
         return new PlannedSegment(path, nodes, comment.ToString(), metadata);
     }
 
@@ -337,7 +613,7 @@ public sealed class ExpansionPlanner
     /// and the preview read (design 5.6).
     /// </summary>
     private static PlannedSegment BuildWalkedSegment(
-        string path, IReadOnlyList<MessageNode> nodes, WalkedContext walked, string? walkedNote)
+        string path, IReadOnlyList<MessageNode> nodes, WalkedContext walked, IReadOnlyList<string> needs, string? walkedNote)
     {
         string comment = walked.Selector.Type == SelectorType.Select
             ? $"Select branch: {walked.Selector.ArgumentName} = {walked.KeyText}"
@@ -364,7 +640,20 @@ public sealed class ExpansionPlanner
             ["icu:offset"] = walked.Selector.OffsetRaw ?? "0"
         };
 
-        return new PlannedSegment(path, nodes, comment, metadata);
+        var builder = new StringBuilder(comment);
+        AppendNeeds(builder, metadata, needs);
+        return new PlannedSegment(path, nodes, builder.ToString(), metadata);
+    }
+
+    /// <summary>The dependent forms a language needs here and the application does not supply, on the comment and as <c>icu:needs</c>.</summary>
+    private static void AppendNeeds(StringBuilder comment, Dictionary<string, string> metadata, IReadOnlyList<string> needs)
+    {
+        foreach (var need in needs)
+        {
+            comment.Append('\n').Append($"Needs: {need}");
+        }
+
+        metadata["icu:needs"] = string.Join("\n", needs);
     }
 
     /// <summary>
@@ -393,7 +682,7 @@ public sealed class ExpansionPlanner
         return path.Length == 0 ? component : $"{path}/{component}";
     }
 
-    private static string DisplayNameOf(string languageTag)
+    private static string DisplayNameOf(string languageTag, string fallback = "the source language")
     {
         try
         {
@@ -407,7 +696,7 @@ public sealed class ExpansionPlanner
         }
         catch (CultureNotFoundException)
         {
-            return "the source language";
+            return fallback;
         }
     }
 }

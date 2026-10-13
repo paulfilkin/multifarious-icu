@@ -516,6 +516,17 @@
             "other"
           ],
           "within": {
+            "MASCULINE": [
+              "IL",
+              "LO",
+              "L",
+              "other"
+            ],
+            "FEMININE": [
+              "LA",
+              "L",
+              "other"
+            ],
             "MASCULINE/one": [
               "IL",
               "LO",

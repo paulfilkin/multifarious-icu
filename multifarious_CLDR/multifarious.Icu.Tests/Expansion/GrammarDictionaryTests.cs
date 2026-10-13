@@ -115,6 +115,8 @@ public class GrammarDictionaryTests
     [Theory]
     [InlineData("fr", "MASCULINE", "LE,L,other")]
     [InlineData("fr", "FEMININE", "LA,L,other")]
+    [InlineData("it", "MASCULINE", "IL,LO,L,other")]
+    [InlineData("it", "FEMININE", "LA,L,other")]
     [InlineData("it", "MASCULINE/one", "IL,LO,L,other")]
     [InlineData("it", "MASCULINE/many", "I,GLI,other")]
     [InlineData("it", "MASCULINE/other", "I,GLI,other")]

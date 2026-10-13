@@ -16,14 +16,24 @@ public sealed class ExpansionPlan
         string hoistedText,
         PlannedNode root,
         IReadOnlyList<PlannedSegment> segments,
-        int maxUnitsPerMessage)
+        int maxUnitsPerMessage,
+        IReadOnlyList<string>? notes = null)
     {
         RawValue = rawValue;
         HoistedText = hoistedText;
         Root = root;
         Segments = segments;
         MaxUnitsPerMessage = maxUnitsPerMessage;
+        Notes = notes ?? Array.Empty<string>();
     }
+
+    /// <summary>
+    /// What the planner could not do and the report should say: a grammar select laid out
+    /// without a dependent form the language needs because the application does not supply
+    /// it, or walked because a target language is unknown to the dictionary. One line each,
+    /// once per message.
+    /// </summary>
+    public IReadOnlyList<string> Notes { get; }
 
     /// <summary>The original source value, for the paragraph unit's `icu:pattern`.</summary>
     public string RawValue { get; }
@@ -59,7 +69,9 @@ public sealed class PlannedSelector : PlannedNode
         string? offsetRaw,
         bool isExpanded,
         string path,
-        IReadOnlyList<PlannedBranch> branches)
+        IReadOnlyList<PlannedBranch> branches,
+        string? kind = null,
+        IReadOnlyList<string>? keys = null)
     {
         Type = type;
         ArgumentName = argumentName;
@@ -67,7 +79,15 @@ public sealed class PlannedSelector : PlannedNode
         IsExpanded = isExpanded;
         Path = path;
         Branches = branches;
+        Kind = kind;
+        Keys = keys;
     }
+
+    /// <summary>The grammar dictionary kind a category-expanded select belongs to; null for a plural kind or a walked select.</summary>
+    public string? Kind { get; }
+
+    /// <summary>The key set a grammar select was laid out with, in order, so restore can prune to it without the dictionary; null otherwise.</summary>
+    public IReadOnlyList<string>? Keys { get; }
 
     /// <summary>The argument's position in the path tree, such as <c>count</c> or <c>gender:female/count</c>; carried on the selector's open and close tags.</summary>
     public string Path { get; }
@@ -80,8 +100,9 @@ public sealed class PlannedSelector : PlannedNode
     public string? OffsetRaw { get; }
 
     /// <summary>
-    /// True for an expanded plural kind; false for a select, or a plural kind whose
-    /// expansion is disabled, whose branches are the source's, walked untouched.
+    /// True for an expanded plural kind or a select the grammar dictionary category
+    /// expanded; false for any other select, or a plural kind whose expansion is
+    /// disabled, whose branches are the source's, walked untouched.
     /// </summary>
     public bool IsExpanded { get; }
 

@@ -283,6 +283,39 @@ public sealed class GrammarDictionary
         return language.Respell(own, argument.PathRenames);
     }
 
+    /// <summary>
+    /// Every key any language of the kind uses, respelt for the base argument. A source
+    /// key outside this set is the developer's own and is kept; one inside it that the
+    /// target language does not need is pruned.
+    /// </summary>
+    public IReadOnlyList<string> KnownKeys(string kindName, string? baseArgument = null)
+    {
+        if (kindName is null) throw new ArgumentNullException(nameof(kindName));
+
+        if (!Kinds.TryGetValue(kindName, out var kind))
+        {
+            return Array.Empty<string>();
+        }
+
+        var own = baseArgument is not null
+            && DeveloperFile?.Argument(baseArgument) is { } argument
+            && argument.Keys.TryGetValue(kindName, out var map)
+            ? map
+            : EmptyMap;
+
+        var known = new List<string>();
+        foreach (var key in kind.Languages.Values.SelectMany(language => language.Keys))
+        {
+            var spelt = own.TryGetValue(key, out var to) ? to : key;
+            if (!known.Contains(spelt, StringComparer.Ordinal))
+            {
+                known.Add(spelt);
+            }
+        }
+
+        return known;
+    }
+
     /// <summary>Whether the developer's file declares the dependent argument of a kind supplied for a language.</summary>
     public bool Supplies(string baseArgument, string? languageTag, string kindName)
     {
