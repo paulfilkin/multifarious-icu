@@ -21,7 +21,8 @@ it is in the 2.0 package or the published documentation yet.
 > committed, 1,639 tests, plus the ICU Settings dialog on the Projects view (Studio shows a
 > plugin task's page only inside its wizards).  The Studio test plan
 > `Documentation\Testing\Grammar-Dictionary-Studio-Test-Plan.md` (local) is the next step, Paul
-> working through it; its Project 63 run is from
+> working through it: section A and S2 passed on 13 October (the package of 22:21 installed, the
+> ICU Settings dialog opens over Project 63), S3 onwards is where to resume.  Its Project 63 run is from
 > `test-corpus\grammar.json`, targets German, French, Italian, Japanese and American English,
 > the template saved from the Expand page and imported back, Expand, pseudo-translate, Restore,
 > Generate Target, the restored JSON checked per language, Expand again over the restored file,
@@ -43,6 +44,7 @@ A select whose argument the grammar dictionary recognises is laid out with the f
 - `5fb0b75` Add the grammar dictionary model and the Phase 0 corpus (Phase 1).
 - `111964c` Expand grammar selects in the planner (Phase 2).
 - `1b80d0f` Wire the grammar dictionary into Studio (Phase 3).
+- `010a468` Add the ICU Settings dialog on the Projects view.
 
 All on `release/2.0`; `main` is still at 1.0.2.0.
 
@@ -131,7 +133,9 @@ project's settings bundle, saved through `FileBasedProject.UpdateSettings` and `
 `RefreshProjects`.  Cancel discards because the view models hold edits until Apply.  Seven UI
 strings in nine languages, three plugin resource entries, one contract test, 1,639 tests.  The
 test plan gained section S for it.  Studio was open throughout, so the package was not yet
-deployed when this was written.
+deployed when this was written; it was deployed at 22:21 after Paul closed Studio, committed as
+`010a468`, and the first two checks passed: the button is on the Projects view's Add-ins tab and
+the dialog opens over Project 63 with both tabs (S2).  Testing resumes at S3 tomorrow.
 
 ## The Studio run to do (Project 63)
 
@@ -163,6 +167,10 @@ deployed when this was written.
    not supply vehicleArticle".
 
 ## Open items
+
+- The Studio test plan from S3: the dialog's Cancel, validation and save path (S3 to S7), then
+  the settings page (C), the Expand run with the template (D), the editor and window (E), the
+  verifier (F), the round trip (G, H), the run without a file (I), regression (J).
 
 - The Studio run above, then Phase 4: a user guide section on grammar selects and the
   developer's file, the template, the shipped default documented key by key, the changelog.
