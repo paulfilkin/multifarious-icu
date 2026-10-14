@@ -440,7 +440,7 @@
     <value>Сохранить шаблон…</value>
   </data>
   <data name="Expand_GrammarRemove" xml:space="preserve">
-    <value>Удалить</value>
+    <value>Удалить файл</value>
   </data>
   <data name="Expand_GrammarHint" xml:space="preserve">
     <value>Сообщение select, имя аргумента которого оканчивается на Gender или Article, раскладывается на формы, нужные целевому языку. Файл разработчика называет аргументы приложения, задаёт написание ключей и объявляет, какие зависимые аргументы приложение передаёт.</value>
@@ -452,7 +452,7 @@
     <value>Сообщение select в ICU выбирает ветвь по значению, которое передаёт приложение. Если это значение грамматическое, например род предмета, названного в предложении, то нужные ветви различаются по языкам: немецкому нужны мужской, женский и средний род, французскому ещё и форма артикля, японскому одна форма. Словарь перечисляет, что нужно каждому языку, и задача раскладывает по одной форме на ключ, как для множественного числа.</value>
   </data>
   <data name="Expand_GrammarHelp2" xml:space="preserve">
-    <value>Встроенный словарь охватывает языки, для которых CLDR публикует грамматический род. Файл разработчика, написанный по шаблону, добавляет имена аргументов и написание ключей проекта и указывает, для каких языков приложение передаёт зависимый аргумент, например форму артикля; только тогда вставляется селектор, которого нет в исходном тексте. Экспорт записывает импортированный файл без изменений.</value>
+    <value>Встроенный словарь охватывает языки, для которых CLDR публикует грамматический род. Файл разработчика, написанный по шаблону, добавляет имена аргументов и написание ключей проекта и указывает, для каких языков приложение передаёт зависимый аргумент, например форму артикля; только тогда вставляется селектор, которого нет в исходном тексте. Экспорт записывает файл проекта в текущем виде, включая правки, сделанные на этой странице.</value>
   </data>
   <data name="Expand_GrammarFileFilter" xml:space="preserve">
     <value>Файлы JSON (*.json)|*.json|Все файлы (*.*)|*.*</value>
@@ -492,5 +492,137 @@
   </data>
   <data name="Settings_SaveFailed" xml:space="preserve">
     <value>Настройки не сохранены. {0}</value>
+  </data>
+  <data name="Settings_OptionsTab" xml:space="preserve">
+    <value>Параметры</value>
+  </data>
+  <data name="Settings_GrammarTab" xml:space="preserve">
+    <value>Грамматический словарь</value>
+  </data>
+  <data name="Expand_SegmentsHeader" xml:space="preserve">
+    <value>Текст сегментов и плейсхолдеры</value>
+  </data>
+  <data name="Grammar_LanguagesHeader" xml:space="preserve">
+    <value>Языки и их ключи</value>
+  </data>
+  <data name="Grammar_KeysHint" xml:space="preserve">
+    <value>Ключи - это ветви, для которых раскладывается форма, по порядку, через запятую, последний всегда other. Набор ключей, отличный от поставляемого по умолчанию, записывается в файл разработчика проекта; Сбросить возвращает значение по умолчанию.</value>
+  </data>
+  <data name="Grammar_ColumnKind" xml:space="preserve">
+    <value>Вид</value>
+  </data>
+  <data name="Grammar_ColumnLanguage" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="Grammar_ColumnKeys" xml:space="preserve">
+    <value>Ключи</value>
+  </data>
+  <data name="Grammar_ColumnSource" xml:space="preserve">
+    <value>Источник</value>
+  </data>
+  <data name="Grammar_SourceDefault" xml:space="preserve">
+    <value>По умолчанию</value>
+  </data>
+  <data name="Grammar_SourceProject" xml:space="preserve">
+    <value>Проект</value>
+  </data>
+  <data name="Grammar_ResetRow" xml:space="preserve">
+    <value>Сбросить</value>
+  </data>
+  <data name="Grammar_RenamesLine" xml:space="preserve">
+    <value>Переименованные ключи в файле: {0}</value>
+  </data>
+  <data name="Grammar_RenameAs" xml:space="preserve">
+    <value>{0} как {1}</value>
+  </data>
+  <data name="Grammar_AddLanguageLabel" xml:space="preserve">
+    <value>Добавить язык:</value>
+  </data>
+  <data name="Grammar_AddLanguageTag" xml:space="preserve">
+    <value>Добавляемый языковой тег, например cs или pt-BR.</value>
+  </data>
+  <data name="Grammar_Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Grammar_ArgumentsHeader" xml:space="preserve">
+    <value>Аргументы, передаваемые приложением</value>
+  </data>
+  <data name="Grammar_ArgumentsHint" xml:space="preserve">
+    <value>Одна строка на базовый аргумент. В каждом столбце роли указан аргумент, который приложение передаёт для неё; в столбце Поставляет перечислены по языкам зависимые виды, которые приложение передаёт дополнительно, в формате fr: article; it: article. В сообщение, где вида нет, вставляется только поставляемый вид.</value>
+  </data>
+  <data name="Grammar_ColumnArgument" xml:space="preserve">
+    <value>Базовый аргумент</value>
+  </data>
+  <data name="Grammar_RoleColumn" xml:space="preserve">
+    <value>Аргумент {0}</value>
+  </data>
+  <data name="Grammar_ColumnSupplies" xml:space="preserve">
+    <value>Поставляет</value>
+  </data>
+  <data name="Grammar_ColumnRespelling" xml:space="preserve">
+    <value>Написание ключей</value>
+  </data>
+  <data name="Grammar_AddArgument" xml:space="preserve">
+    <value>Добавить аргумент</value>
+  </data>
+  <data name="Grammar_RemoveArgument" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Grammar_NewArgumentName" xml:space="preserve">
+    <value>argument</value>
+  </data>
+  <data name="Grammar_EmptyArgument" xml:space="preserve">
+    <value>Аргументу нужно базовое имя.</value>
+  </data>
+  <data name="Grammar_DuplicateArgument" xml:space="preserve">
+    <value>Аргумент '{0}' уже объявлен.</value>
+  </data>
+  <data name="Grammar_OtherLabel" xml:space="preserve">
+    <value>Ваше описание ключа other:</value>
+  </data>
+  <data name="Grammar_Edited" xml:space="preserve">
+    <value>Файл разработчика создан на этой странице; экспортируйте его, чтобы сохранить копию.</value>
+  </data>
+  <data name="Grammar_ImportedEdited" xml:space="preserve">
+    <value>Файл разработчика {0}, импортирован {1}, после этого изменён на этой странице.</value>
+  </data>
+  <data name="Grammar_Invalid" xml:space="preserve">
+    <value>Словарь в таком виде сохранить нельзя. {0}</value>
+  </data>
+  <data name="Grammar_KeyHint" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Grammar_KeyWithSample" xml:space="preserve">
+    <value>{0}: {1}, например {2}</value>
+  </data>
+  <data name="Grammar_Needs" xml:space="preserve">
+    <value>Требует {0} под {1}</value>
+  </data>
+  <data name="Report_GrammarEdited" xml:space="preserve">
+    <value>создан на странице настроек</value>
+  </data>
+  <data name="Grammar_LanguagesHelpHeader" xml:space="preserve">
+    <value>Какие языки и ключи можно изменить?</value>
+  </data>
+  <data name="Grammar_LanguagesHelp1" xml:space="preserve">
+    <value>Каждая строка - один вид для одного языка: ключи - это ветви, для каждой из которых задача раскладывает форму, в этом порядке, other последний. По умолчанию означает, что ключи - поставляемый набор из CLDR; Проект - что их задаёт файл разработчика проекта.</value>
+  </data>
+  <data name="Grammar_LanguagesHelp2" xml:space="preserve">
+    <value>Изменяйте набор ключей, когда приложение передаёт ключ, которого нет по умолчанию, или добавьте язык, которого нет в наборе по умолчанию, через Добавить язык и его тег, например cs или pt-BR. Сбросить возвращает значение по умолчанию или удаляет добавленный вами язык. Подсказки и примеры существительных во всплывающей подсказке берутся из поставляемого набора и здесь не редактируются.</value>
+  </data>
+  <data name="Grammar_ArgumentsHelpHeader" xml:space="preserve">
+    <value>Для чего нужны аргументы?</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp1" xml:space="preserve">
+    <value>Аргумент - это значение, которое приложение передаёт в сообщение. Базовый аргумент - сам предмет, vehicle; в каждом столбце роли указан аргумент, несущий его род, артикль или количество. Указание их здесь позволяет распознать select как грамматический, когда имя его аргумента не оканчивается на Gender или Article.</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp2" xml:space="preserve">
+    <value>Поставляет объявляет по языкам зависимые аргументы, которые приложение передаёт дополнительно, в формате fr: article; it: article. В сообщение, где вида нет, вставляется только поставляемый вид, потому что вставленный селектор меняет то, что приложение должно передавать во время выполнения; язык с потребностью, которую приложение не поставляет, раскладывается без неё, и это отмечается в результатах задачи.</value>
+  </data>
+  <data name="Grammar_OtherHelpHeader" xml:space="preserve">
+    <value>Что такое ключ other?</value>
+  </data>
+  <data name="Grammar_OtherHelp1" xml:space="preserve">
+    <value>ICU требует, чтобы каждый select заканчивался ветвью other, которая берётся, когда не подходит ни один другой ключ. Что в ней хранится - соглашение проекта: форма множественного числа, неизвестный случай, любое другое значение. Введённые здесь слова показываются как подсказка на каждой форме other в окне ICU Forms, чтобы переводчик знал, для чего эта форма.</value>
   </data>
 </root>

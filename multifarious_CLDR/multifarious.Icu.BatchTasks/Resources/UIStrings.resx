@@ -607,7 +607,7 @@
     <comment>Button; saves the template file a developer fills in.</comment>
   </data>
   <data name="Expand_GrammarRemove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Remove file</value>
     <comment>Button; drops the imported file so the shipped default applies again.</comment>
   </data>
   <data name="Expand_GrammarHint" xml:space="preserve">
@@ -623,7 +623,7 @@
     <comment>Help paragraph. "select" is the ICU keyword.</comment>
   </data>
   <data name="Expand_GrammarHelp2" xml:space="preserve">
-    <value>The shipped default covers the languages for which CLDR publishes grammatical gender. A developer's file, written to the template, adds the project's own argument names and key spelling, and says for which languages the application supplies a dependent argument such as an article form; only then is a selector the source does not have inserted. Export writes the imported file back unchanged.</value>
+    <value>The shipped default covers the languages for which CLDR publishes grammatical gender. A developer's file, written to the template, adds the project's own argument names and key spelling, and says for which languages the application supplies a dependent argument such as an article form; only then is a selector the source does not have inserted. Export writes the project's file as it stands, edits made on this page included.</value>
     <comment>Help paragraph. CLDR is the Unicode Common Locale Data Repository.</comment>
   </data>
   <data name="Expand_GrammarFileFilter" xml:space="preserve">
@@ -677,5 +677,181 @@
   <data name="Settings_SaveFailed" xml:space="preserve">
     <value>The settings were not saved. {0}</value>
     <comment>Shown when the project's settings could not be written. {0} is the reason.</comment>
+  </data>
+  <data name="Settings_OptionsTab" xml:space="preserve">
+    <value>Options</value>
+    <comment>Tab on the Expand ICU page holding the task's options, beside the Grammar dictionary tab.</comment>
+  </data>
+  <data name="Settings_GrammarTab" xml:space="preserve">
+    <value>Grammar dictionary</value>
+    <comment>Tab holding the grammar dictionary: on the Expand ICU page and in the ICU Settings dialog.</comment>
+  </data>
+  <data name="Expand_SegmentsHeader" xml:space="preserve">
+    <value>Segment text and placeholders</value>
+    <comment>Group heading. What each expanded segment holds: the source text it starts from and how its placeholders behave.</comment>
+  </data>
+  <data name="Grammar_LanguagesHeader" xml:space="preserve">
+    <value>Languages and their keys</value>
+    <comment>Group heading over the table of languages, one row per kind and language, with the keys each needs.</comment>
+  </data>
+  <data name="Grammar_KeysHint" xml:space="preserve">
+    <value>The keys are the branches a form is laid out for, in order, separated by commas and ending in other. A key set that differs from the shipped default is written to the project's developer's file; Reset puts the default back.</value>
+    <comment>Hint over the languages table. "other" is the ICU keyword and must not be translated; "Reset" is the row button (Grammar_ResetRow).</comment>
+  </data>
+  <data name="Grammar_ColumnKind" xml:space="preserve">
+    <value>Kind</value>
+    <comment>Column header: the selector kind, gender or article.</comment>
+  </data>
+  <data name="Grammar_ColumnLanguage" xml:space="preserve">
+    <value>Language</value>
+    <comment>Column header.</comment>
+  </data>
+  <data name="Grammar_ColumnKeys" xml:space="preserve">
+    <value>Keys</value>
+    <comment>Column header: the key set the language needs.</comment>
+  </data>
+  <data name="Grammar_ColumnSource" xml:space="preserve">
+    <value>Source</value>
+    <comment>Column header: whether the row's keys come from the shipped default or the project's file.</comment>
+  </data>
+  <data name="Grammar_SourceDefault" xml:space="preserve">
+    <value>Default</value>
+    <comment>Cell: the keys are the shipped default's.</comment>
+  </data>
+  <data name="Grammar_SourceProject" xml:space="preserve">
+    <value>Project</value>
+    <comment>Cell: the keys come from the project's developer's file.</comment>
+  </data>
+  <data name="Grammar_ResetRow" xml:space="preserve">
+    <value>Reset</value>
+    <comment>Row button: puts the shipped default's keys back, or removes a language the project added.</comment>
+  </data>
+  <data name="Grammar_RenamesLine" xml:space="preserve">
+    <value>Renamed keys in the file: {0}</value>
+    <comment>Read-only line under the languages table. {0} lists the kind-level renames, each as Grammar_RenameAs.</comment>
+  </data>
+  <data name="Grammar_RenameAs" xml:space="preserve">
+    <value>{0} as {1}</value>
+    <comment>One rename: {0} is the default key, {1} the project's spelling of it.</comment>
+  </data>
+  <data name="Grammar_AddLanguageLabel" xml:space="preserve">
+    <value>Add a language:</value>
+    <comment>Label before the kind list, the language tag box and the Add button.</comment>
+  </data>
+  <data name="Grammar_AddLanguageTag" xml:space="preserve">
+    <value>The language tag to add, such as cs or pt-BR.</value>
+    <comment>Tooltip and accessible name of the language tag box. "cs" and "pt-BR" are language tags and must not be translated.</comment>
+  </data>
+  <data name="Grammar_Add" xml:space="preserve">
+    <value>Add</value>
+    <comment>Button; adds the typed language to the chosen kind.</comment>
+  </data>
+  <data name="Grammar_ArgumentsHeader" xml:space="preserve">
+    <value>Arguments the application passes</value>
+    <comment>Group heading over the table of base arguments the developer's file declares.</comment>
+  </data>
+  <data name="Grammar_ArgumentsHint" xml:space="preserve">
+    <value>One row per base argument. Each role column names the argument the application passes for it; Supplies lists, per language, the dependent kinds the application passes as well, written as fr: article; it: article. Only a supplied kind is inserted into a message that does not have it.</value>
+    <comment>Hint over the arguments table. "fr: article; it: article" is the entry format and must not be translated; "Supplies" is the column (Grammar_ColumnSupplies).</comment>
+  </data>
+  <data name="Grammar_ColumnArgument" xml:space="preserve">
+    <value>Base argument</value>
+    <comment>Column header: the argument the roles belong to, such as vehicle.</comment>
+  </data>
+  <data name="Grammar_RoleColumn" xml:space="preserve">
+    <value>{0} argument</value>
+    <comment>Column header of a role column. {0} is the kind name as in the dictionary (gender, article) or count; not translated.</comment>
+  </data>
+  <data name="Grammar_ColumnSupplies" xml:space="preserve">
+    <value>Supplies</value>
+    <comment>Column header: the dependent kinds the application supplies per language.</comment>
+  </data>
+  <data name="Grammar_ColumnRespelling" xml:space="preserve">
+    <value>Key spelling</value>
+    <comment>Column header: the argument's own key spelling, read-only, from the file.</comment>
+  </data>
+  <data name="Grammar_AddArgument" xml:space="preserve">
+    <value>Add argument</value>
+    <comment>Button; adds a row to the arguments table.</comment>
+  </data>
+  <data name="Grammar_RemoveArgument" xml:space="preserve">
+    <value>Remove</value>
+    <comment>Row button; removes the argument from the file.</comment>
+  </data>
+  <data name="Grammar_NewArgumentName" xml:space="preserve">
+    <value>argument</value>
+    <comment>The base name a new row starts with, for the user to change. Lower case, no spaces; it becomes a JSON key.</comment>
+  </data>
+  <data name="Grammar_EmptyArgument" xml:space="preserve">
+    <value>An argument needs a base name.</value>
+    <comment>Validation message when a base argument's name is cleared.</comment>
+  </data>
+  <data name="Grammar_DuplicateArgument" xml:space="preserve">
+    <value>Argument '{0}' is already declared.</value>
+    <comment>Validation message. {0} is the base name typed twice.</comment>
+  </data>
+  <data name="Grammar_OtherLabel" xml:space="preserve">
+    <value>Your words for the other key:</value>
+    <comment>Label before the box holding the project's description of the other key. "other" is the ICU keyword and must not be translated.</comment>
+  </data>
+  <data name="Grammar_Edited" xml:space="preserve">
+    <value>Developer's file made on this page; export it to keep a copy.</value>
+    <comment>Status line when the project's file was made by edits on this page rather than imported.</comment>
+  </data>
+  <data name="Grammar_ImportedEdited" xml:space="preserve">
+    <value>Developer's file {0}, imported {1}, edited on this page since.</value>
+    <comment>Status line. {0} is the file name, {1} the date and time it was imported.</comment>
+  </data>
+  <data name="Grammar_Invalid" xml:space="preserve">
+    <value>The dictionary cannot be saved as it stands. {0}</value>
+    <comment>Shown in red while an edit in the tables does not validate; {0} is the reason. The page refuses to save until it is fixed.</comment>
+  </data>
+  <data name="Grammar_KeyHint" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>Tooltip line. {0} is a key, {1} its hint.</comment>
+  </data>
+  <data name="Grammar_KeyWithSample" xml:space="preserve">
+    <value>{0}: {1}, e.g. {2}</value>
+    <comment>Tooltip line. {0} is a key, {1} its hint, {2} a sample noun.</comment>
+  </data>
+  <data name="Grammar_Needs" xml:space="preserve">
+    <value>Needs {0} under {1}</value>
+    <comment>Tooltip line: a dependent kind the language needs. {0} is the kind (article), {1} the keys it is needed under.</comment>
+  </data>
+  <data name="Report_GrammarEdited" xml:space="preserve">
+    <value>made on the settings page</value>
+    <comment>The report's Grammar dictionary row where the project's file was made by edits on the page rather than imported.</comment>
+  </data>
+  <data name="Grammar_LanguagesHelpHeader" xml:space="preserve">
+    <value>Which languages and keys can I change?</value>
+    <comment>Header of a collapsible help panel under the languages table. Phrased as the question a puzzled user would ask.</comment>
+  </data>
+  <data name="Grammar_LanguagesHelp1" xml:space="preserve">
+    <value>Each row is one kind for one language: the keys are the branches the task lays out one form for, in that order, with other last. Default means the keys are the shipped set, taken from CLDR; Project means the project's developer's file sets them.</value>
+    <comment>Help paragraph. "other" is the ICU keyword and must not be translated; Default and Project are the Source column's values (Grammar_SourceDefault, Grammar_SourceProject). CLDR is the Unicode Common Locale Data Repository.</comment>
+  </data>
+  <data name="Grammar_LanguagesHelp2" xml:space="preserve">
+    <value>Edit a key set when the application passes a key the default lacks, or add a language the default does not list with Add a language and its tag, such as cs or pt-BR. Reset puts the default back, or removes a language you added. The hints and sample nouns in the tooltip come from the shipped default and cannot be edited here.</value>
+    <comment>Help paragraph. "cs" and "pt-BR" are language tags and must not be translated; Add a language and Reset are controls on the page (Grammar_AddLanguageLabel, Grammar_ResetRow).</comment>
+  </data>
+  <data name="Grammar_ArgumentsHelpHeader" xml:space="preserve">
+    <value>What are the arguments for?</value>
+    <comment>Header of a collapsible help panel under the arguments table. Phrased as the question a puzzled user would ask.</comment>
+  </data>
+  <data name="Grammar_ArgumentsHelp1" xml:space="preserve">
+    <value>An argument is a value the application passes into a message. The base argument is the thing itself, vehicle; each role column names the argument that carries its gender, its article or its count. Naming them here is how a select is recognised as grammar when its argument name does not end in Gender or Article.</value>
+    <comment>Help paragraph. "vehicle" is an example argument name; "select" is the ICU keyword; "Gender" and "Article" are argument name suffixes. None of these is translated.</comment>
+  </data>
+  <data name="Grammar_ArgumentsHelp2" xml:space="preserve">
+    <value>Supplies declares, per language, the dependent arguments the application also passes, written as fr: article; it: article. Only a supplied kind is inserted into a message that lacks it, because an inserted selector changes what the application must pass at run time; a language with a need the application does not supply is laid out without it and noted in the task results.</value>
+    <comment>Help paragraph. "fr: article; it: article" is the entry format and must not be translated; Supplies is the column (Grammar_ColumnSupplies).</comment>
+  </data>
+  <data name="Grammar_OtherHelpHeader" xml:space="preserve">
+    <value>What is the other key?</value>
+    <comment>Header of a collapsible help panel under the other box. "other" is the ICU keyword and must not be translated.</comment>
+  </data>
+  <data name="Grammar_OtherHelp1" xml:space="preserve">
+    <value>ICU requires every select to end in an other branch, taken when no other key matches. What it holds is the project's convention: the plural form, the unknown case, any other value. The words you enter here are shown as the hint on every other form in the ICU Forms window, so the translator knows what the form is for.</value>
+    <comment>Help paragraph. "select" and "other" are ICU keywords and must not be translated; ICU Forms is the window's name.</comment>
   </data>
 </root>

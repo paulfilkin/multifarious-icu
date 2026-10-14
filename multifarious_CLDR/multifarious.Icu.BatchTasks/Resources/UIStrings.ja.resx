@@ -440,7 +440,7 @@
     <value>テンプレートを保存…</value>
   </data>
   <data name="Expand_GrammarRemove" xml:space="preserve">
-    <value>削除</value>
+    <value>ファイルを削除</value>
   </data>
   <data name="Expand_GrammarHint" xml:space="preserve">
     <value>引数名が Gender または Article で終わる select メッセージは、ターゲット言語に必要な形で展開されます。開発者ファイルはアプリケーションの引数を指定し、キーの表記を定め、アプリケーションが供給する従属引数を宣言します。</value>
@@ -452,7 +452,7 @@
     <value>ICU の select メッセージは、アプリケーションが渡す値によって分岐を選びます。その値が文法的なもの、たとえば文中で名指しされる物の性である場合、言語ごとに必要な分岐が異なります。ドイツ語には男性、女性、中性が、フランス語にはさらに冠詞の形が、日本語には一つの形だけが必要です。辞書は各言語に必要なものを列挙し、タスクは複数形と同じようにキーごとに一つの形を展開します。</value>
   </data>
   <data name="Expand_GrammarHelp2" xml:space="preserve">
-    <value>付属の既定値は、CLDR が文法性を公開している言語を対象とします。テンプレートに沿って書かれた開発者ファイルは、プロジェクト固有の引数名とキーの表記を加え、冠詞の形のような従属引数をアプリケーションがどの言語に供給するかを示します。そのときに限り、ソースにないセレクターが挿入されます。書き出しは読み込んだファイルをそのまま書き戻します。</value>
+    <value>付属の既定値は、CLDR が文法性を公開している言語を対象とします。テンプレートに沿って書かれた開発者ファイルは、プロジェクト固有の引数名とキーの表記を加え、冠詞の形のような従属引数をアプリケーションがどの言語に供給するかを示します。そのときに限り、ソースにないセレクターが挿入されます。書き出しは、このページで行った編集を含め、プロジェクトのファイルを現在の状態で書き出します。</value>
   </data>
   <data name="Expand_GrammarFileFilter" xml:space="preserve">
     <value>JSON ファイル (*.json)|*.json|すべてのファイル (*.*)|*.*</value>
@@ -492,5 +492,137 @@
   </data>
   <data name="Settings_SaveFailed" xml:space="preserve">
     <value>設定は保存されませんでした。{0}</value>
+  </data>
+  <data name="Settings_OptionsTab" xml:space="preserve">
+    <value>オプション</value>
+  </data>
+  <data name="Settings_GrammarTab" xml:space="preserve">
+    <value>文法辞書</value>
+  </data>
+  <data name="Expand_SegmentsHeader" xml:space="preserve">
+    <value>セグメントのテキストとプレースホルダー</value>
+  </data>
+  <data name="Grammar_LanguagesHeader" xml:space="preserve">
+    <value>言語とキー</value>
+  </data>
+  <data name="Grammar_KeysHint" xml:space="preserve">
+    <value>キーは形が配置される分岐で、順番にコンマで区切り、最後は other です。付属の既定と異なるキーの組はプロジェクトの開発者ファイルに書き込まれます。リセットで既定に戻ります。</value>
+  </data>
+  <data name="Grammar_ColumnKind" xml:space="preserve">
+    <value>種類</value>
+  </data>
+  <data name="Grammar_ColumnLanguage" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="Grammar_ColumnKeys" xml:space="preserve">
+    <value>キー</value>
+  </data>
+  <data name="Grammar_ColumnSource" xml:space="preserve">
+    <value>ソース</value>
+  </data>
+  <data name="Grammar_SourceDefault" xml:space="preserve">
+    <value>既定</value>
+  </data>
+  <data name="Grammar_SourceProject" xml:space="preserve">
+    <value>プロジェクト</value>
+  </data>
+  <data name="Grammar_ResetRow" xml:space="preserve">
+    <value>リセット</value>
+  </data>
+  <data name="Grammar_RenamesLine" xml:space="preserve">
+    <value>ファイルで名前が変更されたキー: {0}</value>
+  </data>
+  <data name="Grammar_RenameAs" xml:space="preserve">
+    <value>{0} を {1} に</value>
+  </data>
+  <data name="Grammar_AddLanguageLabel" xml:space="preserve">
+    <value>言語を追加:</value>
+  </data>
+  <data name="Grammar_AddLanguageTag" xml:space="preserve">
+    <value>追加する言語タグ（cs や pt-BR など）。</value>
+  </data>
+  <data name="Grammar_Add" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="Grammar_ArgumentsHeader" xml:space="preserve">
+    <value>アプリケーションが渡す引数</value>
+  </data>
+  <data name="Grammar_ArgumentsHint" xml:space="preserve">
+    <value>基本引数ごとに 1 行です。各ロール列には、アプリケーションがそのロールに渡す引数を指定します。「供給」には、アプリケーションが併せて渡す従属の種類を言語ごとに fr: article; it: article の形式で記述します。供給された種類だけが、それを持たないメッセージに挿入されます。</value>
+  </data>
+  <data name="Grammar_ColumnArgument" xml:space="preserve">
+    <value>基本引数</value>
+  </data>
+  <data name="Grammar_RoleColumn" xml:space="preserve">
+    <value>{0} 引数</value>
+  </data>
+  <data name="Grammar_ColumnSupplies" xml:space="preserve">
+    <value>供給</value>
+  </data>
+  <data name="Grammar_ColumnRespelling" xml:space="preserve">
+    <value>キーの表記</value>
+  </data>
+  <data name="Grammar_AddArgument" xml:space="preserve">
+    <value>引数を追加</value>
+  </data>
+  <data name="Grammar_RemoveArgument" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Grammar_NewArgumentName" xml:space="preserve">
+    <value>argument</value>
+  </data>
+  <data name="Grammar_EmptyArgument" xml:space="preserve">
+    <value>引数には基本名が必要です。</value>
+  </data>
+  <data name="Grammar_DuplicateArgument" xml:space="preserve">
+    <value>引数 '{0}' は既に宣言されています。</value>
+  </data>
+  <data name="Grammar_OtherLabel" xml:space="preserve">
+    <value>other キーの説明:</value>
+  </data>
+  <data name="Grammar_Edited" xml:space="preserve">
+    <value>このページで作成した開発者ファイルです。コピーを残すには書き出してください。</value>
+  </data>
+  <data name="Grammar_ImportedEdited" xml:space="preserve">
+    <value>開発者ファイル {0}、{1} に読み込み、その後このページで編集済み。</value>
+  </data>
+  <data name="Grammar_Invalid" xml:space="preserve">
+    <value>この状態では辞書を保存できません。{0}</value>
+  </data>
+  <data name="Grammar_KeyHint" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Grammar_KeyWithSample" xml:space="preserve">
+    <value>{0}: {1}、例: {2}</value>
+  </data>
+  <data name="Grammar_Needs" xml:space="preserve">
+    <value>{1} の下に {0} が必要</value>
+  </data>
+  <data name="Report_GrammarEdited" xml:space="preserve">
+    <value>設定ページで作成</value>
+  </data>
+  <data name="Grammar_LanguagesHelpHeader" xml:space="preserve">
+    <value>どの言語とキーを変更できますか？</value>
+  </data>
+  <data name="Grammar_LanguagesHelp1" xml:space="preserve">
+    <value>各行は 1 つの言語の 1 つの種類です。キーは、タスクが 1 つずつ形を配置する分岐で、その順番どおりに並び、最後が other です。既定はキーが CLDR 由来の付属の組であることを、プロジェクトはプロジェクトの開発者ファイルがキーを設定していることを示します。</value>
+  </data>
+  <data name="Grammar_LanguagesHelp2" xml:space="preserve">
+    <value>アプリケーションが既定にないキーを渡す場合はキーの組を編集し、既定にない言語は「言語を追加」とその言語タグ（cs や pt-BR など）で追加します。リセットは既定に戻すか、追加した言語を削除します。ツールチップのヒントと例の名詞は付属の既定に由来し、ここでは編集できません。</value>
+  </data>
+  <data name="Grammar_ArgumentsHelpHeader" xml:space="preserve">
+    <value>引数は何のためにありますか？</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp1" xml:space="preserve">
+    <value>引数は、アプリケーションがメッセージに渡す値です。基本引数は対象そのもの（vehicle）で、各ロール列には、その性、冠詞、数を運ぶ引数を指定します。ここで指定することで、引数名が Gender や Article で終わらない select も文法として認識されます。</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp2" xml:space="preserve">
+    <value>「供給」には、アプリケーションが併せて渡す従属引数を言語ごとに fr: article; it: article の形式で宣言します。挿入されたセレクターは実行時にアプリケーションが渡すべき値を変えるため、供給された種類だけが、それを持たないメッセージに挿入されます。必要なのにアプリケーションが供給しない言語は、それなしで配置され、タスク結果に注記されます。</value>
+  </data>
+  <data name="Grammar_OtherHelpHeader" xml:space="preserve">
+    <value>other キーとは何ですか？</value>
+  </data>
+  <data name="Grammar_OtherHelp1" xml:space="preserve">
+    <value>ICU では、すべての select は、他のどのキーにも一致しないときに使われる other 分岐で終わる必要があります。その内容はプロジェクトの取り決めです。複数形、不明な場合、その他の値などです。ここに入力した語は ICU Forms ウィンドウのすべての other の形にヒントとして表示され、翻訳者はその形の用途を知ることができます。</value>
   </data>
 </root>

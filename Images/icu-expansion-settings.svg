@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- ICU Message Expansion: favicon cut. Heavier strokes, two bars, settings cog bottom-right. -->
+  <rect width="512" height="512" rx="102" fill="#2c5aa0"/>
+  <g>
+    <path d="M195 96 C158 96 146 116 146 156 L146 212 C146 238 130 250 104 256 C130 262 146 274 146 300 L146 356 C146 396 158 416 195 416"
+          fill="none" stroke="#FFFFFF" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="300" y="96"  width="140" height="64" rx="32" fill="#fdd788"/>
+    <rect x="300" y="224" width="110" height="64" rx="32" fill="#fdd788"/>
+  </g>
+  <!-- Settings cog: six teeth, centre (398, 398) -->
+  <g transform="translate(398 398)">
+    <circle r="72" fill="none" stroke="#FFFFFF" stroke-width="44" stroke-dasharray="37.7 37.7" transform="rotate(-15)"/>
+    <circle r="62" fill="#FFFFFF"/>
+    <circle r="26" fill="#2c5aa0"/>
+  </g>
+</svg>

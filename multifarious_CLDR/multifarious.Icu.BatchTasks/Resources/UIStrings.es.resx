@@ -440,7 +440,7 @@
     <value>Guardar plantilla…</value>
   </data>
   <data name="Expand_GrammarRemove" xml:space="preserve">
-    <value>Quitar</value>
+    <value>Quitar archivo</value>
   </data>
   <data name="Expand_GrammarHint" xml:space="preserve">
     <value>Un mensaje select cuyo nombre de argumento termina en Gender o Article se presenta con las formas que necesita el idioma de destino. Un archivo del desarrollador nombra los argumentos de la aplicación, define la ortografía de las claves y declara qué argumentos dependientes suministra la aplicación.</value>
@@ -452,7 +452,7 @@
     <value>Un mensaje select de ICU elige una rama según un valor que pasa la aplicación. Cuando ese valor es gramatical, por ejemplo el género de algo nombrado en la frase, las ramas que necesita cada idioma difieren: el alemán necesita masculino, femenino y neutro, el francés además una forma de artículo, el japonés una sola forma. El diccionario enumera lo que necesita cada idioma y la tarea presenta una forma por clave, como hace con los plurales.</value>
   </data>
   <data name="Expand_GrammarHelp2" xml:space="preserve">
-    <value>El valor predeterminado incluido cubre los idiomas para los que CLDR publica género gramatical. Un archivo del desarrollador, escrito según la plantilla, añade los nombres de argumento y la ortografía de las claves del proyecto e indica para qué idiomas la aplicación suministra un argumento dependiente, como una forma de artículo; solo entonces se inserta un selector que el origen no tiene. Exportar escribe el archivo importado sin cambios.</value>
+    <value>El valor predeterminado incluido cubre los idiomas para los que CLDR publica género gramatical. Un archivo del desarrollador, escrito según la plantilla, añade los nombres de argumento y la ortografía de las claves del proyecto e indica para qué idiomas la aplicación suministra un argumento dependiente, como una forma de artículo; solo entonces se inserta un selector que el origen no tiene. Exportar escribe el archivo del proyecto tal como está, incluidas las ediciones hechas en esta página.</value>
   </data>
   <data name="Expand_GrammarFileFilter" xml:space="preserve">
     <value>Archivos JSON (*.json)|*.json|Todos los archivos (*.*)|*.*</value>
@@ -492,5 +492,137 @@
   </data>
   <data name="Settings_SaveFailed" xml:space="preserve">
     <value>La configuración no se ha guardado. {0}</value>
+  </data>
+  <data name="Settings_OptionsTab" xml:space="preserve">
+    <value>Opciones</value>
+  </data>
+  <data name="Settings_GrammarTab" xml:space="preserve">
+    <value>Diccionario gramatical</value>
+  </data>
+  <data name="Expand_SegmentsHeader" xml:space="preserve">
+    <value>Texto de segmento y marcadores de posición</value>
+  </data>
+  <data name="Grammar_LanguagesHeader" xml:space="preserve">
+    <value>Idiomas y sus claves</value>
+  </data>
+  <data name="Grammar_KeysHint" xml:space="preserve">
+    <value>Las claves son las ramas para las que se dispone una forma, en orden, separadas por comas y terminando en other. Un conjunto de claves distinto del predeterminado incluido se escribe en el archivo del desarrollador del proyecto; Restablecer vuelve al predeterminado.</value>
+  </data>
+  <data name="Grammar_ColumnKind" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="Grammar_ColumnLanguage" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="Grammar_ColumnKeys" xml:space="preserve">
+    <value>Claves</value>
+  </data>
+  <data name="Grammar_ColumnSource" xml:space="preserve">
+    <value>Origen</value>
+  </data>
+  <data name="Grammar_SourceDefault" xml:space="preserve">
+    <value>Predeterminado</value>
+  </data>
+  <data name="Grammar_SourceProject" xml:space="preserve">
+    <value>Proyecto</value>
+  </data>
+  <data name="Grammar_ResetRow" xml:space="preserve">
+    <value>Restablecer</value>
+  </data>
+  <data name="Grammar_RenamesLine" xml:space="preserve">
+    <value>Claves renombradas en el archivo: {0}</value>
+  </data>
+  <data name="Grammar_RenameAs" xml:space="preserve">
+    <value>{0} como {1}</value>
+  </data>
+  <data name="Grammar_AddLanguageLabel" xml:space="preserve">
+    <value>Añadir un idioma:</value>
+  </data>
+  <data name="Grammar_AddLanguageTag" xml:space="preserve">
+    <value>La etiqueta de idioma que se va a añadir, como cs o pt-BR.</value>
+  </data>
+  <data name="Grammar_Add" xml:space="preserve">
+    <value>Añadir</value>
+  </data>
+  <data name="Grammar_ArgumentsHeader" xml:space="preserve">
+    <value>Argumentos que pasa la aplicación</value>
+  </data>
+  <data name="Grammar_ArgumentsHint" xml:space="preserve">
+    <value>Una fila por argumento base. Cada columna de rol nombra el argumento que la aplicación pasa para él; Suministra enumera, por idioma, los tipos dependientes que la aplicación también pasa, escritos como fr: article; it: article. Solo un tipo suministrado se inserta en un mensaje que no lo tiene.</value>
+  </data>
+  <data name="Grammar_ColumnArgument" xml:space="preserve">
+    <value>Argumento base</value>
+  </data>
+  <data name="Grammar_RoleColumn" xml:space="preserve">
+    <value>Argumento {0}</value>
+  </data>
+  <data name="Grammar_ColumnSupplies" xml:space="preserve">
+    <value>Suministra</value>
+  </data>
+  <data name="Grammar_ColumnRespelling" xml:space="preserve">
+    <value>Ortografía de claves</value>
+  </data>
+  <data name="Grammar_AddArgument" xml:space="preserve">
+    <value>Añadir argumento</value>
+  </data>
+  <data name="Grammar_RemoveArgument" xml:space="preserve">
+    <value>Quitar</value>
+  </data>
+  <data name="Grammar_NewArgumentName" xml:space="preserve">
+    <value>argumento</value>
+  </data>
+  <data name="Grammar_EmptyArgument" xml:space="preserve">
+    <value>Un argumento necesita un nombre base.</value>
+  </data>
+  <data name="Grammar_DuplicateArgument" xml:space="preserve">
+    <value>El argumento '{0}' ya está declarado.</value>
+  </data>
+  <data name="Grammar_OtherLabel" xml:space="preserve">
+    <value>Sus palabras para la clave other:</value>
+  </data>
+  <data name="Grammar_Edited" xml:space="preserve">
+    <value>Archivo del desarrollador creado en esta página; expórtelo para conservar una copia.</value>
+  </data>
+  <data name="Grammar_ImportedEdited" xml:space="preserve">
+    <value>Archivo del desarrollador {0}, importado el {1}, editado en esta página desde entonces.</value>
+  </data>
+  <data name="Grammar_Invalid" xml:space="preserve">
+    <value>El diccionario no se puede guardar tal como está. {0}</value>
+  </data>
+  <data name="Grammar_KeyHint" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Grammar_KeyWithSample" xml:space="preserve">
+    <value>{0}: {1}, p. ej. {2}</value>
+  </data>
+  <data name="Grammar_Needs" xml:space="preserve">
+    <value>Necesita {0} bajo {1}</value>
+  </data>
+  <data name="Report_GrammarEdited" xml:space="preserve">
+    <value>creado en la página de configuración</value>
+  </data>
+  <data name="Grammar_LanguagesHelpHeader" xml:space="preserve">
+    <value>¿Qué idiomas y claves puedo cambiar?</value>
+  </data>
+  <data name="Grammar_LanguagesHelp1" xml:space="preserve">
+    <value>Cada fila es un tipo para un idioma: las claves son las ramas para las que la tarea dispone una forma, en ese orden, con other al final. Predeterminado significa que las claves son el conjunto incluido, tomado de CLDR; Proyecto significa que las establece el archivo del desarrollador del proyecto.</value>
+  </data>
+  <data name="Grammar_LanguagesHelp2" xml:space="preserve">
+    <value>Edite un conjunto de claves cuando la aplicación pase una clave que el predeterminado no tiene, o añada un idioma que el predeterminado no incluye con Añadir un idioma y su etiqueta, como cs o pt-BR. Restablecer vuelve al predeterminado o quita un idioma que haya añadido. Las indicaciones y los sustantivos de ejemplo de la información sobre herramientas proceden del predeterminado incluido y no se pueden editar aquí.</value>
+  </data>
+  <data name="Grammar_ArgumentsHelpHeader" xml:space="preserve">
+    <value>¿Para qué sirven los argumentos?</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp1" xml:space="preserve">
+    <value>Un argumento es un valor que la aplicación pasa a un mensaje. El argumento base es la cosa en sí, vehicle; cada columna de rol nombra el argumento que lleva su género, su artículo o su recuento. Nombrarlos aquí es lo que permite reconocer un select como gramatical cuando el nombre de su argumento no termina en Gender ni en Article.</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp2" xml:space="preserve">
+    <value>Suministra declara, por idioma, los argumentos dependientes que la aplicación también pasa, escritos como fr: article; it: article. Solo un tipo suministrado se inserta en un mensaje que no lo tiene, porque un selector insertado cambia lo que la aplicación debe pasar en tiempo de ejecución; un idioma con una necesidad que la aplicación no suministra se dispone sin ella y se anota en los resultados de la tarea.</value>
+  </data>
+  <data name="Grammar_OtherHelpHeader" xml:space="preserve">
+    <value>¿Qué es la clave other?</value>
+  </data>
+  <data name="Grammar_OtherHelp1" xml:space="preserve">
+    <value>ICU exige que todo select termine en una rama other, que se toma cuando ninguna otra clave coincide. Lo que contiene es convención del proyecto: la forma plural, el caso desconocido, cualquier otro valor. Las palabras que escriba aquí se muestran como indicación en cada forma other de la ventana ICU Forms, para que el traductor sepa para qué sirve la forma.</value>
   </data>
 </root>

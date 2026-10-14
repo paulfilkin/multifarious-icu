@@ -504,5 +504,137 @@ namespace multifarious.Icu.BatchTasks.Resources
 
         /// <summary>Shown when the project's settings could not be written. {0} is the reason.</summary>
         public static string Settings_SaveFailed { get { return Manager.GetString("Settings_SaveFailed", Culture); } }
+
+        /// <summary>Tab on the Expand ICU page holding the task's options, beside the Grammar dictionary tab.</summary>
+        public static string Settings_OptionsTab { get { return Manager.GetString("Settings_OptionsTab", Culture); } }
+
+        /// <summary>Tab holding the grammar dictionary: on the Expand ICU page and in the ICU Settings dialog.</summary>
+        public static string Settings_GrammarTab { get { return Manager.GetString("Settings_GrammarTab", Culture); } }
+
+        /// <summary>Group heading. What each expanded segment holds: the source text it starts from and how its placeholders behave.</summary>
+        public static string Expand_SegmentsHeader { get { return Manager.GetString("Expand_SegmentsHeader", Culture); } }
+
+        /// <summary>Group heading over the table of languages, one row per kind and language, with the keys each needs.</summary>
+        public static string Grammar_LanguagesHeader { get { return Manager.GetString("Grammar_LanguagesHeader", Culture); } }
+
+        /// <summary>Hint over the languages table. "other" is the ICU keyword and must not be translated; "Reset" is the row button (Grammar_ResetRow).</summary>
+        public static string Grammar_KeysHint { get { return Manager.GetString("Grammar_KeysHint", Culture); } }
+
+        /// <summary>Column header: the selector kind, gender or article.</summary>
+        public static string Grammar_ColumnKind { get { return Manager.GetString("Grammar_ColumnKind", Culture); } }
+
+        /// <summary>Column header.</summary>
+        public static string Grammar_ColumnLanguage { get { return Manager.GetString("Grammar_ColumnLanguage", Culture); } }
+
+        /// <summary>Column header: the key set the language needs.</summary>
+        public static string Grammar_ColumnKeys { get { return Manager.GetString("Grammar_ColumnKeys", Culture); } }
+
+        /// <summary>Column header: whether the row's keys come from the shipped default or the project's file.</summary>
+        public static string Grammar_ColumnSource { get { return Manager.GetString("Grammar_ColumnSource", Culture); } }
+
+        /// <summary>Cell: the keys are the shipped default's.</summary>
+        public static string Grammar_SourceDefault { get { return Manager.GetString("Grammar_SourceDefault", Culture); } }
+
+        /// <summary>Cell: the keys come from the project's developer's file.</summary>
+        public static string Grammar_SourceProject { get { return Manager.GetString("Grammar_SourceProject", Culture); } }
+
+        /// <summary>Row button: puts the shipped default's keys back, or removes a language the project added.</summary>
+        public static string Grammar_ResetRow { get { return Manager.GetString("Grammar_ResetRow", Culture); } }
+
+        /// <summary>Read-only line under the languages table. {0} lists the kind-level renames, each as Grammar_RenameAs.</summary>
+        public static string Grammar_RenamesLine { get { return Manager.GetString("Grammar_RenamesLine", Culture); } }
+
+        /// <summary>One rename: {0} is the default key, {1} the project's spelling of it.</summary>
+        public static string Grammar_RenameAs { get { return Manager.GetString("Grammar_RenameAs", Culture); } }
+
+        /// <summary>Label before the kind list, the language tag box and the Add button.</summary>
+        public static string Grammar_AddLanguageLabel { get { return Manager.GetString("Grammar_AddLanguageLabel", Culture); } }
+
+        /// <summary>Tooltip and accessible name of the language tag box. "cs" and "pt-BR" are language tags and must not be translated.</summary>
+        public static string Grammar_AddLanguageTag { get { return Manager.GetString("Grammar_AddLanguageTag", Culture); } }
+
+        /// <summary>Button; adds the typed language to the chosen kind.</summary>
+        public static string Grammar_Add { get { return Manager.GetString("Grammar_Add", Culture); } }
+
+        /// <summary>Group heading over the table of base arguments the developer's file declares.</summary>
+        public static string Grammar_ArgumentsHeader { get { return Manager.GetString("Grammar_ArgumentsHeader", Culture); } }
+
+        /// <summary>Hint over the arguments table. "fr: article; it: article" is the entry format and must not be translated; "Supplies" is the column (Grammar_ColumnSupplies).</summary>
+        public static string Grammar_ArgumentsHint { get { return Manager.GetString("Grammar_ArgumentsHint", Culture); } }
+
+        /// <summary>Column header: the argument the roles belong to, such as vehicle.</summary>
+        public static string Grammar_ColumnArgument { get { return Manager.GetString("Grammar_ColumnArgument", Culture); } }
+
+        /// <summary>Column header of a role column. {0} is the kind name as in the dictionary (gender, article) or count; not translated.</summary>
+        public static string Grammar_RoleColumn { get { return Manager.GetString("Grammar_RoleColumn", Culture); } }
+
+        /// <summary>Column header: the dependent kinds the application supplies per language.</summary>
+        public static string Grammar_ColumnSupplies { get { return Manager.GetString("Grammar_ColumnSupplies", Culture); } }
+
+        /// <summary>Column header: the argument's own key spelling, read-only, from the file.</summary>
+        public static string Grammar_ColumnRespelling { get { return Manager.GetString("Grammar_ColumnRespelling", Culture); } }
+
+        /// <summary>Button; adds a row to the arguments table.</summary>
+        public static string Grammar_AddArgument { get { return Manager.GetString("Grammar_AddArgument", Culture); } }
+
+        /// <summary>Row button; removes the argument from the file.</summary>
+        public static string Grammar_RemoveArgument { get { return Manager.GetString("Grammar_RemoveArgument", Culture); } }
+
+        /// <summary>The base name a new row starts with, for the user to change. Lower case, no spaces; it becomes a JSON key.</summary>
+        public static string Grammar_NewArgumentName { get { return Manager.GetString("Grammar_NewArgumentName", Culture); } }
+
+        /// <summary>Validation message when a base argument's name is cleared.</summary>
+        public static string Grammar_EmptyArgument { get { return Manager.GetString("Grammar_EmptyArgument", Culture); } }
+
+        /// <summary>Validation message. {0} is the base name typed twice.</summary>
+        public static string Grammar_DuplicateArgument { get { return Manager.GetString("Grammar_DuplicateArgument", Culture); } }
+
+        /// <summary>Label before the box holding the project's description of the other key. "other" is the ICU keyword and must not be translated.</summary>
+        public static string Grammar_OtherLabel { get { return Manager.GetString("Grammar_OtherLabel", Culture); } }
+
+        /// <summary>Status line when the project's file was made by edits on this page rather than imported.</summary>
+        public static string Grammar_Edited { get { return Manager.GetString("Grammar_Edited", Culture); } }
+
+        /// <summary>Status line. {0} is the file name, {1} the date and time it was imported.</summary>
+        public static string Grammar_ImportedEdited { get { return Manager.GetString("Grammar_ImportedEdited", Culture); } }
+
+        /// <summary>Shown in red while an edit in the tables does not validate; {0} is the reason. The page refuses to save until it is fixed.</summary>
+        public static string Grammar_Invalid { get { return Manager.GetString("Grammar_Invalid", Culture); } }
+
+        /// <summary>Tooltip line. {0} is a key, {1} its hint.</summary>
+        public static string Grammar_KeyHint { get { return Manager.GetString("Grammar_KeyHint", Culture); } }
+
+        /// <summary>Tooltip line. {0} is a key, {1} its hint, {2} a sample noun.</summary>
+        public static string Grammar_KeyWithSample { get { return Manager.GetString("Grammar_KeyWithSample", Culture); } }
+
+        /// <summary>Tooltip line: a dependent kind the language needs. {0} is the kind (article), {1} the keys it is needed under.</summary>
+        public static string Grammar_Needs { get { return Manager.GetString("Grammar_Needs", Culture); } }
+
+        /// <summary>The report's Grammar dictionary row where the project's file was made by edits on the page rather than imported.</summary>
+        public static string Report_GrammarEdited { get { return Manager.GetString("Report_GrammarEdited", Culture); } }
+
+        /// <summary>Header of a collapsible help panel under the languages table. Phrased as the question a puzzled user would ask.</summary>
+        public static string Grammar_LanguagesHelpHeader { get { return Manager.GetString("Grammar_LanguagesHelpHeader", Culture); } }
+
+        /// <summary>Help paragraph. "other" is the ICU keyword and must not be translated; Default and Project are the Source column's values (Grammar_SourceDefault, Grammar_SourceProject). CLDR is the Unicode Common Locale Data Repository.</summary>
+        public static string Grammar_LanguagesHelp1 { get { return Manager.GetString("Grammar_LanguagesHelp1", Culture); } }
+
+        /// <summary>Help paragraph. "cs" and "pt-BR" are language tags and must not be translated; Add a language and Reset are controls on the page (Grammar_AddLanguageLabel, Grammar_ResetRow).</summary>
+        public static string Grammar_LanguagesHelp2 { get { return Manager.GetString("Grammar_LanguagesHelp2", Culture); } }
+
+        /// <summary>Header of a collapsible help panel under the arguments table. Phrased as the question a puzzled user would ask.</summary>
+        public static string Grammar_ArgumentsHelpHeader { get { return Manager.GetString("Grammar_ArgumentsHelpHeader", Culture); } }
+
+        /// <summary>Help paragraph. "vehicle" is an example argument name; "select" is the ICU keyword; "Gender" and "Article" are argument name suffixes. None of these is translated.</summary>
+        public static string Grammar_ArgumentsHelp1 { get { return Manager.GetString("Grammar_ArgumentsHelp1", Culture); } }
+
+        /// <summary>Help paragraph. "fr: article; it: article" is the entry format and must not be translated; Supplies is the column (Grammar_ColumnSupplies).</summary>
+        public static string Grammar_ArgumentsHelp2 { get { return Manager.GetString("Grammar_ArgumentsHelp2", Culture); } }
+
+        /// <summary>Header of a collapsible help panel under the other box. "other" is the ICU keyword and must not be translated.</summary>
+        public static string Grammar_OtherHelpHeader { get { return Manager.GetString("Grammar_OtherHelpHeader", Culture); } }
+
+        /// <summary>Help paragraph. "select" and "other" are ICU keywords and must not be translated; ICU Forms is the window's name.</summary>
+        public static string Grammar_OtherHelp1 { get { return Manager.GetString("Grammar_OtherHelp1", Culture); } }
     }
 }

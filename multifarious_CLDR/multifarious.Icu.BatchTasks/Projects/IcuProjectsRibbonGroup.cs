@@ -31,7 +31,7 @@ namespace multifarious.Icu.BatchTasks.Projects
         Constants.ShowSettingsActionId,
         Name = "Action_ShowSettings_Name",
         Description = "Action_ShowSettings_Description",
-        Icon = "IcuForms_Icon")]
+        Icon = "IcuSettings_Icon")]
     [ActionLayout(typeof(IcuProjectsRibbonGroup), 10, DisplayType.Large)]
     public class ShowIcuSettingsAction : AbstractAction
     {

@@ -440,7 +440,7 @@
     <value>Vorlage speichern…</value>
   </data>
   <data name="Expand_GrammarRemove" xml:space="preserve">
-    <value>Entfernen</value>
+    <value>Datei entfernen</value>
   </data>
   <data name="Expand_GrammarHint" xml:space="preserve">
     <value>Eine select-Nachricht, deren Argumentname auf Gender oder Article endet, wird mit den Formen ausgelegt, die die Zielsprache braucht. Eine Entwicklerdatei benennt die Argumente der Anwendung, legt die Schreibweise der Schlüssel fest und erklärt, welche abhängigen Argumente die Anwendung liefert.</value>
@@ -452,7 +452,7 @@
     <value>Eine ICU-select-Nachricht wählt einen Zweig nach einem Wert, den die Anwendung übergibt. Ist dieser Wert grammatisch, etwa das Genus einer im Satz genannten Sache, brauchen die Sprachen verschiedene Zweige: Deutsch braucht Maskulinum, Femininum und Neutrum, Französisch zusätzlich eine Artikelform, Japanisch eine einzige Form. Das Wörterbuch führt auf, was jede Sprache braucht, und die Aufgabe legt je Schlüssel eine Form aus, wie bei Pluralen.</value>
   </data>
   <data name="Expand_GrammarHelp2" xml:space="preserve">
-    <value>Der mitgelieferte Standard deckt die Sprachen ab, für die CLDR ein grammatisches Genus veröffentlicht. Eine nach der Vorlage geschriebene Entwicklerdatei ergänzt die Argumentnamen und die Schlüsselschreibweise des Projekts und sagt, für welche Sprachen die Anwendung ein abhängiges Argument wie eine Artikelform liefert; nur dann wird ein Selektor eingefügt, den die Quelle nicht hat. Der Export schreibt die importierte Datei unverändert zurück.</value>
+    <value>Der mitgelieferte Standard deckt die Sprachen ab, für die CLDR ein grammatisches Genus veröffentlicht. Eine nach der Vorlage geschriebene Entwicklerdatei ergänzt die Argumentnamen und die Schlüsselschreibweise des Projekts und sagt, für welche Sprachen die Anwendung ein abhängiges Argument wie eine Artikelform liefert; nur dann wird ein Selektor eingefügt, den die Quelle nicht hat. Der Export schreibt die Datei des Projekts im aktuellen Stand, einschließlich der auf dieser Seite vorgenommenen Änderungen.</value>
   </data>
   <data name="Expand_GrammarFileFilter" xml:space="preserve">
     <value>JSON-Dateien (*.json)|*.json|Alle Dateien (*.*)|*.*</value>
@@ -492,5 +492,137 @@
   </data>
   <data name="Settings_SaveFailed" xml:space="preserve">
     <value>Die Einstellungen wurden nicht gespeichert. {0}</value>
+  </data>
+  <data name="Settings_OptionsTab" xml:space="preserve">
+    <value>Optionen</value>
+  </data>
+  <data name="Settings_GrammarTab" xml:space="preserve">
+    <value>Grammatikwörterbuch</value>
+  </data>
+  <data name="Expand_SegmentsHeader" xml:space="preserve">
+    <value>Segmenttext und Platzhalter</value>
+  </data>
+  <data name="Grammar_LanguagesHeader" xml:space="preserve">
+    <value>Sprachen und ihre Schlüssel</value>
+  </data>
+  <data name="Grammar_KeysHint" xml:space="preserve">
+    <value>Die Schlüssel sind die Zweige, für die eine Form angelegt wird, in dieser Reihenfolge, durch Kommas getrennt und mit other am Ende. Ein Schlüsselsatz, der vom mitgelieferten Standard abweicht, wird in die Entwicklerdatei des Projekts geschrieben; Zurücksetzen stellt den Standard wieder her.</value>
+  </data>
+  <data name="Grammar_ColumnKind" xml:space="preserve">
+    <value>Art</value>
+  </data>
+  <data name="Grammar_ColumnLanguage" xml:space="preserve">
+    <value>Sprache</value>
+  </data>
+  <data name="Grammar_ColumnKeys" xml:space="preserve">
+    <value>Schlüssel</value>
+  </data>
+  <data name="Grammar_ColumnSource" xml:space="preserve">
+    <value>Quelle</value>
+  </data>
+  <data name="Grammar_SourceDefault" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="Grammar_SourceProject" xml:space="preserve">
+    <value>Projekt</value>
+  </data>
+  <data name="Grammar_ResetRow" xml:space="preserve">
+    <value>Zurücksetzen</value>
+  </data>
+  <data name="Grammar_RenamesLine" xml:space="preserve">
+    <value>Umbenannte Schlüssel in der Datei: {0}</value>
+  </data>
+  <data name="Grammar_RenameAs" xml:space="preserve">
+    <value>{0} als {1}</value>
+  </data>
+  <data name="Grammar_AddLanguageLabel" xml:space="preserve">
+    <value>Sprache hinzufügen:</value>
+  </data>
+  <data name="Grammar_AddLanguageTag" xml:space="preserve">
+    <value>Das hinzuzufügende Sprachkürzel, etwa cs oder pt-BR.</value>
+  </data>
+  <data name="Grammar_Add" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="Grammar_ArgumentsHeader" xml:space="preserve">
+    <value>Argumente, die die Anwendung übergibt</value>
+  </data>
+  <data name="Grammar_ArgumentsHint" xml:space="preserve">
+    <value>Eine Zeile je Basisargument. Jede Rollenspalte nennt das Argument, das die Anwendung dafür übergibt; Liefert nennt je Sprache die abhängigen Arten, die die Anwendung ebenfalls übergibt, geschrieben als fr: article; it: article. Nur eine gelieferte Art wird in eine Nachricht eingefügt, die sie nicht hat.</value>
+  </data>
+  <data name="Grammar_ColumnArgument" xml:space="preserve">
+    <value>Basisargument</value>
+  </data>
+  <data name="Grammar_RoleColumn" xml:space="preserve">
+    <value>Argument {0}</value>
+  </data>
+  <data name="Grammar_ColumnSupplies" xml:space="preserve">
+    <value>Liefert</value>
+  </data>
+  <data name="Grammar_ColumnRespelling" xml:space="preserve">
+    <value>Schlüsselschreibung</value>
+  </data>
+  <data name="Grammar_AddArgument" xml:space="preserve">
+    <value>Argument hinzufügen</value>
+  </data>
+  <data name="Grammar_RemoveArgument" xml:space="preserve">
+    <value>Entfernen</value>
+  </data>
+  <data name="Grammar_NewArgumentName" xml:space="preserve">
+    <value>argument</value>
+  </data>
+  <data name="Grammar_EmptyArgument" xml:space="preserve">
+    <value>Ein Argument braucht einen Basisnamen.</value>
+  </data>
+  <data name="Grammar_DuplicateArgument" xml:space="preserve">
+    <value>Das Argument '{0}' ist bereits deklariert.</value>
+  </data>
+  <data name="Grammar_OtherLabel" xml:space="preserve">
+    <value>Ihre Bezeichnung für den Schlüssel other:</value>
+  </data>
+  <data name="Grammar_Edited" xml:space="preserve">
+    <value>Entwicklerdatei auf dieser Seite erstellt; exportieren Sie sie, um eine Kopie zu behalten.</value>
+  </data>
+  <data name="Grammar_ImportedEdited" xml:space="preserve">
+    <value>Entwicklerdatei {0}, importiert am {1}, seitdem auf dieser Seite bearbeitet.</value>
+  </data>
+  <data name="Grammar_Invalid" xml:space="preserve">
+    <value>Das Wörterbuch kann so nicht gespeichert werden. {0}</value>
+  </data>
+  <data name="Grammar_KeyHint" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Grammar_KeyWithSample" xml:space="preserve">
+    <value>{0}: {1}, z. B. {2}</value>
+  </data>
+  <data name="Grammar_Needs" xml:space="preserve">
+    <value>Benötigt {0} unter {1}</value>
+  </data>
+  <data name="Report_GrammarEdited" xml:space="preserve">
+    <value>auf der Einstellungsseite erstellt</value>
+  </data>
+  <data name="Grammar_LanguagesHelpHeader" xml:space="preserve">
+    <value>Welche Sprachen und Schlüssel kann ich ändern?</value>
+  </data>
+  <data name="Grammar_LanguagesHelp1" xml:space="preserve">
+    <value>Jede Zeile ist eine Art für eine Sprache: Die Schlüssel sind die Zweige, für die die Aufgabe je eine Form anlegt, in dieser Reihenfolge, other zuletzt. Standard bedeutet, die Schlüssel sind der mitgelieferte Satz aus CLDR; Projekt bedeutet, die Entwicklerdatei des Projekts legt sie fest.</value>
+  </data>
+  <data name="Grammar_LanguagesHelp2" xml:space="preserve">
+    <value>Bearbeiten Sie einen Schlüsselsatz, wenn die Anwendung einen Schlüssel übergibt, den der Standard nicht hat, oder fügen Sie mit Sprache hinzufügen und dem Sprachkürzel, etwa cs oder pt-BR, eine Sprache hinzu, die der Standard nicht führt. Zurücksetzen stellt den Standard wieder her oder entfernt eine von Ihnen hinzugefügte Sprache. Die Hinweise und Beispielwörter im Tooltip stammen aus dem mitgelieferten Standard und lassen sich hier nicht bearbeiten.</value>
+  </data>
+  <data name="Grammar_ArgumentsHelpHeader" xml:space="preserve">
+    <value>Wozu dienen die Argumente?</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp1" xml:space="preserve">
+    <value>Ein Argument ist ein Wert, den die Anwendung in eine Nachricht übergibt. Das Basisargument ist die Sache selbst, vehicle; jede Rollenspalte nennt das Argument, das ihr Genus, ihren Artikel oder ihre Anzahl trägt. Durch die Angabe hier wird ein select als Grammatik erkannt, auch wenn sein Argumentname nicht auf Gender oder Article endet.</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp2" xml:space="preserve">
+    <value>Liefert gibt je Sprache die abhängigen Argumente an, die die Anwendung ebenfalls übergibt, geschrieben als fr: article; it: article. Nur eine gelieferte Art wird in eine Nachricht eingefügt, der sie fehlt, denn ein eingefügter Selektor ändert, was die Anwendung zur Laufzeit übergeben muss; eine Sprache mit einem Bedarf, den die Anwendung nicht liefert, wird ohne ihn angelegt und in den Aufgabenergebnissen vermerkt.</value>
+  </data>
+  <data name="Grammar_OtherHelpHeader" xml:space="preserve">
+    <value>Was ist der Schlüssel other?</value>
+  </data>
+  <data name="Grammar_OtherHelp1" xml:space="preserve">
+    <value>ICU verlangt, dass jedes select mit einem Zweig other endet, der gilt, wenn kein anderer Schlüssel passt. Was er enthält, ist Konvention des Projekts: die Pluralform, der unbekannte Fall, jeder andere Wert. Die hier eingegebenen Wörter erscheinen im Fenster ICU Forms als Hinweis zu jeder other-Form, damit die Übersetzerin oder der Übersetzer weiß, wofür die Form da ist.</value>
   </data>
 </root>

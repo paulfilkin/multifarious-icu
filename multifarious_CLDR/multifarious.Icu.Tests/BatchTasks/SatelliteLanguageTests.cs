@@ -124,6 +124,14 @@ public class SatelliteLanguageTests
             ["Restore_MismatchHelp1"] = ["{name}", "#"],
             ["Expand_KeepHelp1"] = ["Restore ICU"],
             ["Expand_KeepHelp2"] = ["Restore ICU"],
+            ["Grammar_KeysHint"] = ["other"],
+            ["Grammar_AddLanguageTag"] = ["cs", "pt-BR"],
+            ["Grammar_ArgumentsHint"] = ["fr: article; it: article"],
+            ["Grammar_LanguagesHelp1"] = ["other", "CLDR"],
+            ["Grammar_LanguagesHelp2"] = ["cs", "pt-BR"],
+            ["Grammar_ArgumentsHelp1"] = ["vehicle", "select", "Gender", "Article"],
+            ["Grammar_ArgumentsHelp2"] = ["fr: article; it: article"],
+            ["Grammar_OtherHelp1"] = ["select", "other", "ICU Forms"],
         };
 
         foreach (var culture in TranslatedCultures())

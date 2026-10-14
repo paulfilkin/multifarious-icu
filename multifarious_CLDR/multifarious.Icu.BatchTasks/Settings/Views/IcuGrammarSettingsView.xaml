@@ -1,0 +1,283 @@
+<UserControl x:Class="multifarious.Icu.BatchTasks.Settings.Views.IcuGrammarSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:multifarious.Icu.BatchTasks.Resources"
+             KeyboardNavigation.TabNavigation="Continue">
+  <!-- The Grammar dictionary tab, bound to GrammarDictionaryViewModel: the file's status and its
+       buttons, then the effective dictionary as two editable tables. ItemsControl with a header
+       row and shared column sizes rather than DataGrid, which the sibling plugins found a trap in
+       Studio's hosting. Every cell writes into the developer's file through the view model; the
+       page refuses to save while the file does not validate. -->
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/buttonresources.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/groupboxresources.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Sdl.Desktop.Platform.Styles;component/textblockresources.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+
+      <Style TargetType="GroupBox" BasedOn="{StaticResource Sdl.GroupBox.SingleLineStyle}">
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Padding" Value="8" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="Hint">
+        <Setter Property="Foreground" Value="#666666" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,2,0,8" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="Invalid">
+        <Setter Property="Foreground" Value="#B00020" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,4,0,0" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="ColumnHeader">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,0,8,4" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="Cell">
+        <Setter Property="Margin" Value="0,0,8,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+      </Style>
+      <Style TargetType="TextBox" x:Key="CellBox">
+        <Setter Property="Margin" Value="0,0,8,0" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+      </Style>
+      <Style TargetType="Button" x:Key="RowButton" BasedOn="{StaticResource Sdl.Button.SecondaryStyle}">
+        <Setter Property="MinWidth" Value="64" />
+        <Setter Property="Padding" Value="6,1" />
+      </Style>
+      <Style TargetType="Border" x:Key="Row">
+        <Setter Property="Padding" Value="0,2" />
+        <Setter Property="BorderBrush" Value="#E6E6E6" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+      </Style>
+      <Style TargetType="Expander" x:Key="Help">
+        <Setter Property="Margin" Value="0,6,0,4" />
+        <Setter Property="Foreground" Value="#1A5FB4" />
+      </Style>
+      <Style TargetType="Border" x:Key="HelpBody">
+        <Setter Property="Background" Value="#F7F9FC" />
+        <Setter Property="BorderBrush" Value="#D6E0EC" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="Margin" Value="0,4,0,0" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="HelpText">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,0,0,6" />
+      </Style>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+    <StackPanel>
+
+      <!-- The file: what the default covers, what the project has, and the buttons. -->
+      <TextBlock TextWrapping="Wrap" Margin="0,0,0,4" Text="{Binding DictionaryDefault, Mode=OneWay}" />
+      <TextBlock TextWrapping="Wrap" Margin="0,0,0,8" Text="{Binding DictionaryStatus, Mode=OneWay}" />
+      <WrapPanel>
+        <Button TabIndex="10" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="110" Margin="0,0,8,4"
+                Content="{x:Static res:UIStrings.Expand_GrammarImport}" Click="OnImportDictionary" />
+        <Button TabIndex="11" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="110" Margin="0,0,8,4"
+                Content="{x:Static res:UIStrings.Expand_GrammarExport}" Click="OnExportDictionary" IsEnabled="{Binding HasDictionary}" />
+        <Button TabIndex="12" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="110" Margin="0,0,8,4"
+                Content="{x:Static res:UIStrings.Expand_GrammarRemove}" Click="OnRemoveDictionary" IsEnabled="{Binding HasDictionary}" />
+        <Button TabIndex="13" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="110" Margin="0,0,0,4"
+                Content="{x:Static res:UIStrings.Expand_GrammarTemplate}" Click="OnSaveTemplate" />
+      </WrapPanel>
+      <TextBlock Style="{StaticResource Invalid}" Text="{Binding ImportError, Mode=OneWay}"
+                 Visibility="{Binding HasImportError, Converter={StaticResource VisibleWhenTrue}}" />
+      <TextBlock Style="{StaticResource Invalid}" Text="{Binding Error, Mode=OneWay}"
+                 Visibility="{Binding HasError, Converter={StaticResource VisibleWhenTrue}}" />
+      <TextBlock Style="{StaticResource Hint}" Margin="0,6,0,4" Text="{x:Static res:UIStrings.Expand_GrammarHint}" />
+      <Expander Style="{StaticResource Help}" TabIndex="14" Margin="0,0,0,12" Header="{x:Static res:UIStrings.Expand_GrammarHelpHeader}">
+        <Border Style="{StaticResource HelpBody}">
+          <StackPanel>
+            <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_GrammarHelp1}" />
+            <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Expand_GrammarHelp2}" Margin="0" />
+          </StackPanel>
+        </Border>
+      </Expander>
+
+      <!-- The languages and their keys, one row per kind and language. -->
+      <GroupBox Header="{x:Static res:UIStrings.Grammar_LanguagesHeader}">
+        <StackPanel Grid.IsSharedSizeScope="True">
+          <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Grammar_KeysHint}" />
+
+          <Grid Margin="0,0,0,2">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" SharedSizeGroup="Kind" />
+              <ColumnDefinition Width="Auto" SharedSizeGroup="Language" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" SharedSizeGroup="Source" />
+              <ColumnDefinition Width="Auto" SharedSizeGroup="RowButton" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Style="{StaticResource ColumnHeader}" Text="{x:Static res:UIStrings.Grammar_ColumnKind}" />
+            <TextBlock Grid.Column="1" Style="{StaticResource ColumnHeader}" Text="{x:Static res:UIStrings.Grammar_ColumnLanguage}" />
+            <TextBlock Grid.Column="2" Style="{StaticResource ColumnHeader}" Text="{x:Static res:UIStrings.Grammar_ColumnKeys}" />
+            <TextBlock Grid.Column="3" Style="{StaticResource ColumnHeader}" Text="{x:Static res:UIStrings.Grammar_ColumnSource}" />
+          </Grid>
+
+          <ItemsControl ItemsSource="{Binding Languages}" Focusable="False">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Style="{StaticResource Row}" ToolTip="{Binding Detail}" ToolTipService.ShowDuration="30000">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Kind" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Language" />
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Source" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="RowButton" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Style="{StaticResource Cell}" Text="{Binding Kind, Mode=OneWay}" />
+                    <TextBlock Grid.Column="1" Style="{StaticResource Cell}" Text="{Binding Language, Mode=OneWay}" />
+                    <TextBox Grid.Column="2" Style="{StaticResource CellBox}" MinWidth="160"
+                             AutomationProperties.Name="{x:Static res:UIStrings.Grammar_ColumnKeys}"
+                             Text="{Binding KeysText, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Column="3" Style="{StaticResource Cell}" Text="{Binding Source, Mode=OneWay}" />
+                    <Button Grid.Column="4" Style="{StaticResource RowButton}" Content="{x:Static res:UIStrings.Grammar_ResetRow}"
+                            IsEnabled="{Binding IsProject}" Click="OnResetLanguage" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <TextBlock Style="{StaticResource Hint}" Margin="0,8,0,0" Text="{Binding RenamesLine, Mode=OneWay}"
+                     Visibility="{Binding HasRenames, Converter={StaticResource VisibleWhenTrue}}" />
+
+          <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" Text="{x:Static res:UIStrings.Grammar_AddLanguageLabel}" />
+            <ComboBox TabIndex="20" MinWidth="90" Margin="0,0,8,0" VerticalContentAlignment="Center"
+                      AutomationProperties.Name="{x:Static res:UIStrings.Grammar_ColumnKind}"
+                      ItemsSource="{Binding KindNames}" SelectedItem="{Binding AddLanguageKind}" />
+            <TextBox TabIndex="21" Width="90" Padding="2" Margin="0,0,8,0" VerticalContentAlignment="Center"
+                     AutomationProperties.Name="{x:Static res:UIStrings.Grammar_AddLanguageTag}"
+                     ToolTip="{x:Static res:UIStrings.Grammar_AddLanguageTag}"
+                     Text="{Binding AddLanguageLocale, UpdateSourceTrigger=PropertyChanged}" />
+            <Button TabIndex="22" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="80"
+                    Content="{x:Static res:UIStrings.Grammar_Add}" IsEnabled="{Binding CanAddLanguage}" Click="OnAddLanguage" />
+          </StackPanel>
+          <Expander Style="{StaticResource Help}" TabIndex="23" Header="{x:Static res:UIStrings.Grammar_LanguagesHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Grammar_LanguagesHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Grammar_LanguagesHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
+        </StackPanel>
+      </GroupBox>
+
+      <!-- The arguments the application passes, one row per base argument. -->
+      <GroupBox Header="{x:Static res:UIStrings.Grammar_ArgumentsHeader}">
+        <StackPanel Grid.IsSharedSizeScope="True">
+          <TextBlock Style="{StaticResource Hint}" Text="{x:Static res:UIStrings.Grammar_ArgumentsHint}" />
+
+          <Grid Margin="0,0,0,2">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" SharedSizeGroup="Base" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" SharedSizeGroup="RowButton" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Style="{StaticResource ColumnHeader}" Text="{x:Static res:UIStrings.Grammar_ColumnArgument}" />
+            <ItemsControl Grid.Column="1" ItemsSource="{Binding RoleHeaders}" Focusable="False">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Style="{StaticResource ColumnHeader}" Width="104" TextTrimming="CharacterEllipsis" Text="{Binding}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Grid.Column="2" Style="{StaticResource ColumnHeader}" Text="{x:Static res:UIStrings.Grammar_ColumnSupplies}" />
+          </Grid>
+
+          <ItemsControl ItemsSource="{Binding Arguments}" Focusable="False">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Style="{StaticResource Row}">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Base" />
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="RowButton" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBox Grid.Column="0" Style="{StaticResource CellBox}" MinWidth="90"
+                             AutomationProperties.Name="{x:Static res:UIStrings.Grammar_ColumnArgument}"
+                             Text="{Binding BaseName, UpdateSourceTrigger=PropertyChanged}" />
+                    <ItemsControl Grid.Column="1" ItemsSource="{Binding Roles}" Focusable="False">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <TextBox Style="{StaticResource CellBox}" Width="96"
+                                   AutomationProperties.Name="{Binding Role, Mode=OneWay}"
+                                   Text="{Binding ArgumentName, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox Grid.Column="2" Style="{StaticResource CellBox}" MinWidth="120"
+                             AutomationProperties.Name="{x:Static res:UIStrings.Grammar_ColumnSupplies}"
+                             Text="{Binding SuppliesText, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Grid.Column="3" Style="{StaticResource RowButton}" Content="{x:Static res:UIStrings.Grammar_RemoveArgument}"
+                            Click="OnRemoveArgument" />
+                    <!-- The argument's own key spelling, from the file, read-only: a line under the row where it has one. -->
+                    <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Style="{StaticResource Hint}" Margin="0,2,0,2"
+                               Visibility="{Binding HasRespelling, Converter={StaticResource VisibleWhenTrue}}">
+                      <Run Text="{x:Static res:UIStrings.Grammar_ColumnRespelling}" /><Run Text=": " /><Run Text="{Binding Respelling, Mode=OneWay}" />
+                    </TextBlock>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Button TabIndex="30" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="110" Margin="0,10,0,0" HorizontalAlignment="Left"
+                  Content="{x:Static res:UIStrings.Grammar_AddArgument}" Click="OnAddArgument" />
+          <Expander Style="{StaticResource Help}" TabIndex="31" Header="{x:Static res:UIStrings.Grammar_ArgumentsHelpHeader}">
+            <Border Style="{StaticResource HelpBody}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Grammar_ArgumentsHelp1}" />
+                <TextBlock Style="{StaticResource HelpText}" Text="{x:Static res:UIStrings.Grammar_ArgumentsHelp2}" Margin="0" />
+              </StackPanel>
+            </Border>
+          </Expander>
+        </StackPanel>
+      </GroupBox>
+
+      <!-- The project's words for the other key. -->
+      <StackPanel Margin="0,0,0,12">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" Text="{x:Static res:UIStrings.Grammar_OtherLabel}" />
+          <TextBox TabIndex="40" MinWidth="200" Padding="2" VerticalContentAlignment="Center"
+                   AutomationProperties.Name="{x:Static res:UIStrings.Grammar_OtherLabel}"
+                   Text="{Binding OtherText, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <Expander Style="{StaticResource Help}" TabIndex="41" Header="{x:Static res:UIStrings.Grammar_OtherHelpHeader}">
+          <Border Style="{StaticResource HelpBody}">
+            <TextBlock Style="{StaticResource HelpText}" Margin="0" Text="{x:Static res:UIStrings.Grammar_OtherHelp1}" />
+          </Border>
+        </Expander>
+      </StackPanel>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

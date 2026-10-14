@@ -440,7 +440,7 @@
     <value>Salva modello…</value>
   </data>
   <data name="Expand_GrammarRemove" xml:space="preserve">
-    <value>Rimuovi</value>
+    <value>Rimuovi file</value>
   </data>
   <data name="Expand_GrammarHint" xml:space="preserve">
     <value>Un messaggio select il cui nome di argomento termina in Gender o Article viene presentato con le forme di cui la lingua di destinazione ha bisogno. Un file dello sviluppatore nomina gli argomenti dell'applicazione, definisce la grafia delle chiavi e dichiara quali argomenti dipendenti l'applicazione fornisce.</value>
@@ -452,7 +452,7 @@
     <value>Un messaggio select ICU sceglie un ramo in base a un valore passato dall'applicazione. Quando quel valore è grammaticale, per esempio il genere di una cosa nominata nella frase, i rami necessari cambiano da lingua a lingua: il tedesco ha bisogno di maschile, femminile e neutro, il francese anche di una forma di articolo, il giapponese di una sola forma. Il dizionario elenca ciò di cui ogni lingua ha bisogno e l'attività presenta una forma per chiave, come fa per i plurali.</value>
   </data>
   <data name="Expand_GrammarHelp2" xml:space="preserve">
-    <value>L'impostazione predefinita fornita copre le lingue per cui CLDR pubblica il genere grammaticale. Un file dello sviluppatore, scritto secondo il modello, aggiunge i nomi di argomento e la grafia delle chiavi del progetto e indica per quali lingue l'applicazione fornisce un argomento dipendente, come una forma di articolo; solo allora viene inserito un selettore che l'origine non ha. L'esportazione riscrive il file importato senza modifiche.</value>
+    <value>L'impostazione predefinita fornita copre le lingue per cui CLDR pubblica il genere grammaticale. Un file dello sviluppatore, scritto secondo il modello, aggiunge i nomi di argomento e la grafia delle chiavi del progetto e indica per quali lingue l'applicazione fornisce un argomento dipendente, come una forma di articolo; solo allora viene inserito un selettore che l'origine non ha. L'esportazione scrive il file del progetto così com'è, incluse le modifiche fatte in questa pagina.</value>
   </data>
   <data name="Expand_GrammarFileFilter" xml:space="preserve">
     <value>File JSON (*.json)|*.json|Tutti i file (*.*)|*.*</value>
@@ -492,5 +492,137 @@
   </data>
   <data name="Settings_SaveFailed" xml:space="preserve">
     <value>Le impostazioni non sono state salvate. {0}</value>
+  </data>
+  <data name="Settings_OptionsTab" xml:space="preserve">
+    <value>Opzioni</value>
+  </data>
+  <data name="Settings_GrammarTab" xml:space="preserve">
+    <value>Dizionario grammaticale</value>
+  </data>
+  <data name="Expand_SegmentsHeader" xml:space="preserve">
+    <value>Testo dei segmenti e segnaposto</value>
+  </data>
+  <data name="Grammar_LanguagesHeader" xml:space="preserve">
+    <value>Lingue e relative chiavi</value>
+  </data>
+  <data name="Grammar_KeysHint" xml:space="preserve">
+    <value>Le chiavi sono i rami per cui viene disposta una forma, in ordine, separate da virgole e con other alla fine. Un insieme di chiavi diverso dal predefinito fornito viene scritto nel file dello sviluppatore del progetto; Ripristina rimette il predefinito.</value>
+  </data>
+  <data name="Grammar_ColumnKind" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="Grammar_ColumnLanguage" xml:space="preserve">
+    <value>Lingua</value>
+  </data>
+  <data name="Grammar_ColumnKeys" xml:space="preserve">
+    <value>Chiavi</value>
+  </data>
+  <data name="Grammar_ColumnSource" xml:space="preserve">
+    <value>Origine</value>
+  </data>
+  <data name="Grammar_SourceDefault" xml:space="preserve">
+    <value>Predefinito</value>
+  </data>
+  <data name="Grammar_SourceProject" xml:space="preserve">
+    <value>Progetto</value>
+  </data>
+  <data name="Grammar_ResetRow" xml:space="preserve">
+    <value>Ripristina</value>
+  </data>
+  <data name="Grammar_RenamesLine" xml:space="preserve">
+    <value>Chiavi rinominate nel file: {0}</value>
+  </data>
+  <data name="Grammar_RenameAs" xml:space="preserve">
+    <value>{0} come {1}</value>
+  </data>
+  <data name="Grammar_AddLanguageLabel" xml:space="preserve">
+    <value>Aggiungi una lingua:</value>
+  </data>
+  <data name="Grammar_AddLanguageTag" xml:space="preserve">
+    <value>Il tag di lingua da aggiungere, ad esempio cs o pt-BR.</value>
+  </data>
+  <data name="Grammar_Add" xml:space="preserve">
+    <value>Aggiungi</value>
+  </data>
+  <data name="Grammar_ArgumentsHeader" xml:space="preserve">
+    <value>Argomenti passati dall'applicazione</value>
+  </data>
+  <data name="Grammar_ArgumentsHint" xml:space="preserve">
+    <value>Una riga per argomento di base. Ogni colonna di ruolo indica l'argomento che l'applicazione passa per esso; Fornisce elenca, per lingua, i tipi dipendenti che l'applicazione passa anch'essi, scritti come fr: article; it: article. Solo un tipo fornito viene inserito in un messaggio che non lo ha.</value>
+  </data>
+  <data name="Grammar_ColumnArgument" xml:space="preserve">
+    <value>Argomento di base</value>
+  </data>
+  <data name="Grammar_RoleColumn" xml:space="preserve">
+    <value>Argomento {0}</value>
+  </data>
+  <data name="Grammar_ColumnSupplies" xml:space="preserve">
+    <value>Fornisce</value>
+  </data>
+  <data name="Grammar_ColumnRespelling" xml:space="preserve">
+    <value>Grafia delle chiavi</value>
+  </data>
+  <data name="Grammar_AddArgument" xml:space="preserve">
+    <value>Aggiungi argomento</value>
+  </data>
+  <data name="Grammar_RemoveArgument" xml:space="preserve">
+    <value>Rimuovi</value>
+  </data>
+  <data name="Grammar_NewArgumentName" xml:space="preserve">
+    <value>argomento</value>
+  </data>
+  <data name="Grammar_EmptyArgument" xml:space="preserve">
+    <value>Un argomento richiede un nome di base.</value>
+  </data>
+  <data name="Grammar_DuplicateArgument" xml:space="preserve">
+    <value>L'argomento '{0}' è già dichiarato.</value>
+  </data>
+  <data name="Grammar_OtherLabel" xml:space="preserve">
+    <value>Le vostre parole per la chiave other:</value>
+  </data>
+  <data name="Grammar_Edited" xml:space="preserve">
+    <value>File dello sviluppatore creato in questa pagina; esportarlo per conservarne una copia.</value>
+  </data>
+  <data name="Grammar_ImportedEdited" xml:space="preserve">
+    <value>File dello sviluppatore {0}, importato il {1}, modificato in questa pagina da allora.</value>
+  </data>
+  <data name="Grammar_Invalid" xml:space="preserve">
+    <value>Il dizionario non può essere salvato così com'è. {0}</value>
+  </data>
+  <data name="Grammar_KeyHint" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Grammar_KeyWithSample" xml:space="preserve">
+    <value>{0}: {1}, ad es. {2}</value>
+  </data>
+  <data name="Grammar_Needs" xml:space="preserve">
+    <value>Richiede {0} sotto {1}</value>
+  </data>
+  <data name="Report_GrammarEdited" xml:space="preserve">
+    <value>creato nella pagina delle impostazioni</value>
+  </data>
+  <data name="Grammar_LanguagesHelpHeader" xml:space="preserve">
+    <value>Quali lingue e chiavi posso modificare?</value>
+  </data>
+  <data name="Grammar_LanguagesHelp1" xml:space="preserve">
+    <value>Ogni riga è un tipo per una lingua: le chiavi sono i rami per cui l'attività dispone una forma, in quell'ordine, con other per ultimo. Predefinito significa che le chiavi sono l'insieme fornito, preso da CLDR; Progetto significa che le imposta il file dello sviluppatore del progetto.</value>
+  </data>
+  <data name="Grammar_LanguagesHelp2" xml:space="preserve">
+    <value>Modificare un insieme di chiavi quando l'applicazione passa una chiave che il predefinito non ha, oppure aggiungere una lingua che il predefinito non elenca con Aggiungi una lingua e il suo tag, ad esempio cs o pt-BR. Ripristina rimette il predefinito o rimuove una lingua aggiunta. I suggerimenti e i sostantivi di esempio nella descrizione comandi vengono dal predefinito fornito e non si possono modificare qui.</value>
+  </data>
+  <data name="Grammar_ArgumentsHelpHeader" xml:space="preserve">
+    <value>A cosa servono gli argomenti?</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp1" xml:space="preserve">
+    <value>Un argomento è un valore che l'applicazione passa in un messaggio. L'argomento di base è la cosa stessa, vehicle; ogni colonna di ruolo indica l'argomento che ne porta il genere, l'articolo o il conteggio. Indicarli qui è ciò che fa riconoscere un select come grammaticale quando il nome del suo argomento non termina in Gender o Article.</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp2" xml:space="preserve">
+    <value>Fornisce dichiara, per lingua, gli argomenti dipendenti che l'applicazione passa anch'essi, scritti come fr: article; it: article. Solo un tipo fornito viene inserito in un messaggio che non lo ha, perché un selettore inserito cambia ciò che l'applicazione deve passare in esecuzione; una lingua con un bisogno che l'applicazione non fornisce viene disposta senza di esso e segnalata nei risultati dell'attività.</value>
+  </data>
+  <data name="Grammar_OtherHelpHeader" xml:space="preserve">
+    <value>Che cos'è la chiave other?</value>
+  </data>
+  <data name="Grammar_OtherHelp1" xml:space="preserve">
+    <value>ICU richiede che ogni select termini con un ramo other, usato quando nessun'altra chiave corrisponde. Cosa contenga è una convenzione del progetto: la forma plurale, il caso sconosciuto, qualsiasi altro valore. Le parole inserite qui vengono mostrate come suggerimento su ogni forma other nella finestra ICU Forms, così il traduttore sa a cosa serve la forma.</value>
   </data>
 </root>

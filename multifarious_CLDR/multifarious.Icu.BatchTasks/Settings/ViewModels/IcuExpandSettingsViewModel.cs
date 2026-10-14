@@ -1,7 +1,4 @@
-using System;
 using System.Globalization;
-using System.IO;
-using multifarious.Icu.BatchTasks.Resources;
 using multifarious.Icu.Expansion;
 
 namespace multifarious.Icu.BatchTasks.Settings.ViewModels
@@ -9,7 +6,9 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
     /// <summary>
     /// The expand page. Enumerations are exposed as one bool per option so radio buttons bind
     /// without a converter; the budget is edited as text and validated here, so the page can
-    /// refuse to save rather than the binding silently keeping the old number.
+    /// refuse to save rather than the binding silently keeping the old number. The grammar
+    /// dictionary, its own tab, is <see cref="Grammar"/>; its text, name and date are part of
+    /// the same settings group and are applied with the rest.
     /// </summary>
     public sealed class IcuExpandSettingsViewModel : ObservableObject
     {
@@ -24,16 +23,20 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         private bool _keepTranslated;
         private string _keepMinimumText = string.Empty;
         private bool _lockKept;
-        private string _dictionaryText = string.Empty;
-        private string _dictionaryName = string.Empty;
-        private string _dictionaryImportedAt = string.Empty;
-        private string _importError;
 
         public IcuExpandSettingsViewModel(IcuExpandSettings settings)
         {
             _settings = settings ?? new IcuExpandSettings();
+            Grammar = new GrammarDictionaryViewModel();
+            Grammar.PropertyChanged += (sender, e) =>
+            {
+                if (e.PropertyName == nameof(GrammarDictionaryViewModel.IsValid)) Raise(nameof(IsValid));
+            };
             LoadFrom(_settings);
         }
+
+        /// <summary>The Grammar dictionary tab.</summary>
+        public GrammarDictionaryViewModel Grammar { get; }
 
         public bool ExpandCardinal
         {
@@ -87,10 +90,10 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             }
         }
 
-        /// <summary>Whether the page may be saved. Only the two number boxes can be wrong, and the match box only while it is in use.</summary>
+        /// <summary>Whether the page may be saved: the two number boxes, the match box only while it is in use, and the grammar dictionary as edited.</summary>
         public bool IsValid
         {
-            get { return IsBudgetValid && (!_keepTranslated || IsKeepMinimumValid); }
+            get { return IsBudgetValid && (!_keepTranslated || IsKeepMinimumValid) && Grammar.IsValid; }
         }
 
         public bool KeepTranslated
@@ -134,121 +137,6 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             set { Set(ref _lockKept, value); }
         }
 
-        // ---- the grammar dictionary ----------------------------------------------------------
-
-        /// <summary>What the shipped default covers, for the line above the imported file's.</summary>
-        public string DictionaryDefault
-        {
-            get
-            {
-                var dictionary = GrammarDictionary.Default;
-                GrammarKind gender;
-                var languages = dictionary.Kinds.TryGetValue("gender", out gender) ? gender.Languages.Count : 0;
-                return string.Format(CultureInfo.CurrentCulture, UIStrings.Expand_GrammarDefault, dictionary.CldrVersion, languages);
-            }
-        }
-
-        public bool HasDictionary
-        {
-            get { return _dictionaryText.Trim().Length > 0; }
-        }
-
-        /// <summary>The imported file's name and date, or that there is none.</summary>
-        public string DictionaryStatus
-        {
-            get
-            {
-                if (!HasDictionary) return UIStrings.Expand_GrammarNone;
-
-                DateTime imported;
-                var when = DateTime.TryParse(_dictionaryImportedAt, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out imported)
-                    ? imported.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)
-                    : _dictionaryImportedAt;
-                return string.Format(CultureInfo.CurrentCulture, UIStrings.Expand_GrammarImported, _dictionaryName, when);
-            }
-        }
-
-        /// <summary>Why the last import was refused, shown under the buttons; null once an import succeeds or the file is removed.</summary>
-        public string ImportError
-        {
-            get { return _importError; }
-            private set
-            {
-                if (Set(ref _importError, value)) Raise(nameof(HasImportError));
-            }
-        }
-
-        public bool HasImportError
-        {
-            get { return _importError != null; }
-        }
-
-        /// <summary>The imported text, for export; empty where there is none.</summary>
-        public string DictionaryText
-        {
-            get { return _dictionaryText; }
-        }
-
-        public string DictionaryName
-        {
-            get { return _dictionaryName; }
-        }
-
-        /// <summary>
-        /// Takes a developer's file: parsed and merged over the shipped default here, so a
-        /// file that does not validate is refused with its reason and the page keeps what it
-        /// had. The text is stored as given; export writes it back unchanged.
-        /// </summary>
-        public bool TryImport(string fileName, string text)
-        {
-            try
-            {
-                GrammarDictionary.Default.WithDeveloperFile(DeveloperFile.Parse(text ?? string.Empty));
-            }
-            catch (GrammarDictionaryException exception)
-            {
-                ImportError = string.Format(CultureInfo.CurrentCulture, UIStrings.Expand_GrammarInvalid, exception.Message);
-                return false;
-            }
-
-            _dictionaryText = text;
-            _dictionaryName = fileName ?? string.Empty;
-            _dictionaryImportedAt = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            ImportError = null;
-            RaiseDictionary();
-            return true;
-        }
-
-        public void RemoveDictionary()
-        {
-            _dictionaryText = string.Empty;
-            _dictionaryName = string.Empty;
-            _dictionaryImportedAt = string.Empty;
-            ImportError = null;
-            RaiseDictionary();
-        }
-
-        /// <summary>The developer's file template, embedded in the plugin.</summary>
-        public static string TemplateText()
-        {
-            using (var stream = typeof(IcuExpandSettingsViewModel).Assembly.GetManifestResourceStream(Constants.GrammarTemplateResource))
-            {
-                if (stream == null) throw new InvalidOperationException("The grammar dictionary template is missing from the plugin.");
-                using (var reader = new StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
-                }
-            }
-        }
-
-        private void RaiseDictionary()
-        {
-            Raise(nameof(HasDictionary));
-            Raise(nameof(DictionaryStatus));
-            Raise(nameof(DictionaryText));
-            Raise(nameof(DictionaryName));
-        }
-
         public bool ParseErrorPassesThrough
         {
             get { return _onParseError == ParseErrorBehaviour.PassThrough; }
@@ -288,9 +176,9 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             _settings.KeepTranslated = _keepTranslated;
             _settings.KeepMinimumMatch = minimum;
             _settings.LockKept = _lockKept;
-            _settings.GrammarDictionaryText = _dictionaryText;
-            _settings.GrammarDictionaryName = _dictionaryName;
-            _settings.GrammarDictionaryImportedAt = _dictionaryImportedAt;
+            _settings.GrammarDictionaryText = Grammar.DictionaryText;
+            _settings.GrammarDictionaryName = Grammar.DictionaryName;
+            _settings.GrammarDictionaryImportedAt = Grammar.DictionaryImportedAt;
             return _settings;
         }
 
@@ -343,10 +231,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             _keepTranslated = settings.KeepTranslated;
             _keepMinimumText = settings.KeepMinimumMatch.ToString(CultureInfo.CurrentCulture);
             _lockKept = settings.LockKept;
-            _dictionaryText = settings.GrammarDictionaryText;
-            _dictionaryName = settings.GrammarDictionaryName;
-            _dictionaryImportedAt = settings.GrammarDictionaryImportedAt;
-            _importError = null;
+            Grammar.Load(settings.GrammarDictionaryText, settings.GrammarDictionaryName, settings.GrammarDictionaryImportedAt);
         }
 
         private void RaiseAll()
@@ -365,9 +250,6 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             Raise(nameof(KeepMinimumText));
             Raise(nameof(IsKeepMinimumValid));
             Raise(nameof(LockKept));
-            Raise(nameof(ImportError));
-            Raise(nameof(HasImportError));
-            RaiseDictionary();
         }
     }
 }

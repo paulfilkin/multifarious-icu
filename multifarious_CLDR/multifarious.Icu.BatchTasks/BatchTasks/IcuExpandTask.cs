@@ -67,7 +67,7 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             // it. A file that no longer validates is reported once and the default runs.
             _dictionary = settings.ToDictionary(out _dictionaryFailure);
             _dictionaryName = settings.HasGrammarDictionaryFile && _dictionaryFailure == null
-                ? settings.GrammarDictionaryName
+                ? (settings.GrammarDictionaryName.Length > 0 ? settings.GrammarDictionaryName : UIStrings.Report_GrammarEdited)
                 : null;
             if (_dictionaryFailure != null)
             {

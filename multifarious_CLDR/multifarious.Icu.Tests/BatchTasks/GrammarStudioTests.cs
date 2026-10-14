@@ -116,35 +116,36 @@ public class GrammarStudioTests
     {
         var settings = Bundle().GetSettingsGroup<IcuExpandSettings>();
         var viewModel = new IcuExpandSettingsViewModel(settings);
-        Assert.False(viewModel.HasDictionary);
-        Assert.Contains("61", viewModel.DictionaryDefault, StringComparison.Ordinal);
+        var grammar = viewModel.Grammar;
+        Assert.False(grammar.HasDictionary);
+        Assert.Contains("61", grammar.DictionaryDefault, StringComparison.Ordinal);
 
-        Assert.True(viewModel.TryImport("vehicles.json", ExampleFile));
-        Assert.True(viewModel.HasDictionary);
-        Assert.Null(viewModel.ImportError);
-        Assert.Contains("vehicles.json", viewModel.DictionaryStatus, StringComparison.Ordinal);
+        Assert.True(grammar.TryImport("vehicles.json", ExampleFile));
+        Assert.True(grammar.HasDictionary);
+        Assert.Null(grammar.ImportError);
+        Assert.Contains("vehicles.json", grammar.DictionaryStatus, StringComparison.Ordinal);
 
-        Assert.False(viewModel.TryImport("bad.json", """{ "version": 1, "keys": { "mood": { } } }"""));
-        Assert.True(viewModel.HasImportError);
-        Assert.Contains("no kind of that name", viewModel.ImportError, StringComparison.Ordinal);
-        Assert.True(viewModel.HasDictionary);
-        Assert.Equal(ExampleFile, viewModel.DictionaryText);
+        Assert.False(grammar.TryImport("bad.json", """{ "version": 1, "keys": { "mood": { } } }"""));
+        Assert.True(grammar.HasImportError);
+        Assert.Contains("no kind of that name", grammar.ImportError, StringComparison.Ordinal);
+        Assert.True(grammar.HasDictionary);
+        Assert.Equal(ExampleFile, grammar.DictionaryText);
 
         var applied = viewModel.Apply();
         Assert.Equal(ExampleFile, applied.GrammarDictionaryText);
         Assert.Equal("vehicles.json", applied.GrammarDictionaryName);
         Assert.NotEqual("", applied.GrammarDictionaryImportedAt);
 
-        viewModel.RemoveDictionary();
-        Assert.False(viewModel.HasDictionary);
-        Assert.Null(viewModel.ImportError);
+        grammar.RemoveDictionary();
+        Assert.False(grammar.HasDictionary);
+        Assert.Null(grammar.ImportError);
         Assert.Equal("", viewModel.Apply().GrammarDictionaryText);
     }
 
     [Fact]
     public void The_template_is_a_valid_developers_file()
     {
-        var text = IcuExpandSettingsViewModel.TemplateText();
+        var text = GrammarDictionaryViewModel.TemplateText();
 
         var dictionary = GrammarDictionary.Default.WithDeveloperFile(DeveloperFile.Parse(text));
 

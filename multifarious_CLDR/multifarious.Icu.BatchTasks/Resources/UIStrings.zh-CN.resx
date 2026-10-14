@@ -440,7 +440,7 @@
     <value>保存模板…</value>
   </data>
   <data name="Expand_GrammarRemove" xml:space="preserve">
-    <value>移除</value>
+    <value>移除文件</value>
   </data>
   <data name="Expand_GrammarHint" xml:space="preserve">
     <value>参数名以 Gender 或 Article 结尾的 select 消息会按目标语言所需的形式展开。开发者文件指定应用程序的参数、键的写法，并声明应用程序提供哪些从属参数。</value>
@@ -452,7 +452,7 @@
     <value>ICU 的 select 消息根据应用程序传入的值选择分支。当该值是语法性质的，例如句中所提事物的性别，各语言所需的分支就不同：德语需要阳性、阴性和中性，法语还需要冠词形式，日语只需一种形式。词典列出每种语言所需的内容，任务按每个键展开一种形式，与复数的处理方式相同。</value>
   </data>
   <data name="Expand_GrammarHelp2" xml:space="preserve">
-    <value>内置默认词典涵盖 CLDR 发布了语法性别的语言。按模板编写的开发者文件可加入项目自己的参数名和键的写法，并说明应用程序为哪些语言提供从属参数（例如冠词形式）；只有这样，才会插入源文本中没有的选择器。导出会将导入的文件原样写回。</value>
+    <value>内置默认词典涵盖 CLDR 发布了语法性别的语言。按模板编写的开发者文件可加入项目自己的参数名和键的写法，并说明应用程序为哪些语言提供从属参数（例如冠词形式）；只有这样，才会插入源文本中没有的选择器。导出会按当前状态写出项目的文件，包括在此页面上所做的编辑。</value>
   </data>
   <data name="Expand_GrammarFileFilter" xml:space="preserve">
     <value>JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*</value>
@@ -492,5 +492,137 @@
   </data>
   <data name="Settings_SaveFailed" xml:space="preserve">
     <value>设置未保存。{0}</value>
+  </data>
+  <data name="Settings_OptionsTab" xml:space="preserve">
+    <value>选项</value>
+  </data>
+  <data name="Settings_GrammarTab" xml:space="preserve">
+    <value>语法词典</value>
+  </data>
+  <data name="Expand_SegmentsHeader" xml:space="preserve">
+    <value>句段文本和占位符</value>
+  </data>
+  <data name="Grammar_LanguagesHeader" xml:space="preserve">
+    <value>语言及其键</value>
+  </data>
+  <data name="Grammar_KeysHint" xml:space="preserve">
+    <value>键是为其排布形式的分支，按顺序以逗号分隔，最后一个是 other。与随附默认值不同的键集会写入项目的开发者文件；重置可恢复默认值。</value>
+  </data>
+  <data name="Grammar_ColumnKind" xml:space="preserve">
+    <value>种类</value>
+  </data>
+  <data name="Grammar_ColumnLanguage" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="Grammar_ColumnKeys" xml:space="preserve">
+    <value>键</value>
+  </data>
+  <data name="Grammar_ColumnSource" xml:space="preserve">
+    <value>来源</value>
+  </data>
+  <data name="Grammar_SourceDefault" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="Grammar_SourceProject" xml:space="preserve">
+    <value>项目</value>
+  </data>
+  <data name="Grammar_ResetRow" xml:space="preserve">
+    <value>重置</value>
+  </data>
+  <data name="Grammar_RenamesLine" xml:space="preserve">
+    <value>文件中重命名的键：{0}</value>
+  </data>
+  <data name="Grammar_RenameAs" xml:space="preserve">
+    <value>{0} 作为 {1}</value>
+  </data>
+  <data name="Grammar_AddLanguageLabel" xml:space="preserve">
+    <value>添加语言：</value>
+  </data>
+  <data name="Grammar_AddLanguageTag" xml:space="preserve">
+    <value>要添加的语言标记，例如 cs 或 pt-BR。</value>
+  </data>
+  <data name="Grammar_Add" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="Grammar_ArgumentsHeader" xml:space="preserve">
+    <value>应用程序传递的参数</value>
+  </data>
+  <data name="Grammar_ArgumentsHint" xml:space="preserve">
+    <value>每个基础参数一行。每个角色列指定应用程序为该角色传递的参数；“提供”按语言列出应用程序同时传递的从属种类，写作 fr: article; it: article。只有已提供的种类才会插入到没有它的消息中。</value>
+  </data>
+  <data name="Grammar_ColumnArgument" xml:space="preserve">
+    <value>基础参数</value>
+  </data>
+  <data name="Grammar_RoleColumn" xml:space="preserve">
+    <value>{0} 参数</value>
+  </data>
+  <data name="Grammar_ColumnSupplies" xml:space="preserve">
+    <value>提供</value>
+  </data>
+  <data name="Grammar_ColumnRespelling" xml:space="preserve">
+    <value>键拼写</value>
+  </data>
+  <data name="Grammar_AddArgument" xml:space="preserve">
+    <value>添加参数</value>
+  </data>
+  <data name="Grammar_RemoveArgument" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="Grammar_NewArgumentName" xml:space="preserve">
+    <value>argument</value>
+  </data>
+  <data name="Grammar_EmptyArgument" xml:space="preserve">
+    <value>参数需要一个基础名称。</value>
+  </data>
+  <data name="Grammar_DuplicateArgument" xml:space="preserve">
+    <value>参数 '{0}' 已声明。</value>
+  </data>
+  <data name="Grammar_OtherLabel" xml:space="preserve">
+    <value>您对 other 键的说明：</value>
+  </data>
+  <data name="Grammar_Edited" xml:space="preserve">
+    <value>在此页面上创建的开发者文件；请导出以保留副本。</value>
+  </data>
+  <data name="Grammar_ImportedEdited" xml:space="preserve">
+    <value>开发者文件 {0}，于 {1} 导入，此后在此页面上编辑过。</value>
+  </data>
+  <data name="Grammar_Invalid" xml:space="preserve">
+    <value>词典目前的状态无法保存。{0}</value>
+  </data>
+  <data name="Grammar_KeyHint" xml:space="preserve">
+    <value>{0}：{1}</value>
+  </data>
+  <data name="Grammar_KeyWithSample" xml:space="preserve">
+    <value>{0}：{1}，例如 {2}</value>
+  </data>
+  <data name="Grammar_Needs" xml:space="preserve">
+    <value>在 {1} 下需要 {0}</value>
+  </data>
+  <data name="Report_GrammarEdited" xml:space="preserve">
+    <value>在设置页面上创建</value>
+  </data>
+  <data name="Grammar_LanguagesHelpHeader" xml:space="preserve">
+    <value>我可以更改哪些语言和键？</value>
+  </data>
+  <data name="Grammar_LanguagesHelp1" xml:space="preserve">
+    <value>每一行是某种语言的一个种类：键是任务为其逐一排布形式的分支，按该顺序排列，other 在最后。默认表示键是取自 CLDR 的随附集合；项目表示由项目的开发者文件设置。</value>
+  </data>
+  <data name="Grammar_LanguagesHelp2" xml:space="preserve">
+    <value>当应用程序传递默认值中没有的键时，编辑键集；默认值未列出的语言，可通过“添加语言”及其标记（例如 cs 或 pt-BR）添加。重置可恢复默认值，或移除您添加的语言。工具提示中的提示和示例名词来自随附默认值，无法在此编辑。</value>
+  </data>
+  <data name="Grammar_ArgumentsHelpHeader" xml:space="preserve">
+    <value>参数有什么用？</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp1" xml:space="preserve">
+    <value>参数是应用程序传入消息的值。基础参数是事物本身，即 vehicle；每个角色列指定承载其性、冠词或数量的参数。在此指定后，即使参数名不以 Gender 或 Article 结尾，select 也会被识别为语法选择。</value>
+  </data>
+  <data name="Grammar_ArgumentsHelp2" xml:space="preserve">
+    <value>“提供”按语言声明应用程序同时传递的从属参数，写作 fr: article; it: article。只有已提供的种类才会插入到没有它的消息中，因为插入的选择器会改变应用程序在运行时必须传递的内容；某语言有需要而应用程序未提供时，将在没有它的情况下排布，并在任务结果中注明。</value>
+  </data>
+  <data name="Grammar_OtherHelpHeader" xml:space="preserve">
+    <value>other 键是什么？</value>
+  </data>
+  <data name="Grammar_OtherHelp1" xml:space="preserve">
+    <value>ICU 要求每个 select 都以 other 分支结尾，在没有其他键匹配时使用。它保存的内容是项目的约定：复数形式、未知情况、任何其他值。您在此输入的文字会作为提示显示在 ICU Forms 窗口的每个 other 形式上，让译员知道该形式的用途。</value>
   </data>
 </root>

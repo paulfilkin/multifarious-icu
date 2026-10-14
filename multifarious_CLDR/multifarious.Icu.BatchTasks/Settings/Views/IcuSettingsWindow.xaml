@@ -3,12 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:res="clr-namespace:multifarious.Icu.BatchTasks.Resources"
         xmlns:views="clr-namespace:multifarious.Icu.BatchTasks.Settings.Views"
-        Width="760" Height="720" MinWidth="560" MinHeight="420"
+        Width="860" Height="760" MinWidth="620" MinHeight="420"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         Background="White">
-  <!-- The two batch task pages as the wizards show them, for the project selected in the
-       Projects view. The views and their view models are the wizard pages' own; this window
-       only hosts them and applies both on OK. -->
+  <!-- The batch task pages as the wizards show them, for the project selected in the Projects
+       view: the Expand ICU options, the grammar dictionary and the Restore ICU options, each a
+       tab. The views and their view models are the wizard pages' own; this window only hosts
+       them and applies both groups on OK. -->
   <Window.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
@@ -25,7 +26,10 @@
 
     <TabControl Grid.Row="0">
       <TabItem Header="{x:Static res:UIStrings.Settings_ExpandTab}">
-        <views:IcuExpandSettingsView x:Name="ExpandView" />
+        <views:IcuExpandOptionsView x:Name="ExpandView" />
+      </TabItem>
+      <TabItem Header="{x:Static res:UIStrings.Settings_GrammarTab}">
+        <views:IcuGrammarSettingsView x:Name="GrammarView" />
       </TabItem>
       <TabItem Header="{x:Static res:UIStrings.Settings_RestoreTab}">
         <views:IcuRestoreSettingsView x:Name="RestoreView" />

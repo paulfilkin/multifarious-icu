@@ -10,10 +10,11 @@ using Sdl.Core.Settings;
 namespace multifarious.Icu.BatchTasks.Settings.Views
 {
     /// <summary>
-    /// The ICU Settings dialog the Projects view opens: the Expand ICU and Restore ICU pages
-    /// over a project's settings bundle. The view models hold every edit until Apply, so
-    /// Cancel leaves the bundle as it was; OK applies both pages and the caller updates the
-    /// project. Owned by Studio's main window so it is modal to it.
+    /// The ICU Settings dialog the Projects view opens: the Expand ICU options, the grammar
+    /// dictionary and the Restore ICU options over a project's settings bundle, three tabs. The
+    /// view models hold every edit until Apply, so Cancel leaves the bundle as it was; OK
+    /// applies both groups and the caller updates the project. Owned by Studio's main window so
+    /// it is modal to it.
     /// </summary>
     public partial class IcuSettingsWindow : Window
     {
@@ -30,6 +31,7 @@ namespace multifarious.Icu.BatchTasks.Settings.Views
             _expand = new IcuExpandSettingsViewModel(bundle.GetSettingsGroup<IcuExpandSettings>());
             _restore = new IcuRestoreSettingsViewModel(bundle.GetSettingsGroup<IcuRestoreSettings>());
             ExpandView.DataContext = _expand;
+            GrammarView.DataContext = _expand.Grammar;
             RestoreView.DataContext = _restore;
 
             var owner = Process.GetCurrentProcess().MainWindowHandle;
@@ -39,12 +41,12 @@ namespace multifarious.Icu.BatchTasks.Settings.Views
             }
         }
 
-        /// <summary>OK applies both pages into the bundle's groups; a page with an invalid number box keeps the dialog open, its message showing.</summary>
+        /// <summary>OK applies both groups into the bundle; an invalid number box or a dictionary edit that does not validate keeps the dialog open, its message showing.</summary>
         private void OnOk(object sender, RoutedEventArgs e)
         {
             if (!_expand.IsValid)
             {
-                ExpandView.Focus();
+                (_expand.Grammar.IsValid ? (UIElement)ExpandView : GrammarView).Focus();
                 return;
             }
 
