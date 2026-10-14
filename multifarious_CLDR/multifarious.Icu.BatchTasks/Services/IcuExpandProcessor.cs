@@ -65,6 +65,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
         /// <summary>The next segment number in the file; see <see cref="SegmentNumbering"/>.</summary>
         private int _nextSegmentNumber = 1;
+        private string _structurePath;
 
         /// <param name="sourceLanguageTag">The project's source language, or null to take it from the file.</param>
         /// <param name="targetLanguageTag">The file's target language, or null to take it from the file.</param>
@@ -123,6 +124,10 @@ namespace multifarious.Icu.BatchTasks.Services
 
         public override void ProcessParagraphUnit(IParagraphUnit paragraphUnit)
         {
+            // Under an embedded content processor the key is on a structure unit of the
+            // enclosing file, ahead of the sub-content it names; kept until the next one.
+            _structurePath = ResourceKey.StructurePathOf(paragraphUnit) ?? _structurePath;
+
             if (paragraphUnit != null && !paragraphUnit.IsStructure && paragraphUnit.Source != null)
             {
                 Expand(paragraphUnit);
@@ -141,7 +146,7 @@ namespace multifarious.Icu.BatchTasks.Services
             Units++;
             var unitId = unit.Properties.ParagraphUnitId.Id;
 
-            var key = ResourceKey.Of(unit);
+            var key = ResourceKey.Of(unit) ?? _structurePath;
             var icuContext = ResourceKey.IcuContextOf(unit);
             var restored = icuContext != null && ResourceKey.IsRestored(unit);
             if (icuContext != null && !restored)

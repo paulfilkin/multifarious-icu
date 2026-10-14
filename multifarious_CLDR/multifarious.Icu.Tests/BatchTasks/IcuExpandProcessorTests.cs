@@ -738,4 +738,31 @@ public class IcuExpandProcessorTests
         Assert.Equal("сообщений", RawValueReconstruction.Reconstruct(many).RawValue);
         Assert.Equal("Привет, {name}, у вас # непрочитанных сообщений!", RawValueReconstruction.Reconstruct(targets[2]).RawValue);
     }
+
+    /// <summary>
+    /// Under an embedded content processor each value is its own sub-content file whose unit
+    /// carries no JsonPath; the key is on a structure unit of the enclosing file, ahead of it
+    /// (Project 72, 14 October 2026: the ICU Forms window's heading was empty). The processor
+    /// keeps the last structure path and the unit's context records it as the key.
+    /// </summary>
+    [Fact]
+    public void A_sub_content_unit_takes_its_key_from_the_structure_unit_before_it()
+    {
+        var processor = Processor("ru-RU");
+        var structure = ParagraphUnits.Structure("inbox.unreadCount");
+        var unit = ParagraphUnits.WithSegments(UnreadCount);
+
+        processor.ProcessParagraphUnit(structure);
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal("inbox.unreadCount", ResourceKey.IcuContextOf(unit)!.GetMetaData("icu:key"));
+        Assert.Equal("inbox.unreadCount", processor.Outcomes.Single().Key);
+        Assert.Equal("inbox.unreadCount", new IcuFormsReader().Read(unit, "ru-RU")!.Key);
+
+        // The next value's structure unit replaces it; a unit with its own JsonPath keeps that.
+        processor.ProcessParagraphUnit(ParagraphUnits.Structure("inbox.other"));
+        var own = ParagraphUnits.Json(UnreadCount, "['inbox.own']");
+        processor.ProcessParagraphUnit(own);
+        Assert.Equal("['inbox.own']", ResourceKey.IcuContextOf(own)!.GetMetaData("icu:key"));
+    }
 }

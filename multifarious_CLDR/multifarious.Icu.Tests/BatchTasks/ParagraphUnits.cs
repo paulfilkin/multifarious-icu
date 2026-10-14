@@ -60,6 +60,20 @@ internal static class ParagraphUnits
         return unit;
     }
 
+    /// <summary>
+    /// The structure unit the JSON filter writes ahead of a value's sub-content under an
+    /// embedded content processor: no text, a StructureParagraphUnit context carrying the key
+    /// as StructureParagraphPath (Project 72, 14 October 2026).
+    /// </summary>
+    public static IParagraphUnit Structure(string path)
+    {
+        var unit = ItemFactory.CreateParagraphUnit(LockTypeFlags.Structure);
+        var context = PropertiesFactory.CreateContextInfo("StructureParagraphUnit");
+        context.SetMetaData("StructureParagraphPath", path);
+        AddContext(unit, context);
+        return unit;
+    }
+
     public static void AddContext(IParagraphUnit unit, IContextInfo context)
     {
         unit.Properties.Contexts ??= PropertiesFactory.CreateContextProperties();

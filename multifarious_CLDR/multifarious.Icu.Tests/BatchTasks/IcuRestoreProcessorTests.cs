@@ -848,4 +848,20 @@ public class IcuRestoreProcessorTests
         Assert.Equal("с возвращением", RawValueReconstruction.Reconstruct(marker).RawValue);
         Assert.Equal(1, TagsUnder(unit.Target));
     }
+
+    /// <summary>The restore report names a sub-content unit by the key the expansion recorded, or the structure unit's path.</summary>
+    [Fact]
+    public void A_sub_content_unit_is_restored_under_the_key_the_expansion_recorded()
+    {
+        var expander = new IcuExpandProcessor("en-GB", "ru-RU", ExpansionOptions.Default, "1.0.0") { ItemFactory = ParagraphUnits.ItemFactory };
+        var unit = ParagraphUnits.WithSegments(UnreadCount);
+        expander.ProcessParagraphUnit(ParagraphUnits.Structure("inbox.unreadCount"));
+        expander.ProcessParagraphUnit(unit);
+
+        var restorer = Restorer("ru-RU");
+        restorer.ProcessParagraphUnit(ParagraphUnits.Structure("inbox.unreadCount"));
+        restorer.ProcessParagraphUnit(unit);
+
+        Assert.Equal("inbox.unreadCount", restorer.Outcomes.Single().Key);
+    }
 }

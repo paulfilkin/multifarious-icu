@@ -45,6 +45,30 @@ namespace multifarious.Icu.BatchTasks.Services
             return null;
         }
 
+        /// <summary>
+        /// The key a structure unit announces for the sub-content that follows it. With an
+        /// embedded content processor on the JSON filter, each value becomes its own
+        /// sub-content file whose units carry no JsonPath; the enclosing file holds a structure
+        /// unit with a <c>StructureParagraphUnit</c> context whose <c>StructureParagraphPath</c>
+        /// is the key (Project 72, 14 October 2026). Null for any other unit.
+        /// </summary>
+        public static string StructurePathOf(IParagraphUnit unit)
+        {
+            if (unit == null || !unit.IsStructure || unit.Properties == null || unit.Properties.Contexts == null) return null;
+
+            var contexts = unit.Properties.Contexts.Contexts;
+            if (contexts == null) return null;
+
+            foreach (var context in contexts)
+            {
+                if (context == null || context.ContextType != "StructureParagraphUnit") continue;
+                var path = context.MetaDataContainsKey("StructureParagraphPath") ? context.GetMetaData("StructureParagraphPath") : null;
+                if (!string.IsNullOrEmpty(path)) return path;
+            }
+
+            return null;
+        }
+
         /// <summary>The plugin's own context on the unit, or null where the unit has never been expanded.</summary>
         public static IContextInfo IcuContextOf(IParagraphUnit unit)
         {

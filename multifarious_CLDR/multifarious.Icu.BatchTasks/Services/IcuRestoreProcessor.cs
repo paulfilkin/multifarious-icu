@@ -83,6 +83,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
         /// <summary>The next segment number in the file; see <see cref="SegmentNumbering"/>.</summary>
         private int _nextSegmentNumber = 1;
+        private string _structurePath;
 
         public IcuRestoreProcessor(string targetLanguageTag, RestoreOptions options)
         {
@@ -121,6 +122,9 @@ namespace multifarious.Icu.BatchTasks.Services
 
         public override void ProcessParagraphUnit(IParagraphUnit paragraphUnit)
         {
+            // The key of sub-content under an embedded content processor, see ResourceKey.
+            _structurePath = ResourceKey.StructurePathOf(paragraphUnit) ?? _structurePath;
+
             if (paragraphUnit != null && !paragraphUnit.IsStructure && paragraphUnit.Source != null)
             {
                 if (paragraphUnit.Target != null && ResourceKey.IsExpanded(paragraphUnit))
@@ -263,7 +267,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 Restored++;
             }
 
-            _outcomes.Add(new RestoreUnitOutcome(unitId, ResourceKey.Of(unit), targetSegments.Count,
+            _outcomes.Add(new RestoreUnitOutcome(unitId, ResourceKey.Of(unit) ?? IcuMetadata(unit, "icu:key") ?? _structurePath, targetSegments.Count,
                 Pruned - prunedBefore, Filled - filledBefore, unitWarnings));
             Diagnostics.Write("  unit " + unitId + ": " + (mismatch ? "left expanded with tags" : "restored")
                 + ", forms=" + targetSegments.Count + ", comments stripped=" + CommentsStripped);

@@ -126,9 +126,13 @@ all five languages.  Five findings, all fixed in the afternoon build (1,659 test
   context (`icu:seededFrom`, `icu:syntheticSource`, `icu:grammarForms`) were keyed by the
   segment id the writer gave, and Studio renumbers the ids after the task: in the French file
   of Project 64 the forms of `readyMinimal` carry ids 3 to 9 (the file's first unit is the
-  two-segment `_comment`) while the records ran from 1.  The processor's own count was seeded
-  at 1 for that unit, which says the renumbering is Studio's, not ours; the new diagnostics
-  line "numbered from N" will show it.  Fix: the records name a segment by its position in
+  two-segment `_comment`) while the records ran from 1.  The retest on Project 72 (R1) showed
+  the task numbering that unit from 3 and keying from 3, so the task's own output agrees with
+  itself.  Project 73 then cleared the two suspects: the ids stayed at 3 to 9 after the
+  editor's save (17:02) and after a Restore and second Expand (17:08); Project 74, the
+  standard filter without the embedded content processor as Project 64 was, agreed too
+  ("numbered from 3", ids 3 to 6).  How Project 64's ids moved is unexplained; it cannot
+  matter again.  Fix: the records name a segment by its position in
   the unit, with `icu:numbering=position` on the context; the reader keys by position where
   the marker is and by id where it is not, so the morning's files still read.
 - **A refusal went unseen** (S4a, C17 to C20).  The message now sits in a red box under the
@@ -142,6 +146,15 @@ all five languages.  Five findings, all fixed in the afternoon build (1,659 test
   `SetActiveSegmentPair(paragraphId, segmentId, true)` through the controller.
 - **No Reset in the dialog** (C13).  A Reset to defaults button, bottom left, resets both
   groups as the wizard page does.
+
+The retest (R1) passed on Project 72, created with the HTML embedded content processor left
+on by accident, which found one more: **the window's heading had no key**.  Under the
+processor each value is its own sub-content `<file>` whose unit carries no JsonPath; the key
+sits on a structure unit of the enclosing JSON file, a `StructureParagraphUnit` context with
+`StructureParagraphPath`, ahead of the sub-content.  Both processors now keep the last
+structure path and use it where the unit has no key of its own
+(`ResourceKey.StructurePathOf`); the expansion records it as `icu:key`, so the window and
+the reports name the message.  Two tests, 1,661.  R12 in the plan.
 
 Seen once in the log and not reproduced: Studio's message reporter threw a null reference on
 a located placeholder error (Project 64).  The verifier now logs the full exception and
