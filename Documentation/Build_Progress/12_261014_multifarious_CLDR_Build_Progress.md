@@ -181,10 +181,14 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
   window), 009 (Options tab), 010 (Grammar dictionary tab), 011 (ICU Settings dialog), 012
   (Restore page), 013 (Restore report), 014 (the window on a French article form) and 015
   (a target with its tags reordered) are new.  Paul takes them in Studio.
-- The release as 2.0 with the dictionary (Paul, 14 October): tag `v1.0.2.0` and branch
-  `release/1.0` on the old `main`, fast-forward `main` to `release/2.0`, tag `v2.0.0.0`, push;
-  Release build, the package to `Documentation\appstore` for the store upload.  Then
-  `CLAUDE.md` loses its "nothing of it is in the 2.0 package" lines.
+- Released as 2.0.0.0 with the dictionary (Paul, 14 October, 21:45).  The Release build
+  passed the 1,661 tests; the package is `Documentation\appstore\IcuSupport.sdlplugin`
+  (1,103,485 bytes, gitignored) for the store upload.  The manifest's description, which the
+  AppStore shows, still said "finalise" and was corrected first (`9e87e9a`).  Git: `v1.0.2.0`
+  and `release/1.0` on the old `main`, `main` fast-forwarded to `release/2.0`, `v2.0.0.0` on
+  `9e87e9a`, all pushed.  `CLAUDE.md` records the branch scheme.  Still to do for the store:
+  the ten screenshots, the HTML guide at `Documentation\website\multifariousICU_UserGuide_2.0.html`
+  with its placeholders replaced, the upload itself, and the native read of the strings.
 - The fifty-three new strings in eight languages need a native read with the rest.
 - The Options tab's sub-headings reuse `Expand_SeedHeader` and `Expand_PlaceholdersHeader`
   as they stand; if a native reader finds them long as sub-headings, shorten there.
