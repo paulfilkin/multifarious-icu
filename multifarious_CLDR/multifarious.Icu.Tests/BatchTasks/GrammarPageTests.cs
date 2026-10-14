@@ -377,6 +377,7 @@ public class GrammarPageTests
         german.KeysText = "MASCULINE, FEMININE";
 
         Assert.True(viewModel.ErrorInLanguages);
+        Assert.False(viewModel.ErrorUnderLanguagesTable);
         Assert.False(viewModel.ErrorInFile);
         Assert.False(viewModel.ErrorInArguments);
         Assert.True(german.HasError);
@@ -411,6 +412,7 @@ public class GrammarPageTests
         row.SuppliesText = "fr: article";
 
         Assert.True(viewModel.ErrorInArguments);
+        Assert.False(viewModel.ErrorUnderArgumentsTable);
         Assert.False(viewModel.ErrorInLanguages);
         Assert.True(row.HasError);
 
@@ -436,6 +438,7 @@ public class GrammarPageTests
 
         Assert.True(viewModel.AddLanguageHasError);
         Assert.True(viewModel.ErrorInLanguages);
+        Assert.True(viewModel.ErrorUnderLanguagesTable);
 
         viewModel.AddLanguageLocale = "eu";
         Assert.NotNull(viewModel.AddLanguage());

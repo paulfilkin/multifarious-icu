@@ -196,6 +196,21 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             get { return HasError && _errorArea == ErrorAreaOther; }
         }
 
+        /// <summary>
+        /// A refusal that belongs to no row of the languages table (the add-language tag) is
+        /// shown under the table; one on a row is shown under that row, where the user is
+        /// looking (Paul, 14 October 2026: the box under a sixty-row table was still too far).
+        /// </summary>
+        public bool ErrorUnderLanguagesTable
+        {
+            get { return ErrorInLanguages && !(_errorRow is GrammarLanguageRow); }
+        }
+
+        public bool ErrorUnderArgumentsTable
+        {
+            get { return ErrorInArguments && !(_errorRow is GrammarArgumentRow); }
+        }
+
         /// <summary>True while the typed language tag was refused.</summary>
         public bool AddLanguageHasError
         {
@@ -210,6 +225,8 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             Raise(nameof(ErrorInLanguages));
             Raise(nameof(ErrorInArguments));
             Raise(nameof(ErrorInOther));
+            Raise(nameof(ErrorUnderLanguagesTable));
+            Raise(nameof(ErrorUnderArgumentsTable));
         }
 
         /// <summary>
@@ -242,6 +259,8 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             argumentRow = row as GrammarArgumentRow;
             if (argumentRow != null) argumentRow.SetHasError(true);
             if (row is string && (string)row == ErrorAreaLanguages) AddLanguageHasError = true;
+            Raise(nameof(ErrorUnderLanguagesTable));
+            Raise(nameof(ErrorUnderArgumentsTable));
         }
 
         public bool IsValid

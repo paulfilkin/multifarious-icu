@@ -87,7 +87,7 @@ SnapTab 1 'dialog-grammar-arguments.png'
 $grammar = $grammarView.DataContext
 $german = $grammar.Languages | Where-Object { $_.Kind -eq 'gender' -and $_.LocaleKey -eq 'de' }
 $german.KeysText = 'MASCULINE, FEMININE'
-$scroller.ScrollToVerticalOffset(1800)
+$scroller.ScrollToVerticalOffset(300)
 SnapTab 1 'dialog-grammar-error.png'
 $german.Reset()
 SnapTab 2 'dialog-restore.png'

@@ -179,6 +179,10 @@
                       <ColumnDefinition Width="Auto" SharedSizeGroup="Source" />
                       <ColumnDefinition Width="Auto" SharedSizeGroup="RowButton" />
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
                     <TextBlock Grid.Column="0" Style="{StaticResource Cell}" Text="{Binding Kind, Mode=OneWay}" />
                     <TextBlock Grid.Column="1" Style="{StaticResource Cell}" Text="{Binding Language, Mode=OneWay}" />
                     <TextBox Grid.Column="2" Style="{StaticResource LanguageCellBox}" MinWidth="160"
@@ -187,6 +191,12 @@
                     <TextBlock Grid.Column="3" Style="{StaticResource Cell}" Text="{Binding Source, Mode=OneWay}" />
                     <Button Grid.Column="4" Style="{StaticResource RowButton}" Content="{x:Static res:UIStrings.Grammar_ResetRow}"
                             IsEnabled="{Binding IsProject}" Click="OnResetLanguage" />
+                    <!-- The refusal, under the row it belongs to. -->
+                    <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Style="{StaticResource InvalidBox}" Margin="0,4,8,4"
+                            Visibility="{Binding HasError, Converter={StaticResource VisibleWhenTrue}}">
+                      <TextBlock Style="{StaticResource InvalidText}"
+                                 Text="{Binding DataContext.Error, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
+                    </Border>
                   </Grid>
                 </Border>
               </DataTemplate>
@@ -219,7 +229,7 @@
             <Button TabIndex="22" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="80"
                     Content="{x:Static res:UIStrings.Grammar_Add}" IsEnabled="{Binding CanAddLanguage}" Click="OnAddLanguage" />
           </StackPanel>
-          <Border Style="{StaticResource InvalidBox}" Visibility="{Binding ErrorInLanguages, Converter={StaticResource VisibleWhenTrue}}">
+          <Border Style="{StaticResource InvalidBox}" Visibility="{Binding ErrorUnderLanguagesTable, Converter={StaticResource VisibleWhenTrue}}">
             <TextBlock Style="{StaticResource InvalidText}" Text="{Binding Error, Mode=OneWay}" />
           </Border>
           <Expander Style="{StaticResource Help}" TabIndex="23" Header="{x:Static res:UIStrings.Grammar_LanguagesHelpHeader}">
@@ -275,6 +285,7 @@
                     <Grid.RowDefinitions>
                       <RowDefinition Height="Auto" />
                       <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <TextBox Grid.Column="0" Style="{StaticResource ArgumentCellBox}" MinWidth="90"
                              AutomationProperties.Name="{x:Static res:UIStrings.Grammar_ColumnArgument}"
@@ -303,6 +314,12 @@
                                Visibility="{Binding HasRespelling, Converter={StaticResource VisibleWhenTrue}}">
                       <Run Text="{x:Static res:UIStrings.Grammar_ColumnRespelling}" /><Run Text=": " /><Run Text="{Binding Respelling, Mode=OneWay}" />
                     </TextBlock>
+                    <!-- The refusal, under the row it belongs to. -->
+                    <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Style="{StaticResource InvalidBox}" Margin="0,4,8,4"
+                            Visibility="{Binding HasError, Converter={StaticResource VisibleWhenTrue}}">
+                      <TextBlock Style="{StaticResource InvalidText}"
+                                 Text="{Binding DataContext.Error, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
+                    </Border>
                   </Grid>
                 </Border>
               </DataTemplate>
@@ -311,7 +328,7 @@
 
           <Button TabIndex="30" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="110" Margin="0,10,0,0" HorizontalAlignment="Left"
                   Content="{x:Static res:UIStrings.Grammar_AddArgument}" Click="OnAddArgument" />
-          <Border Style="{StaticResource InvalidBox}" Visibility="{Binding ErrorInArguments, Converter={StaticResource VisibleWhenTrue}}">
+          <Border Style="{StaticResource InvalidBox}" Visibility="{Binding ErrorUnderArgumentsTable, Converter={StaticResource VisibleWhenTrue}}">
             <TextBlock Style="{StaticResource InvalidText}" Text="{Binding Error, Mode=OneWay}" />
           </Border>
           <Expander Style="{StaticResource Help}" TabIndex="31" Header="{x:Static res:UIStrings.Grammar_ArgumentsHelpHeader}">
