@@ -168,8 +168,9 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
 
 ## Open items
 
-- The Studio test plan from S2 on the 14 October package: S (the dialog, with S4a for a
-  refused table edit), C0 to C20 (the tabs and the tables), then D to K as before.
+- The Studio test plan is complete: A to J on the morning package, R1 to R10 and R12 on the
+  afternoon packages, all passing (Paul, 14 October, evening).  R11 waits on the verifier
+  fault recurring.
 - Phase 4: the user guide section on grammar selects, the tabs and the tables, the
   developer's file key by key, the shipped default; the changelog.
 - The forty-four new strings in eight languages need a native read with the rest.
