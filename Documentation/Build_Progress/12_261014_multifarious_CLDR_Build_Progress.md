@@ -200,6 +200,16 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
   as they stand; if a native reader finds them long as sub-headings, shorten there.
 - Hints, samples, needs, narrowing and renames are read-only on the page.  Making them
   editable means extending the developer's file format: a separate decision.
+- **The ICU Forms window on a passed-through unit** (2.0.1 candidate, from the test file,
+  14 October).  A message over the budget both expanded and walked is passed through with
+  a warning comment on the unit, Studio then sentence-segments the raw value, and the
+  window shows "Not an ICU message" on those segments.  It should read the unit's own
+  warning instead: "This message was passed through: expansion needs 3,110 segments and
+  the source's own branches 84, against a budget of 24", and point at the Expand setting.
+  The warning is on the unit already (`Warn`, a comment by the plugin's author), so the
+  window only has to find it; the Counts column and the rows stay empty.  In the test file
+  this is `RESULT_ON_DEVICETYPE` for French and Italian and `DEVICE_NEEDS_TIME` for all
+  but English.
 - The open items from handovers 05 to 11 stand.
 
 ## A test file from the source material (after the release)
