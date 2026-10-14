@@ -5,10 +5,11 @@ Text that includes a number is written differently from one language to the next
 ### What it does
 
 - **Expand ICU**, a batch task, restructures every plural and ordinal message in a JSON or Java properties file into one segment per form the target language needs, each a complete sentence. The syntax between the forms is locked. Arguments such as `{name}` and the count marker `#` are placeholder tags, placed like any tag in Studio.
+- **Gender selects** are laid out the same way. A message that chooses by the gender of a thing named in it gets the genders the target language has, German three, French two with their article forms, Japanese one, from a grammar dictionary built on CLDR's grammatical features for 61 languages. A developer's file names the application's own arguments.
 - **Restore ICU**, a batch task, puts each message back together as one plain segment: it removes the forms the language does not use, escapes apostrophes and braces typed as text, checks the placeholders, fills an untranslated form from the source with a warning, and assembles the forms into valid ICU. Run it before generating the target files, or whenever you want the whole messages back; Expand ICU lays them out again with their translations, so you can switch between the two shapes at will. A message already matched from a memory of whole messages can be kept as it is.
 - **ICU Forms**, a window under the editor, shows every form of the message the active segment belongs to, with the numbers that select each, the source and target as sentences, a count box, and the whole message reassembled and checked as you type.
 - **ICU Verifier** joins Studio's verifiers: an untranslated form, placeholders that differ from the source, a count marker typed as text, or a message that will not parse.
-- **Reports** per language pair after each task, and settings pages with help, in nine languages.
+- **Reports** per language pair after each task, settings pages with help, and an **ICU Settings** button on the Projects view, in nine languages.
 
 ### Who it is for
 
@@ -20,6 +21,6 @@ Studio's own JSON and Java Resources file types. The tasks run on the bilingual 
 
 ### Maturity
 
-The tasks, the window and the verifier have been tested end to end on a set of ICU messages covering nested selects, exact values, offsets, ordinals and argument-only messages, generating files that parse and render as the source does for every number. Real projects will contain messages that set never saw. Feedback from anyone translating ICU messages is welcome: a message that lays out oddly, a form a language needs that the window describes badly, a file type you would like added.
+The tasks, the window and the verifier have been tested end to end on a set of ICU messages covering nested selects, exact values, offsets, ordinals, gender selects with and without article forms, and argument-only messages, generating files that parse and render as the source does for every number. Real projects will contain messages that set never saw. Feedback from anyone translating ICU messages is welcome: a message that lays out oddly, a form a language needs that the window describes badly, a file type you would like added.
 
 Full documentation: <https://multifarious.filkin.com/product/icu-support/>

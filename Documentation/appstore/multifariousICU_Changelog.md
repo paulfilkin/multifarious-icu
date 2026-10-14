@@ -2,7 +2,8 @@
 
 ## 2.0.0.0 (October 2026)
 
-Two batch tasks, **Expand ICU** and **Restore ICU**. ICU Finalise Messages is replaced by
+Two batch tasks, **Expand ICU** and **Restore ICU**, and a grammar dictionary that lays out a
+select by gender as the target language needs it. ICU Finalise Messages is replaced by
 Restore, and a project template or task sequence that named it has to be re-saved with the new
 task.
 
@@ -22,8 +23,31 @@ task.
 - A message that arrives pre-translated as a whole, from a memory of restored messages, is
   split into its forms with the match on every form.
 - The task names are Expand ICU and Restore ICU; the reports are named the same.
+- The Expand ICU settings page has two tabs, **Options** and **Grammar dictionary**. The
+  options are in the order the task decides them: which messages to expand and the branch
+  budget, messages already translated, the segment text and the placeholders, and what to do
+  with a value that does not parse.
+- A click on a row in the ICU Forms window moves the editor to that segment.
 
 ### Added
+
+- **Gender selects.** A select whose argument name ends in Gender or Article, or that the
+  project's developer's file declares, is laid out like a plural: one segment per form the
+  target language needs, from a grammar dictionary built on CLDR's grammatical features for
+  61 languages. German gets masculine, feminine and neuter; French masculine and feminine,
+  each with its article forms where the application supplies the article argument; Japanese
+  one form. Restore removes the forms the language does not use. The ICU Forms window shows
+  the grammatical term where a plural shows its numbers, with a sample noun for German,
+  French, Italian and Spanish, and the verifier names a form with its term.
+- **The Grammar dictionary tab** shows the dictionary in force as two tables, the languages
+  with their keys and the arguments the application passes, both editable, with Import,
+  Export, Remove file and Save template for the developer's file. The file names the
+  application's arguments, says for which languages it supplies a dependent argument such as
+  the article, respells keys and adds languages. A project template carries it.
+- **ICU Settings** on the Projects view's Add-ins tab opens the Expand ICU, Grammar dictionary
+  and Restore ICU pages for the selected project, with Reset to defaults. Studio shows a
+  plugin task's page only inside its wizards, so this is how a project's settings are changed
+  between runs.
 
 - Expand setting **Keep messages already translated**, off by default: a message whose every
   segment is matched at the chosen percentage or better is left as it is, and locked if
@@ -54,6 +78,9 @@ task.
   Generate Target Translations; it is what turns the forms back into one plain message.
 - Update Main Translation Memories stores whatever shape the file is in when it runs: one unit
   per form while expanded, one per whole message once restored. The tasks do not decide this.
+- An article form is only inserted where the developer's file says the application supplies
+  the article argument for that language, because an inserted selector changes what the
+  application must pass at run time. Without it the message gets its genders and a note.
 
 ## 1.0.2.0 (September 2026)
 

@@ -1,0 +1,39 @@
+{
+  "_note": [
+    "Grammar dictionary developer's file for multifariousICU Support for Trados Studio.",
+    "Fill this in for your application and import it on the Expand ICU settings page.",
+    "",
+    "arguments: one entry per base argument the application passes grammatical values for.",
+    "  Each role names the argument the application passes: 'gender' and 'article' are",
+    "  kinds in the dictionary, 'count' is the plural argument. 'supplies' lists, per",
+    "  target language, the dependent kinds the application passes for that argument;",
+    "  only those are inserted into a message that does not have them. 'keys' respells",
+    "  the kind's keys for this one argument.",
+    "keys: respelling for the whole project. 'rename' maps a default key to your spelling;",
+    "  'languages' replaces a language's key set outright, or adds a language the",
+    "  default lacks. Every set ends in 'other', which ICU requires.",
+    "other: your words for what the 'other' key holds, shown with each form.",
+    "",
+    "Delete this note and the example entries you do not use."
+  ],
+  "version": 1,
+  "arguments": {
+    "vehicle": {
+      "gender": "vehicleGender",
+      "count": "vehicleCount",
+      "article": "vehicleArticle",
+      "supplies": { "fr": ["article"], "it": ["article"] }
+    },
+    "line": {
+      "gender": "lineGenus",
+      "keys": { "gender": { "MASCULINE": "MASKULINUM", "FEMININE": "FEMININUM", "NEUTER": "NEUTRUM" } }
+    }
+  },
+  "keys": {
+    "gender": {
+      "rename": { },
+      "languages": { }
+    }
+  },
+  "other": "any other value"
+}

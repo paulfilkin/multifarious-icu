@@ -171,14 +171,25 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
 - The Studio test plan is complete: A to J on the morning package, R1 to R10 and R12 on the
   afternoon packages, all passing (Paul, 14 October, evening).  R11 waits on the verifier
   fault recurring.
-- Phase 4: the user guide section on grammar selects, the tabs and the tables, the
-  developer's file key by key, the shipped default; the changelog.
-- The forty-four new strings in eight languages need a native read with the rest.
+- Phase 4 is written (evening of 14 October): the user guide has a section "Messages that
+  choose by gender" with the coverage and article tables, the developer's file key by key and
+  a worked example; "The settings" describes the two tabs and the ICU Settings dialog and no
+  longer says the pages are under Project Settings; the changelog, Documentation.md and
+  Description.md carry the dictionary; `grammar.json` and the template are in the samples.
+  The images follow the website's numbering (001 to 015): 001, 003, 005, 006 and 008 stand;
+  002 and 004 need retaking (they show the old task names and Finalise); 007 (Messages
+  window), 009 (Options tab), 010 (Grammar dictionary tab), 011 (ICU Settings dialog), 012
+  (Restore page), 013 (Restore report), 014 (the window on a French article form) and 015
+  (a target with its tags reordered) are new.  Paul takes them in Studio.
+- The release as 2.0 with the dictionary (Paul, 14 October): tag `v1.0.2.0` and branch
+  `release/1.0` on the old `main`, fast-forward `main` to `release/2.0`, tag `v2.0.0.0`, push;
+  Release build, the package to `Documentation\appstore` for the store upload.  Then
+  `CLAUDE.md` loses its "nothing of it is in the 2.0 package" lines.
+- The fifty-three new strings in eight languages need a native read with the rest.
 - The Options tab's sub-headings reuse `Expand_SeedHeader` and `Expand_PlaceholdersHeader`
   as they stand; if a native reader finds them long as sub-headings, shorten there.
 - Hints, samples, needs, narrowing and renames are read-only on the page.  Making them
   editable means extending the developer's file format: a separate decision.
-- The release of 2.0 as it stood, or 2.1 with the dictionary: Paul's call.
 - The open items from handovers 05 to 11 stand.
 
 ## Traps

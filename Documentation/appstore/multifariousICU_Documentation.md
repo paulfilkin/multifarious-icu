@@ -3,7 +3,7 @@
 ## Introduction
 Text that includes a number is written differently from one language to the next. Applications handle this with ICU MessageFormat, the notation of the International Components for Unicode library, in which one string carries every form the source language needs: `{count, plural, one {# unread message} other {# unread messages}}`. Each language needs its own set of forms, from one in Japanese to six in Arabic. The application selects the form at run time using the plural rules in CLDR, the Common Locale Data Repository of the Unicode Consortium.
 
-multifariousICU Support gives the translator each form as a complete sentence in its own segment, with the syntax locked and the arguments protected, exactly the forms the target language needs. A second task puts the message back together as valid ICU, and the first lays it out again, so a file can be switched between the two shapes at any point. A window under the editor shows every form of the message the translator is working on, and a verifier lists what is still wrong.
+multifariousICU Support gives the translator each form as a complete sentence in its own segment, with the syntax locked and the arguments protected, exactly the forms the target language needs. The same goes for a message that chooses by the gender of a thing named in it: a grammar dictionary built on CLDR's grammatical features gives each language its genders, and French and Italian their article forms. A second task puts the message back together as valid ICU, and the first lays it out again, so a file can be switched between the two shapes at any point. A window under the editor shows every form of the message the translator is working on, and a verifier lists what is still wrong.
 
 It is built for translators and language service providers doing software localisation. No knowledge of the ICU notation is needed to translate, and no plural rule has to be looked up: the forms and the numbers that select them come from the same CLDR data the application uses.
 
@@ -16,6 +16,7 @@ Full documentation in detail is maintained at <https://multifarious.filkin.com/p
 - **Syntax protected**: the selector and branch syntax sits between the segments as locked text. Arguments such as `{name}` and the count marker `#` are placeholder tags inside the sentence, placed like any tag, with an option to lock them.
 - **Restore to whole messages**: the forms a language does not use are removed, apostrophes and braces typed as text are escaped, placeholders are checked, untranslated forms are filled from the source with a warning, and each message becomes one plain segment again, the shape Studio's file writers need. Expand lays a restored message out again with its translations and confirmation states.
 - **Keep what is already translated**: a message pre-translated as a whole from a memory of restored messages can be left as it is, and locked, when every segment of it is matched at a chosen percentage or better. Off by default.
+- **Gender selects**: a select whose value is a gender is laid out with the genders the target language has, from a grammar dictionary covering 61 languages, with the grammatical term and a sample noun in the ICU Forms window. A developer's file names the application's own arguments and says where it supplies an article argument, and an editable table on the Grammar dictionary tab shows the dictionary in force.
 - **ICU Forms window**: every form of the active message with the numbers that select it, written out in full, the source and target as sentences, a count box, the reassembled message checked as you type, and a zoom.
 - **ICU Verifier**: untranslated forms, placeholder mismatches, a count marker typed as text and a message that will not parse, on F8 and as segments are confirmed, with a severity per check.
 - **Reports** per language pair listing every message and what happened to it.
@@ -42,11 +43,11 @@ The app is a standard Trados Studio plugin installed from the AppStore.
 The defaults are chosen so that a first project works without changing anything: plural and ordinal messages are expanded, the placeholders are tags a translator can place, the branch budget is 24, every message is expanded whatever its match, and Restore fills an untranslated form from the source with a warning.
 
 ### Configuration Steps
-1. **Step 1**: Run the task through **Batch Tasks** and open its page on the Settings step, or open **Project Settings** and find the two tasks and the verifier there. A project template carries the settings into new projects.
-2. **Step 2**: Adjust what you need. Expand: which message kinds to expand, which source form a new form starts from, whether to lock the placeholders, the branch budget, whether to keep messages already translated at a given match and lock them, and what to do with a value that does not parse. Restore: what to do with an untranslated form and with a placeholder mismatch. Verifier: whether it runs and the severity of each check.
-3. **Step 3**: Save. Expand settings take effect on the next run of the task; a file already expanded is left alone until it is restored.
+1. **Step 1**: Select the project in the Projects view and click **ICU Settings** on the **Add-ins** tab, which opens the Expand ICU, Grammar dictionary and Restore ICU pages in one dialog. The same pages appear on the Settings step of the batch task wizard and in the New Project wizard; Studio does not show a plugin task's page under Project Settings. The verifier's page is under Project Settings, Verification. A project template carries the settings into new projects.
+2. **Step 2**: Adjust what you need. Expand, Options tab: which message kinds to expand and the branch budget, whether to keep messages already translated at a given match and lock them, which source form a new form starts from, whether to lock the placeholders, and what to do with a value that does not parse. Grammar dictionary tab: the languages and their keys, the application's arguments, and Import for the developer's file. Restore: what to do with an untranslated form and with a placeholder mismatch. Verifier: whether it runs and the severity of each check.
+3. **Step 3**: OK. Expand settings take effect on the next run of the task; a file already expanded is left alone until it is restored.
 
-> **Tip**: Every group on the pages has a help panel that explains the choice: why expand at all, where the text for a new form comes from, why the placeholders are tags, what the branch budget is for.
+> **Tip**: Every group on the pages has a help panel that explains the choice: why expand at all, where the text for a new form comes from, why the placeholders are tags, what the branch budget is for, what the grammar dictionary is.
 
 ---
 
@@ -65,7 +66,8 @@ To go back to the forms, run **Expand ICU** on the restored file. Each form gets
 
 ### Advanced Tips
 - **A form the source language does not have**, such as Russian "few", starts from the source's "one" form where there is one, otherwise from "other". The ICU Forms window's tooltip says which. Switch to "always other" if your translators prefer the general form as the starting point.
-- **Nested messages**: a select, which chooses a branch by a value such as gender, keeps its branches, and a plural inside each branch is expanded. Offsets, exact values such as `=0` and ordinals are handled.
+- **Nested messages**: a select, which chooses a branch by a value such as a status, keeps its branches, and a plural inside each branch is expanded. Offsets, exact values such as `=0` and ordinals are handled.
+- **Gender selects**: an argument whose name ends in Gender or Article is laid out with the forms the target language needs, German three genders, French two with their articles, Japanese one. An argument named differently is declared in the developer's file, which Save template… on the Grammar dictionary tab writes out for the developer to fill in and Import… takes back. The article forms for French and Italian are inserted only where the file says the application supplies the article argument.
 - **Two independent plurals in one message multiply**: six forms times six is 36 segments for Arabic. Over the branch budget the message keeps the source's own branches with the syntax protected, and the report says so. The ICU Forms window shows which numbers each kept branch is used for; `other` takes every number the message has no form for.
 - **Apostrophes**: type them as usual. Restore doubles the straight apostrophe as ICU requires. Studio's AutoCorrect may replace it with a typographic one, which ICU treats as plain text.
 - **Translation memory**: Update Main Translation Memories stores the file as it is at the time: one unit per form while expanded, one unit per whole message once restored, the source as the developer wrote it against the whole target message. Store whichever suits the memory's use, or both.
@@ -106,6 +108,12 @@ A9: CLDR gives these languages, and Catalan, a `many` form for a round million a
 **Q10: My values contain HTML. Can the markup be tags?**
 A10: Yes. Turn on the file type's Embedded Content settings before creating the project: the HTML embedded content processor on JSON, or tag definition rules on Java Resources. Expand puts each tag into every form it belongs to and Restore puts them back, so the generated file carries the markup as the source did. A tag pair that opens in one branch and closes in another cannot be laid out, and that message is left as it is with a warning.
 
+**Q11: A message that chooses by gender kept the source's branches.**
+A11: Its argument name does not end in Gender or Article and is not declared in the project's developer's file, or the target language is not in the grammar dictionary. Declare the argument in the file, or add the language on the Grammar dictionary tab. A select by anything other than grammar, such as a status, is meant to keep its branches.
+
+**Q12: French got masculine and feminine but no article forms.**
+A12: An article form is a selector the source does not have, and inserting it changes what the application must pass at run time, so it is only inserted where the developer's file says the application supplies the article argument for that language. Add `"supplies": { "fr": ["article"] }` to the argument in the file, import it again, and expand a fresh copy of the file.
+
 > **Tip**: Full documentation in detail is maintained at <https://multifarious.filkin.com/product/icu-support/>.
 
 ---
@@ -116,6 +124,6 @@ Copyright 2026 multifarious. Released under the Apache License, Version 2.0. The
 ---
 
 ## Acknowledgements
-The plural rules and their example numbers are the Unicode **CLDR** plural rules, used under the Unicode licence.
+The plural rules and their example numbers are the Unicode **CLDR** plural rules, and the gender sets of the grammar dictionary are CLDR's grammatical features, both used under the Unicode licence.
 
 ---
