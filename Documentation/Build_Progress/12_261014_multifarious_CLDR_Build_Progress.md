@@ -210,6 +210,14 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
   window only has to find it; the Counts column and the rows stay empty.  In the test file
   this is `RESULT_ON_DEVICETYPE` for French and Italian and `DEVICE_NEEDS_TIME` for all
   but English.
+- **The ICU Forms window should scroll to the active row** (2.0.1 candidate, Paul,
+  14 October).  A message with more forms than the window shows, a walked list at 100 or
+  an Italian gender over a plural, leaves the active row out of view as the translator
+  moves through the segments, so the hints cannot be followed.  Once the active row would
+  fall outside the visible rows, keep it vertically centred: `ScrollViewer.ScrollToVerticalOffset`
+  from the row's position when `IsActive` changes, in the view's code-behind, with no
+  scrolling while the row is already in view so the translator's own scroll position is
+  not fought.  The click navigation added today goes the other way and is unaffected.
 - The open items from handovers 05 to 11 stand.
 
 ## A test file from the source material (after the release)
