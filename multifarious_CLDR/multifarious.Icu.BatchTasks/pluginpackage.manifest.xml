@@ -4,7 +4,7 @@
        the listing by this name. -->
   <PlugInName>multifariousICU Support for Trados Studio</PlugInName>
   <Version>2.0.0.0</Version>
-  <Description>Batch tasks for ICU MessageFormat messages in JSON and Java properties files: expand plural forms into one translatable segment per CLDR category the target language needs, and finalise the translated messages before target generation.</Description>
+  <Description>Batch tasks for ICU MessageFormat messages in JSON and Java properties files: expand plural, ordinal and gender messages into one translatable segment per form the target language needs, and restore the translated messages to valid ICU before target generation.</Description>
   <Author>multifarious</Author>
   <RequiredProduct name="TradosStudio" minversion="19.0" maxversion="19.9"/>
   <!-- The ICU, CLDR and planning layers are separate assemblies, so they must be named here or
