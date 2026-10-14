@@ -156,6 +156,11 @@ structure path and use it where the unit has no key of its own
 (`ResourceKey.StructurePathOf`); the expansion records it as `icu:key`, so the window and
 the reports name the message.  Two tests, 1,661.  R12 in the plan.
 
+The retest went on through R1 to R6 and R12 on Projects 72 to 74, all passing, with one
+more change from R7: the refusal message was still out of sight under a sixty-row table, so
+it now sits directly under the row it belongs to (`ce0cb4f`); the box under the table stays
+only for a refused language tag.  The package of 18:48 carries everything in this handover.
+
 Seen once in the log and not reproduced: Studio's message reporter threw a null reference on
 a located placeholder error (Project 64).  The verifier now logs the full exception and
 reports the message on the unit when the located report throws.  Section R of the test plan
