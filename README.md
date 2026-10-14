@@ -1,6 +1,6 @@
 # multifariousICU Support for Trados Studio
 
-A Trados Studio 2026 plugin that turns ICU MessageFormat plurals into ordinary translation: one segment per form the target language needs, each a whole sentence, with the syntax protected and the message reassembled for you.
+A Trados Studio 2026 plugin that turns ICU MessageFormat plurals, and selects by gender, into ordinary translation: one segment per form the target language needs, each a whole sentence, with the syntax protected and the message reassembled for you.
 
 - AppStore listing: <https://appstore.rws.com/plugin/490>
 - User documentation: <https://multifarious.filkin.com/product/icu-support/>
@@ -18,19 +18,23 @@ A translator normally receives that whole expression as one segment.  They have 
 
 ## What the plugin does
 
-**Expand ICU**, a batch task, restructures every `plural` and `selectordinal` message in a JSON or Java properties target file into one segment per CLDR form the target language needs.  For the message above a Russian file gets four segments, `one`, `few`, `many` and `other`, each a complete sentence.  The selector syntax between the forms is locked text.  Arguments such as `{name}` and the count marker `#` are placeholder tags inside the sentence, placed like any tag in Studio.  A `select` keeps its branches and a plural inside one is expanded.  A message with arguments and no plural becomes one segment with the arguments protected.
+**Expand ICU**, a batch task, restructures every `plural` and `selectordinal` message in a JSON or Java properties target file into one segment per CLDR form the target language needs.  For the message above a Russian file gets four segments, `one`, `few`, `many` and `other`, each a complete sentence.  The selector syntax between the forms is locked text.  Arguments such as `{name}` and the count marker `#` are placeholder tags inside the sentence, placed like any tag in Studio.  A message with arguments and no plural becomes one segment with the arguments protected.
+
+A `select` whose value is the gender of a thing named in the sentence is laid out the same way, from a **grammar dictionary** built on CLDR's grammatical features for 61 languages: German gets masculine, feminine and neuter, French masculine and feminine with their article forms, Japanese one form.  The select is recognised by its argument name, `vehicleGender` or `vehicleArticle`, or by a developer's file that names the application's own arguments, says for which languages it supplies a dependent argument such as the article, respells keys and adds languages.  Any other `select` keeps its branches, and a plural inside one is expanded.
+
+**ICU Settings**, a button on the Projects view's Add-ins tab, opens the two tasks' settings for the selected project: the Expand options, the grammar dictionary as two editable tables, and the Restore options.  Studio shows a plugin task's settings page only inside its wizards, which is why the button exists.
 
 **Restore ICU**, a batch task, puts each message back together as one plain segment on each side: it removes the forms the language does not use, escapes apostrophes and braces typed as text, checks the placeholders against the source, fills an untranslated form from the source with a warning, and assembles the forms into one ICU message, the shape Studio's file writers emit as it stands.  Run it before Generate Target Translations, or whenever you want the whole messages back.  Expand ICU on a restored file lays the forms out again with their translations and their confirmation states, so the two shapes can be switched between at will.
 
 A project pre-translated from a memory of whole messages can keep them: Expand ICU has a setting to leave a message alone when every segment of it is matched at a chosen percentage or better, locked if you wish.  It is off by default, so a translator sees every match form by form unless the project says otherwise.
 
-**ICU Forms**, a window under the editor, shows every form of the message the active segment belongs to: the numbers that select each form, source and target as sentences, a count box, and the whole message reassembled and checked as you type.
+**ICU Forms**, a window under the editor, shows every form of the message the active segment belongs to: the numbers that select each form, or the grammatical term and a sample noun for a gender form, source and target as sentences, a count box, and the whole message reassembled and checked as you type.  A click on a row moves the editor to that segment.
 
 **ICU Verifier** joins Studio's verifiers on F8: an untranslated form, placeholders that differ from the source, a count marker typed as text, or a message that will not parse.
 
 Each task writes a report per language pair.  The settings pages, the window, the reports and the verifier messages are in English, German, French, Spanish, Italian, Japanese, Korean, Russian and Simplified Chinese.
 
-The plural rules and the numbers that select each form come from the CLDR data embedded in the plugin, the same data the applications use, so the forms Studio offers are the forms the application will select.
+The plural rules and the numbers that select each form come from the CLDR data embedded in the plugin, the same data the applications use, so the forms Studio offers are the forms the application will select.  The gender sets come from CLDR's grammatical features; the article forms for French and Italian, the hints and the sample nouns are the plugin's own.
 
 ## Workflow
 
@@ -55,9 +59,9 @@ Markup opened as tags through a file type's Embedded Content settings is kept: E
 
 ## Installing
 
-Install from the integrated AppStore inside Trados Studio, or download the `.sdlplugin` from the [AppStore record](https://appstore.rws.com/plugin/490) and double-click it.  Restart Studio.  The two tasks appear in the Batch Tasks list, ICU Forms on the editor's Add-ins tab in the multifarious ICU group, and ICU Verifier under Project Settings, Verification.
+Install from the integrated AppStore inside Trados Studio, or download the `.sdlplugin` from the [AppStore record](https://appstore.rws.com/plugin/490) and double-click it.  Restart Studio.  The two tasks appear in the Batch Tasks list, ICU Forms on the editor's Add-ins tab in the multifarious ICU group, ICU Settings on the Projects view's Add-ins tab in the same group, and ICU Verifier under Project Settings, Verification.
 
-Requirements: Trados Studio 2026 on Windows.  There are no other dependencies.  The ICU parser and the CLDR data are inside the plugin.
+Requirements: Trados Studio 2026 on Windows.  There are no other dependencies.  The ICU parser, the CLDR data and the grammar dictionary are inside the plugin.
 
 ## Building from source
 
@@ -84,22 +88,23 @@ Notes:
 - `TreatWarningsAsErrors` is on.  The build is expected to be clean.
 - The UI strings accessor `Resources\UIStrings.cs` is generated from `UIStrings.resx` by `multifarious_CLDR\tools\generate-uistrings.ps1`.  Run it after adding or renaming an entry.  A test fails if the two drift apart, and another compares every translated resx with the English one.
 - Setting `MULTIFARIOUS_ICU_DIAGNOSTICS=1` in Studio's environment writes `%TEMP%\multifarious-icu-diagnostics.log`.
+- `multifarious_CLDR\tools\render-settings.ps1` renders the settings dialog and the Expand ICU page to PNG against Studio's style assemblies without opening Studio, which the tests cannot do.  Windows PowerShell with `-STA`, after a Debug build.
 
 ## Repository layout
 
 ```
 multifarious_CLDR\                  solution root
     Icu.Core\                       ICU MessageFormat: parser, tree, serialiser, hoisting, escaping
-    Icu.Cldr\                       CLDR plural data, rule evaluator, locale fallback, hints
-    multifarious.Icu.Expansion\     classifier, planner, plan, options (no Studio dependency)
-    multifarious.Icu.BatchTasks\    the plugin: tasks, processors, settings, editor window, verifier
+    Icu.Cldr\                       CLDR plural data, the grammar dictionary, rule evaluator, locale fallback, hints
+    multifarious.Icu.Expansion\     classifier, planner, plan, options, the dictionary model (no Studio dependency)
+    multifarious.Icu.BatchTasks\    the plugin: tasks, processors, settings, the Projects view dialog, editor window, verifier
     multifarious.Icu.Tests\         one xunit project, folders per library
     test-corpus\                    ICU fixture files (JSON, properties)
-    tools\                          generate-uistrings.ps1
+    tools\                          generate-uistrings.ps1, render-settings.ps1
 Documentation\
     appstore\                       AppStore description, documentation, user guide, changelog, samples
     Build_Progress\                 session handovers, one per working session
-Images\                             tile and icon
+Images\                             tile and icons
 ```
 
 The first three projects reference nothing from Studio and are tested without it.  `multifarious.Icu.BatchTasks` is the Studio-facing shell over them.  The libraries target .NET Framework 4.8 in C# 12, with PolySharp supplying the compiler-facing types the framework lacks.
@@ -118,10 +123,13 @@ The design is recorded as it was made, in the handovers under `Documentation\Bui
 - **Filter tags travel as sentinels.**  A value is parsed with one private-use character in place of each of the filter's tags, so the ICU parser sees them as text and hoisting carries them into the forms with the text around them; the writer puts a clone of the tag where each character lands.  Studio's writers accept the same tag cloned into several segments and write each as markup, and drop a pair split across segments (Project 56 probes, 12 October 2026), so a form holding one half of a pair refuses and the unit passes through.
 - **No comments except warnings, and those on the paragraph unit.**  Studio copies a comment inside a source segment into the target.  Expand warnings go on the unit, which Studio never copies.  Restore findings go on the target segment concerned, as a reviewer would record them, and are removed at the start of the next run.
 - **Bilingual API, not BCM converters.**  Studio ships converters from SDLXLIFF to its Bilingual Content Model and back, which would have let the cloud app's code run unchanged.  They are undocumented and the fidelity of the regenerated SDLXLIFF is unproven, so the tasks operate on SDLXLIFF through the File Type Support Framework.
+- **A select by gender is a plural with other keys.**  The shipped dictionary gives each of CLDR's 61 languages with grammatical features its gender set, and French and Italian an article set narrowed by gender and number; a select is recognised by an argument name suffix or by the project's developer's file.  A key the dictionary knows but the language lacks is pruned; a key no language uses is the developer's own and is kept.  An article selector the source does not have is inserted only where the developer's file says the application supplies it, because an inserted selector changes what the application must pass at run time.  The dictionary lives in the project settings as the developer's file's text; the Grammar dictionary tab shows the effective dictionary and writes every edit back into that file.
+- **Per-segment records are keyed by position, never by segment id.**  What the expansion records for a form (its source form, its hint and sample) names the segment by its position in the unit, because segment ids were found renumbered after the task in one project and no file shape reproduced it.
+- **Settings pages live in the wizards; the dialog is the way in.**  Studio adds a plugin task's settings page only when a wizard hands it a task template, never under Project Settings, so the Projects view button opens the pages over the selected project's settings and saves them to the project.
 
 ## Maturity and feedback
 
-The tasks, the window and the verifier have been tested end to end on a set of ICU messages covering nested selects, exact values, offsets, ordinals and argument-only messages, generating files that parse and render as the source does for every number.  Real projects will contain messages that set never saw.  Please open an issue for a message that lays out oddly, a form a language needs that the window describes badly, or a file type you would like added.
+The tasks, the window and the verifier have been tested end to end on a set of ICU messages covering nested selects, exact values, offsets, ordinals, gender selects with and without article forms, and argument-only messages, generating files that parse and render as the source does for every number.  Real projects will contain messages that set never saw.  Please open an issue for a message that lays out oddly, a form a language needs that the window describes badly, a gender set a language needs, or a file type you would like added.
 
 ## Licence
 
@@ -129,7 +137,7 @@ Apache License, Version 2.0.  See [LICENSE](LICENSE) and [NOTICE](NOTICE).  You 
 
 Third-party material:
 
-- The plural rules and their example numbers in `Icu.Cldr\Data\` are from the Unicode CLDR project, release 48, used under the [Unicode Licence v3](https://www.unicode.org/license.txt).  A copy is beside the data files.
+- The plural rules and their example numbers in `Icu.Cldr\Data\`, and the gender sets of the grammar dictionary, are from the Unicode CLDR project, release 48, used under the [Unicode Licence v3](https://www.unicode.org/license.txt).  A copy is beside the data files.
 - Newtonsoft.Json (MIT) is referenced but not redistributed.  Studio ships it.
 - PolySharp (MIT) is a build-time source generator.  Nothing of it reaches the package.
 - xunit (Apache 2.0) and FsCheck (BSD 3-clause) are used by the tests only.
