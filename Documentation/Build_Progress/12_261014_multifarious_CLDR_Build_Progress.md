@@ -3,8 +3,9 @@
 Twelfth session.  The settings pages reworked before the grammar dictionary's Studio run: the
 dictionary on a tab of its own with two editable tables, the Expand options reordered into
 four groups, a settings icon for the Projects view button.  Built, 1,652 tests, rendered
-offscreen against Studio's styles, deployed to Studio's Packages folder at 09:37.  Not yet
-committed when this was written; the commit message is proposed below.
+offscreen against Studio's styles, deployed to Studio's Packages folder at 09:37, committed as
+`e777049` on `release/2.0`.  The template stays as it is (option 1, Paul): its `keys` section is
+empty, so an import fills the arguments table and leaves every language row Default.
 
 ## Kickoff prompt for the next session (paste this)
 
