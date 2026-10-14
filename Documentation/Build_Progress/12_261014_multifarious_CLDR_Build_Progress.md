@@ -1,36 +1,35 @@
 # 12 - multifarious_CLDR Build Progress - 2026-10-14
 
-Twelfth session.  The settings pages reworked before the grammar dictionary's Studio run, then the run itself and its fixes: the
-dictionary on a tab of its own with two editable tables, the Expand options reordered into
-four groups, a settings icon for the Projects view button.  Built, 1,652 tests, rendered
-offscreen against Studio's styles, the morning package deployed at 09:37 and committed as
-`e777049` on `release/2.0`.  The template stays as it is (option 1, Paul): its `keys` section is
-empty, so an import fills the arguments table and leaves every language row Default.
+Twelfth session, and the release.  The settings pages reworked before the grammar
+dictionary's Studio run, the run itself and its fixes, the documents for 2.0, the Release
+build, the branch and tag work, and **2.0.0.0 published on the AppStore and live** (Paul,
+late on 14 October).  1,662 tests.  The dictionary is a tab of its own with two editable
+tables, the Expand options are in four groups, the Projects view button has its own icon.
+The template stays as it is (option 1, Paul): its `keys` section is empty, so an import fills
+the arguments table and leaves every language row Default.
 
 ## Kickoff prompt for the next session (paste this)
 
 > Read `CLAUDE.md`, then
 > `Documentation\Build_Progress\12_261014_multifarious_CLDR_Build_Progress.md`.
 >
-> Release 2.0 is on branch `release/2.0`: Restore ICU in place of Finalise, target-aware
-> Expand, keep settings, comments and filter tags through both tasks, the source restored as
-> written.  Still open on the release: the user guide screenshots 4, 11 and 12, a native read
-> of the translations, and the release itself (merge to `main`, Release build, store package).
+> 2.0.0.0 is released and live on the AppStore (14 October 2026): Restore ICU in place of
+> Finalise, target-aware Expand, keep settings, comments and filter tags through both tasks,
+> the source restored as written, and the grammar dictionary for gender selects with its
+> own tab, the ICU Settings dialog on the Projects view, and the editable tables.  `main`
+> and `release/2.0` are level at the release plus the handover, `v2.0.0.0` is on `1e141db`,
+> `release/1.0` and `v1.0.2.0` hold the previous release; new work starts from `main` and a
+> 2.0.x fix goes on `release/2.0`, tagged and merged back.  1,662 tests.
 >
-> On top of it, the grammar dictionary for select messages
-> (`Documentation\Design\Grammar-Dictionary-Design-v2.md`, local): Phases 0 to 3 built and
-> committed, the ICU Settings dialog on the Projects view, and on 14 October the settings
-> pages reworked: the Expand ICU page has two tabs, Options and Grammar dictionary; the
-> dialog has three, Expand ICU, Grammar dictionary, Restore ICU; the Grammar dictionary tab
-> shows the effective dictionary as two editable tables whose edits are written into the
-> developer's file; the Projects view button has its own icon.  1,652 tests, forty-four new UI strings.  The Studio test
-> plan `Documentation\Testing\Grammar-Dictionary-Studio-Test-Plan.md` (local) has sections S
-> and C rewritten for the tabs; A and S1 to S2 passed on the 13 October build, so S2 onwards
-> is where to resume on the 14 October afternoon package (deployed 16:08; Studio installs it on its
-> next start).  Its Project 63 run is from `test-corpus\grammar.json`, targets German, French,
-> Italian, Japanese and American English.  Then Phase 4, the user guide section (the tabs,
-> the tables, the developer's file key by key, the shipped default), and the forty-four new
-> UI strings need a native read with the rest.  The source material under
+> Open after the release: the ten screenshots for the website guide and its HTML at
+> `Documentation\website\multifariousICU_UserGuide_2.0.html` (local), the native read of the
+> fifty-three strings added on 14 October, and the uncommitted `tools\plan-file.ps1`, a
+> harness that plans any JSON file for any languages outside Studio, which Paul has not yet
+> decided to keep.  The design note `Documentation\Design\Grammar-Dictionary-Design-v2.md`
+> and the test plan `Documentation\Testing\Grammar-Dictionary-Studio-Test-Plan.md` are local.
+> A test file built from the source material is under `Documentation\CustomDictionaries\Test`
+> (local): German source, article selects written with gender keys, `other` carrying the
+> plural, and what the planner makes of it is in this handover.  The source material under
 > `Documentation\CustomDictionaries` is local and must not be named in anything published.
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
@@ -39,7 +38,7 @@ empty, so an import fills the arguments table and leaves every language row Defa
 
 ## Where we are in one line
 
-The grammar dictionary is a tab the translator can read and the developer can edit in place, the Expand options read in the order the task decides them, and nothing of either has yet been opened in Studio.
+2.0.0.0 is live with the grammar dictionary, the settings tabs and the ICU Settings dialog, tested through the whole plan in Studio and documented; the next session starts from `main`.
 
 ## What was asked (Paul, 14 October 2026)
 
@@ -191,15 +190,56 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
   for the store upload, and `v2.0.0.0` was moved to the rebuilt commit before the upload.  The manifest's description, which the
   AppStore shows, still said "finalise" and was corrected first (`9e87e9a`).  Git: `v1.0.2.0`
   and `release/1.0` on the old `main`, `main` fast-forwarded to `release/2.0`, `v2.0.0.0` on
-  `9e87e9a`, all pushed.  `CLAUDE.md` records the branch scheme.  Still to do for the store:
-  the ten screenshots, the HTML guide at `Documentation\website\multifariousICU_UserGuide_2.0.html`
-  with its placeholders replaced, the upload itself, and the native read of the strings.
+  `9e87e9a`, all pushed; `v2.0.0.0` then moved to `1e141db` for the sample-noun fix.
+  `CLAUDE.md` records the branch scheme.  **Paul uploaded the package and 2.0.0.0 went live
+  on the AppStore late on 14 October.**  Still to do for the website: the ten screenshots and
+  the HTML guide at `Documentation\website\multifariousICU_UserGuide_2.0.html` with its
+  placeholders replaced; and the native read of the strings.
 - The fifty-three new strings in eight languages need a native read with the rest.
 - The Options tab's sub-headings reuse `Expand_SeedHeader` and `Expand_PlaceholdersHeader`
   as they stand; if a native reader finds them long as sub-headings, shorten there.
 - Hints, samples, needs, narrowing and renames are read-only on the page.  Making them
   editable means extending the developer's file format: a separate decision.
 - The open items from handovers 05 to 11 stand.
+
+## A test file from the source material (after the release)
+
+Paul asked for a test file in the shape of the files the dictionary was designed for, from
+the source material under `Documentation\CustomDictionaries` (local, never named in anything
+published).  Written to `Documentation\CustomDictionaries\Test` (local): a JSON resource file
+of 31 values with a German source, the application's macro fragments inlined as the
+application resolves them, and a developer's file for it.  Planned for English, French,
+Italian and Spanish with `tools\plan-file.ps1` (uncommitted, Paul's call), which plans any
+JSON file for any languages with or without a developer's file outside Studio.  What the
+material taught, for the design:
+
+- **`other` carries the plural.**  In this content a gender select's `other` branch is the
+  sentence for several devices, not a neutral singular.  An English target, with `other`
+  alone, is seeded from that plural sentence.  The developer's file's `other` wording is
+  what tells the translator; nothing else can.
+- **Article selects written with gender keys.**  The German macros use the article argument
+  with MASCULINE, FEMININE and NEUTER, where the French and Italian macros use LE, L, LA and
+  IL, LO, L, I, GLI, LA under a gender.  Without help the dictionary treats the German keys
+  as the developer's own and every target keeps them.  The fix is in the file: an article
+  entry for `de` with the gender keys makes them keys the kind knows, so French prunes them
+  and lays out LE, LA, L, other; `en` and `es` get `other` alone, one form.  A real project
+  will need exactly this entry, and the user guide does not yet say so.
+- **Keys respelt per language.**  The Spanish macros use MASKULINUM in a few cells and
+  MASCULINE elsewhere; the file can respell per argument, not per language, so a project
+  with mixed spellings has to be cleaned at the source.
+- **Italian indefinite articles** (UN, UNO, UNA) exist in the macros; the file adds them to
+  Italian's set, but the `within` narrowing knows nothing of them, so they are offered on
+  every article row rather than under the right gender and number.  A limit of the format.
+- **Over the budget as a matter of course.**  A list macro with an article select in each
+  of its `=1`, `=2` and `other` slots plans to 212 French and 3,110 Italian segments, and a
+  gender select over a nested duration plural to 225 and 525; both are laid out walked.  Two
+  article selects in one sentence reach 16 for French and 100 for Italian.
+- **Shapes that parse but mean something else**, both from the sheet: a stray `mit {…}`
+  between branches is read as a branch named "mit", and `other{x,plural}` is literal text.
+  Neither is reported; both pass through the plugin as the developer wrote them.
+- A plural written as a select, `=0 =1 =2` with number arguments, application-state selects
+  (OVERZERO, CST_PROCESSACTIONS_SC, TEXT, TODAY), two plurals on one argument in a sentence,
+  and SSML (`<speak>`, `<phoneme>`) inside a value all behave as the design says.
 
 ## Traps
 
