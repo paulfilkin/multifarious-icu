@@ -31,6 +31,7 @@ namespace multifarious.Icu.BatchTasks.Verification
 
         private readonly IcuFormsReader _reader = new IcuFormsReader();
         private SegmentId _currentSegmentId;
+        private string _currentUnitId;
         private bool _enabled = true;
         private CheckSeverity _emptyForm = CheckSeverity.Warning;
         private CheckSeverity _placeholders = CheckSeverity.Error;
@@ -116,7 +117,7 @@ namespace multifarious.Icu.BatchTasks.Verification
             catch (Exception ex)
             {
                 Diagnostics.Write("verifier: FAILED on unit " + paragraphUnit.Properties.ParagraphUnitId.Id
-                    + ": " + ex.GetType().Name + ": " + ex.Message);
+                    + ": " + ex);
                 MessageReporter.ReportMessage(this, UIStrings.Verifier_Origin, ErrorLevel.Error,
                     ex.GetType().Name + ": " + ex.Message, paragraphUnit.Properties.ParagraphUnitId.Id);
             }
@@ -131,6 +132,7 @@ namespace multifarious.Icu.BatchTasks.Verification
 
             var targets = TargetSegments(paragraphUnit);
             var onlySegment = _currentSegmentId.Id;
+            _currentUnitId = paragraphUnit.Properties.ParagraphUnitId.Id;
             ISegment reportedInvalidOn = null;
 
             for (var index = 0; index < model.Rows.Count && index < targets.Count; index++)
@@ -172,7 +174,18 @@ namespace multifarious.Icu.BatchTasks.Verification
 
             var location = new TextLocation(target);
             Diagnostics.Write("verifier: report " + level.Value + " segment " + target.Properties.Id.Id + ": " + message);
-            MessageReporter.ReportMessage(this, UIStrings.Verifier_Origin, level.Value, message, location, location);
+            try
+            {
+                MessageReporter.ReportMessage(this, UIStrings.Verifier_Origin, level.Value, message, location, location);
+            }
+            catch (Exception ex)
+            {
+                // Studio's reporter threw once on a located message (Project 64, 14 October
+                // 2026, a null reference inside Studio). The message still reaches the results,
+                // on the paragraph unit, and the stack goes to the log for the next time.
+                Diagnostics.Write("verifier: located report failed, reported on the unit instead: " + ex);
+                MessageReporter.ReportMessage(this, UIStrings.Verifier_Origin, level.Value, message, _currentUnitId);
+            }
         }
 
         private static string FormName(IcuFormRow row)

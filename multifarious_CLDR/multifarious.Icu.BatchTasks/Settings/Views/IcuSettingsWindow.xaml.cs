@@ -54,5 +54,16 @@ namespace multifarious.Icu.BatchTasks.Settings.Views
             _restore.Apply();
             DialogResult = true;
         }
+
+        /// <summary>
+        /// Every setting on the three tabs back to its default, the dictionary file included,
+        /// as the wizard page's own Reset to defaults does. The groups are reset at once, as
+        /// there; OK then writes the project, Cancel leaves the project file as it was.
+        /// </summary>
+        private void OnResetDefaults(object sender, RoutedEventArgs e)
+        {
+            _expand.ResetToDefaults();
+            _restore.ResetToDefaults();
+        }
     }
 }

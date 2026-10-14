@@ -32,6 +32,25 @@
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="Margin" Value="0,4,0,0" />
       </Style>
+      <!-- A refused edit: boxed and placed under the table it came from, so it is seen where the
+           user is looking (test plan S4a, C17 to C20). -->
+      <Style TargetType="Border" x:Key="InvalidBox">
+        <Setter Property="Background" Value="#FDECEA" />
+        <Setter Property="BorderBrush" Value="#B00020" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="Margin" Value="0,8,0,0" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="InvalidText">
+        <Setter Property="Foreground" Value="#B00020" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+      </Style>
+      <Style TargetType="TextBlock" x:Key="Status">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+      </Style>
       <Style TargetType="TextBlock" x:Key="ColumnHeader">
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Margin" Value="0,0,8,4" />
@@ -45,6 +64,31 @@
         <Setter Property="Margin" Value="0,0,8,0" />
         <Setter Property="Padding" Value="2" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+      </Style>
+      <!-- The same cell, red while its row is what the dictionary refuses. -->
+      <Style TargetType="TextBox" x:Key="LanguageCellBox" BasedOn="{StaticResource CellBox}">
+        <Style.Triggers>
+          <DataTrigger Binding="{Binding HasError}" Value="True">
+            <Setter Property="BorderBrush" Value="#B00020" />
+            <Setter Property="BorderThickness" Value="2" />
+          </DataTrigger>
+        </Style.Triggers>
+      </Style>
+      <Style TargetType="TextBox" x:Key="ArgumentCellBox" BasedOn="{StaticResource CellBox}">
+        <Style.Triggers>
+          <DataTrigger Binding="{Binding HasError}" Value="True">
+            <Setter Property="BorderBrush" Value="#B00020" />
+            <Setter Property="BorderThickness" Value="2" />
+          </DataTrigger>
+        </Style.Triggers>
+      </Style>
+      <Style TargetType="TextBox" x:Key="RoleCellBox" BasedOn="{StaticResource CellBox}">
+        <Style.Triggers>
+          <DataTrigger Binding="{Binding Row.HasError}" Value="True">
+            <Setter Property="BorderBrush" Value="#B00020" />
+            <Setter Property="BorderThickness" Value="2" />
+          </DataTrigger>
+        </Style.Triggers>
       </Style>
       <Style TargetType="Button" x:Key="RowButton" BasedOn="{StaticResource Sdl.Button.SecondaryStyle}">
         <Setter Property="MinWidth" Value="64" />
@@ -78,7 +122,7 @@
 
       <!-- The file: what the default covers, what the project has, and the buttons. -->
       <TextBlock TextWrapping="Wrap" Margin="0,0,0,4" Text="{Binding DictionaryDefault, Mode=OneWay}" />
-      <TextBlock TextWrapping="Wrap" Margin="0,0,0,8" Text="{Binding DictionaryStatus, Mode=OneWay}" />
+      <TextBlock Style="{StaticResource Status}" Text="{Binding DictionaryStatus, Mode=OneWay}" />
       <WrapPanel>
         <Button TabIndex="10" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="110" Margin="0,0,8,4"
                 Content="{x:Static res:UIStrings.Expand_GrammarImport}" Click="OnImportDictionary" />
@@ -91,8 +135,9 @@
       </WrapPanel>
       <TextBlock Style="{StaticResource Invalid}" Text="{Binding ImportError, Mode=OneWay}"
                  Visibility="{Binding HasImportError, Converter={StaticResource VisibleWhenTrue}}" />
-      <TextBlock Style="{StaticResource Invalid}" Text="{Binding Error, Mode=OneWay}"
-                 Visibility="{Binding HasError, Converter={StaticResource VisibleWhenTrue}}" />
+      <Border Style="{StaticResource InvalidBox}" Visibility="{Binding ErrorInFile, Converter={StaticResource VisibleWhenTrue}}">
+        <TextBlock Style="{StaticResource InvalidText}" Text="{Binding Error, Mode=OneWay}" />
+      </Border>
       <TextBlock Style="{StaticResource Hint}" Margin="0,6,0,4" Text="{x:Static res:UIStrings.Expand_GrammarHint}" />
       <Expander Style="{StaticResource Help}" TabIndex="14" Margin="0,0,0,12" Header="{x:Static res:UIStrings.Expand_GrammarHelpHeader}">
         <Border Style="{StaticResource HelpBody}">
@@ -136,7 +181,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Style="{StaticResource Cell}" Text="{Binding Kind, Mode=OneWay}" />
                     <TextBlock Grid.Column="1" Style="{StaticResource Cell}" Text="{Binding Language, Mode=OneWay}" />
-                    <TextBox Grid.Column="2" Style="{StaticResource CellBox}" MinWidth="160"
+                    <TextBox Grid.Column="2" Style="{StaticResource LanguageCellBox}" MinWidth="160"
                              AutomationProperties.Name="{x:Static res:UIStrings.Grammar_ColumnKeys}"
                              Text="{Binding KeysText, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Column="3" Style="{StaticResource Cell}" Text="{Binding Source, Mode=OneWay}" />
@@ -159,10 +204,24 @@
             <TextBox TabIndex="21" Width="90" Padding="2" Margin="0,0,8,0" VerticalContentAlignment="Center"
                      AutomationProperties.Name="{x:Static res:UIStrings.Grammar_AddLanguageTag}"
                      ToolTip="{x:Static res:UIStrings.Grammar_AddLanguageTag}"
-                     Text="{Binding AddLanguageLocale, UpdateSourceTrigger=PropertyChanged}" />
+                     Text="{Binding AddLanguageLocale, UpdateSourceTrigger=PropertyChanged}">
+              <TextBox.Style>
+                <Style TargetType="TextBox">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding AddLanguageHasError}" Value="True">
+                      <Setter Property="BorderBrush" Value="#B00020" />
+                      <Setter Property="BorderThickness" Value="2" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBox.Style>
+            </TextBox>
             <Button TabIndex="22" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="80"
                     Content="{x:Static res:UIStrings.Grammar_Add}" IsEnabled="{Binding CanAddLanguage}" Click="OnAddLanguage" />
           </StackPanel>
+          <Border Style="{StaticResource InvalidBox}" Visibility="{Binding ErrorInLanguages, Converter={StaticResource VisibleWhenTrue}}">
+            <TextBlock Style="{StaticResource InvalidText}" Text="{Binding Error, Mode=OneWay}" />
+          </Border>
           <Expander Style="{StaticResource Help}" TabIndex="23" Header="{x:Static res:UIStrings.Grammar_LanguagesHelpHeader}">
             <Border Style="{StaticResource HelpBody}">
               <StackPanel>
@@ -217,7 +276,7 @@
                       <RowDefinition Height="Auto" />
                       <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBox Grid.Column="0" Style="{StaticResource CellBox}" MinWidth="90"
+                    <TextBox Grid.Column="0" Style="{StaticResource ArgumentCellBox}" MinWidth="90"
                              AutomationProperties.Name="{x:Static res:UIStrings.Grammar_ColumnArgument}"
                              Text="{Binding BaseName, UpdateSourceTrigger=PropertyChanged}" />
                     <ItemsControl Grid.Column="1" ItemsSource="{Binding Roles}" Focusable="False">
@@ -228,13 +287,13 @@
                       </ItemsControl.ItemsPanel>
                       <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                          <TextBox Style="{StaticResource CellBox}" Width="96"
+                          <TextBox Style="{StaticResource RoleCellBox}" Width="96"
                                    AutomationProperties.Name="{Binding Role, Mode=OneWay}"
                                    Text="{Binding ArgumentName, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                       </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <TextBox Grid.Column="2" Style="{StaticResource CellBox}" MinWidth="120"
+                    <TextBox Grid.Column="2" Style="{StaticResource ArgumentCellBox}" MinWidth="120"
                              AutomationProperties.Name="{x:Static res:UIStrings.Grammar_ColumnSupplies}"
                              Text="{Binding SuppliesText, UpdateSourceTrigger=PropertyChanged}" />
                     <Button Grid.Column="3" Style="{StaticResource RowButton}" Content="{x:Static res:UIStrings.Grammar_RemoveArgument}"
@@ -252,6 +311,9 @@
 
           <Button TabIndex="30" Style="{StaticResource Sdl.Button.SecondaryStyle}" MinWidth="110" Margin="0,10,0,0" HorizontalAlignment="Left"
                   Content="{x:Static res:UIStrings.Grammar_AddArgument}" Click="OnAddArgument" />
+          <Border Style="{StaticResource InvalidBox}" Visibility="{Binding ErrorInArguments, Converter={StaticResource VisibleWhenTrue}}">
+            <TextBlock Style="{StaticResource InvalidText}" Text="{Binding Error, Mode=OneWay}" />
+          </Border>
           <Expander Style="{StaticResource Help}" TabIndex="31" Header="{x:Static res:UIStrings.Grammar_ArgumentsHelpHeader}">
             <Border Style="{StaticResource HelpBody}">
               <StackPanel>
@@ -271,6 +333,9 @@
                    AutomationProperties.Name="{x:Static res:UIStrings.Grammar_OtherLabel}"
                    Text="{Binding OtherText, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
+        <Border Style="{StaticResource InvalidBox}" Visibility="{Binding ErrorInOther, Converter={StaticResource VisibleWhenTrue}}">
+          <TextBlock Style="{StaticResource InvalidText}" Text="{Binding Error, Mode=OneWay}" />
+        </Border>
         <Expander Style="{StaticResource Help}" TabIndex="41" Header="{x:Static res:UIStrings.Grammar_OtherHelpHeader}">
           <Border Style="{StaticResource HelpBody}">
             <TextBlock Style="{StaticResource HelpText}" Margin="0" Text="{x:Static res:UIStrings.Grammar_OtherHelp1}" />

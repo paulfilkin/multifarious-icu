@@ -241,6 +241,7 @@ namespace multifarious.Icu.BatchTasks.Services
                     }
                     Record(unitId, key, ExpandOutcome.Expanded, restored, written, seed, plan.Notes);
                     Diagnostics.Write("  unit " + unitId + ": expanded to " + written.Segments + " segments for " + targetLanguage
+                        + " numbered from " + seed.FirstSegmentNumber
                         + (seed.TargetForms != null ? ", " + written.TargetFormsFilled + " forms filled from the target" : string.Empty)
                         + (written.CommentsCarried > 0 ? ", " + written.CommentsCarried + " comment markers carried" : string.Empty)
                         + TagNote(written));

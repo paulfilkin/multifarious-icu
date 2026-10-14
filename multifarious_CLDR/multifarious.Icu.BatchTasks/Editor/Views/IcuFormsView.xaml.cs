@@ -20,6 +20,14 @@ namespace multifarious.Icu.BatchTasks.Editor.Views
         {
         }
 
+        /// <summary>A click on a row takes the editor to the row's segment.</summary>
+        private void OnRowClick(object sender, MouseButtonEventArgs e)
+        {
+            var viewModel = DataContext as IcuFormsViewModel;
+            var row = (sender as System.Windows.FrameworkElement)?.DataContext as IcuFormRowViewModel;
+            if (viewModel != null && row != null) viewModel.ActivateRow(row);
+        }
+
         /// <summary>Ctrl and the mouse wheel zoom the window, as they do the editor; a plain wheel scrolls it.</summary>
         private void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {

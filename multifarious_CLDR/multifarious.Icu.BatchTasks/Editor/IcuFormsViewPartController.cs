@@ -37,10 +37,30 @@ namespace multifarious.Icu.BatchTasks.Editor
             if (_view == null)
             {
                 _viewModel = new IcuFormsViewModel();
+                _viewModel.RowActivated += OnRowActivated;
                 _view = new IcuFormsView { DataContext = _viewModel };
             }
 
             return _view;
+        }
+
+        /// <summary>
+        /// A click on a row moves the editor to that segment, with the focus, so the window
+        /// navigates the document as well as following it. The editor then raises
+        /// ActiveSegmentChanged and the window refreshes as for any other move.
+        /// </summary>
+        private void OnRowActivated(object sender, RowActivatedEventArgs e)
+        {
+            if (_document == null) return;
+            try
+            {
+                var moved = _document.SetActiveSegmentPair(e.ParagraphUnitId, e.SegmentId, true);
+                Diagnostics.Write("forms: row clicked, segment " + e.SegmentId + " of unit " + e.ParagraphUnitId + (moved ? "" : " (not found)"));
+            }
+            catch (Exception exception)
+            {
+                Diagnostics.Write("forms: navigation failed: " + exception);
+            }
         }
 
         protected override void Initialize()
@@ -207,6 +227,7 @@ namespace multifarious.Icu.BatchTasks.Editor
             if (disposing)
             {
                 if (_editor != null) _editor.ActiveDocumentChanged -= OnActiveDocumentChanged;
+                if (_viewModel != null) _viewModel.RowActivated -= OnRowActivated;
                 Attach(null);
             }
 

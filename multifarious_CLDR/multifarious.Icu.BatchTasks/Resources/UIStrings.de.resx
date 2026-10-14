@@ -625,4 +625,7 @@
   <data name="Grammar_OtherHelp1" xml:space="preserve">
     <value>ICU verlangt, dass jedes select mit einem Zweig other endet, der gilt, wenn kein anderer Schlüssel passt. Was er enthält, ist Konvention des Projekts: die Pluralform, der unbekannte Fall, jeder andere Wert. Die hier eingegebenen Wörter erscheinen im Fenster ICU Forms als Hinweis zu jeder other-Form, damit die Übersetzerin oder der Übersetzer weiß, wofür die Form da ist.</value>
   </data>
+  <data name="Settings_ResetDefaults" xml:space="preserve">
+    <value>Standardwerte wiederherstellen</value>
+  </data>
 </root>

@@ -83,6 +83,13 @@ $scroller.ScrollToVerticalOffset(520)
 SnapTab 1 'dialog-grammar-tables.png'
 $scroller.ScrollToVerticalOffset(2200)
 SnapTab 1 'dialog-grammar-arguments.png'
+# A refused edit: the German row without other, the message under the table, the cell red.
+$grammar = $grammarView.DataContext
+$german = $grammar.Languages | Where-Object { $_.Kind -eq 'gender' -and $_.LocaleKey -eq 'de' }
+$german.KeysText = 'MASCULINE, FEMININE'
+$scroller.ScrollToVerticalOffset(1800)
+SnapTab 1 'dialog-grammar-error.png'
+$german.Reset()
 SnapTab 2 'dialog-restore.png'
 
 # The wizard page too: the two inner tabs, at the batch task wizard's narrower width.

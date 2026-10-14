@@ -625,4 +625,7 @@
   <data name="Grammar_OtherHelp1" xml:space="preserve">
     <value>ICU exige que todo select termine en una rama other, que se toma cuando ninguna otra clave coincide. Lo que contiene es convención del proyecto: la forma plural, el caso desconocido, cualquier otro valor. Las palabras que escriba aquí se muestran como indicación en cada forma other de la ventana ICU Forms, para que el traductor sepa para qué sirve la forma.</value>
   </data>
+  <data name="Settings_ResetDefaults" xml:space="preserve">
+    <value>Restablecer valores predeterminados</value>
+  </data>
 </root>

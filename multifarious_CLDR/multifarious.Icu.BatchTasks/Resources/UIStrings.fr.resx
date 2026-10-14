@@ -625,4 +625,7 @@
   <data name="Grammar_OtherHelp1" xml:space="preserve">
     <value>ICU exige que chaque select se termine par une branche other, retenue lorsqu'aucune autre clé ne correspond. Ce qu'elle contient relève de la convention du projet : la forme plurielle, le cas inconnu, toute autre valeur. Les mots saisis ici s'affichent comme indication sur chaque forme other dans la fenêtre ICU Forms, pour que le traducteur sache à quoi sert la forme.</value>
   </data>
+  <data name="Settings_ResetDefaults" xml:space="preserve">
+    <value>Rétablir les valeurs par défaut</value>
+  </data>
 </root>

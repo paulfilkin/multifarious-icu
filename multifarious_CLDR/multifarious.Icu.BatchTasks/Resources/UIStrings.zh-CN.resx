@@ -625,4 +625,7 @@
   <data name="Grammar_OtherHelp1" xml:space="preserve">
     <value>ICU 要求每个 select 都以 other 分支结尾，在没有其他键匹配时使用。它保存的内容是项目的约定：复数形式、未知情况、任何其他值。您在此输入的文字会作为提示显示在 ICU Forms 窗口的每个 other 形式上，让译员知道该形式的用途。</value>
   </data>
+  <data name="Settings_ResetDefaults" xml:space="preserve">
+    <value>重置为默认值</value>
+  </data>
 </root>

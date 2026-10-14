@@ -359,4 +359,92 @@ public class GrammarPageTests
         Assert.Equal(["fr", "it"], supplies.Select(pair => pair.Key));
         Assert.Equal(["article", "gender"], supplies[1].Value);
     }
+
+    // ---- where a refusal shows ---------------------------------------------------------------
+
+    /// <summary>
+    /// A refused edit is shown under the table it came from, on the row that caused it (Paul,
+    /// test plan S4a and C17 to C20, 14 October 2026: a message at the top of a long page went
+    /// unseen).
+    /// </summary>
+    [Fact]
+    public void A_refused_key_set_marks_its_row_and_the_languages_block_until_fixed()
+    {
+        var viewModel = new GrammarDictionaryViewModel();
+        var german = Row(viewModel, "gender", "de");
+        var french = Row(viewModel, "gender", "fr");
+
+        german.KeysText = "MASCULINE, FEMININE";
+
+        Assert.True(viewModel.ErrorInLanguages);
+        Assert.False(viewModel.ErrorInFile);
+        Assert.False(viewModel.ErrorInArguments);
+        Assert.True(german.HasError);
+        Assert.False(french.HasError);
+
+        german.KeysText = "MASCULINE, FEMININE, other";
+        Assert.False(viewModel.HasError);
+        Assert.False(viewModel.ErrorInLanguages);
+        Assert.False(german.HasError);
+
+        // A good edit on another row leaves the mark where the refusal is. French must keep
+        // MASCULINE and FEMININE, which its article forms are needed under, so only the
+        // order changes.
+        german.KeysText = "MASCULINE";
+        french.KeysText = "FEMININE, MASCULINE, other";
+        Assert.True(viewModel.HasError);
+        Assert.True(german.HasError);
+        Assert.False(french.HasError);
+        german.Reset();
+        Assert.False(viewModel.HasError);
+        Assert.False(german.HasError);
+    }
+
+    [Fact]
+    public void A_refused_argument_marks_its_row_and_the_arguments_block()
+    {
+        var viewModel = new GrammarDictionaryViewModel();
+        var row = viewModel.AddArgument();
+        row.BaseName = "vehicle";
+        row.Roles.Single(role => role.Role == "gender").ArgumentName = "vehicleGender";
+
+        row.SuppliesText = "fr: article";
+
+        Assert.True(viewModel.ErrorInArguments);
+        Assert.False(viewModel.ErrorInLanguages);
+        Assert.True(row.HasError);
+
+        row.Roles.Single(role => role.Role == "article").ArgumentName = "vehicleArticle";
+        Assert.False(viewModel.HasError);
+        Assert.False(row.HasError);
+
+        row.BaseName = "";
+        Assert.True(viewModel.ErrorInArguments);
+        Assert.True(row.HasError);
+        row.BaseName = "vehicle";
+        Assert.False(row.HasError);
+    }
+
+    [Fact]
+    public void A_refused_language_tag_marks_the_tag_box_and_a_stored_file_the_file_block()
+    {
+        var viewModel = new GrammarDictionaryViewModel();
+        viewModel.AddLanguageKind = "gender";
+        viewModel.AddLanguageLocale = "not a tag";
+
+        Assert.Null(viewModel.AddLanguage());
+
+        Assert.True(viewModel.AddLanguageHasError);
+        Assert.True(viewModel.ErrorInLanguages);
+
+        viewModel.AddLanguageLocale = "eu";
+        Assert.NotNull(viewModel.AddLanguage());
+        Assert.False(viewModel.AddLanguageHasError);
+        Assert.False(viewModel.HasError);
+
+        viewModel.Load("""{ "version": 1, "keys": { "mood": { } } }""", "mood.json", "");
+        Assert.True(viewModel.ErrorInFile);
+        Assert.False(viewModel.ErrorInLanguages);
+        Assert.False(viewModel.AddLanguageHasError);
+    }
 }

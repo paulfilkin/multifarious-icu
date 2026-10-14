@@ -625,4 +625,7 @@
   <data name="Grammar_OtherHelp1" xml:space="preserve">
     <value>ICU では、すべての select は、他のどのキーにも一致しないときに使われる other 分岐で終わる必要があります。その内容はプロジェクトの取り決めです。複数形、不明な場合、その他の値などです。ここに入力した語は ICU Forms ウィンドウのすべての other の形にヒントとして表示され、翻訳者はその形の用途を知ることができます。</value>
   </data>
+  <data name="Settings_ResetDefaults" xml:space="preserve">
+    <value>既定値に戻す</value>
+  </data>
 </root>

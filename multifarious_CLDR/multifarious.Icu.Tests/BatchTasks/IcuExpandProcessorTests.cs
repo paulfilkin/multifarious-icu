@@ -609,9 +609,10 @@ public class IcuExpandProcessorTests
         Assert.Equal(["3", "4", "5", "6"], SegmentsOf(expanded.Target).Select(s => s.Properties.Id.Id));
         Assert.Equal(["7"], SegmentsOf(protectedUnit.Source).Select(s => s.Properties.Id.Id));
 
-        // The seeding record on the context uses the file-wide numbers, which is what the
-        // ICU Forms reader matches rows on.
-        Assert.Equal("4:other,5:other", ResourceKey.IcuContextOf(expanded)!.GetMetaData("icu:seededFrom"));
+        // The seeding record on the context names a segment by its position in the unit, which
+        // is what the ICU Forms reader matches rows on; Studio renumbers the ids after the task
+        // (Project 64, 14 October 2026), so the file-wide number is not a key.
+        Assert.Equal("2:other,3:other", ResourceKey.IcuContextOf(expanded)!.GetMetaData("icu:seededFrom"));
         var rows = Rows(expanded);
         Assert.Equal("other", rows[1].SeededFrom);
         Assert.Equal("", rows[0].SeededFrom);

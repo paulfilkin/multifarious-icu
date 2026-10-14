@@ -41,6 +41,10 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         private JObject _document;
         private GrammarDictionary _effective = GrammarDictionary.Default;
         private string _error;
+        private string _errorArea = ErrorAreaFile;
+        private object _errorRow;
+        private string _markedError;
+        private bool _addLanguageHasError;
         private string _importError;
         private string _otherText = string.Empty;
         private string _addLanguageKind;
@@ -136,6 +140,11 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             get { return _importError != null; }
         }
 
+        public const string ErrorAreaFile = "file";
+        public const string ErrorAreaLanguages = "languages";
+        public const string ErrorAreaArguments = "arguments";
+        public const string ErrorAreaOther = "other";
+
         /// <summary>Why the file as edited does not validate; null while it does. Blocks saving.</summary>
         public string Error
         {
@@ -146,6 +155,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
                 {
                     Raise(nameof(HasError));
                     Raise(nameof(IsValid));
+                    RaiseErrorAreas();
                 }
             }
         }
@@ -153,6 +163,85 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         public bool HasError
         {
             get { return _error != null; }
+        }
+
+        /// <summary>
+        /// Which block of the page the message belongs under, so it shows beside the edit that
+        /// caused it rather than at the top of a long page (Paul, test plan S4a and C17 to C20,
+        /// 14 October 2026): the languages table, the arguments table, the other box, or the
+        /// file itself for a stored text that does not validate.
+        /// </summary>
+        public string ErrorArea
+        {
+            get { return _errorArea; }
+        }
+
+        public bool ErrorInFile
+        {
+            get { return HasError && _errorArea == ErrorAreaFile; }
+        }
+
+        public bool ErrorInLanguages
+        {
+            get { return HasError && _errorArea == ErrorAreaLanguages; }
+        }
+
+        public bool ErrorInArguments
+        {
+            get { return HasError && _errorArea == ErrorAreaArguments; }
+        }
+
+        public bool ErrorInOther
+        {
+            get { return HasError && _errorArea == ErrorAreaOther; }
+        }
+
+        /// <summary>True while the typed language tag was refused.</summary>
+        public bool AddLanguageHasError
+        {
+            get { return _addLanguageHasError; }
+            private set { Set(ref _addLanguageHasError, value); }
+        }
+
+        private void RaiseErrorAreas()
+        {
+            Raise(nameof(ErrorArea));
+            Raise(nameof(ErrorInFile));
+            Raise(nameof(ErrorInLanguages));
+            Raise(nameof(ErrorInArguments));
+            Raise(nameof(ErrorInOther));
+        }
+
+        /// <summary>
+        /// Places the current error: the block it shows under and the row or box that carries
+        /// the red border. Called after every edit with what was edited; a valid state clears
+        /// the previous mark.
+        /// </summary>
+        private void MarkError(string area, object row)
+        {
+            // The refusal is the same one as before the edit: the cause has not moved, so the
+            // mark stays where it is. Typing a good set into French while German is still
+            // wrong keeps German red.
+            if (!IsValid && _errorRow != null && _error == _markedError) return;
+            _markedError = IsValid ? null : _error;
+
+            var languageRow = _errorRow as GrammarLanguageRow;
+            if (languageRow != null) languageRow.SetHasError(false);
+            var argumentRow = _errorRow as GrammarArgumentRow;
+            if (argumentRow != null) argumentRow.SetHasError(false);
+            AddLanguageHasError = false;
+            _errorRow = null;
+
+            _errorArea = area;
+            RaiseErrorAreas();
+            if (IsValid) return;
+
+            _errorRow = row;
+            languageRow = row as GrammarLanguageRow;
+            if (languageRow != null) languageRow.SetHasError(true);
+            argumentRow = row as GrammarArgumentRow;
+            if (argumentRow != null) argumentRow.SetHasError(true);
+            if (row is string && (string)row == ErrorAreaLanguages) AddLanguageHasError = true;
         }
 
         public bool IsValid
@@ -171,6 +260,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
                 if (_otherText.Trim().Length == 0) document.Remove(OtherKey);
                 else document[OtherKey] = _otherText;
                 AfterEdit();
+                MarkError(ErrorAreaOther, null);
             }
         }
 
@@ -254,9 +344,11 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
                 var reason = Error;
                 AfterEdit();
                 Error = reason;
+                MarkError(ErrorAreaLanguages, ErrorAreaLanguages);
                 return null;
             }
 
+            MarkError(ErrorAreaLanguages, null);
             var row = LanguageRow(kind, locale);
             Languages.Insert(InsertionIndex(kind, locale), row);
             return row;
@@ -336,6 +428,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
                 _document = _text.Trim().Length > 0 ? TryParse(_text) : null;
                 _otherText = _document != null && _document[OtherKey] is JValue other ? (string)other ?? string.Empty : string.Empty;
                 Validate();
+                MarkError(ErrorAreaFile, null);
                 BuildRows();
                 RaiseStatus();
                 Raise(nameof(OtherText));
@@ -364,6 +457,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             else languages[row.LocaleKey] = new JArray(keys.Cast<object>().ToArray());
 
             AfterEdit();
+            MarkError(ErrorAreaLanguages, row);
             row.SetIsProject(!isDefault);
             if (IsValid) row.SetDetail(Describe(row.Kind, row.LocaleKey));
         }
@@ -373,6 +467,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             var languages = _document == null ? null : (_document[KeysKey] as JObject)?[row.Kind] is JObject kind ? kind[LanguagesKey] as JObject : null;
             if (languages != null) languages.Remove(row.LocaleKey);
             AfterEdit();
+            MarkError(ErrorAreaLanguages, row);
 
             if (row.IsAddedByProject)
             {
@@ -396,6 +491,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             if (name.Length == 0)
             {
                 Error = string.Format(CultureInfo.CurrentCulture, UIStrings.Grammar_Invalid, UIStrings.Grammar_EmptyArgument);
+                MarkError(ErrorAreaArguments, row);
                 return;
             }
 
@@ -403,6 +499,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             {
                 Error = string.Format(CultureInfo.CurrentCulture, UIStrings.Grammar_Invalid,
                     string.Format(CultureInfo.CurrentCulture, UIStrings.Grammar_DuplicateArgument, name));
+                MarkError(ErrorAreaArguments, row);
                 return;
             }
 
@@ -416,6 +513,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
 
             row.SetStoredName(name);
             AfterEdit();
+            MarkError(ErrorAreaArguments, row);
         }
 
         internal void RoleEdited(GrammarArgumentRow row, GrammarRoleCell cell)
@@ -426,6 +524,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             if (name.Length == 0) entry.Remove(cell.Role);
             else entry[cell.Role] = name;
             AfterEdit();
+            MarkError(ErrorAreaArguments, row);
         }
 
         internal void SuppliesEdited(GrammarArgumentRow row)
@@ -442,6 +541,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             }
 
             AfterEdit();
+            MarkError(ErrorAreaArguments, row);
         }
 
         public GrammarArgumentRow AddArgument()
@@ -455,6 +555,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
 
             arguments[name] = new JObject();
             AfterEdit();
+            MarkError(ErrorAreaArguments, null);
             var row = ArgumentRow(name, (JObject)arguments[name]);
             Arguments.Add(row);
             return row;
@@ -466,6 +567,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             if (arguments != null) arguments.Remove(row.StoredName);
             Arguments.Remove(row);
             AfterEdit();
+            MarkError(ErrorAreaArguments, null);
         }
 
         // ---- internals -------------------------------------------------------------------------
@@ -723,6 +825,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         private string _keysText;
         private bool _isProject;
         private string _detail;
+        private bool _hasError;
 
         internal GrammarLanguageRow(GrammarDictionaryViewModel owner, string kind, string localeKey, string languageName,
             string keysText, bool isProject, bool isAddedByProject, string detail)
@@ -779,9 +882,20 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             get { return _detail; }
         }
 
+        /// <summary>True while this row's keys are what the dictionary refuses; the cell shows a red border.</summary>
+        public bool HasError
+        {
+            get { return _hasError; }
+        }
+
         public void Reset()
         {
             _owner.ResetLanguage(this);
+        }
+
+        internal void SetHasError(bool value)
+        {
+            Set(ref _hasError, value, nameof(HasError));
         }
 
         internal void SetIsProject(bool value)
@@ -833,6 +947,7 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
         private readonly GrammarDictionaryViewModel _owner;
         private string _baseName;
         private string _suppliesText;
+        private bool _hasError;
 
         internal GrammarArgumentRow(GrammarDictionaryViewModel owner, string baseName, IReadOnlyList<GrammarRoleCell> roles, string suppliesText, string respelling)
         {
@@ -878,9 +993,20 @@ namespace multifarious.Icu.BatchTasks.Settings.ViewModels
             get { return Respelling.Length > 0; }
         }
 
+        /// <summary>True while this row is what the dictionary refuses; its cells show a red border.</summary>
+        public bool HasError
+        {
+            get { return _hasError; }
+        }
+
         public void Remove()
         {
             _owner.RemoveArgument(this);
+        }
+
+        internal void SetHasError(bool value)
+        {
+            Set(ref _hasError, value, nameof(HasError));
         }
 
         internal void RoleEdited(GrammarRoleCell cell)

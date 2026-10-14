@@ -1,9 +1,9 @@
 # 12 - multifarious_CLDR Build Progress - 2026-10-14
 
-Twelfth session.  The settings pages reworked before the grammar dictionary's Studio run: the
+Twelfth session.  The settings pages reworked before the grammar dictionary's Studio run, then the run itself and its fixes: the
 dictionary on a tab of its own with two editable tables, the Expand options reordered into
 four groups, a settings icon for the Projects view button.  Built, 1,652 tests, rendered
-offscreen against Studio's styles, deployed to Studio's Packages folder at 09:37, committed as
+offscreen against Studio's styles, the morning package deployed at 09:37 and committed as
 `e777049` on `release/2.0`.  The template stays as it is (option 1, Paul): its `keys` section is
 empty, so an import fills the arguments table and leaves every language row Default.
 
@@ -26,7 +26,7 @@ empty, so an import fills the arguments table and leaves every language row Defa
 > developer's file; the Projects view button has its own icon.  1,652 tests, forty-four new UI strings.  The Studio test
 > plan `Documentation\Testing\Grammar-Dictionary-Studio-Test-Plan.md` (local) has sections S
 > and C rewritten for the tabs; A and S1 to S2 passed on the 13 October build, so S2 onwards
-> is where to resume on the 14 October package (deployed 09:37; Studio installs it on its
+> is where to resume on the 14 October afternoon package (deployed 16:08; Studio installs it on its
 > next start).  Its Project 63 run is from `test-corpus\grammar.json`, targets German, French,
 > Italian, Japanese and American English.  Then Phase 4, the user guide section (the tabs,
 > the tables, the developer's file key by key, the shipped default), and the forty-four new
@@ -115,6 +115,38 @@ styles without opening Studio.
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
 ```
+
+## The Studio run (afternoon) and what it found
+
+Paul ran the plan through to J on the morning package (Projects 63 to 69).  S, C, D, F, G, H,
+I and J passed; the Expand and Restore round trips and the checker's structures are right for
+all five languages.  Five findings, all fixed in the afternoon build (1,659 tests):
+
+- **The hints were two rows out** (E2, E7 to E10, I5).  The per-segment records on the unit
+  context (`icu:seededFrom`, `icu:syntheticSource`, `icu:grammarForms`) were keyed by the
+  segment id the writer gave, and Studio renumbers the ids after the task: in the French file
+  of Project 64 the forms of `readyMinimal` carry ids 3 to 9 (the file's first unit is the
+  two-segment `_comment`) while the records ran from 1.  The processor's own count was seeded
+  at 1 for that unit, which says the renumbering is Studio's, not ours; the new diagnostics
+  line "numbered from N" will show it.  Fix: the records name a segment by its position in
+  the unit, with `icu:numbering=position` on the context; the reader keys by position where
+  the marker is and by id where it is not, so the morning's files still read.
+- **A refusal went unseen** (S4a, C17 to C20).  The message now sits in a red box under the
+  table it came from, the offending row's cell has a red border, the add-language box too,
+  and the status line is semibold.  The mark stays on the row that caused the refusal when
+  another row is edited correctly.
+- **"Your Anna has been delayed"** (E6).  The base argument of a grammar select previews as
+  the dictionary's sample noun on a form that has one ("Your Zug"), and as its own name
+  otherwise ("Your vehicle").  The writer records the base argument as a sixth field.
+- **The window did not navigate** (Paul).  A click on a row calls
+  `SetActiveSegmentPair(paragraphId, segmentId, true)` through the controller.
+- **No Reset in the dialog** (C13).  A Reset to defaults button, bottom left, resets both
+  groups as the wizard page does.
+
+Seen once in the log and not reproduced: Studio's message reporter threw a null reference on
+a located placeholder error (Project 64).  The verifier now logs the full exception and
+reports the message on the unit when the located report throws.  Section R of the test plan
+is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
 
 ## Open items
 

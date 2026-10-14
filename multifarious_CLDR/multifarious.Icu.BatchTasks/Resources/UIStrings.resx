@@ -854,4 +854,8 @@
     <value>ICU requires every select to end in an other branch, taken when no other key matches. What it holds is the project's convention: the plural form, the unknown case, any other value. The words you enter here are shown as the hint on every other form in the ICU Forms window, so the translator knows what the form is for.</value>
     <comment>Help paragraph. "select" and "other" are ICU keywords and must not be translated; ICU Forms is the window's name.</comment>
   </data>
+  <data name="Settings_ResetDefaults" xml:space="preserve">
+    <value>Reset to defaults</value>
+    <comment>Dialog button; puts every setting on all three tabs back to its default, the grammar dictionary file removed.</comment>
+  </data>
 </root>

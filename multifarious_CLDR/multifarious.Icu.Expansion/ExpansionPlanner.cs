@@ -193,7 +193,7 @@ public sealed class ExpansionPlanner
         GrammarForm? Grammar = null);
 
     /// <summary>A grammar select's key as laid out: the kind, and the hint and sample the dictionary gives it, or none for the developer's own key.</summary>
-    private sealed record GrammarForm(string Kind, string? LocaleKey, string? Hint, string? Sample);
+    private sealed record GrammarForm(string Kind, string? LocaleKey, string? Hint, string? Sample, string BaseArgument);
 
     /// <summary>
     /// The innermost walked selector component above a leaf. Annotates a leaf that
@@ -416,7 +416,7 @@ public sealed class ExpansionPlanner
         {
             var branchPath = Join(path, selector.ArgumentName, branch.Key.Text);
             var branchContext = new SegmentContext(
-                selector, branch.Key.Text, null, null, null, false, new GrammarForm(recognition.Kind, null, null, null));
+                selector, branch.Key.Text, null, null, null, false, new GrammarForm(recognition.Kind, null, null, null, recognition.BaseArgument));
             var branchScope = scope.EnterGrammar(new GrammarFrame(recognition, languages, branch.Key.Text));
             var content = PlanSequence(branch.Nodes, branchPath, branchContext, walked, branchScope, state);
             branches.Add(new PlannedBranch(branch.Key.Text, false, null, false, branchPath, content));
@@ -434,7 +434,7 @@ public sealed class ExpansionPlanner
             // The hint and sample come from the first target language whose set has the
             // key, as the plural samples do.
             var language = languages.First(language => language.Keys.Contains(key, StringComparer.Ordinal));
-            var form = new GrammarForm(recognition.Kind, language.LocaleKey, language.Hint(key), language.Sample(key));
+            var form = new GrammarForm(recognition.Kind, language.LocaleKey, language.Hint(key), language.Sample(key), recognition.BaseArgument);
 
             var branchPath = Join(path, selector.ArgumentName, key);
             var branchContext = new SegmentContext(selector, key, null, null, seededFrom, synthetic, form);
@@ -594,6 +594,7 @@ public sealed class ExpansionPlanner
             ["icu:locale"] = grammar.LocaleKey ?? "",
             ["icu:hint"] = grammar.Hint ?? "",
             ["icu:sample"] = grammar.Sample ?? "",
+            ["icu:baseArgument"] = grammar.BaseArgument,
             ["icu:exampleIntegers"] = "",
             ["icu:exampleDecimals"] = "",
             ["icu:syntheticSource"] = context.SyntheticSource ? "true" : "false",

@@ -274,4 +274,28 @@ public class IcuFormsViewTests
         Assert.Matches(@"<ScaleTransform ScaleX=""\{Binding Zoom, Mode=OneWay\}"" ScaleY=""\{Binding Zoom, Mode=OneWay\}""", Xaml());
         Assert.Contains("PreviewMouseWheel=\"OnPreviewMouseWheel\"", Xaml());
     }
+
+    /// <summary>
+    /// A click on a row asks the editor to go to that segment (Paul, 14 October 2026: the window
+    /// followed the editor but not the other way). The view model raises the request with the
+    /// unit and segment ids; the controller, which alone holds the document, moves the editor.
+    /// </summary>
+    [Fact]
+    public void A_clicked_row_asks_for_its_segment_by_unit_and_segment_id()
+    {
+        var unit = Expanded(UnreadCount);
+        var segments = ParagraphUnits.SegmentsOf(unit.Source);
+        var viewModel = new IcuFormsViewModel();
+        viewModel.Show(unit, segments[0].Properties.Id.Id, "ru-RU", "Russian (Russia)");
+
+        RowActivatedEventArgs? raised = null;
+        viewModel.RowActivated += (_, e) => raised = e;
+
+        viewModel.ActivateRow(viewModel.Rows[2]);
+
+        Assert.NotNull(raised);
+        Assert.Equal(unit.Properties.ParagraphUnitId.Id, raised!.ParagraphUnitId);
+        Assert.Equal(segments[2].Properties.Id.Id, raised.SegmentId);
+        Assert.Contains("MouseLeftButtonUp=\"OnRowClick\"", Xaml());
+    }
 }

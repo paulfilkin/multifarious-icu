@@ -120,6 +120,18 @@ namespace multifarious.Icu.BatchTasks
         /// </summary>
         public const string GrammarFormsKey = "icu:grammarForms";
 
+        /// <summary>
+        /// How the per-segment records on the unit context (seeded from, synthetic source, the
+        /// grammar forms) name their segment. <see cref="NumberingByPosition"/> means the
+        /// segment's position within the unit, 1-based, which survives any renumbering of the
+        /// ids; absent means the segment id as written, the scheme of files expanded before
+        /// 14 October 2026, when Studio turned out to renumber the ids after the task (Project
+        /// 64: the records of a unit whose ids ran from 3 were keyed from 1).
+        /// </summary>
+        public const string NumberingKey = "icu:numbering";
+
+        public const string NumberingByPosition = "position";
+
         /// <summary>The developer's file template the Expand page saves for a project to fill in.</summary>
         public const string GrammarTemplateResource = "multifarious.Icu.BatchTasks.Resources.grammar-dictionary-template.json";
 

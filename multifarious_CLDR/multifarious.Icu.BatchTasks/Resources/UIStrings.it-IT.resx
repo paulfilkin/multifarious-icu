@@ -625,4 +625,7 @@
   <data name="Grammar_OtherHelp1" xml:space="preserve">
     <value>ICU richiede che ogni select termini con un ramo other, usato quando nessun'altra chiave corrisponde. Cosa contenga è una convenzione del progetto: la forma plurale, il caso sconosciuto, qualsiasi altro valore. Le parole inserite qui vengono mostrate come suggerimento su ogni forma other nella finestra ICU Forms, così il traduttore sa a cosa serve la forma.</value>
   </data>
+  <data name="Settings_ResetDefaults" xml:space="preserve">
+    <value>Ripristina valori predefiniti</value>
+  </data>
 </root>

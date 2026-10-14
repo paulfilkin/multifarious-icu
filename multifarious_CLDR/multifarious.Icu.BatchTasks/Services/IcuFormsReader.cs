@@ -64,6 +64,9 @@ namespace multifarious.Icu.BatchTasks.Services
         /// <summary>The dependent forms the language needs here that the application does not supply, as the expansion recorded; empty where none.</summary>
         public string Needs { get; set; } = string.Empty;
 
+        /// <summary>The base argument of the grammar select this form belongs to, <c>vehicle</c>; empty where the form is not a grammar form or the file predates the record.</summary>
+        public string BaseArgument { get; set; } = string.Empty;
+
         /// <summary>
         /// True where the target text carries a '#' typed as text while the source form uses the
         /// protected count marker: almost always a translator reaching for the count, and Restore
@@ -153,9 +156,21 @@ namespace multifarious.Icu.BatchTasks.Services
                 Metadata(context, "icu:syntheticSource").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.Ordinal);
             var grammarForms = GrammarForms(Metadata(context, Constants.GrammarFormsKey));
 
+            // The per-segment records name a segment by its position in the unit (files from
+            // 14 October 2026 on) or by the id it had when written (earlier files). Studio
+            // renumbers the ids after the task (Project 64), so the position is what holds.
+            var byPosition = Metadata(context, Constants.NumberingKey) == Constants.NumberingByPosition;
+
             var samples = new Dictionary<string, string>(StringComparer.Ordinal);
             var nameOrdinal = 0;
             var inPluralContext = ContainsPluralKindSyntax(unit.Target);
+
+            // A grammar select's base argument previews as its own name, "vehicle", rather than
+            // a placeholder name, and as the dictionary's sample noun on a form that has one.
+            foreach (var record in grammarForms.Values)
+            {
+                if (record.Base.Length > 0 && !samples.ContainsKey(record.Base)) samples[record.Base] = record.Base;
+            }
 
             var placed = PlaceSegments(unit.Source);
             var targetSegments = SegmentsOf(unit.Target);
@@ -166,7 +181,8 @@ namespace multifarious.Icu.BatchTasks.Services
                 var place = placed[index];
                 var target = index < targetSegments.Count ? targetSegments[index] : null;
                 if (target != null && activeId != null && target.Properties.Id.Id == activeId) target = activeTarget;
-                rows.Add(Row(place, target, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic, layout, grammarForms));
+                var recordKey = byPosition ? (index + 1).ToString(CultureInfo.InvariantCulture) : place.Segment.Properties.Id.Id;
+                rows.Add(Row(place, target, recordKey, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic, layout, grammarForms));
             }
 
             var projection = EscapedProjection(unit.Target, inPluralContext, activeId, activeTarget);
@@ -382,9 +398,10 @@ namespace multifarious.Icu.BatchTasks.Services
             public string Hint = string.Empty;
             public string Sample = string.Empty;
             public string Needs = string.Empty;
+            public string Base = string.Empty;
         }
 
-        /// <summary>The grammar form records by segment number: one per line, segment, kind, hint, sample and needs, tab-separated.</summary>
+        /// <summary>The grammar form records by segment key: one per line, segment, kind, hint, sample, needs and (from 14 October 2026) base argument, tab-separated.</summary>
         private static Dictionary<string, GrammarFormRecord> GrammarForms(string metadata)
         {
             var records = new Dictionary<string, GrammarFormRecord>(StringComparer.Ordinal);
@@ -392,12 +409,19 @@ namespace multifarious.Icu.BatchTasks.Services
             {
                 var fields = line.Split('\t');
                 if (fields.Length < 5) continue;
-                records[fields[0]] = new GrammarFormRecord { Kind = fields[1], Hint = fields[2], Sample = fields[3], Needs = fields[4] };
+                records[fields[0]] = new GrammarFormRecord
+                {
+                    Kind = fields[1],
+                    Hint = fields[2],
+                    Sample = fields[3],
+                    Needs = fields[4],
+                    Base = fields.Length > 5 ? fields[5] : string.Empty,
+                };
             }
             return records;
         }
 
-        private IcuFormRow Row(PlacedSegment place, ISegment target, string language, Dictionary<string, string> samples,
+        private IcuFormRow Row(PlacedSegment place, ISegment target, string recordKey, string language, Dictionary<string, string> samples,
             ref int nameOrdinal, bool inPluralContext, Dictionary<string, string> seededFrom, HashSet<string> synthetic, Layout layout,
             Dictionary<string, GrammarFormRecord> grammarForms)
         {
@@ -413,12 +437,13 @@ namespace multifarious.Icu.BatchTasks.Services
             };
 
             GrammarFormRecord grammar;
-            if (grammarForms.TryGetValue(row.SegmentId, out grammar))
+            if (grammarForms.TryGetValue(recordKey, out grammar))
             {
                 row.GrammarKind = grammar.Kind;
                 row.GrammarHint = grammar.Hint;
                 row.GrammarSample = grammar.Sample;
                 row.Needs = grammar.Needs;
+                row.BaseArgument = grammar.Base;
             }
 
             // The counts from CLDR: the explicit value itself, the category's samples, nothing
@@ -482,8 +507,8 @@ namespace multifarious.Icu.BatchTasks.Services
             // when the segments carried comments has it on the comment, which then also serves
             // as the tooltip. Otherwise the tooltip is composed from the same facts.
             string seed;
-            row.SeededFrom = seededFrom.TryGetValue(row.SegmentId, out seed) ? seed : string.Empty;
-            row.SyntheticSource = synthetic.Contains(row.SegmentId);
+            row.SeededFrom = seededFrom.TryGetValue(recordKey, out seed) ? seed : string.Empty;
+            row.SyntheticSource = synthetic.Contains(recordKey);
             var comment = FirstComment(source);
             if (comment != null)
             {
@@ -501,6 +526,13 @@ namespace multifarious.Icu.BatchTasks.Services
             // An outer plural's '#' was rewritten by hoisting to "{argument, number}", so it
             // renders as that selector's own sample count for this row, not a fixed number.
             var bound = BoundCounts(place, language);
+
+            // The base argument previews as the form's sample noun where the dictionary has one
+            // for this form, "Zug" on the German MASCULINE row, its own name otherwise.
+            if (row.BaseArgument.Length > 0)
+            {
+                samples[row.BaseArgument] = row.GrammarSample.Length > 0 ? NounOf(row.GrammarSample) : row.BaseArgument;
+            }
 
             row.SourceRendered = Rendered(source, pound, bound, samples, ref nameOrdinal, inPluralContext);
             row.TargetEmpty = target == null || IsEmpty(target);
@@ -714,6 +746,14 @@ namespace multifarious.Icu.BatchTasks.Services
                 samples[name] = sample;
             }
             return sample;
+        }
+
+        /// <summary>The noun of a sample such as "der Zug" or "le train": its last word, the article dropped.</summary>
+        private static string NounOf(string sample)
+        {
+            var trimmed = sample.Trim();
+            var space = trimmed.LastIndexOf(' ');
+            return space < 0 ? trimmed : trimmed.Substring(space + 1);
         }
 
         /// <summary>The target paragraph as Restore will assemble it, so it can be parsed as ICU while the translator types.</summary>

@@ -654,43 +654,50 @@ namespace multifarious.Icu.BatchTasks.Services
             CollectExpanded(plan.Root, expanded);
             context.SetMetaData("icu:expandedSelectors", string.Join(",", expanded));
 
-            // Which segments started from a source form other than their own, by segment number:
-            // "2:other,3:other". The ICU Forms window says so in the row's tooltip.
+            // Which segments started from a source form other than their own, by the segment's
+            // position in the unit: "2:other,3:other". The ICU Forms window says so in the
+            // row's tooltip. The position, not the id: Studio renumbers the ids after the task
+            // (Project 64, 14 October 2026), and the window reads rows in document order.
+            context.SetMetaData(Constants.NumberingKey, Constants.NumberingByPosition);
             var seeded = new List<string>();
             var synthetic = new List<string>();
-            foreach (var pair in state.Written)
+            for (var index = 0; index < state.Written.Count; index++)
             {
+                var position = (index + 1).ToString(CultureInfo.InvariantCulture);
                 string value;
-                if (pair.Value.Metadata.TryGetValue("icu:seededFrom", out value) && !string.IsNullOrEmpty(value))
+                if (state.Written[index].Value.Metadata.TryGetValue("icu:seededFrom", out value) && !string.IsNullOrEmpty(value))
                 {
-                    seeded.Add(pair.Key.ToString(CultureInfo.InvariantCulture) + ":" + value);
+                    seeded.Add(position + ":" + value);
                 }
-                if (pair.Value.Metadata.TryGetValue("icu:syntheticSource", out value) && value == "true")
+                if (state.Written[index].Value.Metadata.TryGetValue("icu:syntheticSource", out value) && value == "true")
                 {
-                    synthetic.Add(pair.Key.ToString(CultureInfo.InvariantCulture));
+                    synthetic.Add(position);
                 }
             }
             context.SetMetaData("icu:seededFrom", string.Join(",", seeded));
             context.SetMetaData("icu:syntheticSource", string.Join(",", synthetic));
 
             // The grammar dictionary's part of the layout: which selects it category expanded,
-            // with the kind and the key set, and per segment the hint, the sample and the
-            // dependent forms the language needs that the application does not supply. The
-            // ICU Forms window reads these, so the file says what it was laid out with on a
-            // machine without the project's dictionary. One entry per line, fields tab-separated.
+            // with the kind and the key set, and per segment (by position, as above) the hint,
+            // the sample, the dependent forms the language needs that the application does not
+            // supply, and the base argument the sample stands for. The ICU Forms window reads
+            // these, so the file says what it was laid out with on a machine without the
+            // project's dictionary. One entry per line, fields tab-separated.
             var grammar = new List<string>();
             CollectGrammar(plan.Root, grammar);
             context.SetMetaData(Constants.GrammarKey, string.Join("\n", grammar));
 
             var forms = new List<string>();
-            foreach (var pair in state.Written)
+            for (var index = 0; index < state.Written.Count; index++)
             {
-                var kind = MetadataOf(pair.Value, "icu:kind");
-                var hint = MetadataOf(pair.Value, "icu:hint");
-                var sample = MetadataOf(pair.Value, "icu:sample");
-                var needs = MetadataOf(pair.Value, "icu:needs").Replace("\n", " | ");
+                var planned = state.Written[index].Value;
+                var kind = MetadataOf(planned, "icu:kind");
+                var hint = MetadataOf(planned, "icu:hint");
+                var sample = MetadataOf(planned, "icu:sample");
+                var needs = MetadataOf(planned, "icu:needs").Replace("\n", " | ");
+                var baseArgument = MetadataOf(planned, "icu:baseArgument");
                 if (kind.Length == 0 && hint.Length == 0 && needs.Length == 0) continue;
-                forms.Add(pair.Key.ToString(CultureInfo.InvariantCulture) + "\t" + kind + "\t" + hint + "\t" + sample + "\t" + needs);
+                forms.Add((index + 1).ToString(CultureInfo.InvariantCulture) + "\t" + kind + "\t" + hint + "\t" + sample + "\t" + needs + "\t" + baseArgument);
             }
             context.SetMetaData(Constants.GrammarFormsKey, string.Join("\n", forms));
 

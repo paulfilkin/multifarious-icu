@@ -636,5 +636,8 @@ namespace multifarious.Icu.BatchTasks.Resources
 
         /// <summary>Help paragraph. "select" and "other" are ICU keywords and must not be translated; ICU Forms is the window's name.</summary>
         public static string Grammar_OtherHelp1 { get { return Manager.GetString("Grammar_OtherHelp1", Culture); } }
+
+        /// <summary>Dialog button; puts every setting on all three tabs back to its default, the grammar dictionary file removed.</summary>
+        public static string Settings_ResetDefaults { get { return Manager.GetString("Settings_ResetDefaults", Culture); } }
     }
 }

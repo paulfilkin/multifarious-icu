@@ -145,7 +145,7 @@
       <ItemsControl ItemsSource="{Binding Rows, Mode=OneWay}" IsTabStop="False" AlternationCount="2">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
-            <Border BorderThickness="3,0,0,0" ToolTip="{Binding Comment, Mode=OneWay}">
+            <Border BorderThickness="3,0,0,0" ToolTip="{Binding Comment, Mode=OneWay}" Cursor="Hand" MouseLeftButtonUp="OnRowClick">
               <Border.Style>
                 <Style TargetType="Border">
                   <Setter Property="BorderBrush" Value="Transparent" />

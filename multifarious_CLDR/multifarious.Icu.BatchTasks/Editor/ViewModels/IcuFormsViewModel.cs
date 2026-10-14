@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -10,6 +11,20 @@ using Sdl.FileTypeSupport.Framework.BilingualApi;
 
 namespace multifarious.Icu.BatchTasks.Editor.ViewModels
 {
+    /// <summary>The segment a clicked row stands for.</summary>
+    public sealed class RowActivatedEventArgs : EventArgs
+    {
+        public RowActivatedEventArgs(string paragraphUnitId, string segmentId)
+        {
+            ParagraphUnitId = paragraphUnitId;
+            SegmentId = segmentId;
+        }
+
+        public string ParagraphUnitId { get; }
+
+        public string SegmentId { get; }
+    }
+
     /// <summary>One row of the ICU Forms window.</summary>
     public sealed class IcuFormRowViewModel : ObservableObject
     {
@@ -151,6 +166,20 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
 
         public bool HasMessage { get { return _model != null; } }
 
+        /// <summary>The paragraph unit the rows belong to, for navigating the editor to a row's segment.</summary>
+        public string ParagraphUnitId { get; private set; } = string.Empty;
+
+        /// <summary>Raised when the translator clicks a row: the controller moves the editor to that segment.</summary>
+        public event EventHandler<RowActivatedEventArgs> RowActivated;
+
+        /// <summary>A click on a row asks the editor to go to the row's segment; the window then follows the editor as always.</summary>
+        public void ActivateRow(IcuFormRowViewModel row)
+        {
+            if (row == null || _model == null || string.IsNullOrEmpty(row.Row.SegmentId)) return;
+            var handler = RowActivated;
+            if (handler != null) handler(this, new RowActivatedEventArgs(ParagraphUnitId, row.Row.SegmentId));
+        }
+
         public string Key
         {
             get { return _key; }
@@ -235,6 +264,7 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
             }
 
             _model = model;
+            ParagraphUnitId = unit.Properties != null && unit.Properties.ParagraphUnitId.Id != null ? unit.Properties.ParagraphUnitId.Id : string.Empty;
             Key = model.Key ?? string.Empty;
             Summary = string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_Summary,
                 string.IsNullOrEmpty(targetLanguageName) ? targetLanguageTag : targetLanguageName, model.Rows.Count);

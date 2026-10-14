@@ -10,6 +10,7 @@ using multifarious.Icu.BatchTasks.Settings.ViewModels;
 using multifarious.Icu.Expansion;
 using Sdl.Core.Settings;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
+using Sdl.FileTypeSupport.Framework.NativeApi;
 
 namespace multifarious.Icu.Tests.BatchTasks;
 
@@ -175,8 +176,77 @@ public class GrammarStudioTests
 
         var forms = Metadata(unit, Constants.GrammarFormsKey).Split('\n');
         Assert.Equal(7, forms.Length);
-        Assert.Equal("1\tarticle\tmasculine singular before a consonant\t\t", forms[0]);
-        Assert.Equal("7\tgender\tthe plural form\t\t", forms[6]);
+        Assert.Equal("1\tarticle\tmasculine singular before a consonant\t\t\tvehicle", forms[0]);
+        Assert.Equal("7\tgender\tthe plural form\t\t\tvehicle", forms[6]);
+        Assert.Equal(Constants.NumberingByPosition, Metadata(unit, Constants.NumberingKey));
+    }
+
+    /// <summary>
+    /// Studio renumbers the segment ids after the task (Project 64, 14 October 2026: a file
+    /// whose first unit was a two-segment comment had the forms' ids running from 3 while the
+    /// records ran from 1, and every hint was read two rows along). The records name a
+    /// segment by its position in the unit, so a renumbering changes nothing the window reads.
+    /// </summary>
+    [Fact]
+    public void The_records_survive_a_renumbering_of_the_segment_ids()
+    {
+        var processor = Expander("fr-FR", WithFile);
+        var comment = ParagraphUnits.WithSegments("Grammar dictionary Phase 0.", "Source English.");
+        var unit = ParagraphUnits.Json(ReadyMinimal, "['boarding.readyMinimal']");
+        processor.ProcessParagraphUnit(comment);
+        processor.ProcessParagraphUnit(unit);
+        Assert.Equal("3", ParagraphUnits.SegmentsOf(unit.Source)[0].Properties.Id.Id);
+
+        // What Studio did to Project 64: the ids shift, the records stay. Source and target
+        // segments share their properties, so the source's shift is the target's too.
+        var shift = 10;
+        foreach (var segment in ParagraphUnits.SegmentsOf(unit.Source))
+        {
+            segment.Properties.Id = new SegmentId((int.Parse(segment.Properties.Id.Id) + shift).ToString());
+        }
+        Assert.Equal("13", ParagraphUnits.SegmentsOf(unit.Target)[0].Properties.Id.Id);
+
+        var model = new IcuFormsReader().Read(unit, "fr-FR")!;
+        Assert.Equal("masculine singular before a consonant", model.Rows[0].GrammarHint);
+        Assert.Equal("singular before a vowel sound", model.Rows[1].GrammarHint);
+        Assert.Equal("feminine singular before a consonant", model.Rows[3].GrammarHint);
+        Assert.Equal("the plural form", model.Rows[6].GrammarHint);
+        Assert.Equal("other", model.Rows[0].SeededFrom);
+        Assert.Equal("", model.Rows[6].SeededFrom);
+        Assert.Equal("13", model.Rows[0].SegmentId);
+    }
+
+    /// <summary>A file expanded before the position scheme keys its records by id, and still reads.</summary>
+    [Fact]
+    public void A_file_keyed_by_segment_id_still_reads_its_records()
+    {
+        var unit = Expanded(ReadyMinimal, "de-DE", GrammarDictionary.Default, out _);
+        var context = ResourceKey.IcuContextOf(unit)!;
+        context.RemoveMetaData(Constants.NumberingKey);
+        Assert.Equal("1", ParagraphUnits.SegmentsOf(unit.Source)[0].Properties.Id.Id);
+
+        var model = new IcuFormsReader().Read(unit, "de-DE")!;
+        Assert.Equal("masculine", model.Rows[0].GrammarHint);
+        Assert.Equal("neuter", model.Rows[2].GrammarHint);
+        Assert.Equal("other", model.Rows[0].SeededFrom);
+    }
+
+    /// <summary>
+    /// The base argument previews as the dictionary's sample noun on a form that has one and
+    /// as its own name otherwise, rather than as a placeholder name (Paul, test plan E6,
+    /// 14 October 2026: "Your Anna has been delayed").
+    /// </summary>
+    [Fact]
+    public void The_base_argument_previews_as_the_sample_noun_or_its_own_name()
+    {
+        var german = new IcuFormsReader().Read(Expanded(ReadyMinimal, "de-DE", GrammarDictionary.Default, out _), "de-DE")!;
+        Assert.Equal("Your Zug is ready to board.", german.Rows[0].SourceRendered);
+        Assert.Equal("Your Fähre is ready to board.", german.Rows[1].SourceRendered);
+        Assert.Equal("Your vehicle is ready to board.", german.Rows[3].SourceRendered);
+
+        var french = new IcuFormsReader().Read(Expanded(ReadyMinimal, "fr-FR", WithFile, out _), "fr-FR")!;
+        Assert.Equal("Your vehicle is ready to board.", french.Rows[0].SourceRendered);
+        Assert.Equal("Your vehicle is ready to board.", french.Rows[6].SourceRendered);
     }
 
     [Fact]
