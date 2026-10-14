@@ -696,7 +696,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 var sample = MetadataOf(planned, "icu:sample");
                 var needs = MetadataOf(planned, "icu:needs").Replace("\n", " | ");
                 var baseArgument = MetadataOf(planned, "icu:baseArgument");
-                if (kind.Length == 0 && hint.Length == 0 && needs.Length == 0) continue;
+                if (kind.Length == 0 && hint.Length == 0 && needs.Length == 0 && baseArgument.Length == 0) continue;
                 forms.Add((index + 1).ToString(CultureInfo.InvariantCulture) + "\t" + kind + "\t" + hint + "\t" + sample + "\t" + needs + "\t" + baseArgument);
             }
             context.SetMetaData(Constants.GrammarFormsKey, string.Join("\n", forms));

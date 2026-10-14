@@ -305,7 +305,7 @@ public sealed class ExpansionPlanner
             }
         }
 
-        var segment = BuildSegment(path, nodes, context, walked, needs, state);
+        var segment = BuildSegment(path, nodes, context, walked, needs, scope.Frames.Count > 0 ? scope.Frames[^1] : null, state);
         state.Segments.Add(segment);
         return segment;
     }
@@ -475,7 +475,7 @@ public sealed class ExpansionPlanner
 
     private PlannedSegment BuildSegment(
         string path, IReadOnlyList<MessageNode> nodes, SegmentContext? context, WalkedContext? walked,
-        IReadOnlyList<string> needs, PlanningState state)
+        IReadOnlyList<string> needs, GrammarFrame? enclosingGrammar, PlanningState state)
     {
         if (context is null)
         {
@@ -504,6 +504,17 @@ public sealed class ExpansionPlanner
             ["icu:syntheticSource"] = context.SyntheticSource ? "true" : "false",
             ["icu:seededFrom"] = context.SeededFrom ?? ""
         };
+
+        // A plural leaf under a gender select still belongs to that gender's argument: the
+        // ICU Forms window previews the argument as the gender's sample noun, "Your Zug is
+        // waiting", rather than a placeholder name (Paul, 14 October 2026, German waiting).
+        if (enclosingGrammar is not null)
+        {
+            metadata["icu:baseArgument"] = enclosingGrammar.Recognition.BaseArgument;
+            var entry = enclosingGrammar.Languages.FirstOrDefault(language =>
+                language.Keys.Contains(enclosingGrammar.KeyText, StringComparer.Ordinal));
+            metadata["icu:sample"] = entry?.Sample(enclosingGrammar.KeyText) ?? "";
+        }
 
         // Comment lines are joined with '\n' explicitly: the text lands in BCM comment
         // definitions and must not vary with the operating system the task ran on.

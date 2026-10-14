@@ -181,9 +181,14 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
   window), 009 (Options tab), 010 (Grammar dictionary tab), 011 (ICU Settings dialog), 012
   (Restore page), 013 (Restore report), 014 (the window on a French article form) and 015
   (a target with its tags reordered) are new.  Paul takes them in Studio.
-- Released as 2.0.0.0 with the dictionary (Paul, 14 October, 21:45).  The Release build
-  passed the 1,661 tests; the package is `Documentation\appstore\IcuSupport.sdlplugin`
-  (1,103,485 bytes, gitignored) for the store upload.  The manifest's description, which the
+- Released as 2.0.0.0 with the dictionary (Paul, 14 October, 21:45), then rebuilt at 22:44
+  after a last fix from the French screenshots: a plural row under a gender select previewed
+  its argument as "Anna" rather than the gender's sample noun, because only a gender leaf
+  carried the base argument.  A plural leaf under a gender now carries the gender's base
+  argument and sample (planner), the writer records it, and the window reads "Your Zug is
+  waiting at the platform."  One test, 1,662.  The Release build passed them all; the
+  package is `Documentation\appstore\IcuSupport.sdlplugin` (1,105,021 bytes, gitignored)
+  for the store upload, and `v2.0.0.0` was moved to the rebuilt commit before the upload.  The manifest's description, which the
   AppStore shows, still said "finalise" and was corrected first (`9e87e9a`).  Git: `v1.0.2.0`
   and `release/1.0` on the old `main`, `main` fast-forwarded to `release/2.0`, `v2.0.0.0` on
   `9e87e9a`, all pushed.  `CLAUDE.md` records the branch scheme.  Still to do for the store:

@@ -249,6 +249,32 @@ public class GrammarStudioTests
         Assert.Equal("Your vehicle is ready to board.", french.Rows[6].SourceRendered);
     }
 
+    /// <summary>
+    /// A plural leaf under a gender select belongs to the gender's argument too, so its
+    /// preview takes the sample noun ("Your Zug is waiting") rather than a placeholder name
+    /// (Paul, 14 October 2026: the German waiting message read "Your Anna").
+    /// </summary>
+    [Fact]
+    public void A_plural_under_a_gender_previews_the_genders_sample_noun()
+    {
+        const string waiting = "{vehicleGender, select, MASCULINE {{vehicleCount, plural, one {Your {vehicle} is waiting at the platform.} other {Your # {vehicle}s are waiting at the platform.}}} FEMININE {{vehicleCount, plural, one {Your {vehicle} is waiting at the platform.} other {Your # {vehicle}s are waiting at the platform.}}} other {{vehicleCount, plural, one {Your {vehicle} is waiting at the platform.} other {Your # {vehicle}s are waiting at the platform.}}}}";
+        var unit = Expanded(waiting, "de-DE", GrammarDictionary.Default, out _);
+        var model = new IcuFormsReader().Read(unit, "de-DE")!;
+
+        Assert.Equal(8, model.Rows.Count);
+        Assert.Equal("vehicleGender:MASCULINE/vehicleCount:one", model.Rows[0].Path);
+        Assert.Equal("Your Zug is waiting at the platform.", model.Rows[0].SourceRendered);
+        Assert.Equal("Your Fähre is waiting at the platform.", model.Rows[2].SourceRendered);
+        Assert.Equal("Your Taxi is waiting at the platform.", model.Rows[4].SourceRendered);
+        Assert.Equal("Your vehicle is waiting at the platform.", model.Rows[6].SourceRendered);
+
+        // Still a plural row: counts in the Counts column, no grammar kind on it.
+        Assert.Equal("", model.Rows[0].GrammarKind);
+        Assert.NotEmpty(model.Rows[0].Counts);
+        Assert.Equal("1", model.Rows[0].Counts[0]);
+        Assert.StartsWith("CLDR category: one", model.Rows[0].Comment, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void The_window_shows_the_hint_where_a_plural_shows_its_counts()
     {
