@@ -218,6 +218,13 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
   from the row's position when `IsActive` changes, in the view's code-behind, with no
   scrolling while the row is already in view so the translator's own scroll position is
   not fought.  The click navigation added today goes the other way and is unaffected.
+- **The ICU Forms window should name the key on an ordinary segment** (2.0.1 candidate,
+  Paul, 14 October).  The test file's `_comment` value arrives as six translatable segments,
+  which the window calls "ordinary text".  Naming the key in that line, "The active segment
+  is ordinary text: Default._comment", lets a translator see a comment-like key for what it
+  is.  One line: the key is read already (`ResourceKey.Of`, the structure path under the
+  embedded content processor).  No guessing from the key name; excluding such values is the
+  JSON file type's job, through its parser rules, before the project is created.
 - The open items from handovers 05 to 11 stand.
 
 ## A test file from the source material (after the release)
