@@ -349,6 +349,9 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Line under the message key. {0} is the target language name, {1} the number of forms; keep the placeholders.</summary>
         public static string Forms_Summary { get { return Manager.GetString("Forms_Summary", Culture); } }
 
+        /// <summary>Line under the message key when the message nests two or more selectors. {0} is the target language name, {1} the number of forms, {2} where they come from, such as "gender 3 × count 6" (argument names and counts, not translated); keep the placeholders.</summary>
+        public static string Forms_SummaryBy { get { return Manager.GetString("Forms_SummaryBy", Culture); } }
+
         /// <summary>Column title: the plural form, explicit value or select key of the row.</summary>
         public static string Forms_ColumnForm { get { return Manager.GetString("Forms_ColumnForm", Culture); } }
 

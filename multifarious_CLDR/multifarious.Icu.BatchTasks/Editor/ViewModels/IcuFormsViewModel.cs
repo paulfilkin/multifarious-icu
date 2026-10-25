@@ -272,8 +272,11 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
             _model = model;
             ParagraphUnitId = unit.Properties != null && unit.Properties.ParagraphUnitId.Id != null ? unit.Properties.ParagraphUnitId.Id : string.Empty;
             Key = model.Key ?? string.Empty;
-            Summary = string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_Summary,
-                string.IsNullOrEmpty(targetLanguageName) ? targetLanguageTag : targetLanguageName, model.Rows.Count);
+            var language = string.IsNullOrEmpty(targetLanguageName) ? targetLanguageTag : targetLanguageName;
+            var selectors = SelectorsOf(model.Rows);
+            Summary = selectors == null
+                ? string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_Summary, language, model.Rows.Count)
+                : string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_SummaryBy, language, model.Rows.Count, selectors);
 
             Rows.Clear();
             foreach (var row in model.Rows)
@@ -345,6 +348,62 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
             var note = why + Environment.NewLine + Environment.NewLine + reason;
             if (pointer != null) note += Environment.NewLine + Environment.NewLine + pointer;
             ShowEmpty(UIStrings.Forms_PassedThroughTitle, note);
+        }
+
+        /// <summary>
+        /// Where a large count comes from: the selectors by depth with the number of keys each
+        /// contributes, "gender 3 × count 6", read from the rows' branch paths. Null unless the
+        /// message nests at least two selectors, every row goes the same depth through the same
+        /// arguments and the product is the row count; a narrowed inner set varies by branch,
+        /// and a product that did not add up would mislead.
+        /// </summary>
+        private static string SelectorsOf(IReadOnlyList<IcuFormRow> rows)
+        {
+            if (rows.Count == 0) return null;
+
+            List<string[]> frames = null;
+            foreach (var row in rows)
+            {
+                var components = (row.Path ?? string.Empty).Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                if (components.Length < 2) return null;
+                if (frames == null)
+                {
+                    frames = new List<string[]>();
+                    foreach (var component in components) frames.Add(new[] { ArgumentOf(component) });
+                }
+                else if (components.Length != frames.Count)
+                {
+                    return null;
+                }
+                else
+                {
+                    for (var depth = 0; depth < components.Length; depth++)
+                    {
+                        if (ArgumentOf(components[depth]) != frames[depth][0]) return null;
+                    }
+                }
+            }
+
+            var parts = new List<string>();
+            var product = 1;
+            for (var depth = 0; depth < frames.Count; depth++)
+            {
+                var keys = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var row in rows)
+                {
+                    keys.Add(row.Path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries)[depth]);
+                }
+                product *= keys.Count;
+                parts.Add(frames[depth][0] + " " + keys.Count.ToString(CultureInfo.CurrentCulture));
+            }
+
+            return product == rows.Count ? string.Join(" × ", parts) : null;
+        }
+
+        private static string ArgumentOf(string component)
+        {
+            var colon = component.IndexOf(':');
+            return colon < 0 ? component : component.Substring(0, colon);
         }
 
         /// <summary>

@@ -369,6 +369,39 @@ public class IcuFormsViewTests
         Assert.DoesNotContain(":", viewModel.EmptyNote.Substring(0, viewModel.EmptyNote.IndexOf("Move", StringComparison.Ordinal)));
     }
 
+    /// <summary>
+    /// A large count is explained in the summary line where it comes from nested selectors,
+    /// "g 2 × count 6"; a single selector, or a nesting whose product does not add up (a
+    /// select branch with no plural under it is one row), keeps the plain line.
+    /// </summary>
+    [Fact]
+    public void The_summary_says_where_nested_forms_come_from()
+    {
+        var nested = ParagraphUnits.Json(
+            "{g, select, a {You have {count, plural, one {# file} other {# files}}} other {They have {count, plural, one {# file} other {# files}}}}",
+            "['files']");
+        var uneven = ParagraphUnits.Json(
+            "{g, select, a {You have {count, plural, one {# file} other {# files}}} other {They have files}}",
+            "['files.uneven']");
+        foreach (var unit in new[] { nested, uneven })
+        {
+            new IcuExpandProcessor("en-GB", "ar-SA", ExpansionOptions.Default, "1.0.0") { ItemFactory = ParagraphUnits.ItemFactory }
+                .ProcessParagraphUnit(unit);
+        }
+        var viewModel = new IcuFormsViewModel();
+
+        viewModel.Show(nested, "1", "ar-SA", "Arabic (Saudi Arabia)");
+        Assert.Equal(12, viewModel.Rows.Count);
+        Assert.Equal("Arabic (Saudi Arabia), 12 form(s): g 2 × count 6", viewModel.Summary);
+
+        viewModel.Show(uneven, "1", "ar-SA", "Arabic (Saudi Arabia)");
+        Assert.Equal(7, viewModel.Rows.Count);
+        Assert.Equal("Arabic (Saudi Arabia), 7 form(s)", viewModel.Summary);
+
+        viewModel.Show(Expanded(UnreadCount), "1", "ru-RU", "Russian (Russia)");
+        Assert.Equal("Russian (Russia), 4 form(s)", viewModel.Summary);
+    }
+
     [Fact]
     public void The_view_keeps_the_active_row_in_view_through_named_parts()
     {

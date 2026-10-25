@@ -337,6 +337,9 @@
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, {1} Form(en)</value>
   </data>
+  <data name="Forms_SummaryBy" xml:space="preserve">
+    <value>{0}, {1} Form(en): {2}</value>
+  </data>
   <data name="Forms_ColumnForm" xml:space="preserve">
     <value>Form</value>
   </data>

@@ -53,6 +53,67 @@ public class HoisterTests
             Hoisted("{a, plural, one {A} other {As}} and {b, plural, one {B} other {Bs}}"));
     }
 
+    /// <summary>
+    /// Two selects on the same argument in one sentence (the test file's article selects,
+    /// 25 October 2026): the argument has one value, so the second select resolves to the
+    /// branch the first already chose rather than nesting under every one of its branches.
+    /// </summary>
+    [Fact]
+    public void ASecondSelectOnTheSameArgumentCollapsesToTheBoundBranch()
+    {
+        Assert.Equal(
+            "{a, select, x {X and X2} other {O and O2}}",
+            Hoisted("{a, select, x {X} other {O}} and {a, select, x {X2} other {O2}}"));
+    }
+
+    /// <summary>
+    /// Under a key the inner select lacks it falls to its other; under the outer's other
+    /// the value is none of the outer's named keys, so only the inner's keys the outer has
+    /// not got stay reachable, and the inner survives as a smaller select.
+    /// </summary>
+    [Fact]
+    public void ACollapsedSelectKeepsTheKeysTheOuterCannotHaveRuledOut()
+    {
+        Assert.Equal(
+            "{a, select, x {X and O2} other {{a, select, y {O and Y2} other {O and O2}}}}",
+            Hoisted("{a, select, x {X} other {O}} and {a, select, y {Y2} other {O2}}"));
+    }
+
+    [Fact]
+    public void ASecondPluralOnTheSameArgumentCollapsesByCategory()
+    {
+        Assert.Equal(
+            "{n, plural, one {# file in # folder} other {# files in # folders}}",
+            Hoisted("{n, plural, one {# file} other {# files}} in {n, plural, one {# folder} other {# folders}}"));
+    }
+
+    /// <summary>
+    /// An explicit key on either side is left nested: whether 0 is 'one' or 'other' is a
+    /// CLDR question this layer cannot answer. Under the outer's other the inner's 'one'
+    /// is still reachable (the outer has no 'one'), so that nests too.
+    /// </summary>
+    [Fact]
+    public void AnExplicitKeyLeavesASameArgumentPluralNested()
+    {
+        Assert.Equal(
+            "{n, plural, =0 {{n, plural, one {none a} other {none b}}} other {{n, plural, one {{n, number} a} other {{n, number} b}}}}",
+            Hoisted("{n, plural, =0 {none} other {#}} {n, plural, one {a} other {b}}"));
+    }
+
+    /// <summary>
+    /// The binding holds through another plural in between, and a '#' the collapse lands in
+    /// that plural's scope is rewritten to its own argument, as any crossing '#' is.
+    /// </summary>
+    [Fact]
+    public void ACollapseThroughAnotherPluralRewritesItsPound()
+    {
+        Assert.Equal(
+            "{a, plural, " +
+            "one {{b, plural, one {A B {a, number}} other {A Bs {a, number}}}} " +
+            "other {{b, plural, one {As B {a, number}s} other {As Bs {a, number}s}}}}",
+            Hoisted("{a, plural, one {A} other {As}} {b, plural, one {B} other {Bs}} {a, plural, one {#} other {#s}}"));
+    }
+
     [Fact]
     public void APluralInsideASelectBranchHoistsWithinThatBranch()
     {

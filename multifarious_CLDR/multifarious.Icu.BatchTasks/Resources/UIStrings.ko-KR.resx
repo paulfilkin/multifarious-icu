@@ -337,6 +337,9 @@
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, 형태 {1}개</value>
   </data>
+  <data name="Forms_SummaryBy" xml:space="preserve">
+    <value>{0}, 형태 {1}개: {2}</value>
+  </data>
   <data name="Forms_ColumnForm" xml:space="preserve">
     <value>형태</value>
   </data>

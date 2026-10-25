@@ -466,6 +466,10 @@
     <value>{0}, {1} form(s)</value>
     <comment>Line under the message key. {0} is the target language name, {1} the number of forms; keep the placeholders.</comment>
   </data>
+  <data name="Forms_SummaryBy" xml:space="preserve">
+    <value>{0}, {1} form(s): {2}</value>
+    <comment>Line under the message key when the message nests two or more selectors. {0} is the target language name, {1} the number of forms, {2} where they come from, such as "gender 3 × count 6" (argument names and counts, not translated); keep the placeholders.</comment>
+  </data>
   <data name="Forms_ColumnForm" xml:space="preserve">
     <value>Form</value>
     <comment>Column title: the plural form, explicit value or select key of the row.</comment>

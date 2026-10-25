@@ -44,14 +44,22 @@ public static class Hoister
     public static IReadOnlyList<MessageNode> Hoist(IReadOnlyList<MessageNode> nodes)
     {
         if (nodes is null) throw new ArgumentNullException(nameof(nodes));
-        return HoistSequence(nodes, enclosing: null);
+        return HoistSequence(nodes, enclosing: null, bindings: Array.Empty<Binding>());
     }
 
     /// <summary>The plural-kind selector whose branch a sequence sits inside, if any.</summary>
     private sealed record EnclosingPlural(string ArgumentName, decimal Offset);
 
+    /// <summary>
+    /// A selector on the path above a sequence and the branch of it the sequence sits in:
+    /// inside that branch the argument is known to match <see cref="Key"/>, or, under
+    /// <c>other</c>, to match none of <see cref="SiblingKeys"/>.
+    /// </summary>
+    private sealed record Binding(
+        SelectorType Type, string ArgumentName, decimal Offset, BranchKey Key, IReadOnlyList<BranchKey> SiblingKeys);
+
     private static IReadOnlyList<MessageNode> HoistSequence(
-        IReadOnlyList<MessageNode> nodes, EnclosingPlural? enclosing)
+        IReadOnlyList<MessageNode> nodes, EnclosingPlural? enclosing, IReadOnlyList<Binding> bindings)
     {
         var index = IndexOfFirstSelector(nodes);
         if (index < 0)
@@ -62,6 +70,20 @@ public static class Hoister
         var selector = (SelectorNode)nodes[index];
         var prefix = nodes.Take(index).ToList();
         var suffix = nodes.Skip(index + 1).ToList();
+
+        // A second selector on an argument already bound above resolves to what the
+        // binding allows, instead of nesting every one of its branches under every one
+        // of the outer's: two article selects in one sentence are ten whole sentences,
+        // not a hundred of which ninety could never be rendered (25 October 2026).
+        var collapsed = Collapse(selector, enclosing, bindings);
+        if (collapsed is not null)
+        {
+            var replaced = new List<MessageNode>(prefix.Count + collapsed.Count + suffix.Count);
+            replaced.AddRange(prefix);
+            replaced.AddRange(collapsed);
+            replaced.AddRange(suffix);
+            return HoistSequence(replaced, enclosing, bindings);
+        }
 
         // Only the plural kinds capture '#'; distributing into a select moves nothing
         // out of its binding scope.
@@ -75,6 +97,7 @@ public static class Hoister
             ? new EnclosingPlural(selector.ArgumentName, selector.Offset)
             : enclosing;
 
+        var siblingKeys = selector.Branches.Select(branch => branch.Key).ToList();
         var branches = new List<Branch>(selector.Branches.Count);
         foreach (var branch in selector.Branches)
         {
@@ -82,7 +105,10 @@ public static class Hoister
             content.AddRange(prefix);
             content.AddRange(branch.Nodes);
             content.AddRange(suffix);
-            branches.Add(new Branch(branch.Key, HoistSequence(content, childEnclosing), branch.Span));
+            var childBindings = new List<Binding>(bindings.Count + 1);
+            childBindings.AddRange(bindings);
+            childBindings.Add(new Binding(selector.Type, selector.ArgumentName, selector.Offset, branch.Key, siblingKeys));
+            branches.Add(new Branch(branch.Key, HoistSequence(content, childEnclosing, childBindings), branch.Span));
         }
 
         return new MessageNode[]
@@ -92,6 +118,107 @@ public static class Hoister
                 branches, selector.Span)
         };
     }
+
+    /// <summary>
+    /// What a selector reduces to under a binding of its own argument, or null where it
+    /// cannot be reduced and nests as any other selector does. Only exact reductions are
+    /// made, so rendering is unchanged for every value:
+    /// a select under a select on the same argument, and a plural kind under the same
+    /// kind, argument and offset when the bound key is a keyword and the inner has no
+    /// explicit <c>=n</c> keys. Under a named key the inner's branch of that key stands,
+    /// or its <c>other</c>; under <c>other</c> the value matches none of the outer's
+    /// named keys, so those of the inner's branches are dropped and what is left stands,
+    /// whole or as a smaller selector. An explicit key on either side is left alone:
+    /// resolving a number to a category needs CLDR, which this layer has not got.
+    /// </summary>
+    private static IReadOnlyList<MessageNode>? Collapse(
+        SelectorNode selector, EnclosingPlural? enclosing, IReadOnlyList<Binding> bindings)
+    {
+        Binding? binding = null;
+        foreach (var candidate in bindings)
+        {
+            if (candidate.Type == selector.Type
+                && string.Equals(candidate.ArgumentName, selector.ArgumentName, StringComparison.Ordinal)
+                && (!selector.IsPluralKind || candidate.Offset == selector.Offset))
+            {
+                binding = candidate;
+                break;
+            }
+        }
+
+        if (binding is null)
+        {
+            return null;
+        }
+
+        if (selector.IsPluralKind
+            && (binding.Key.IsExplicit || selector.Branches.Any(branch => branch.Key.IsExplicit)))
+        {
+            return null;
+        }
+
+        IReadOnlyList<MessageNode>? content;
+        if (!IsOther(binding.Key))
+        {
+            var chosen = selector.Branches.FirstOrDefault(branch => branch.Key.Equals(binding.Key))
+                ?? selector.Branches.FirstOrDefault(branch => IsOther(branch.Key));
+            if (chosen is null)
+            {
+                return null;
+            }
+
+            content = chosen.Nodes;
+        }
+        else
+        {
+            var reachable = selector.Branches
+                .Where(branch => IsOther(branch.Key) || !binding.SiblingKeys.Contains(branch.Key))
+                .ToList();
+            if (reachable.Count == selector.Branches.Count)
+            {
+                return null;
+            }
+
+            if (reachable.Count == 1)
+            {
+                content = reachable[0].Nodes;
+            }
+            else
+            {
+                return new MessageNode[]
+                {
+                    new SelectorNode(
+                        selector.Type, selector.ArgumentName, selector.OffsetRaw, selector.Offset,
+                        reachable, selector.Span)
+                };
+            }
+        }
+
+        // A '#' in a collapsed plural-kind branch was bound to that plural; in the sequence
+        // it lands in it binds to the enclosing one, which is the same argument and offset
+        // unless another plural sits between the two. Then it is rewritten, or, with an
+        // offset ICU cannot write as an argument, the selector is left nested.
+        if (selector.IsPluralKind && content.Any(ContainsBoundPound))
+        {
+            var sameScope = enclosing is not null
+                && string.Equals(enclosing.ArgumentName, selector.ArgumentName, StringComparison.Ordinal)
+                && enclosing.Offset == selector.Offset;
+            if (!sameScope)
+            {
+                if (selector.Offset != 0)
+                {
+                    return null;
+                }
+
+                var own = new EnclosingPlural(selector.ArgumentName, selector.Offset);
+                content = content.Select(node => RewritePounds(node, own)).ToList();
+            }
+        }
+
+        return content;
+    }
+
+    private static bool IsOther(BranchKey key) => string.Equals(key.Text, "other", StringComparison.Ordinal);
 
     private static int IndexOfFirstSelector(IReadOnlyList<MessageNode> nodes)
     {
