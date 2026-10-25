@@ -340,6 +340,12 @@
   <data name="Forms_SummaryBy" xml:space="preserve">
     <value>{0}, {1} forma/e: {2}</value>
   </data>
+  <data name="Forms_SummaryWalked" xml:space="preserve">
+    <value>{0}, {1} forma/e disposte come scritte</value>
+  </data>
+  <data name="Forms_SummaryWalkedBy" xml:space="preserve">
+    <value>{0}, {1} forma/e disposte come scritte: {2}</value>
+  </data>
   <data name="Forms_ColumnForm" xml:space="preserve">
     <value>Forma</value>
   </data>

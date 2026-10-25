@@ -340,6 +340,12 @@
   <data name="Forms_SummaryBy" xml:space="preserve">
     <value>{0}、{1} 個の形式: {2}</value>
   </data>
+  <data name="Forms_SummaryWalked" xml:space="preserve">
+    <value>{0}、{1} 個の形式、記述どおりに配置</value>
+  </data>
+  <data name="Forms_SummaryWalkedBy" xml:space="preserve">
+    <value>{0}、{1} 個の形式、記述どおりに配置: {2}</value>
+  </data>
   <data name="Forms_ColumnForm" xml:space="preserve">
     <value>形式</value>
   </data>

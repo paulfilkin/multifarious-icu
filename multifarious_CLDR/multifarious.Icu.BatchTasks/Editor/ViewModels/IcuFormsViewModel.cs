@@ -274,9 +274,16 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
             Key = model.Key ?? string.Empty;
             var language = string.IsNullOrEmpty(targetLanguageName) ? targetLanguageTag : targetLanguageName;
             var selectors = SelectorsOf(model.Rows);
-            Summary = selectors == null
-                ? string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_Summary, language, model.Rows.Count)
-                : string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_SummaryBy, language, model.Rows.Count, selectors);
+            // A message with a plural kind and nothing category expanded was laid out walked:
+            // over the branch budget, or its only plural kind disabled. The rows then show the
+            // source's own branches, and the line says so, since the translator would otherwise
+            // look for the target language's categories among them.
+            var walked = model.HasPluralKind && model.ExpandedSelectors.Count == 0;
+            Summary = string.Format(CultureInfo.CurrentCulture,
+                walked
+                    ? (selectors == null ? UIStrings.Forms_SummaryWalked : UIStrings.Forms_SummaryWalkedBy)
+                    : (selectors == null ? UIStrings.Forms_Summary : UIStrings.Forms_SummaryBy),
+                language, model.Rows.Count, selectors);
 
             Rows.Clear();
             foreach (var row in model.Rows)

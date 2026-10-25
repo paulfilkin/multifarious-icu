@@ -340,6 +340,12 @@
   <data name="Forms_SummaryBy" xml:space="preserve">
     <value>{0}, 형태 {1}개: {2}</value>
   </data>
+  <data name="Forms_SummaryWalked" xml:space="preserve">
+    <value>{0}, 형태 {1}개, 작성된 대로 배치됨</value>
+  </data>
+  <data name="Forms_SummaryWalkedBy" xml:space="preserve">
+    <value>{0}, 형태 {1}개, 작성된 대로 배치됨: {2}</value>
+  </data>
   <data name="Forms_ColumnForm" xml:space="preserve">
     <value>형태</value>
   </data>

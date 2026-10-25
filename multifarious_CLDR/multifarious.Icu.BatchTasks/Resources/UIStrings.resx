@@ -470,6 +470,14 @@
     <value>{0}, {1} form(s): {2}</value>
     <comment>Line under the message key when the message nests two or more selectors. {0} is the target language name, {1} the number of forms, {2} where they come from, such as "gender 3 × count 6" (argument names and counts, not translated); keep the placeholders.</comment>
   </data>
+  <data name="Forms_SummaryWalked" xml:space="preserve">
+    <value>{0}, {1} form(s) laid out as written</value>
+    <comment>Line under the message key when the message was laid out with the source's own branches and nothing category expanded (over the branch budget, or its only plural kind disabled). {0} is the target language name, {1} the number of forms; keep the placeholders.</comment>
+  </data>
+  <data name="Forms_SummaryWalkedBy" xml:space="preserve">
+    <value>{0}, {1} form(s) laid out as written: {2}</value>
+    <comment>The same when the message nests two or more selectors. {2} is where the forms come from, such as "gender 3 × count 3" (argument names and counts, not translated); keep the placeholders.</comment>
+  </data>
   <data name="Forms_ColumnForm" xml:space="preserve">
     <value>Form</value>
     <comment>Column title: the plural form, explicit value or select key of the row.</comment>

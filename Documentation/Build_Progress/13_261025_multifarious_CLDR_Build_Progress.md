@@ -7,8 +7,10 @@ that answers it, an ordinary segment's note names the unit's key, and the active
 kept in view (committed, `0454680`).  Second, from Paul's Studio run of that build: two
 article selects on one argument in one sentence came out as a hundred Italian forms, ninety
 of them unreachable, so the hoister now collapses a selector on an argument already bound
-above, and the window's summary line says where nested forms come from.  1,672 tests.  The
-second commit is proposed below.
+above, and the window's summary line says where nested forms come from (`98f22df`).  Third,
+from the run of that build: the header grew to ten lines under a long summary, so it is a
+Grid with the summary wrapping, and the summary says when a message was laid out as written.
+1,673 tests.
 
 ## Kickoff prompt for the next session (paste this)
 
@@ -20,8 +22,9 @@ second commit is proposed below.
 > unit's warning, names the key on an ordinary segment and scrolls to the active row
 > (`0454680`); the hoister collapses a selector on an argument already bound above, so two
 > article selects in one sentence are ten Italian forms and not a hundred, and the window's
-> summary says where nested forms come from (second commit, see the handover).  Seven new
-> strings in nine resource files, ten new tests (1,672), `tools\check-forms-scroll.ps1`.
+> summary says where nested forms come from (`98f22df`); the header is a Grid that wraps the
+> summary, and the summary says when a message was laid out as written (third commit).  Nine
+> new strings in nine resource files, eleven new tests (1,673), `tools\check-forms-scroll.ps1`.
 > The version numbers are still 2.0.0.0.  The hoister change is in `Icu.Core`, a file copy
 > from the reference project at `c:\Users\paul\Documents\GIT\.NET\CLDR Support\` (read
 > only), and has not been copied back there or into its design's section 5.9.
@@ -40,7 +43,7 @@ second commit is proposed below.
 
 ## Where we are in one line
 
-The window improvements are committed on `release/2.1` and passed their Studio run; the same-argument collapse and the summary line are built, tested and deployed, and wait for the second commit and Paul's run.
+Three commits on `release/2.1`: the window improvements, the same-argument collapse with the summary line, and the header fix with the walked wording; the last two wait for Paul's Studio run.
 
 ## What was asked (Paul, 25 October 2026)
 
@@ -186,12 +189,57 @@ nine languages, six new tests (1,672).
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
 ```
 
+## The third piece: the header and the walked wording (late evening)
+
+Paul's run of the second build showed `DeviceState['DEVICE_NEEDS_TIME.1']` for French, 36
+forms, with the header ten lines tall and the summary running off the right edge.  Two
+causes, one layout, one wording.  The header was a DockPanel: the summary does not wrap, so
+a long one took the whole width, and the status docked right was left no width and wrapped
+one character per line.  And the message was laid out walked (its categorical expansion is
+225 forms, over the project's budget), so the rows were the source's `=0`, `=1` and `other`
+under every gender including NEUTER, with nothing in the window to say why.
+
+- **Header as a Grid** (`IcuFormsView.xaml`): key, summary in a star column with
+  `TextWrapping="Wrap"`, status at its own width on the right.  `check-forms-scroll.ps1`
+  still passes, so the XAML loads and the rows still scroll.
+- **Walked wording** (`IcuFormsViewModel.Show`, `IcuFormsModel.HasPluralKind`): a plural kind
+  on any row's path with `icu:expandedSelectors` empty reads "French (France), 36 form(s)
+  laid out as written: deviceTypeGender 4 × durationHoursPlural 3 × durationMinutesPlural 3".
+  Not `CountArgument`, which is null when the outermost selector is a select, exactly Paul's
+  case; the first test run caught that.  Two strings, `Forms_SummaryWalked` and
+  `Forms_SummaryWalkedBy`, where the plan said one: the product variant needs its own so the
+  translations stay whole.  One test, two cases.  1,673.
+
+### Proposed third commit
+
+Stage: `Editor\Views\IcuFormsView.xaml`, `Editor\ViewModels\IcuFormsViewModel.cs`,
+`Services\IcuFormsReader.cs`, the nine resx and `UIStrings.cs`,
+`multifarious.Icu.Tests\BatchTasks\IcuFormsViewTests.cs`, this handover.
+
+```
+Wrap the ICU Forms header and say when a message was laid out as written
+
+The header was a DockPanel: a long summary took the whole width and
+left the status no room, so it wrapped one character per line and the
+header grew to ten lines. It is now a Grid with the summary wrapping.
+
+A message over the branch budget is laid out with the source's own
+branches and nothing category expanded, and the rows showed =0, =1 and
+other under every gender with no word on why. The summary now says
+"laid out as written" when a plural kind is on the path and nothing
+was expanded. Two new strings in nine languages, one test (1,673).
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+```
+
 ## Open items
 
-- **Studio run of the collapse and the summary line**: Expand the test file again for
-  Italian and look at `LOCAL_CONTROL_CONFIRMATION.1` (ten rows, each a different article,
-  no `L / I`) and `RESULT_ON_DEVICETYPE.1` (walked, now 50 rather than 3,110); a gender over
-  a plural for the summary's "× count" line.  The window items passed their first run.
+- **Studio run of the collapse, the summary line and the header**: Expand the test file again
+  for Italian and look at `LOCAL_CONTROL_CONFIRMATION.1` (ten rows, each a different article,
+  no `L / I`) and `RESULT_ON_DEVICETYPE.1` (walked, now 50 rather than 3,110); French
+  `DEVICE_NEEDS_TIME.1` for the header on one or two lines and the "laid out as written"
+  wording; a gender over a plural for the "× count" line.  The window items passed their
+  first run.
 - **Copy the hoister back to the reference project** (`Icu.Core\Hoister.cs`, the five
   tests) and add the collapse to design section 5.9.  Paul's, the project is read only here.
 - The website screenshots and the HTML guide (handover 12).

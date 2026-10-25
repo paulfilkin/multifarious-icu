@@ -402,6 +402,32 @@ public class IcuFormsViewTests
         Assert.Equal("Russian (Russia), 4 form(s)", viewModel.Summary);
     }
 
+    /// <summary>
+    /// A message over the branch budget is laid out walked, the source's own branches with
+    /// nothing category expanded, and the summary says so (Paul, 25 October 2026: a French
+    /// message showing =0, =1 and other under every gender, with no word on why).
+    /// </summary>
+    [Fact]
+    public void The_summary_says_when_a_message_was_laid_out_as_written()
+    {
+        // Russian needs four categories; the walked layout is the source's two branches.
+        var walked = Expanded(UnreadCount, ExpansionOptions.Default with { MaxUnitsPerMessage = 2 });
+        var nested = ParagraphUnits.Json(
+            "{g, select, a {You have {count, plural, one {# file} other {# files}}} other {They have {count, plural, one {# file} other {# files}}}}",
+            "['files']");
+        new IcuExpandProcessor("en-GB", "ar-SA", ExpansionOptions.Default with { MaxUnitsPerMessage = 4 }, "1.0.0") { ItemFactory = ParagraphUnits.ItemFactory }
+            .ProcessParagraphUnit(nested);
+        var viewModel = new IcuFormsViewModel();
+
+        viewModel.Show(walked, "1", "ru-RU", "Russian (Russia)");
+        Assert.Equal(["one", "other"], viewModel.Rows.Select(r => r.Form));
+        Assert.Equal("Russian (Russia), 2 form(s) laid out as written", viewModel.Summary);
+
+        viewModel.Show(nested, "1", "ar-SA", "Arabic (Saudi Arabia)");
+        Assert.Equal(4, viewModel.Rows.Count);
+        Assert.Equal("Arabic (Saudi Arabia), 4 form(s) laid out as written: g 2 × count 2", viewModel.Summary);
+    }
+
     [Fact]
     public void The_view_keeps_the_active_row_in_view_through_named_parts()
     {

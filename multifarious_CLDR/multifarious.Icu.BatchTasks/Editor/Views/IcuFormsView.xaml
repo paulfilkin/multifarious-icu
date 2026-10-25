@@ -100,14 +100,22 @@
       </StackPanel>
     </Border>
 
-    <!-- Header: key, language and form count on the left, validity on the right -->
-    <DockPanel Grid.Row="0" Margin="0,0,0,6" LastChildFill="False"
-               Visibility="{Binding HasMessage, Mode=OneWay, Converter={StaticResource Visible}}">
-      <TextBlock DockPanel.Dock="Left" FontWeight="SemiBold" FontFamily="Consolas" VerticalAlignment="Center"
+    <!-- Header: key, language and form count on the left, validity on the right. A Grid, not
+         a DockPanel: the summary names the selectors a large count comes from and must wrap,
+         and in a DockPanel a long summary left the status no width, so it wrapped one
+         character per line and the header grew to ten lines (25 October 2026). -->
+    <Grid Grid.Row="0" Margin="0,0,0,6"
+          Visibility="{Binding HasMessage, Mode=OneWay, Converter={StaticResource Visible}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="0" FontWeight="SemiBold" FontFamily="Consolas" VerticalAlignment="Center"
                  Text="{Binding Key, Mode=OneWay}" Margin="0,0,12,0" />
-      <TextBlock DockPanel.Dock="Left" Foreground="{StaticResource Muted}" VerticalAlignment="Center"
-                 Text="{Binding Summary, Mode=OneWay}" />
-      <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="480" TextAlignment="Right"
+      <TextBlock Grid.Column="1" Foreground="{StaticResource Muted}" VerticalAlignment="Center" TextWrapping="Wrap"
+                 Text="{Binding Summary, Mode=OneWay}" Margin="0,0,12,0" />
+      <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="480" TextAlignment="Right"
                  Text="{Binding ParseStatus, Mode=OneWay}">
         <TextBlock.Style>
           <Style TargetType="TextBlock">
@@ -120,7 +128,7 @@
           </Style>
         </TextBlock.Style>
       </TextBlock>
-    </DockPanel>
+    </Grid>
 
     <!-- Column titles -->
     <Border Grid.Row="1" BorderBrush="{StaticResource Rule}" BorderThickness="0,0,0,1"

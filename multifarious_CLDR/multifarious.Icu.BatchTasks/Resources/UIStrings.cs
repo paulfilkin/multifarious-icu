@@ -352,6 +352,12 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Line under the message key when the message nests two or more selectors. {0} is the target language name, {1} the number of forms, {2} where they come from, such as "gender 3 × count 6" (argument names and counts, not translated); keep the placeholders.</summary>
         public static string Forms_SummaryBy { get { return Manager.GetString("Forms_SummaryBy", Culture); } }
 
+        /// <summary>Line under the message key when the message was laid out with the source's own branches and nothing category expanded (over the branch budget, or its only plural kind disabled). {0} is the target language name, {1} the number of forms; keep the placeholders.</summary>
+        public static string Forms_SummaryWalked { get { return Manager.GetString("Forms_SummaryWalked", Culture); } }
+
+        /// <summary>The same when the message nests two or more selectors. {2} is where the forms come from, such as "gender 3 × count 3" (argument names and counts, not translated); keep the placeholders.</summary>
+        public static string Forms_SummaryWalkedBy { get { return Manager.GetString("Forms_SummaryWalkedBy", Culture); } }
+
         /// <summary>Column title: the plural form, explicit value or select key of the row.</summary>
         public static string Forms_ColumnForm { get { return Manager.GetString("Forms_ColumnForm", Culture); } }
 

@@ -94,6 +94,13 @@ namespace multifarious.Icu.BatchTasks.Services
 
         /// <summary>The argument the outermost plural-kind selector switches on, for the count box; null for a select-only or protected message.</summary>
         public string CountArgument { get; set; }
+
+        /// <summary>
+        /// Whether any selector on any row's path is a plural kind, at whatever depth. With
+        /// <see cref="ExpandedSelectors"/> empty it means the message was laid out walked:
+        /// the source's own branches, nothing category expanded.
+        /// </summary>
+        public bool HasPluralKind { get; set; }
     }
 
     /// <summary>
@@ -202,6 +209,8 @@ namespace multifarious.Icu.BatchTasks.Services
                 TargetParses = parses,
                 ParseError = parses ? null : error.Description + " (offset " + error.Position.ToString(CultureInfo.InvariantCulture) + ")",
                 CountArgument = PreviewForms.OutermostPluralArgument(hoisted.Length > 0 ? hoisted : pattern),
+                HasPluralKind = placed.Any(place => place.Frames != null
+                    && place.Frames.Any(frame => frame.Kind == "plural" || frame.Kind == "selectordinal")),
             };
         }
 
