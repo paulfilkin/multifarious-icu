@@ -114,6 +114,9 @@ A11: Its argument name does not end in Gender or Article and is not declared in 
 **Q12: French got masculine and feminine but no article forms.**
 A12: An article form is a selector the source does not have, and inserting it changes what the application must pass at run time, so it is only inserted where the developer's file says the application supplies the article argument for that language. Add `"supplies": { "fr": ["article"] }` to the argument in the file, import it again, and expand a fresh copy of the file.
 
+**Q13: My values contain speech markup (SSML), and the HTML processor cut the messages into pieces.**
+A13: The HTML embedded content processor treats an element it does not know, such as `<speak>` or `<phoneme>`, as a block and cuts the value at it, so the message is no longer whole. Four settings on the HTML 5 processor put that right, in this order: add the element names as inline elements; under Entities > Advanced, untick `apos` in the Writer settings list; untick Enable entity conversion; set whitespace to be preserved. The element and whitespace settings need a new project; the entity settings apply when the target is saved. The user guide's section on markup inside the values explains each step.
+
 > **Tip**: Full documentation in detail is maintained at <https://multifarious.filkin.com/product/icu-support/>.
 
 ---

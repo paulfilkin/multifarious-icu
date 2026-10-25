@@ -1,5 +1,39 @@
 # multifariousICU Support for Trados Studio - Changelog
 
+## 2.1.0.0 (not yet released)
+
+### Changed
+
+- A second selector on an argument the message has already chosen by, such as two article
+  selects in one sentence, is no longer laid out as every combination. The argument has one
+  value, so the second select takes the branch the first chose. Such a sentence is ten
+  Italian segments where it was a hundred, ninety of them for combinations the application
+  can never show. A plural repeated on the same number is treated the same way. Selectors on
+  different arguments still multiply.
+- The ICU Forms window keeps the active row in view. When the editor moves to a form outside
+  the visible rows, the row is scrolled to the middle; a row already in view stays where it is.
+- The window's header wraps a long summary instead of running off the edge.
+
+### Added
+
+- The ICU Forms window explains more of what it shows:
+  - A message Expand ICU left alone shows the task's own warning with the reason and which
+    Expand ICU setting answers it, the branch budget or what to do when a value does not parse.
+  - An ordinary segment is named by its key, "ordinary text: Default._comment", where the
+    file type puts the key on the segment.
+  - A restored message reads "ICU message restored" with its key, and says Expand ICU lays
+    its forms out again. A file in which every message is restored is no longer told to run
+    Expand ICU before translating.
+  - The summary line says where a large number of forms comes from, such as
+    "deviceTypeGender 3 × count 6", and says when a message was laid out as written because
+    it was over the branch budget.
+
+### Notes
+
+- Values with speech markup (SSML) under the HTML embedded content processor need four
+  settings on the processor, in order. The user guide's section on markup inside the values
+  has them.
+
 ## 2.0.0.0 (October 2026)
 
 Two batch tasks, **Expand ICU** and **Restore ICU**, and a grammar dictionary that lays out a

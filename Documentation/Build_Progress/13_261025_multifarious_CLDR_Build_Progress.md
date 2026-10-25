@@ -296,15 +296,37 @@ back on each form. Three new strings in nine languages, two tests
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
 ```
 
+### The entity recipe (Project 84, pseudo-translated, restored twice, saved three times)
+
+- With "Enable entity conversion" off and Whitespace set to preserve, the first save had no
+  Latin entities and the spaces inside `<speak>` back, but 30 `&apos;`: pseudo-translation's
+  Italian elisions, which Restore had doubled correctly as `''` and the writer then wrote as
+  `&apos;&apos;`.  The decompiled writer (`BackwardEntityConversion` in
+  `Sdl.FileTypeSupport.Filters.Html`) applies `DefaultWriterXmlEntitySettings`, the five XML
+  entities `lt gt quot apos amp` all active, before and regardless of the page's switch.
+  Project 56's `&quot;` was the same set.
+- The Advanced dialog on the Entities page ("Advanced HTML Entity Settings", from
+  `Filters.UI`) has Reader and Writer lists of those five; unticking `apos` in the Writer list
+  writes the apostrophe as a character (`DefaultWriterNameEntityMap3Active = False` in the
+  project).  But the dialog's OK saves its own copy of the entity settings into the same
+  group and sets `ConvertEntities` back to `True`: the second save had the apostrophes right
+  and 91 Latin entities back.
+- Unticking "Enable entity conversion" again, after Advanced, gave the third save: no
+  entities, apostrophes doubled inside ICU values and single in the comment value, spaces
+  inside `<speak>` kept, JSON valid, both settings in the project.
+- Recipe, in order, all on the HTML 5 embedded content processor: `speak` and `phoneme`
+  inline; Advanced, `apos` off in the Writer list; "Enable entity conversion" off; Whitespace
+  preserve.  Elements and whitespace apply at conversion (new project); the entity settings
+  at Save Target.
+
 ## Open items
 
-- **The HTML writer's entities.**  Find the HTML file type's entity setting, set it to write
-  characters, save the target again and check the JSON for `&auml;` and the rest.  Until
-  then the inline-element route is not fit for SSML output.
-- **Documentation of the SSML routes** (AppStore `Documentation.md`, the user guide): the
-  standard filter keeps the message whole with the markup as text; the HTML processor
-  needs `speak` and `phoneme` inline and characters written as characters, and trims the
-  whitespace at the element ends.  After the entity check.
+- **Documentation written, uncommitted** (end of the session): the user guide has
+  "Markup that is not HTML" under "Markup inside the values" with the four steps in order
+  and why each; `multifariousICU_Documentation.md` has Q13; the changelog has a 2.1.0.0
+  entry, "not yet released", covering the four commits.  The website HTML guide is Paul's.
+  Proposed commit: stage the three appstore files and this handover, message "Document
+  the SSML settings and start the 2.1 changelog".
 - **Studio run of the restored state and the collapse**: a restored file for the new state
   and its key under the processor; Italian `LOCAL_CONTROL_CONFIRMATION.1` (ten rows, no
   `L / I`); French `DEVICE_NEEDS_TIME.1` for the header and the "laid out as written"

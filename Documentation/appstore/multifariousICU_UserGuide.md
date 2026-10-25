@@ -95,6 +95,19 @@ Both tasks keep those tags. Expand puts each tag into every form it belongs to, 
 
 One shape cannot be laid out: a tag pair that opens in one branch and closes in another, such as `{count, plural, one {<b># file} other {# files</b>}}`. Studio's writers drop a tag pair split across segments, so the message is left as it is, with a warning in the report and on the message.
 
+#### Markup that is not HTML
+
+The HTML embedded content processor knows the HTML elements. An element it does not know, such as the `<speak>` and `<phoneme>` of Speech Synthesis Markup Language (SSML) in a voice prompt, is treated as a block: the value is cut into pieces at each one, the ICU message is split across the pieces, and no piece is a message any more. Expand leaves every piece as it is and the ICU Forms window calls them ordinary text.
+
+Four settings on the processor make such a value work. They are under **File Types > Embedded Content Processors > HTML 5**, in File > Options or in the project template, and the order matters:
+
+1. **Elements**: add each element name, here `speak` and `phoneme`, as an inline element with translatable content. The value then stays one message, with the elements as tag pairs around their text and their attributes inside the tags.
+2. **Entities > Advanced**: in the Writer settings list, untick `apos`. The writer otherwise writes every apostrophe as `&apos;`. An apostrophe is how ICU escapes text, so an Italian "cinquant'anni" would reach the application as `cinquant&apos;&apos;anni`.
+3. **Entities**: untick **Enable entity conversion**, after step 2, because the Advanced dialog turns it back on when it closes. Left on, the writer writes `ü` as `&uuml;` and the German quotes as `&bdquo;` and `&ldquo;`, which an application reading JSON does not decode.
+4. **Whitespace**: set whitespace to be preserved. Otherwise a space at either end of an element, as in `<speak> Press`, is dropped.
+
+Steps 1 and 4 take effect when the file is opened, so they need a new project. Steps 2 and 3 take effect when the target is saved. The generated file then has the markup as the source had it, no entities, and each apostrophe inside a message doubled, which is how ICU writes one.
+
 ---
 
 ## Your first project
