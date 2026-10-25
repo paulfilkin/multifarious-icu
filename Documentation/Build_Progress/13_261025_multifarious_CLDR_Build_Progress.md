@@ -20,9 +20,9 @@ the code were still 2.0.0.0 when this was written; see the release section.
 > Read `CLAUDE.md`, then
 > `Documentation\Build_Progress\13_261025_multifarious_CLDR_Build_Progress.md`.
 >
-> 2.1.0.0 was released from `release/2.1` on 25 October 2026 (Paul); the release section
-> of handover 13 says what was done and what may still be outstanding (the tag `v2.1.0.0`,
-> the merge into `main`, the push).  Over 2.0.0.0 it carries: the ICU Forms window reads a
+> 2.1.0.0 is live on the AppStore (25 October 2026): `v2.1.0.0` on `6989db3`, `main` and
+> `release/2.1` level there, `release/2.0` at `733539c` for a 2.0.x fix; new work starts
+> from `main`.  Over 2.0.0.0 it carries: the ICU Forms window reads a
 > passed-through unit's warning, names the key on an ordinary segment, has a restored state
 > and scrolls to the active row; the hoister collapses a selector on an argument already
 > bound above, so two article selects in one sentence are ten Italian forms and not a
@@ -73,8 +73,10 @@ tests passing on the Release output; the package built as 2.1.0.0 (its manifest 
 1,136,253 bytes, deployed to Studio's Packages folder and copied to
 `Documentation\appstore\IcuSupport.sdlplugin` for the upload.  The bump commit was proposed
 as "Release 2.1.0.0", staging `AssemblyInfo.cs`, `pluginpackage.manifest.xml`, the changelog
-and this handover.  The tag, the fast-forward of `main` and the pushes are the next session's
-first check if this handover does not say they happened.
+and this handover, and committed as `6989db3`; `v2.1.0.0` tagged on it, `release/2.1` and
+the tag pushed, `main` fast-forwarded to `6989db3` and pushed; `release/2.0` stays at
+`733539c`.  **Paul uploaded the package and 2.1.0.0 went live on the AppStore late on
+25 October 2026.**
 
 ## What was asked (Paul, 25 October 2026)
 
