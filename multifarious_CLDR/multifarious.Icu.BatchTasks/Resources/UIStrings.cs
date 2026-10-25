@@ -346,6 +346,15 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Note of the not-an-ICU-message state when the unit carries a resource key. {0} is the key, such as "Default._comment"; keep the placeholder.</summary>
         public static string Forms_NotIcuKeyed { get { return Manager.GetString("Forms_NotIcuKeyed", Culture); } }
 
+        /// <summary>Title of the empty state when the selected segment belongs to a message the restore task has put back together as one segment per side.</summary>
+        public static string Forms_RestoredTitle { get { return Manager.GetString("Forms_RestoredTitle", Culture); } }
+
+        /// <summary>Note of the restored state when the unit carries no key. "Restore ICU" and "Expand ICU" are the batch tasks' names.</summary>
+        public static string Forms_Restored { get { return Manager.GetString("Forms_Restored", Culture); } }
+
+        /// <summary>Note of the restored state. {0} is the message's resource key, such as "Default.DEVICE_SHOWS"; keep the placeholder.</summary>
+        public static string Forms_RestoredKeyed { get { return Manager.GetString("Forms_RestoredKeyed", Culture); } }
+
         /// <summary>Line under the message key. {0} is the target language name, {1} the number of forms; keep the placeholders.</summary>
         public static string Forms_Summary { get { return Manager.GetString("Forms_Summary", Culture); } }
 

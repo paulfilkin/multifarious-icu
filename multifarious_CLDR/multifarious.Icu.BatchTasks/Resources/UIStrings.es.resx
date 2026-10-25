@@ -334,6 +334,15 @@
   <data name="Forms_NotIcuKeyed" xml:space="preserve">
     <value>El segmento activo es texto normal sin nada que reestructurar: {0}. Vaya a un segmento de un mensaje plural, ordinal o select y sus formas aparecerán aquí.</value>
   </data>
+  <data name="Forms_RestoredTitle" xml:space="preserve">
+    <value>Mensaje ICU restaurado</value>
+  </data>
+  <data name="Forms_Restored" xml:space="preserve">
+    <value>Restore ICU ha vuelto a reunir este mensaje en un segmento por lado. Ejecute Expand ICU sobre el archivo para volver a disponer sus formas; las traducciones y los estados que Restore registró vuelven con ellas.</value>
+  </data>
+  <data name="Forms_RestoredKeyed" xml:space="preserve">
+    <value>Restore ICU ha vuelto a reunir el mensaje {0} en un segmento por lado. Ejecute Expand ICU sobre el archivo para volver a disponer sus formas; las traducciones y los estados que Restore registró vuelven con ellas.</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, {1} forma(s)</value>
   </data>

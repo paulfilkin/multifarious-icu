@@ -462,6 +462,18 @@
     <value>The active segment is ordinary text with nothing to expand: {0}. Move to a segment of a plural, ordinal or select message and its forms appear here.</value>
     <comment>Note of the not-an-ICU-message state when the unit carries a resource key. {0} is the key, such as "Default._comment"; keep the placeholder.</comment>
   </data>
+  <data name="Forms_RestoredTitle" xml:space="preserve">
+    <value>ICU message restored</value>
+    <comment>Title of the empty state when the selected segment belongs to a message the restore task has put back together as one segment per side.</comment>
+  </data>
+  <data name="Forms_Restored" xml:space="preserve">
+    <value>Restore ICU has put this message back together as one segment per side. Run Expand ICU on the file to lay its forms out again; the translations and states Restore recorded come back with them.</value>
+    <comment>Note of the restored state when the unit carries no key. "Restore ICU" and "Expand ICU" are the batch tasks' names.</comment>
+  </data>
+  <data name="Forms_RestoredKeyed" xml:space="preserve">
+    <value>Restore ICU has put the message {0} back together as one segment per side. Run Expand ICU on the file to lay its forms out again; the translations and states Restore recorded come back with them.</value>
+    <comment>Note of the restored state. {0} is the message's resource key, such as "Default.DEVICE_SHOWS"; keep the placeholder.</comment>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, {1} form(s)</value>
     <comment>Line under the message key. {0} is the target language name, {1} the number of forms; keep the placeholders.</comment>

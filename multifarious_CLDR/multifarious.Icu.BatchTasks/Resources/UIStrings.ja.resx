@@ -334,6 +334,15 @@
   <data name="Forms_NotIcuKeyed" xml:space="preserve">
     <value>アクティブなセグメントは展開するもののない通常のテキストです: {0}。複数形・序数・select メッセージのセグメントに移動すると、その形式がここに表示されます。</value>
   </data>
+  <data name="Forms_RestoredTitle" xml:space="preserve">
+    <value>ICU メッセージは復元済みです</value>
+  </data>
+  <data name="Forms_Restored" xml:space="preserve">
+    <value>Restore ICU がこのメッセージを片側 1 セグメントに戻しました。形式を再び展開するにはファイルに対して Expand ICU を実行してください。Restore が記録した訳文と状態も一緒に戻ります。</value>
+  </data>
+  <data name="Forms_RestoredKeyed" xml:space="preserve">
+    <value>Restore ICU がメッセージ {0} を片側 1 セグメントに戻しました。形式を再び展開するにはファイルに対して Expand ICU を実行してください。Restore が記録した訳文と状態も一緒に戻ります。</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}、{1} 個の形式</value>
   </data>

@@ -9,8 +9,10 @@ article selects on one argument in one sentence came out as a hundred Italian fo
 of them unreachable, so the hoister now collapses a selector on an argument already bound
 above, and the window's summary line says where nested forms come from (`98f22df`).  Third,
 from the run of that build: the header grew to ten lines under a long summary, so it is a
-Grid with the summary wrapping, and the summary says when a message was laid out as written.
-1,673 tests.
+Grid with the summary wrapping, and the summary says when a message was laid out as written
+(`36a447b`).  Fourth, from Paul's embedded content run (Project 83): the window has a
+restored state, and the SSML round trip through the HTML processor is recorded with what the
+HTML filter does to it.  1,675 tests.
 
 ## Kickoff prompt for the next session (paste this)
 
@@ -23,9 +25,11 @@ Grid with the summary wrapping, and the summary says when a message was laid out
 > (`0454680`); the hoister collapses a selector on an argument already bound above, so two
 > article selects in one sentence are ten Italian forms and not a hundred, and the window's
 > summary says where nested forms come from (`98f22df`); the header is a Grid that wraps the
-> summary, and the summary says when a message was laid out as written (third commit).  Nine
-> new strings in nine resource files, eleven new tests (1,673), `tools\check-forms-scroll.ps1`.
-> The version numbers are still 2.0.0.0.  The hoister change is in `Icu.Core`, a file copy
+> summary, and the summary says when a message was laid out as written (`36a447b`); the
+> window has a restored state (fourth commit).  Twelve new strings in nine resource files,
+> thirteen new tests (1,675), `tools\check-forms-scroll.ps1`.  The version numbers are still
+> 2.0.0.0.  Project 83 proved SSML through the HTML embedded content processor once `speak`
+> and `phoneme` are inline elements; the HTML writer's entities are the open question there.  The hoister change is in `Icu.Core`, a file copy
 > from the reference project at `c:\Users\paul\Documents\GIT\.NET\CLDR Support\` (read
 > only), and has not been copied back there or into its design's section 5.9.
 >
@@ -43,7 +47,7 @@ Grid with the summary wrapping, and the summary says when a message was laid out
 
 ## Where we are in one line
 
-Three commits on `release/2.1`: the window improvements, the same-argument collapse with the summary line, and the header fix with the walked wording; the last two wait for Paul's Studio run.
+Four commits on `release/2.1`: the window improvements, the same-argument collapse with the summary line, the header fix with the walked wording, and the restored state; the SSML route is proven through the plugin and waits on the HTML writer's entity setting.
 
 ## What was asked (Paul, 25 October 2026)
 
@@ -232,14 +236,79 @@ was expanded. Two new strings in nine languages, one test (1,673).
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
 ```
 
+## The fourth piece: the embedded content run and the restored state (night)
+
+Paul ran the test file through the JSON filter with the HTML embedded content processor
+(Project 83, Italian).  Three screenshots and the saved files:
+
+- **As shipped, the HTML filter splits SSML values.**  `<speak>` and `<phoneme>` are not HTML,
+  so the filter took them as structure and `ACTIVATE_REMOTE_CONTROL_ON_DGBM.1` arrived as
+  several units ("Mobile" and "Start" segments of their own); no piece parsed, nothing
+  expanded, the window called every segment ordinary text.
+- **Defined as inline elements in the HTML file type, the route works end to end.**  One unit,
+  two forms, the pairs around "Mobile" and "Start" with the IPA inside the tags; Restore put
+  the source back as written with the tags and the target hoisted with the pairs cloned into
+  both branches; a second Expand brought the forms back with the tags and the filled targets.
+  The saved target JSON has the SSML as written, attributes, quotes and order intact, and the
+  article select collapsed to Italian's ten keys.  A new test,
+  `Fill_comments_on_a_tagged_message_come_back_on_every_form_after_a_second_expand`,
+  reproduces the shape and shows the fill comments wrapping each form's pair after the
+  second Expand.  Segment 59's target showed no comment highlight in Studio, most likely
+  because the marker wraps the pair and the text sits inside it, which Studio does not paint;
+  the Comments window on the next Expand settles it.
+- **Two things are the HTML filter's.**  It trimmed the spaces inside the element ends on
+  reading (`<speak> Damit … Symbol. </speak>` to `<speak>Damit … Symbol.</speak>`; the
+  sub-content's whitespace handling is `NormalizeWithXmlSpaceOverride` and `icu:pattern`
+  already lacks them).  And its writer emitted named entities for every non-ASCII character
+  in text, 335 in the file (`&auml;` 155, `&uuml;` 91, `&ouml;` 79, `&bdquo;`, `&ldquo;`),
+  while attribute values kept their characters.  No JSON or SSML consumer decodes those, so
+  the route needs the HTML file type's entity setting to write characters.  Not verified yet.
+- **The restored state** (`IcuFormsViewModel.ShowRestored`, `IcuFormsViewPartController`).
+  On the restored file the window said "No ICU messages expanded in this file" and told the
+  translator to expand before translating.  A restored unit now reads "ICU message restored"
+  with the key, `icu:key` where the unit has none of its own (the structure path under the
+  processor), and says Expand lays the forms out again with the recorded translations and
+  states; the survey notes restored units so a restored-only file is not gated.  Three
+  strings (title, note, keyed note) where the plan said two.  One test.  1,675.
+
+### Proposed fourth commit
+
+Stage: `Editor\IcuFormsViewPartController.cs`, `Editor\ViewModels\IcuFormsViewModel.cs`, the
+nine resx and `UIStrings.cs`, `multifarious.Icu.Tests\BatchTasks\IcuFormsViewTests.cs`,
+`multifarious.Icu.Tests\BatchTasks\FilterTagTests.cs`, this handover.
+
+```
+Give the ICU Forms window a restored state
+
+A restored unit is one segment per side with the plugin's context
+saying so. The window called it ordinary text, and a file with only
+restored units was told to run Expand ICU before translating. A
+restored unit now reads "ICU message restored" with its key, the
+recorded one where the unit carries none, and says Expand lays the
+forms out again with the translations and states Restore recorded.
+
+Also a test for the SSML shape from Project 83: a select inside a
+speak pair with phoneme pairs after it, expanded, restored with every
+form filled from the source, and expanded again, the fill comments
+back on each form. Three new strings in nine languages, two tests
+(1,675).
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+```
+
 ## Open items
 
-- **Studio run of the collapse, the summary line and the header**: Expand the test file again
-  for Italian and look at `LOCAL_CONTROL_CONFIRMATION.1` (ten rows, each a different article,
-  no `L / I`) and `RESULT_ON_DEVICETYPE.1` (walked, now 50 rather than 3,110); French
-  `DEVICE_NEEDS_TIME.1` for the header on one or two lines and the "laid out as written"
-  wording; a gender over a plural for the "× count" line.  The window items passed their
-  first run.
+- **The HTML writer's entities.**  Find the HTML file type's entity setting, set it to write
+  characters, save the target again and check the JSON for `&auml;` and the rest.  Until
+  then the inline-element route is not fit for SSML output.
+- **Documentation of the SSML routes** (AppStore `Documentation.md`, the user guide): the
+  standard filter keeps the message whole with the markup as text; the HTML processor
+  needs `speak` and `phoneme` inline and characters written as characters, and trims the
+  whitespace at the element ends.  After the entity check.
+- **Studio run of the restored state and the collapse**: a restored file for the new state
+  and its key under the processor; Italian `LOCAL_CONTROL_CONFIRMATION.1` (ten rows, no
+  `L / I`); French `DEVICE_NEEDS_TIME.1` for the header and the "laid out as written"
+  wording; the Comments window on segment 59 after an Expand.
 - **Copy the hoister back to the reference project** (`Icu.Core\Hoister.cs`, the five
   tests) and add the collapse to design section 5.9.  Paul's, the project is read only here.
 - The website screenshots and the HTML guide (handover 12).

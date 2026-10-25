@@ -334,6 +334,15 @@
   <data name="Forms_NotIcuKeyed" xml:space="preserve">
     <value>Активный сегмент - обычный текст, в котором нечего перестраивать: {0}. Перейдите к сегменту сообщения plural, ordinal или select, и его формы появятся здесь.</value>
   </data>
+  <data name="Forms_RestoredTitle" xml:space="preserve">
+    <value>ICU-сообщение восстановлено</value>
+  </data>
+  <data name="Forms_Restored" xml:space="preserve">
+    <value>Restore ICU снова собрал это сообщение в один сегмент с каждой стороны. Запустите Expand ICU для файла, чтобы снова разложить его формы; записанные Restore переводы и статусы вернутся вместе с ними.</value>
+  </data>
+  <data name="Forms_RestoredKeyed" xml:space="preserve">
+    <value>Restore ICU снова собрал сообщение {0} в один сегмент с каждой стороны. Запустите Expand ICU для файла, чтобы снова разложить его формы; записанные Restore переводы и статусы вернутся вместе с ними.</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, форм: {1}</value>
   </data>

@@ -263,6 +263,16 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
                 // passed through, which reads as ordinary text too once Studio has segmented
                 // it; the task's own comment on the unit tells the two apart.
                 var key = ResourceKey.Of(unit);
+                if (ResourceKey.IsRestored(unit))
+                {
+                    // A restored unit carries the key the expansion recorded, which under an
+                    // embedded content processor is the structure path the unit itself lacks.
+                    var context = ResourceKey.IcuContextOf(unit);
+                    var recorded = context != null && context.MetaDataContainsKey("icu:key") ? context.GetMetaData("icu:key") : null;
+                    ShowRestored(string.IsNullOrEmpty(key) ? recorded : key);
+                    return;
+                }
+
                 var reason = PassedThroughReasonOf(unit);
                 if (reason != null) ShowPassedThrough(key, reason);
                 else ShowNotIcu(key);
@@ -335,6 +345,18 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
             ShowEmpty(UIStrings.Forms_NotIcuTitle, string.IsNullOrEmpty(key)
                 ? UIStrings.Forms_NotIcu
                 : string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_NotIcuKeyed, key));
+        }
+
+        /// <summary>
+        /// A message Restore has put back together as one segment per side. Expand lays the
+        /// forms out again with the translations and states Restore recorded, and the note
+        /// says so rather than telling the translator to expand before translating.
+        /// </summary>
+        public void ShowRestored(string key)
+        {
+            ShowEmpty(UIStrings.Forms_RestoredTitle, string.IsNullOrEmpty(key)
+                ? UIStrings.Forms_Restored
+                : string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_RestoredKeyed, key));
         }
 
         /// <summary>

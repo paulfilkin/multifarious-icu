@@ -388,6 +388,43 @@ public class FilterTagTests
         Assert.Empty(ParagraphUnits.MarkersOf(targets[2]));
     }
 
+    /// <summary>
+    /// Paul's SSML round trip (25 October 2026): a select inside a speak pair with phoneme
+    /// pairs after it, expanded, left untranslated, restored (every form filled from the
+    /// source with the plugin's comment) and expanded again. The fill comments should come
+    /// back on each form as any comment on a restored message does.
+    /// </summary>
+    [Fact]
+    public void Fill_comments_on_a_tagged_message_come_back_on_every_form_after_a_second_expand()
+    {
+        var unit = ParagraphUnits.JsonMarkup("['ACTIVATE']",
+            Pair("<speak>", "</speak>", "1",
+                Text("Press {n, plural, one {the key} other {# keys}} on the "),
+                Pair("<phoneme alphabet=\"ipa\" ph=\"stɑːt\">", "</phoneme>", "2", Text("Start")),
+                Text(" button.")));
+        Expander().ProcessParagraphUnit(unit);
+        var restorer = Restorer();
+        restorer.ProcessParagraphUnit(unit);
+        Assert.Equal(4, restorer.Filled);
+        var restoredTarget = Assert.Single(SegmentsOf(unit.Target));
+        Assert.Equal(4, ParagraphUnits.MarkersOf(restoredTarget).Count);
+
+        var expander = Expander();
+        expander.ProcessParagraphUnit(unit);
+
+        Assert.Empty(expander.Warnings);
+        var targets = SegmentsOf(unit.Target);
+        Assert.Equal(4, targets.Count);
+        foreach (var target in targets)
+        {
+            var marker = Assert.Single(ParagraphUnits.MarkersOf(target));
+            Assert.Equal(Constants.CommentAuthor, marker.Comments.GetItem(0).Author);
+            Assert.Contains("untranslated", marker.Comments.GetItem(0).Text);
+            Assert.Single(ParagraphUnits.ItemsOf(marker).OfType<ITagPair>());
+        }
+        Assert.Equal("<speak>Press # keys on the <phoneme alphabet=\"ipa\" ph=\"stɑːt\">Start</phoneme> button.</speak>", Projection(targets[1]));
+    }
+
     [Fact]
     public void An_untranslated_form_filled_from_the_source_gets_the_sources_tags()
     {

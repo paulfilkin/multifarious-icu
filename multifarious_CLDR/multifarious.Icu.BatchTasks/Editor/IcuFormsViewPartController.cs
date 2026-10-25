@@ -31,6 +31,7 @@ namespace multifarious.Icu.BatchTasks.Editor
         private IStudioDocument _document;
         private bool _documentSupported;
         private bool _documentExpanded;
+        private bool _documentRestored;
 
         protected override IUIControl GetContentControl()
         {
@@ -111,13 +112,16 @@ namespace multifarious.Icu.BatchTasks.Editor
 
         /// <summary>
         /// What kind of file this is, decided once per document so the empty state can say
-        /// something useful: a file type the tasks do not handle, or a supported file the expand
-        /// task has not run on. The scan stops at the first expanded unit.
+        /// something useful: a file type the tasks do not handle, a supported file the expand
+        /// task has not run on, or one whose messages Restore has put back together. The scan
+        /// stops once an expanded unit is found; a restored one is noted on the way, so a file
+        /// with only restored units is not told to expand before translating.
         /// </summary>
         private void Survey(IStudioDocument document)
         {
             _documentSupported = false;
             _documentExpanded = false;
+            _documentRestored = false;
             try
             {
                 var file = document.ActiveFile;
@@ -133,14 +137,16 @@ namespace multifarious.Icu.BatchTasks.Editor
                 foreach (var pair in document.SegmentPairs)
                 {
                     var unit = document.GetParentParagraphUnit(pair);
-                    if (unit != null && ResourceKey.IsExpanded(unit))
+                    if (unit == null) continue;
+                    if (ResourceKey.IsExpanded(unit))
                     {
                         _documentExpanded = true;
                         break;
                     }
+                    if (ResourceKey.IsRestored(unit)) _documentRestored = true;
                 }
 
-                Diagnostics.Write("forms: document surveyed, expanded=" + _documentExpanded);
+                Diagnostics.Write("forms: document surveyed, expanded=" + _documentExpanded + " restored=" + _documentRestored);
             }
             catch (Exception exception)
             {
@@ -190,7 +196,7 @@ namespace multifarious.Icu.BatchTasks.Editor
                     return;
                 }
 
-                if (!_documentExpanded)
+                if (!_documentExpanded && !_documentRestored)
                 {
                     _viewModel.ShowNotExpanded();
                     return;

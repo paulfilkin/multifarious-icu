@@ -428,6 +428,37 @@ public class IcuFormsViewTests
         Assert.Equal("Arabic (Saudi Arabia), 4 form(s) laid out as written: g 2 × count 2", viewModel.Summary);
     }
 
+    /// <summary>
+    /// A restored unit is one segment per side with the plugin's context saying so; the window
+    /// used to call it ordinary text, and the file-level state told the translator to expand
+    /// before translating (Paul, 25 October 2026, Project 83). It now says the message is
+    /// restored and names the key the expansion recorded, which under an embedded content
+    /// processor the unit itself does not carry.
+    /// </summary>
+    [Fact]
+    public void A_restored_message_is_named_and_says_expand_lays_it_out_again()
+    {
+        var unit = Expanded(UnreadCount);
+        ParagraphUnits.CopySourceToTargets(unit);
+        new IcuRestoreProcessor("ru-RU", RestoreOptions.Default) { ItemFactory = ParagraphUnits.ItemFactory }
+            .ProcessParagraphUnit(unit);
+        Assert.True(ResourceKey.IsRestored(unit));
+        var viewModel = new IcuFormsViewModel();
+
+        viewModel.Show(unit, "1", "ru-RU", "Russian (Russia)");
+
+        Assert.False(viewModel.HasMessage);
+        Assert.Equal("ICU message restored", viewModel.EmptyTitle);
+        Assert.Contains("the message ['inbox.unreadCount'] back together", viewModel.EmptyNote);
+        Assert.Contains("Run Expand ICU", viewModel.EmptyNote);
+
+        // Without the filter's key on the unit, the recorded one serves.
+        unit.Properties.Contexts.Contexts.Remove(unit.Properties.Contexts.Contexts.First(c => c.ContextType == "sdl:paragraph"));
+        Assert.Null(ResourceKey.Of(unit));
+        viewModel.Show(unit, "1", "ru-RU", "Russian (Russia)");
+        Assert.Contains("['inbox.unreadCount']", viewModel.EmptyNote);
+    }
+
     [Fact]
     public void The_view_keeps_the_active_row_in_view_through_named_parts()
     {

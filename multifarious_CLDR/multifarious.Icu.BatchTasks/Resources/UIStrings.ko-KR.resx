@@ -334,6 +334,15 @@
   <data name="Forms_NotIcuKeyed" xml:space="preserve">
     <value>활성 세그먼트는 재구성할 것이 없는 일반 텍스트입니다: {0}. 복수형, 서수 또는 select 메시지의 세그먼트로 이동하면 해당 형식이 여기에 표시됩니다.</value>
   </data>
+  <data name="Forms_RestoredTitle" xml:space="preserve">
+    <value>ICU 메시지가 복원되었습니다</value>
+  </data>
+  <data name="Forms_Restored" xml:space="preserve">
+    <value>Restore ICU가 이 메시지를 양쪽 각 한 세그먼트로 다시 합쳤습니다. 형태를 다시 배치하려면 파일에 Expand ICU를 실행하세요. Restore가 기록한 번역과 상태도 함께 돌아옵니다.</value>
+  </data>
+  <data name="Forms_RestoredKeyed" xml:space="preserve">
+    <value>Restore ICU가 메시지 {0}을(를) 양쪽 각 한 세그먼트로 다시 합쳤습니다. 형태를 다시 배치하려면 파일에 Expand ICU를 실행하세요. Restore가 기록한 번역과 상태도 함께 돌아옵니다.</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, 형태 {1}개</value>
   </data>

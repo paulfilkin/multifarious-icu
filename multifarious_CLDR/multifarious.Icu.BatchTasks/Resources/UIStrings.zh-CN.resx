@@ -334,6 +334,15 @@
   <data name="Forms_NotIcuKeyed" xml:space="preserve">
     <value>活动句段是普通文本，没有可重构的内容：{0}。移动到 plural、ordinal 或 select 消息的句段，其形式就会显示在此处。</value>
   </data>
+  <data name="Forms_RestoredTitle" xml:space="preserve">
+    <value>ICU 消息已还原</value>
+  </data>
+  <data name="Forms_Restored" xml:space="preserve">
+    <value>Restore ICU 已将此消息重新合并为每侧一个句段。对文件运行 Expand ICU 可重新展开其形式；Restore 记录的译文和状态会随之返回。</value>
+  </data>
+  <data name="Forms_RestoredKeyed" xml:space="preserve">
+    <value>Restore ICU 已将消息 {0} 重新合并为每侧一个句段。对文件运行 Expand ICU 可重新展开其形式；Restore 记录的译文和状态会随之返回。</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}，{1} 种形式</value>
   </data>

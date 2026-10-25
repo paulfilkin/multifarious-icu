@@ -334,6 +334,15 @@
   <data name="Forms_NotIcuKeyed" xml:space="preserve">
     <value>Das aktive Segment ist gewöhnlicher Text ohne etwas zu erweitern: {0}. Wechseln Sie zu einem Segment einer Plural-, Ordinal- oder Select-Nachricht, dann erscheinen hier ihre Formen.</value>
   </data>
+  <data name="Forms_RestoredTitle" xml:space="preserve">
+    <value>ICU-Nachricht wiederhergestellt</value>
+  </data>
+  <data name="Forms_Restored" xml:space="preserve">
+    <value>Restore ICU hat diese Nachricht wieder zu einem Segment pro Seite zusammengesetzt. Führen Sie Expand ICU für die Datei aus, um ihre Formen erneut anzulegen; die von Restore aufgezeichneten Übersetzungen und Status kommen mit zurück.</value>
+  </data>
+  <data name="Forms_RestoredKeyed" xml:space="preserve">
+    <value>Restore ICU hat die Nachricht {0} wieder zu einem Segment pro Seite zusammengesetzt. Führen Sie Expand ICU für die Datei aus, um ihre Formen erneut anzulegen; die von Restore aufgezeichneten Übersetzungen und Status kommen mit zurück.</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, {1} Form(en)</value>
   </data>
