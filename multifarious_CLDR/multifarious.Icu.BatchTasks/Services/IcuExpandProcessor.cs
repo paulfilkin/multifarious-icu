@@ -505,7 +505,7 @@ namespace multifarious.Icu.BatchTasks.Services
         /// </summary>
         private void Warn(IParagraphUnit unit, string unitId, string reason)
         {
-            Warn(unit, unitId, reason, "ICU message passed through unexpanded: ");
+            Warn(unit, unitId, reason, Constants.PassedThroughCommentPrefix);
         }
 
         /// <summary>The same, with the comment's opening words chosen by the caller: a walked layout is not a pass-through.</summary>

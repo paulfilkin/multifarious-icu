@@ -316,6 +316,24 @@
   <data name="Forms_NotIcu" xml:space="preserve">
     <value>El segmento activo es texto normal sin nada que expandir. Sitúese en un segmento de un mensaje plural, ordinal o select y sus formas aparecerán aquí.</value>
   </data>
+  <data name="Forms_PassedThroughTitle" xml:space="preserve">
+    <value>Mensaje ICU dejado tal cual</value>
+  </data>
+  <data name="Forms_PassedThrough" xml:space="preserve">
+    <value>Expand ICU dejó este mensaje tal cual y Studio lo segmentó como texto normal, así que no hay formas que mostrar.</value>
+  </data>
+  <data name="Forms_PassedThroughKeyed" xml:space="preserve">
+    <value>Expand ICU dejó el mensaje {0} tal cual y Studio lo segmentó como texto normal, así que no hay formas que mostrar.</value>
+  </data>
+  <data name="Forms_PassedThroughBudget" xml:space="preserve">
+    <value>Para reestructurarlo, suba el límite de ramas en la página Expand ICU, en «Mensajes que se reestructuran», y vuelva a ejecutar Expand ICU.</value>
+  </data>
+  <data name="Forms_PassedThroughParse" xml:space="preserve">
+    <value>Corrija el valor en el archivo original y vuelva a ejecutar Expand ICU. La página Expand ICU decide si un valor que no puede leerse se deja tal cual o hace fallar la tarea.</value>
+  </data>
+  <data name="Forms_NotIcuKeyed" xml:space="preserve">
+    <value>El segmento activo es texto normal sin nada que reestructurar: {0}. Vaya a un segmento de un mensaje plural, ordinal o select y sus formas aparecerán aquí.</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, {1} forma(s)</value>
   </data>

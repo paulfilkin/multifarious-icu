@@ -66,6 +66,13 @@ namespace multifarious.Icu.BatchTasks
         public const string CommentAuthor = "multifariousICU Support";
 
         /// <summary>
+        /// The opening words of the comment the expand task puts on a unit it leaves alone;
+        /// the ICU Forms window finds the unit's reason by them, since a passed-through unit
+        /// carries no context of the plugin's own.
+        /// </summary>
+        public const string PassedThroughCommentPrefix = "ICU message passed through unexpanded: ";
+
+        /// <summary>
         /// Metadata key on the placeholder tags the expansion writes for an argument or '#',
         /// which tells them apart from a filter's own placeholder tags: the restore task turns
         /// the former back into text and keeps the latter as tags. Tag metadata persists in

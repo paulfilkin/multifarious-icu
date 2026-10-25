@@ -192,9 +192,7 @@ is the retest.  `tools\render-settings.ps1` gained a refused-edit snapshot.
   and `release/1.0` on the old `main`, `main` fast-forwarded to `release/2.0`, `v2.0.0.0` on
   `9e87e9a`, all pushed; `v2.0.0.0` then moved to `1e141db` for the sample-noun fix.
   `CLAUDE.md` records the branch scheme.  **Paul uploaded the package and 2.0.0.0 went live
-  on the AppStore late on 14 October.**  Still to do for the website: the ten screenshots and
-  the HTML guide at `Documentation\website\multifariousICU_UserGuide_2.0.html` with its
-  placeholders replaced; and the native read of the strings.
+  on the AppStore late on 14 October.**
 - The fifty-three new strings in eight languages need a native read with the rest.
 - The Options tab's sub-headings reuse `Expand_SeedHeader` and `Expand_PlaceholdersHeader`
   as they stand; if a native reader finds them long as sub-headings, shorten there.

@@ -316,6 +316,24 @@
   <data name="Forms_NotIcu" xml:space="preserve">
     <value>当前句段是普通文本，没有可展开的内容。移到复数、序数或 select 消息的句段，其形式就会显示在这里。</value>
   </data>
+  <data name="Forms_PassedThroughTitle" xml:space="preserve">
+    <value>ICU 消息已原样保留</value>
+  </data>
+  <data name="Forms_PassedThrough" xml:space="preserve">
+    <value>Expand ICU 将此消息原样保留，Studio 已将其作为普通文本分段，因此没有可显示的形式。</value>
+  </data>
+  <data name="Forms_PassedThroughKeyed" xml:space="preserve">
+    <value>Expand ICU 将消息 {0} 原样保留，Studio 已将其作为普通文本分段，因此没有可显示的形式。</value>
+  </data>
+  <data name="Forms_PassedThroughBudget" xml:space="preserve">
+    <value>要重构它，请在 Expand ICU 页面的"要重构的消息"下提高分支上限，然后重新运行 Expand ICU。</value>
+  </data>
+  <data name="Forms_PassedThroughParse" xml:space="preserve">
+    <value>请在原始文件中更正该值，然后重新运行 Expand ICU。无法读取的值是原样保留还是使任务失败，由 Expand ICU 页面决定。</value>
+  </data>
+  <data name="Forms_NotIcuKeyed" xml:space="preserve">
+    <value>活动句段是普通文本，没有可重构的内容：{0}。移动到 plural、ordinal 或 select 消息的句段，其形式就会显示在此处。</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}，{1} 种形式</value>
   </data>

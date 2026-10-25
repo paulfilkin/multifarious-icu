@@ -259,7 +259,13 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
             var model = _reader.Read(unit, targetLanguageTag, activeTarget);
             if (model == null)
             {
-                ShowNotIcu();
+                // A unit the expand task left alone is either ordinary text or a message it
+                // passed through, which reads as ordinary text too once Studio has segmented
+                // it; the task's own comment on the unit tells the two apart.
+                var key = ResourceKey.Of(unit);
+                var reason = PassedThroughReasonOf(unit);
+                if (reason != null) ShowPassedThrough(key, reason);
+                else ShowNotIcu(key);
                 return;
             }
 
@@ -308,10 +314,59 @@ namespace multifarious.Icu.BatchTasks.Editor.ViewModels
             ShowEmpty(UIStrings.Forms_NotExpandedTitle, UIStrings.Forms_NotExpanded);
         }
 
-        /// <summary>An ordinary segment in an expanded file.</summary>
-        public void ShowNotIcu()
+        /// <summary>
+        /// An ordinary segment in an expanded file. The note names the unit's key where the
+        /// filter put one on the unit, so a comment-like value is seen for what it is; under
+        /// an embedded content processor the key sits on a structure unit the editor's document
+        /// model does not hand out, and the note goes without it.
+        /// </summary>
+        public void ShowNotIcu(string key = null)
         {
-            ShowEmpty(UIStrings.Forms_NotIcuTitle, UIStrings.Forms_NotIcu);
+            ShowEmpty(UIStrings.Forms_NotIcuTitle, string.IsNullOrEmpty(key)
+                ? UIStrings.Forms_NotIcu
+                : string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_NotIcuKeyed, key));
+        }
+
+        /// <summary>
+        /// A message the expand task passed through: the unit's own warning, as the task wrote
+        /// it, and where the reason is one a setting answers, which setting. Studio has
+        /// sentence-segmented the raw value, so there are no forms and no rows.
+        /// </summary>
+        public void ShowPassedThrough(string key, string reason)
+        {
+            var why = string.IsNullOrEmpty(key)
+                ? UIStrings.Forms_PassedThrough
+                : string.Format(CultureInfo.CurrentCulture, UIStrings.Forms_PassedThroughKeyed, key);
+            var pointer = reason.IndexOf("over the branch budget", StringComparison.Ordinal) >= 0
+                ? UIStrings.Forms_PassedThroughBudget
+                : reason.IndexOf("does not parse", StringComparison.Ordinal) >= 0
+                    ? UIStrings.Forms_PassedThroughParse
+                    : null;
+            var note = why + Environment.NewLine + Environment.NewLine + reason;
+            if (pointer != null) note += Environment.NewLine + Environment.NewLine + pointer;
+            ShowEmpty(UIStrings.Forms_PassedThroughTitle, note);
+        }
+
+        /// <summary>
+        /// The reason the expand task recorded when it passed the unit through, from its comment
+        /// on the unit, or null where the unit carries no such comment.
+        /// </summary>
+        private static string PassedThroughReasonOf(IParagraphUnit unit)
+        {
+            var comments = unit != null && unit.Properties != null ? unit.Properties.Comments : null;
+            if (comments == null) return null;
+
+            for (var i = 0; i < comments.Count; i++)
+            {
+                var comment = comments.GetItem(i);
+                if (comment == null || comment.Author != Constants.CommentAuthor || comment.Text == null) continue;
+                if (comment.Text.StartsWith(Constants.PassedThroughCommentPrefix, StringComparison.Ordinal))
+                {
+                    return comment.Text.Substring(Constants.PassedThroughCommentPrefix.Length);
+                }
+            }
+
+            return null;
         }
 
         private void ShowEmpty(string title, string note)

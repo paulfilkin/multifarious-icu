@@ -316,6 +316,24 @@
   <data name="Forms_NotIcu" xml:space="preserve">
     <value>Активный сегмент — обычный текст, в котором нечего разворачивать. Перейдите к сегменту сообщения с множественным числом, порядковым числительным или select, и здесь появятся его формы.</value>
   </data>
+  <data name="Forms_PassedThroughTitle" xml:space="preserve">
+    <value>ICU-сообщение пропущено без изменений</value>
+  </data>
+  <data name="Forms_PassedThrough" xml:space="preserve">
+    <value>Expand ICU оставил это сообщение без изменений, и Studio сегментировала его как обычный текст, поэтому форм для показа нет.</value>
+  </data>
+  <data name="Forms_PassedThroughKeyed" xml:space="preserve">
+    <value>Expand ICU оставил сообщение {0} без изменений, и Studio сегментировала его как обычный текст, поэтому форм для показа нет.</value>
+  </data>
+  <data name="Forms_PassedThroughBudget" xml:space="preserve">
+    <value>Чтобы перестроить его, увеличьте предел ветвей на странице Expand ICU в разделе «Перестраиваемые сообщения» и запустите Expand ICU снова.</value>
+  </data>
+  <data name="Forms_PassedThroughParse" xml:space="preserve">
+    <value>Исправьте значение в исходном файле и запустите Expand ICU снова. Страница Expand ICU определяет, пропускается ли значение, которое не удаётся прочитать, без изменений или задача завершается с ошибкой.</value>
+  </data>
+  <data name="Forms_NotIcuKeyed" xml:space="preserve">
+    <value>Активный сегмент - обычный текст, в котором нечего перестраивать: {0}. Перейдите к сегменту сообщения plural, ordinal или select, и его формы появятся здесь.</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, форм: {1}</value>
   </data>

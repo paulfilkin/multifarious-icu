@@ -438,6 +438,30 @@
     <value>The active segment is ordinary text with nothing to expand. Move to a segment of a plural, ordinal or select message and its forms appear here.</value>
     <comment>Note of the not-an-ICU-message state.</comment>
   </data>
+  <data name="Forms_PassedThroughTitle" xml:space="preserve">
+    <value>ICU message passed through unexpanded</value>
+    <comment>Title of the empty state when the selected segment belongs to a message the expand task passed through unchanged. "Passed through" is the term the task report uses.</comment>
+  </data>
+  <data name="Forms_PassedThrough" xml:space="preserve">
+    <value>Expand ICU left this message as it was and Studio segmented it as plain text, so there are no forms to show.</value>
+    <comment>First line of the passed-through state when the unit carries no key. "Expand ICU" is the batch task's name.</comment>
+  </data>
+  <data name="Forms_PassedThroughKeyed" xml:space="preserve">
+    <value>Expand ICU left the message {0} as it was and Studio segmented it as plain text, so there are no forms to show.</value>
+    <comment>First line of the passed-through state. {0} is the message's resource key, such as "Default.DEVICE_NEEDS_TIME"; keep the placeholder.</comment>
+  </data>
+  <data name="Forms_PassedThroughBudget" xml:space="preserve">
+    <value>To expand it, raise the branch budget on the Expand ICU page, under Messages to expand, and run Expand ICU again.</value>
+    <comment>Last line of the passed-through state when the message was over the branch budget. "Messages to expand" is the group heading on the Expand ICU settings page (Expand_KindsHeader) and "branch budget" its sub-heading (Expand_BudgetHeader); use the same words.</comment>
+  </data>
+  <data name="Forms_PassedThroughParse" xml:space="preserve">
+    <value>Correct the value in the native file and run Expand ICU again. The Expand ICU page decides whether a value that does not parse is passed through or fails the task.</value>
+    <comment>Last line of the passed-through state when the value did not parse as an ICU message.</comment>
+  </data>
+  <data name="Forms_NotIcuKeyed" xml:space="preserve">
+    <value>The active segment is ordinary text with nothing to expand: {0}. Move to a segment of a plural, ordinal or select message and its forms appear here.</value>
+    <comment>Note of the not-an-ICU-message state when the unit carries a resource key. {0} is the key, such as "Default._comment"; keep the placeholder.</comment>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, {1} form(s)</value>
     <comment>Line under the message key. {0} is the target language name, {1} the number of forms; keep the placeholders.</comment>

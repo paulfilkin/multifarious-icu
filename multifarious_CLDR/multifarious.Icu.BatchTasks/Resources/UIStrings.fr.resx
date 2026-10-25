@@ -316,6 +316,24 @@
   <data name="Forms_NotIcu" xml:space="preserve">
     <value>Le segment actif est du texte ordinaire, sans rien à développer. Placez-vous sur un segment d'un message pluriel, ordinal ou select et ses formes apparaîtront ici.</value>
   </data>
+  <data name="Forms_PassedThroughTitle" xml:space="preserve">
+    <value>Message ICU laissé tel quel</value>
+  </data>
+  <data name="Forms_PassedThrough" xml:space="preserve">
+    <value>Expand ICU a laissé ce message tel quel et Studio l'a segmenté comme du texte ordinaire, il n'y a donc aucune forme à afficher.</value>
+  </data>
+  <data name="Forms_PassedThroughKeyed" xml:space="preserve">
+    <value>Expand ICU a laissé le message {0} tel quel et Studio l'a segmenté comme du texte ordinaire, il n'y a donc aucune forme à afficher.</value>
+  </data>
+  <data name="Forms_PassedThroughBudget" xml:space="preserve">
+    <value>Pour le restructurer, augmentez le plafond de branches sur la page Expand ICU, sous « Messages à restructurer », puis relancez Expand ICU.</value>
+  </data>
+  <data name="Forms_PassedThroughParse" xml:space="preserve">
+    <value>Corrigez la valeur dans le fichier d'origine, puis relancez Expand ICU. La page Expand ICU décide si une valeur qui ne peut pas être lue est laissée telle quelle ou fait échouer la tâche.</value>
+  </data>
+  <data name="Forms_NotIcuKeyed" xml:space="preserve">
+    <value>Le segment actif est du texte ordinaire sans rien à restructurer : {0}. Passez à un segment d'un message plural, ordinal ou select et ses formes apparaîtront ici.</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, {1} forme(s)</value>
   </data>

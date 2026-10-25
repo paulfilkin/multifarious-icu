@@ -139,10 +139,11 @@
       </Grid>
     </Border>
 
-    <!-- Rows -->
-    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+    <!-- Rows. The code-behind keeps the active row in view: when the editor moves to a segment
+         whose row has scrolled out, the row is centred; a row already in view is left alone. -->
+    <ScrollViewer x:Name="RowsScroller" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                   Visibility="{Binding HasMessage, Mode=OneWay, Converter={StaticResource Visible}}">
-      <ItemsControl ItemsSource="{Binding Rows, Mode=OneWay}" IsTabStop="False" AlternationCount="2">
+      <ItemsControl x:Name="RowsControl" ItemsSource="{Binding Rows, Mode=OneWay}" IsTabStop="False" AlternationCount="2">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
             <Border BorderThickness="3,0,0,0" ToolTip="{Binding Comment, Mode=OneWay}" Cursor="Hand" MouseLeftButtonUp="OnRowClick">

@@ -11,6 +11,7 @@ using Sdl.Desktop.IntegrationApi.DefaultLocations;
 using Sdl.Desktop.IntegrationApi.Extensions;
 using Sdl.Desktop.IntegrationApi.Interfaces;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
+using Sdl.FileTypeSupport.Framework.NativeApi;
 using Sdl.TranslationStudioAutomation.IntegrationApi;
 
 namespace multifarious.Icu.Tests.BatchTasks;
@@ -24,10 +25,10 @@ public class IcuFormsViewTests
     private const string UnreadCount =
         "Hello {name}, you have {count, plural, one {# unread message} other {# unread messages}}!";
 
-    private static IParagraphUnit Expanded(string value)
+    private static IParagraphUnit Expanded(string value, ExpansionOptions? options = null)
     {
         var unit = ParagraphUnits.Json(value, "['inbox.unreadCount']");
-        new IcuExpandProcessor("en-GB", "ru-RU", ExpansionOptions.Default, "1.0.0")
+        new IcuExpandProcessor("en-GB", "ru-RU", options ?? ExpansionOptions.Default, "1.0.0")
         {
             ItemFactory = ParagraphUnits.ItemFactory,
         }.ProcessParagraphUnit(unit);
@@ -297,5 +298,83 @@ public class IcuFormsViewTests
         Assert.Equal(unit.Properties.ParagraphUnitId.Id, raised!.ParagraphUnitId);
         Assert.Equal(segments[2].Properties.Id.Id, raised.SegmentId);
         Assert.Contains("MouseLeftButtonUp=\"OnRowClick\"", Xaml());
+    }
+
+    /// <summary>
+    /// A message the expand task passed through carries no context of the plugin's, and Studio
+    /// segments its raw value, so the window used to call it ordinary text (handover 12, the
+    /// test file's DEVICE_NEEDS_TIME). It now reads the task's own warning off the unit and
+    /// points at the setting that answers it.
+    /// </summary>
+    [Fact]
+    public void A_passed_through_message_shows_the_units_warning_and_the_setting_to_change()
+    {
+        var overBudget = Expanded(UnreadCount, ExpansionOptions.Default with { MaxUnitsPerMessage = 1 });
+        Assert.Single(ParagraphUnits.UnitComments(overBudget));
+        var viewModel = new IcuFormsViewModel();
+
+        viewModel.Show(overBudget, "1", "ru-RU", "Russian (Russia)");
+
+        Assert.False(viewModel.HasMessage);
+        Assert.Empty(viewModel.Rows);
+        Assert.Equal("ICU message passed through unexpanded", viewModel.EmptyTitle);
+        Assert.Contains("the message ['inbox.unreadCount'] as it was", viewModel.EmptyNote);
+        Assert.Contains("Expansion is over the branch budget (4 segments needed, 1 allowed)", viewModel.EmptyNote);
+        Assert.Contains("raise the branch budget on the Expand ICU page", viewModel.EmptyNote);
+        Assert.DoesNotContain("ICU message passed through unexpanded: Expansion", viewModel.EmptyNote);
+
+        var broken = Expanded("{count, plural, one {# unread message} other {# unread messages}");
+        viewModel.Show(broken, "1", "ru-RU", "Russian (Russia)");
+
+        Assert.Equal("ICU message passed through unexpanded", viewModel.EmptyTitle);
+        Assert.Contains("The value does not parse as ICU", viewModel.EmptyNote);
+        Assert.Contains("Correct the value in the native file", viewModel.EmptyNote);
+        Assert.DoesNotContain("branch budget", viewModel.EmptyNote);
+    }
+
+    [Fact]
+    public void Only_the_tasks_own_comment_makes_a_unit_passed_through()
+    {
+        // A translator's comment that happens to open with the same words is theirs, not the task's.
+        var unit = ParagraphUnits.Json("Message Centre", "['app.title']");
+        unit.Properties.Comments = ParagraphUnits.PropertiesFactory.CreateCommentProperties();
+        unit.Properties.Comments.Add(ParagraphUnits.PropertiesFactory.CreateComment(
+            Constants.PassedThroughCommentPrefix + "a note of my own", "Anna", Severity.Low));
+        var viewModel = new IcuFormsViewModel();
+
+        viewModel.Show(unit, "1", "ru-RU", "Russian (Russia)");
+
+        Assert.Equal("Not an ICU message", viewModel.EmptyTitle);
+    }
+
+    /// <summary>
+    /// An ordinary segment's note names the unit's key where the filter put one on the unit, so
+    /// a comment-like value such as _comment is seen for what it is (Paul, 14 October 2026).
+    /// </summary>
+    [Fact]
+    public void An_ordinary_segment_is_named_by_its_key_where_the_unit_has_one()
+    {
+        var viewModel = new IcuFormsViewModel();
+
+        viewModel.Show(ParagraphUnits.Json("Strings for the device screens.", "['_comment']"), "1", "fr-FR", "French (France)");
+        Assert.Equal("Not an ICU message", viewModel.EmptyTitle);
+        Assert.Contains("ordinary text with nothing to expand: ['_comment'].", viewModel.EmptyNote);
+
+        viewModel.Show(ParagraphUnits.Properties("Message Centre", "app.title"), "1", "fr-FR", "French (France)");
+        Assert.Contains("nothing to expand: app.title.", viewModel.EmptyNote);
+
+        // A sub-content unit under an embedded content processor carries no key of its own.
+        viewModel.Show(ParagraphUnits.WithSegments("Message Centre"), "1", "fr-FR", "French (France)");
+        Assert.Contains("ordinary text with nothing to expand. Move", viewModel.EmptyNote);
+        Assert.DoesNotContain(":", viewModel.EmptyNote.Substring(0, viewModel.EmptyNote.IndexOf("Move", StringComparison.Ordinal)));
+    }
+
+    [Fact]
+    public void The_view_keeps_the_active_row_in_view_through_named_parts()
+    {
+        // The scroll logic lives in the code-behind and cannot run here; the markup names the
+        // parts it reaches for, so a rename fails this test rather than a null reference in Studio.
+        Assert.Contains("x:Name=\"RowsScroller\"", Xaml());
+        Assert.Contains("x:Name=\"RowsControl\"", Xaml());
     }
 }

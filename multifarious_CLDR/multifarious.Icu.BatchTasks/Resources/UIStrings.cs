@@ -328,6 +328,24 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Note of the not-an-ICU-message state.</summary>
         public static string Forms_NotIcu { get { return Manager.GetString("Forms_NotIcu", Culture); } }
 
+        /// <summary>Title of the empty state when the selected segment belongs to a message the expand task passed through unchanged. "Passed through" is the term the task report uses.</summary>
+        public static string Forms_PassedThroughTitle { get { return Manager.GetString("Forms_PassedThroughTitle", Culture); } }
+
+        /// <summary>First line of the passed-through state when the unit carries no key. "Expand ICU" is the batch task's name.</summary>
+        public static string Forms_PassedThrough { get { return Manager.GetString("Forms_PassedThrough", Culture); } }
+
+        /// <summary>First line of the passed-through state. {0} is the message's resource key, such as "Default.DEVICE_NEEDS_TIME"; keep the placeholder.</summary>
+        public static string Forms_PassedThroughKeyed { get { return Manager.GetString("Forms_PassedThroughKeyed", Culture); } }
+
+        /// <summary>Last line of the passed-through state when the message was over the branch budget. "Messages to expand" is the group heading on the Expand ICU settings page (Expand_KindsHeader) and "branch budget" its sub-heading (Expand_BudgetHeader); use the same words.</summary>
+        public static string Forms_PassedThroughBudget { get { return Manager.GetString("Forms_PassedThroughBudget", Culture); } }
+
+        /// <summary>Last line of the passed-through state when the value did not parse as an ICU message.</summary>
+        public static string Forms_PassedThroughParse { get { return Manager.GetString("Forms_PassedThroughParse", Culture); } }
+
+        /// <summary>Note of the not-an-ICU-message state when the unit carries a resource key. {0} is the key, such as "Default._comment"; keep the placeholder.</summary>
+        public static string Forms_NotIcuKeyed { get { return Manager.GetString("Forms_NotIcuKeyed", Culture); } }
+
         /// <summary>Line under the message key. {0} is the target language name, {1} the number of forms; keep the placeholders.</summary>
         public static string Forms_Summary { get { return Manager.GetString("Forms_Summary", Culture); } }
 

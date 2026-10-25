@@ -316,6 +316,24 @@
   <data name="Forms_NotIcu" xml:space="preserve">
     <value>アクティブなセグメントは展開するもののない通常のテキストです。複数形・序数・select メッセージのセグメントに移動すると、その形式がここに表示されます。</value>
   </data>
+  <data name="Forms_PassedThroughTitle" xml:space="preserve">
+    <value>ICU メッセージはそのまま通過しました</value>
+  </data>
+  <data name="Forms_PassedThrough" xml:space="preserve">
+    <value>Expand ICU はこのメッセージをそのまま残し、Studio が通常のテキストとして分節したため、表示する形式はありません。</value>
+  </data>
+  <data name="Forms_PassedThroughKeyed" xml:space="preserve">
+    <value>Expand ICU はメッセージ {0} をそのまま残し、Studio が通常のテキストとして分節したため、表示する形式はありません。</value>
+  </data>
+  <data name="Forms_PassedThroughBudget" xml:space="preserve">
+    <value>再構成するには、Expand ICU ページの「再構成するメッセージ」で分岐の上限を引き上げ、Expand ICU を再度実行してください。</value>
+  </data>
+  <data name="Forms_PassedThroughParse" xml:space="preserve">
+    <value>元のファイルで値を修正し、Expand ICU を再度実行してください。読み取れない値をそのまま通過させるか、タスクを失敗させるかは Expand ICU ページで決まります。</value>
+  </data>
+  <data name="Forms_NotIcuKeyed" xml:space="preserve">
+    <value>アクティブなセグメントは展開するもののない通常のテキストです: {0}。複数形・序数・select メッセージのセグメントに移動すると、その形式がここに表示されます。</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}、{1} 個の形式</value>
   </data>

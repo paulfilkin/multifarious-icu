@@ -316,6 +316,24 @@
   <data name="Forms_NotIcu" xml:space="preserve">
     <value>Das aktive Segment ist gewöhnlicher Text ohne etwas zu erweitern. Wechseln Sie zu einem Segment einer Plural-, Ordinal- oder Select-Nachricht, dann erscheinen hier ihre Formen.</value>
   </data>
+  <data name="Forms_PassedThroughTitle" xml:space="preserve">
+    <value>ICU-Nachricht unverändert durchgereicht</value>
+  </data>
+  <data name="Forms_PassedThrough" xml:space="preserve">
+    <value>Expand ICU hat diese Nachricht unverändert gelassen, und Studio hat sie als gewöhnlichen Text segmentiert, daher gibt es keine Formen anzuzeigen.</value>
+  </data>
+  <data name="Forms_PassedThroughKeyed" xml:space="preserve">
+    <value>Expand ICU hat die Nachricht {0} unverändert gelassen, und Studio hat sie als gewöhnlichen Text segmentiert, daher gibt es keine Formen anzuzeigen.</value>
+  </data>
+  <data name="Forms_PassedThroughBudget" xml:space="preserve">
+    <value>Um sie umzugliedern, erhöhen Sie die Zweig-Obergrenze auf der Seite Expand ICU unter „Umzugliedernde Nachrichten“ und führen Sie Expand ICU erneut aus.</value>
+  </data>
+  <data name="Forms_PassedThroughParse" xml:space="preserve">
+    <value>Korrigieren Sie den Wert in der Originaldatei und führen Sie Expand ICU erneut aus. Die Seite Expand ICU legt fest, ob ein Wert, der nicht gelesen werden kann, durchgereicht wird oder den Task fehlschlagen lässt.</value>
+  </data>
+  <data name="Forms_NotIcuKeyed" xml:space="preserve">
+    <value>Das aktive Segment ist gewöhnlicher Text ohne etwas zu erweitern: {0}. Wechseln Sie zu einem Segment einer Plural-, Ordinal- oder Select-Nachricht, dann erscheinen hier ihre Formen.</value>
+  </data>
   <data name="Forms_Summary" xml:space="preserve">
     <value>{0}, {1} Form(en)</value>
   </data>
