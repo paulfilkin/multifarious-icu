@@ -22,5 +22,5 @@ using System.Runtime.InteropServices;
 // Not the same thing as the task ids in Constants, which stay as they are: Studio pins a
 // task's registration and its settings against that id, and changing it orphans every project
 // template that names the task. A version bump is not an id bump.
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: AssemblyVersion("2.1.0.0")]
+[assembly: AssemblyFileVersion("2.1.0.0")]

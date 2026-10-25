@@ -1,45 +1,45 @@
 # 13 - multifarious_CLDR Build Progress - 2026-10-25
 
-Thirteenth session, the first after the release, on a new branch `release/2.1` (Paul's
-call).  Two pieces.  First, the three ICU Forms window items that handover 12 listed as
-2.0.1 candidates: a passed-through message shows the unit's own warning and the setting
-that answers it, an ordinary segment's note names the unit's key, and the active row is
-kept in view (committed, `0454680`).  Second, from Paul's Studio run of that build: two
-article selects on one argument in one sentence came out as a hundred Italian forms, ninety
-of them unreachable, so the hoister now collapses a selector on an argument already bound
-above, and the window's summary line says where nested forms come from (`98f22df`).  Third,
-from the run of that build: the header grew to ten lines under a long summary, so it is a
-Grid with the summary wrapping, and the summary says when a message was laid out as written
-(`36a447b`).  Fourth, from Paul's embedded content run (Project 83): the window has a
-restored state, and the SSML round trip through the HTML processor is recorded with what the
-HTML filter does to it.  1,675 tests.
+Thirteenth session, the first after 2.0, on the new branch `release/2.1` (Paul's call), and
+**Paul is releasing 2.1.0.0 from it as this handover is written** (25 October 2026, late).
+Five commits, each from the Studio run of the one before.  The three ICU Forms window items
+handover 12 listed as 2.0.1 candidates: a passed-through message shows the unit's own
+warning and the setting that answers it, an ordinary segment's note names the unit's key,
+the active row is kept in view (`0454680`).  Two article selects on one argument in one
+sentence came out as a hundred Italian forms, ninety of them unreachable, so the hoister
+collapses a selector on an argument already bound above, and the summary line says where
+nested forms come from (`98f22df`).  The header grew to ten lines under a long summary, so
+it is a Grid with the summary wrapping, and the summary says when a message was laid out as
+written (`36a447b`).  The window has a restored state, and the SSML round trip through the
+HTML embedded content processor is proven with a test (`6a8693c`).  The SSML settings are
+documented and the 2.1 changelog started (`606db63`).  1,675 tests.  The version numbers in
+the code were still 2.0.0.0 when this was written; see the release section.
 
 ## Kickoff prompt for the next session (paste this)
 
 > Read `CLAUDE.md`, then
 > `Documentation\Build_Progress\13_261025_multifarious_CLDR_Build_Progress.md`.
 >
-> 2.0.0.0 is live on the AppStore (14 October 2026).  Work since then is on `release/2.1`,
-> branched from `main` at `733539c` on 25 October: the ICU Forms window reads a passed-through
-> unit's warning, names the key on an ordinary segment and scrolls to the active row
-> (`0454680`); the hoister collapses a selector on an argument already bound above, so two
-> article selects in one sentence are ten Italian forms and not a hundred, and the window's
-> summary says where nested forms come from (`98f22df`); the header is a Grid that wraps the
-> summary, and the summary says when a message was laid out as written (`36a447b`); the
-> window has a restored state (fourth commit).  Twelve new strings in nine resource files,
-> thirteen new tests (1,675), `tools\check-forms-scroll.ps1`.  The version numbers are still
-> 2.0.0.0.  Project 83 proved SSML through the HTML embedded content processor once `speak`
-> and `phoneme` are inline elements; the HTML writer's entities are the open question there.  The hoister change is in `Icu.Core`, a file copy
-> from the reference project at `c:\Users\paul\Documents\GIT\.NET\CLDR Support\` (read
-> only), and has not been copied back there or into its design's section 5.9.
+> 2.1.0.0 was released from `release/2.1` on 25 October 2026 (Paul); the release section
+> of handover 13 says what was done and what may still be outstanding (the tag `v2.1.0.0`,
+> the merge into `main`, the push).  Over 2.0.0.0 it carries: the ICU Forms window reads a
+> passed-through unit's warning, names the key on an ordinary segment, has a restored state
+> and scrolls to the active row; the hoister collapses a selector on an argument already
+> bound above, so two article selects in one sentence are ten Italian forms and not a
+> hundred; the summary line says where nested forms come from and when a message was laid
+> out as written, and the header wraps; the SSML settings for the HTML embedded content
+> processor are in the user guide and the FAQ, and the changelog has the 2.1 entry.  Twelve
+> new strings in nine resource files, thirteen new tests (1,675), `tools\check-forms-scroll.ps1`.
+> `Icu.Core\Hoister.cs` changed and has not been copied back to the reference project at
+> `c:\Users\paul\Documents\GIT\.NET\CLDR Support\` (read only) or into its design's
+> section 5.9.
 >
-> Open: Paul's Studio run of the collapse and the summary line (the window items passed
-> their first run); the website screenshots (002, 004, 007 and 009 to 015) and the HTML
-> guide at `Documentation\website\multifariousICU_UserGuide_2.0.html` (local); the native
-> read of the sixty strings added since 14 October; the uncommitted `tools\plan-file.ps1`,
-> which Paul has not yet decided to keep; the version and changelog for 2.1 when Paul sets
-> them.  The source material under `Documentation\CustomDictionaries` is local and must not
-> be named in anything published.
+> Open: the website screenshots (002, 004, 007 and 009 to 015) and the HTML guide at
+> `Documentation\website\multifariousICU_UserGuide_2.0.html` (local), which also needs the
+> SSML section; the native read of the sixty-five strings added since 14 October; the
+> uncommitted `tools\plan-file.ps1`, which Paul has not yet decided to keep.  The source
+> material under `Documentation\CustomDictionaries` is local and must not be named in
+> anything published.
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -47,7 +47,34 @@ HTML filter does to it.  1,675 tests.
 
 ## Where we are in one line
 
-Four commits on `release/2.1`: the window improvements, the same-argument collapse with the summary line, the header fix with the walked wording, and the restored state; the SSML route is proven through the plugin and waits on the HTML writer's entity setting.
+2.1.0.0 is being released from `release/2.1`: five commits of window improvements, the same-argument collapse and the SSML documentation, the version bumped and the Release build in hand; the tag and the merge into `main` follow the upload.
+
+## Release 2.1.0.0 (25 October 2026, late)
+
+Paul decided to release as this handover was written.  The version numbers were still
+2.0.0.0 ("It needs to be 2.1.0.0"), so `AssemblyVersion` and `AssemblyFileVersion` in
+`Properties\AssemblyInfo.cs` and `<Version>` in `pluginpackage.manifest.xml` were set to
+2.1.0.0, and the changelog's heading from "not yet released" to "October 2026".  The steps,
+as for 2.0 (handover 12):
+
+1. Commit the version bump on `release/2.1`.
+2. Release build with Studio closed (the deploy locks otherwise), the tests run against the
+   Release output, the `.sdlplugin` copied to `Documentation\appstore\IcuSupport.sdlplugin`
+   (gitignored) for the store upload.
+3. Tag `v2.1.0.0` on the bump commit, push the branch and the tag.
+4. Fast-forward `main` to `release/2.1` and push; `release/2.0` stays at 2.0.0.0 for a
+   2.0.x fix.  New work starts from `main`; a 2.1.x fix goes on `release/2.1`.
+5. The AppStore documents to upload: `multifariousICU_Documentation.md`,
+   `multifariousICU_Changelog.md`, `multifariousICU_UserGuide.md`, the samples and images
+   as for 2.0.  The manifest's description was checked at 2.0 and has not changed.
+
+Done in the session: the bump in the three files; the Release build, clean, with the 1,675
+tests passing on the Release output; the package built as 2.1.0.0 (its manifest checked),
+1,136,253 bytes, deployed to Studio's Packages folder and copied to
+`Documentation\appstore\IcuSupport.sdlplugin` for the upload.  The bump commit was proposed
+as "Release 2.1.0.0", staging `AssemblyInfo.cs`, `pluginpackage.manifest.xml`, the changelog
+and this handover.  The tag, the fast-forward of `main` and the pushes are the next session's
+first check if this handover does not say they happened.
 
 ## What was asked (Paul, 25 October 2026)
 

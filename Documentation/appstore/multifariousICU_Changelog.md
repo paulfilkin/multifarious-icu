@@ -1,6 +1,6 @@
 # multifariousICU Support for Trados Studio - Changelog
 
-## 2.1.0.0 (not yet released)
+## 2.1.0.0 (October 2026)
 
 ### Changed
 
