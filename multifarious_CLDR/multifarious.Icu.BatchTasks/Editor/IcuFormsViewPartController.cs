@@ -138,7 +138,9 @@ namespace multifarious.Icu.BatchTasks.Editor
                 {
                     var unit = document.GetParentParagraphUnit(pair);
                     if (unit == null) continue;
-                    if (ResourceKey.IsExpanded(unit))
+                    // A file downloaded from Trados Cloud carries the cloud app's layout, which
+                    // the reader takes as expanded too.
+                    if (ResourceKey.IsExpanded(unit) || ResourceKey.IsCloudExpanded(unit))
                     {
                         _documentExpanded = true;
                         break;

@@ -321,6 +321,32 @@ public class IcuExpandProcessorTests
         Assert.Equal(2, unit.Properties.Contexts.Contexts.Count);
     }
 
+    /// <summary>
+    /// A unit the Trados Cloud app laid out reconstructs to a message that parses, and the task
+    /// used to expand it again, nesting the forms inside their own branches (Paul, 19 November
+    /// 2026, on a downloaded project). It is the cloud's and is left as it is.
+    /// </summary>
+    [Fact]
+    public void A_cloud_expanded_unit_is_left_as_it_is()
+    {
+        var unit = ParagraphUnits.CloudExpanded("knightCount", "count", "plural",
+            new ParagraphUnits.CloudForm("one", "There is # knight here."),
+            new ParagraphUnits.CloudForm("other", "There are # knights here."));
+        var before = RawValueReconstruction.Reconstruct(unit.Source).RawValue;
+        var processor = Processor("ru-RU");
+
+        processor.ProcessParagraphUnit(unit);
+
+        Assert.Equal(0, processor.Expanded);
+        Assert.Equal(1, processor.AlreadyExpanded);
+        Assert.Equal(before, RawValueReconstruction.Reconstruct(unit.Source).RawValue);
+        Assert.Equal(2, ParagraphUnits.SegmentsOf(unit.Source).Count);
+        Assert.Null(ResourceKey.IcuContextOf(unit));
+        var outcome = Assert.Single(processor.Outcomes);
+        Assert.Equal(ExpandOutcome.Skipped, outcome.Outcome);
+        Assert.Contains("Trados Cloud", outcome.Detail);
+    }
+
     [Fact]
     public void An_unparseable_message_passes_through_with_a_warning_on_the_unit()
     {

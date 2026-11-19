@@ -286,6 +286,9 @@
   <data name="Report_KeepLocked" xml:space="preserve">
     <value>ロック済み</value>
   </data>
+  <data name="Task_CloudProject" xml:space="preserve">
+    <value>{0} は Trados Studio で作成されたプロジェクトで実行されます。このプロジェクトは Trados Cloud のもので、メッセージの再構成と復元はそちらのアプリが行うため、ファイルはそのまま残されました。</value>
+  </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms は、ICU MessageFormat メッセージの複数形・序数・select の各形式を数の例とともに表示し、メッセージ全体を再構成して示すため、入力しながら訳文を確認できます。</value>
   </data>

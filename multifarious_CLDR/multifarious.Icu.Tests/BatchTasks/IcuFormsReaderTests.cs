@@ -25,6 +25,41 @@ public class IcuFormsReaderTests
         return unit;
     }
 
+    /// <summary>
+    /// A file downloaded from Trados Cloud (project 6a995f7f, 19 November 2026) carries no
+    /// context of this plugin's and none of the unit-level metadata, but the same locked shapes
+    /// and the cloud's per-segment facts on the translation origins. The reader takes the
+    /// pattern from the paragraph, the paths from the layout, the counts from CLDR, and the
+    /// seeding and the note from the origins, so the window shows such a file as it shows its own.
+    /// </summary>
+    [Fact]
+    public void A_cloud_expanded_unit_reads_without_the_plugins_context()
+    {
+        var unit = ParagraphUnits.CloudExpanded("knightCount", "count", "plural",
+            new ParagraphUnits.CloudForm("one", "There is # knight here."),
+            new ParagraphUnits.CloudForm("few", "There are # knights here.", SeededFrom: "other"),
+            new ParagraphUnits.CloudForm("many", "There are # knights here.", SeededFrom: "other",
+                Note: "CLDR category: many\nUsed when the count is: 0, 5, 6, 7, 8, 9"),
+            new ParagraphUnits.CloudForm("other", "There are # knights here."));
+        var model = new IcuFormsReader().Read(unit, "ru-RU");
+
+        Assert.NotNull(model);
+        Assert.Equal("knightCount", model!.Key);
+        Assert.Equal(["count:one", "count:few", "count:many", "count:other"], model.Rows.Select(r => r.Path));
+        Assert.Equal("1, 21, 31, 41, 51, 61", string.Join(", ", model.Rows[0].Counts));
+        Assert.Equal("count", model.CountArgument);
+        Assert.Equal(["count"], model.ExpandedSelectors);
+        Assert.StartsWith("{count, plural, one {", model.Pattern);
+
+        Assert.Equal("", model.Rows[0].SeededFrom);
+        Assert.Equal("other", model.Rows[1].SeededFrom);
+        Assert.True(model.Rows[1].SyntheticSource);
+        Assert.Contains("seeded from", model.Rows[1].Comment);
+        Assert.StartsWith("CLDR category: many", model.Rows[2].Comment);
+        Assert.Equal("There are 2 knights here.", model.Rows[1].SourceRendered);
+        Assert.True(model.TargetParses);
+    }
+
     [Fact]
     public void The_rows_and_their_tooltips_come_from_the_layout_cldr_and_the_unit_context()
     {

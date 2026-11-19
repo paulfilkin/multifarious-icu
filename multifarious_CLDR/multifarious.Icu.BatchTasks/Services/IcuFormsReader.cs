@@ -141,12 +141,18 @@ namespace multifarious.Icu.BatchTasks.Services
         /// </summary>
         public IcuFormsModel Read(IParagraphUnit unit, string targetLanguageTag, ISegment activeTarget = null)
         {
-            if (unit == null || unit.Source == null || unit.Target == null || !ResourceKey.IsExpanded(unit)) return null;
+            if (unit == null || unit.Source == null || unit.Target == null) return null;
+
+            // A unit the Trados Cloud app laid out carries no context of this plugin's; its
+            // layout is the same locked shapes and its per-segment facts sit on the translation
+            // origins, so it reads the same way with those stood in for the context.
+            var cloud = !ResourceKey.IsExpanded(unit);
+            if (cloud && !ResourceKey.IsCloudExpanded(unit)) return null;
             var activeId = activeTarget != null && activeTarget.Properties != null && activeTarget.Properties.Id != null
                 ? activeTarget.Properties.Id.Id
                 : null;
 
-            var context = unit.Properties.Contexts.Contexts.First(c => c != null && c.ContextType == Constants.IcuContextType);
+            var context = cloud ? null : unit.Properties.Contexts.Contexts.First(c => c != null && c.ContextType == Constants.IcuContextType);
             var pattern = Metadata(context, "icu:pattern");
             var hoisted = Metadata(context, "icu:hoisted");
             var expanded = Metadata(context, "icu:expandedSelectors")
@@ -180,6 +186,18 @@ namespace multifarious.Icu.BatchTasks.Services
             }
 
             var placed = PlaceSegments(unit.Source);
+            var notes = new Dictionary<string, string>(StringComparer.Ordinal);
+            if (cloud)
+            {
+                // The cloud expands every plural kind it lays out; the pattern is the paragraph
+                // itself, since the unit-level metadata does not survive the export; and the
+                // per-segment facts come off the origins, by position, as the cloud wrote them.
+                pattern = RawValueReconstruction.Reconstruct(unit.Source).RawValue;
+                hoisted = pattern;
+                expanded = CloudExpandedSelectors(placed);
+                byPosition = true;
+                ReadCloudOrigins(unit, placed, seededFrom, synthetic, notes);
+            }
             var targetSegments = SegmentsOf(unit.Target);
             var layout = new Layout(expanded, placed);
             var rows = new List<IcuFormRow>();
@@ -189,7 +207,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 var target = index < targetSegments.Count ? targetSegments[index] : null;
                 if (target != null && activeId != null && target.Properties.Id.Id == activeId) target = activeTarget;
                 var recordKey = byPosition ? (index + 1).ToString(CultureInfo.InvariantCulture) : place.Segment.Properties.Id.Id;
-                rows.Add(Row(place, target, recordKey, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic, layout, grammarForms));
+                rows.Add(Row(place, target, recordKey, targetLanguageTag, samples, ref nameOrdinal, inPluralContext, seededFrom, synthetic, layout, grammarForms, notes));
             }
 
             var projection = EscapedProjection(unit.Target, inPluralContext, activeId, activeTarget);
@@ -392,7 +410,7 @@ namespace multifarious.Icu.BatchTasks.Services
                 return _branches.TryGetValue(SelectorPath(frames, depth), out keys) && keys.Contains(key);
             }
 
-            private static string SelectorPath(List<Frame> frames, int depth)
+            public static string SelectorPath(List<Frame> frames, int depth)
             {
                 var above = frames.Take(depth).Select(f => f.Argument + ":" + (f.Key ?? string.Empty));
                 var prefix = string.Join("/", above);
@@ -432,7 +450,7 @@ namespace multifarious.Icu.BatchTasks.Services
 
         private IcuFormRow Row(PlacedSegment place, ISegment target, string recordKey, string language, Dictionary<string, string> samples,
             ref int nameOrdinal, bool inPluralContext, Dictionary<string, string> seededFrom, HashSet<string> synthetic, Layout layout,
-            Dictionary<string, GrammarFormRecord> grammarForms)
+            Dictionary<string, GrammarFormRecord> grammarForms, Dictionary<string, string> notes)
         {
             var source = place.Segment;
             var row = new IcuFormRow
@@ -519,11 +537,17 @@ namespace multifarious.Icu.BatchTasks.Services
             row.SeededFrom = seededFrom.TryGetValue(recordKey, out seed) ? seed : string.Empty;
             row.SyntheticSource = synthetic.Contains(recordKey);
             var comment = FirstComment(source);
+            string cloudNote;
             if (comment != null)
             {
                 if (comment.MetaDataContainsKey("icu:seededFrom")) row.SeededFrom = Metadata(comment, "icu:seededFrom");
                 if (comment.MetaDataContainsKey("icu:syntheticSource")) row.SyntheticSource = Metadata(comment, "icu:syntheticSource") == "true";
                 row.Comment = comment.Text ?? string.Empty;
+            }
+            else if (notes.TryGetValue(recordKey, out cloudNote) && cloudNote.Length > 0)
+            {
+                // The cloud app's note for the segment, written as it would have read in a comment.
+                row.Comment = cloudNote;
             }
             else
             {
@@ -855,6 +879,58 @@ namespace multifarious.Icu.BatchTasks.Services
             var marker = segment.Parent as ICommentMarker;
             if (marker == null) marker = segment.Count > 0 ? segment[0] as ICommentMarker : null;
             return marker != null && marker.Comments != null && marker.Comments.Count > 0 ? marker.Comments.GetItem(0) : null;
+        }
+
+        /// <summary>
+        /// The selector paths a cloud-expanded unit treats as category expanded: every plural
+        /// kind on any segment's path, since the cloud app lays out every kind it leaves enabled
+        /// and a walked one is told from its branches, not from metadata the export has not kept.
+        /// </summary>
+        private static string[] CloudExpandedSelectors(IEnumerable<PlacedSegment> placed)
+        {
+            var paths = new List<string>();
+            foreach (var place in placed)
+            {
+                for (var depth = 0; depth < place.Frames.Count; depth++)
+                {
+                    if (place.Frames[depth].Kind == "select") continue;
+                    var path = Layout.SelectorPath(place.Frames, depth);
+                    if (!paths.Contains(path)) paths.Add(path);
+                }
+            }
+            return paths.ToArray();
+        }
+
+        /// <summary>
+        /// The cloud app's per-segment facts, read off each segment's translation origin by the
+        /// segment's position: which source form seeded it, whether that form was synthetic, and
+        /// the note the app wrote for the row's tooltip (<c>icu:note</c>, from 26 October 2026).
+        /// </summary>
+        private static void ReadCloudOrigins(IParagraphUnit unit, IReadOnlyList<PlacedSegment> placed,
+            Dictionary<string, string> seededFrom, HashSet<string> synthetic, Dictionary<string, string> notes)
+        {
+            var origins = new Dictionary<string, IMetaDataContainer>(StringComparer.Ordinal);
+            foreach (var pair in unit.SegmentPairs)
+            {
+                if (pair == null || pair.Properties == null || pair.Properties.Id == null || pair.Properties.TranslationOrigin == null) continue;
+                origins[pair.Properties.Id.Id] = pair.Properties.TranslationOrigin;
+            }
+
+            for (var index = 0; index < placed.Count; index++)
+            {
+                var id = placed[index].Segment.Properties != null && placed[index].Segment.Properties.Id != null
+                    ? placed[index].Segment.Properties.Id.Id
+                    : null;
+                IMetaDataContainer origin;
+                if (id == null || !origins.TryGetValue(id, out origin)) continue;
+
+                var position = (index + 1).ToString(CultureInfo.InvariantCulture);
+                var seed = Metadata(origin, "icu:seededFrom");
+                if (seed.Length > 0) seededFrom[position] = seed;
+                if (Metadata(origin, "icu:syntheticSource") == "true") synthetic.Add(position);
+                var note = Metadata(origin, "icu:note");
+                if (note.Length > 0) notes[position] = note;
+            }
         }
 
         private static string Metadata(IMetaDataContainer container, string key)

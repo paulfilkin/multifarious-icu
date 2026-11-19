@@ -157,6 +157,18 @@ namespace multifarious.Icu.BatchTasks.Services
                 return;
             }
 
+            // A unit the Trados Cloud app laid out reconstructs to a message that parses, and
+            // expanding it again would nest the forms inside their own branches. It belongs to
+            // the cloud's own tasks and is left as it is (19 November 2026).
+            if (icuContext == null && ResourceKey.IsCloudExpanded(unit))
+            {
+                AlreadyExpanded++;
+                _outcomes.Add(new ExpandUnitOutcome(unitId, key, ExpandOutcome.Skipped, CountSegments(unit.Source),
+                    "Laid out by the Trados Cloud app; left as it is."));
+                Diagnostics.Write("  unit " + unitId + ": laid out in Trados Cloud, skipped");
+                return;
+            }
+
             // The value with the filter's tags, if any, as sentinel characters: the parser and
             // the planner see them as text, and the writer puts a clone of each tag back.
             var sourceValue = RawValueReconstruction.Encode(unit.Source);

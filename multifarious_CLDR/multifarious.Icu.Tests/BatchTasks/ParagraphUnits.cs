@@ -229,4 +229,65 @@ internal static class ParagraphUnits
             foreach (var item in ItemsOf(sources[i])) targets[i].Add((IAbstractMarkupData)item.Clone());
         }
     }
+
+    /// <summary>One form of a cloud-expanded message: its key, its source text with '#' where the count goes, and the cloud's facts for it.</summary>
+    public sealed record CloudForm(string Key, string Text, string SeededFrom = "", string Note = "");
+
+    /// <summary>
+    /// A unit as the Trados Cloud app lays it out and the SDLXLIFF export delivers it (project
+    /// 6a995f7f, 19 November 2026): no context of this plugin's, the selector syntax as locked
+    /// content between the segments and '#' as locked content inside them, the JSON filter's
+    /// key on the paragraph context, and the cloud's per-segment facts on each segment pair's
+    /// translation origin, where Studio keeps them through an edit.
+    /// </summary>
+    public static IParagraphUnit CloudExpanded(string jsonPath, string argument, string kind, params CloudForm[] forms)
+    {
+        var unit = ItemFactory.CreateParagraphUnit(LockTypeFlags.Unlocked);
+        unit.Source.Add(Locked("{" + argument + ", " + kind + ","));
+        unit.Target.Add(Locked("{" + argument + ", " + kind + ","));
+        var number = 1;
+        foreach (var form in forms)
+        {
+            var properties = ItemFactory.CreateSegmentPairProperties();
+            properties.Id = new SegmentId(number.ToString());
+            var origin = ItemFactory.CreateTranslationOrigin();
+            origin.OriginType = "nmt";
+            origin.SetMetaData("icu:path", argument + ":" + form.Key);
+            origin.SetMetaData("icu:selector", kind);
+            origin.SetMetaData("icu:category", form.Key);
+            origin.SetMetaData("icu:seededFrom", form.SeededFrom);
+            origin.SetMetaData("icu:syntheticSource", form.SeededFrom.Length > 0 ? "true" : "false");
+            if (form.Note.Length > 0) origin.SetMetaData("icu:note", form.Note);
+            properties.TranslationOrigin = origin;
+            number++;
+
+            unit.Source.Add(Locked(" " + form.Key + " {"));
+            var source = ItemFactory.CreateSegment(properties);
+            foreach (var piece in form.Text.Split('#'))
+            {
+                if (source.Count > 0) source.Add(Locked("#"));
+                if (piece.Length > 0) source.Add(Text(piece));
+            }
+            unit.Source.Add(source);
+            unit.Source.Add(Locked("}"));
+
+            unit.Target.Add(Locked(" " + form.Key + " {"));
+            unit.Target.Add(ItemFactory.CreateSegment(properties));
+            unit.Target.Add(Locked("}"));
+        }
+        unit.Source.Add(Locked("}"));
+        unit.Target.Add(Locked("}"));
+
+        var context = PropertiesFactory.CreateContextInfo("sdl:paragraph");
+        context.SetMetaData("JsonPath", jsonPath);
+        AddContext(unit, context);
+        return unit;
+    }
+
+    private static ILockedContent Locked(string text)
+    {
+        var locked = ItemFactory.CreateLockedContent(PropertiesFactory.CreateLockedContentProperties(LockTypeFlags.Manual));
+        locked.Content.Add(Text(text));
+        return locked;
+    }
 }

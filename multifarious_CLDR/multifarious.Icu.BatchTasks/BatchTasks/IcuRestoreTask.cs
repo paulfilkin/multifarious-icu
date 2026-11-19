@@ -40,6 +40,8 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
         private RestoreOptions _options;
         private int _filesSeen;
         private int _filesProcessed;
+        private bool _cloudProject;
+        private bool _cloudMessageSent;
 
         private sealed class ProcessedFile
         {
@@ -52,8 +54,10 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             _options = GetSetting<IcuRestoreSettings>().ToOptions();
 
             var info = Project != null ? Project.GetProjectInfo() : null;
+            _cloudProject = CloudProjects.IsCloud(info);
             Diagnostics.Start("restore task");
             Diagnostics.Write("project=" + (info != null ? info.Name : "<null>")
+                + " " + CloudProjects.Describe(info)
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
             Diagnostics.Write("settings: emptyBranch=" + _options.OnEmptyBranch
                 + " placeholderMismatch=" + _options.OnPlaceholderMismatch);
@@ -68,10 +72,17 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             var wanted = Constants.DefaultFileTypeIds.Any(id =>
                 string.Equals(projectFile.FileTypeId, id, StringComparison.OrdinalIgnoreCase));
 
+            // On a cloud project nothing is processed; the first file carries the message.
+            if (_cloudProject && wanted)
+            {
+                wanted = !_cloudMessageSent;
+                _cloudMessageSent = true;
+            }
+
             Diagnostics.Write("file: " + projectFile.Name
                 + " fileTypeId=" + (projectFile.FileTypeId ?? "<null>")
                 + " language=" + (projectFile.Language != null ? projectFile.Language.IsoAbbreviation : "<null>")
-                + " -> " + (wanted ? "process" : "skip"));
+                + " -> " + (wanted ? (_cloudProject ? "cloud project, message only" : "process") : "skip"));
 
             return wanted;
         }
@@ -80,6 +91,13 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter converter)
         {
             if (projectFile == null) return;
+            if (_cloudProject)
+            {
+                converter.AddBilingualProcessor(new TaskMessageRelay(TaskMessageRelay.OriginFor("Task_Restore_Name"), projectFile.Name,
+                    () => new[] { CloudProjects.Message(UIStrings.Report_RestoreName) }, ErrorLevel.Warning));
+                Diagnostics.Write("restore: " + projectFile.Name + " cloud project, message relayed, no processor");
+                return;
+            }
             _filesProcessed++;
 
             var targetLanguage = projectFile.Language != null && projectFile.Language.CultureInfo != null
@@ -106,7 +124,8 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                     + " filled=" + processed.Processor.Filled + " warnings=" + processed.Processor.Warnings.Count
                     + " -> keep output");
             }
-            return true;
+            // On a cloud project nothing was changed, and Studio's parse of the file is discarded.
+            return !_cloudProject;
         }
 
         /// <summary>One report per language direction; see the expand task.</summary>

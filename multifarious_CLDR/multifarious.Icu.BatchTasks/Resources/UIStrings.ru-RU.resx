@@ -286,6 +286,9 @@
   <data name="Report_KeepLocked" xml:space="preserve">
     <value>заблокировано</value>
   </data>
+  <data name="Task_CloudProject" xml:space="preserve">
+    <value>{0} выполняется для проектов, созданных в Trados Studio. Этот проект получен из Trados Cloud, где его собственное приложение перестраивает и собирает сообщения, поэтому файлы оставлены без изменений.</value>
+  </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms показывает все формы множественного числа, порядковые формы и ветви select ICU-сообщения MessageFormat с примерами количеств, а также собранное сообщение целиком, чтобы перевод можно было проверять прямо при вводе.</value>
   </data>

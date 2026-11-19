@@ -286,6 +286,9 @@
   <data name="Report_KeepLocked" xml:space="preserve">
     <value>gesperrt</value>
   </data>
+  <data name="Task_CloudProject" xml:space="preserve">
+    <value>{0} läuft auf Projekten, die in Trados Studio erstellt wurden. Dieses Projekt stammt aus Trados Cloud, wo die eigene App die Nachrichten umgliedert und wieder zusammensetzt; die Dateien wurden daher unverändert gelassen.</value>
+  </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms zeigt jede Plural-, Ordinal- und Select-Form einer ICU-MessageFormat-Nachricht mit Beispielzahlen sowie die zusammengesetzte Nachricht, damit eine Übersetzung schon beim Eingeben geprüft werden kann.</value>
   </data>

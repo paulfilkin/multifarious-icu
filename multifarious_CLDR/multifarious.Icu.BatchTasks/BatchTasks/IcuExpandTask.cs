@@ -48,6 +48,8 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
         private string _sourceLanguage;
         private int _filesSeen;
         private int _filesProcessed;
+        private bool _cloudProject;
+        private bool _cloudMessageSent;
 
         /// <summary>A file the task ran over and the processor that did it, for the report.</summary>
         private sealed class ProcessedFile
@@ -78,9 +80,11 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             _sourceLanguage = info != null && info.SourceLanguage != null && info.SourceLanguage.CultureInfo != null
                 ? info.SourceLanguage.CultureInfo.Name
                 : null;
+            _cloudProject = CloudProjects.IsCloud(info);
 
             Diagnostics.Start("expand task");
             Diagnostics.Write("project=" + (info != null ? info.Name : "<null>")
+                + " " + CloudProjects.Describe(info)
                 + " source=" + (_sourceLanguage ?? "<null>")
                 + " files=" + (TaskFiles != null ? TaskFiles.Length : 0));
             Diagnostics.Write("settings: cardinal=" + _options.ExpandCardinal + " ordinal=" + _options.ExpandOrdinal
@@ -103,10 +107,18 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
             var wanted = Constants.DefaultFileTypeIds.Any(id =>
                 string.Equals(projectFile.FileTypeId, id, StringComparison.OrdinalIgnoreCase));
 
+            // On a cloud project nothing is processed; the first file carries the message to
+            // the Task Results window, since a message needs a converter to travel through.
+            if (_cloudProject && wanted)
+            {
+                wanted = !_cloudMessageSent;
+                _cloudMessageSent = true;
+            }
+
             Diagnostics.Write("file: " + projectFile.Name
                 + " fileTypeId=" + (projectFile.FileTypeId ?? "<null>")
                 + " language=" + (projectFile.Language != null ? projectFile.Language.IsoAbbreviation : "<null>")
-                + " -> " + (wanted ? "process" : "skip"));
+                + " -> " + (wanted ? (_cloudProject ? "cloud project, message only" : "process") : "skip"));
 
             return wanted;
         }
@@ -127,6 +139,13 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter converter)
         {
             if (projectFile == null) return;
+            if (_cloudProject)
+            {
+                converter.AddBilingualProcessor(new TaskMessageRelay(TaskMessageRelay.OriginFor("Task_Expand_Name"), projectFile.Name,
+                    () => new[] { CloudProjects.Message(UIStrings.Report_ExpandName) }, ErrorLevel.Warning));
+                Diagnostics.Write("expand: " + projectFile.Name + " cloud project, message relayed, no processor");
+                return;
+            }
             _filesProcessed++;
 
             // The language comes from the project file rather than the conversion properties. This
@@ -165,7 +184,8 @@ namespace multifarious.Icu.BatchTasks.BatchTasks
                     + " expanded=" + processed.Processor.Expanded + " kept=" + processed.Processor.Kept
                     + " warnings=" + processed.Processor.Warnings.Count + " -> keep output");
             }
-            return true;
+            // On a cloud project nothing was changed, and Studio's parse of the file is discarded.
+            return !_cloudProject;
         }
 
         /// <summary>

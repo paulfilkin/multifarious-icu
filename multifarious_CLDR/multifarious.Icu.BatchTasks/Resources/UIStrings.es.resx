@@ -286,6 +286,9 @@
   <data name="Report_KeepLocked" xml:space="preserve">
     <value>bloqueado</value>
   </data>
+  <data name="Task_CloudProject" xml:space="preserve">
+    <value>{0} se ejecuta en proyectos creados en Trados Studio. Este proyecto procede de Trados Cloud, donde su propia aplicación reestructura los mensajes y los vuelve a reunir, así que los archivos se dejaron tal cual.</value>
+  </data>
   <data name="Forms_Purpose" xml:space="preserve">
     <value>ICU Forms muestra todas las formas plurales, ordinales y select de un mensaje ICU MessageFormat con cantidades de ejemplo, y el mensaje completo reensamblado, para que una traducción pueda comprobarse mientras se escribe.</value>
   </data>

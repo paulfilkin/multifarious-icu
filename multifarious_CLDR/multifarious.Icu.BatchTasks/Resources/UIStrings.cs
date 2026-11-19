@@ -298,6 +298,9 @@ namespace multifarious.Icu.BatchTasks.Resources
         /// <summary>Appended to the keep setting's value in the report where kept segments are locked.</summary>
         public static string Report_KeepLocked { get { return Manager.GetString("Report_KeepLocked", Culture); } }
 
+        /// <summary>Task Results message when a task is run on a project downloaded from Trados Cloud. {0} is the task name, "Expand ICU" or "Restore ICU"; keep the placeholder. "Trados Studio" and "Trados Cloud" are product names.</summary>
+        public static string Task_CloudProject { get { return Manager.GetString("Task_CloudProject", Culture); } }
+
         /// <summary>Body of the empty states: what the window is for. "ICU MessageFormat" is a technology name and stays as it is.</summary>
         public static string Forms_Purpose { get { return Manager.GetString("Forms_Purpose", Culture); } }
 

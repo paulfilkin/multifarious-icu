@@ -459,6 +459,27 @@ public class IcuFormsViewTests
         Assert.Contains("['inbox.unreadCount']", viewModel.EmptyNote);
     }
 
+    /// <summary>A customer's case (18 November 2026): a cloud project's file opened offline shows its forms in the window.</summary>
+    [Fact]
+    public void A_cloud_expanded_message_shows_its_forms()
+    {
+        var unit = ParagraphUnits.CloudExpanded("billingAccounts", "number", "plural",
+            new ParagraphUnits.CloudForm("one", "{number} billing account"),
+            new ParagraphUnits.CloudForm("many", "{number} billing accounts", SeededFrom: "other"),
+            new ParagraphUnits.CloudForm("other", "{number} billing accounts"));
+        var viewModel = new IcuFormsViewModel();
+
+        viewModel.Show(unit, "2", "fr-CA", "French (Canada)");
+
+        Assert.True(viewModel.HasMessage);
+        Assert.Equal("billingAccounts", viewModel.Key);
+        Assert.Equal("French (Canada), 3 form(s)", viewModel.Summary);
+        Assert.Equal(["one", "many", "other"], viewModel.Rows.Select(r => r.Form));
+        Assert.Equal([false, true, false], viewModel.Rows.Select(r => r.IsActive));
+        Assert.Contains("1000000", viewModel.Rows[1].Counts);
+        Assert.True(viewModel.ShowsCountBox);
+    }
+
     [Fact]
     public void The_view_keeps_the_active_row_in_view_through_named_parts()
     {

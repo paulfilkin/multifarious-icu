@@ -23,6 +23,30 @@ public class ReconstructionAndKeyTests
         Assert.False(reconstructed.UsedFilterTags);
     }
 
+    /// <summary>
+    /// A unit the Trados Cloud app laid out and the SDLXLIFF export delivered (19 November
+    /// 2026): told by its locked shapes and the cloud's metadata on the segments' origins, never
+    /// by a context, and never mistaken for this plugin's own layout or for plain text.
+    /// </summary>
+    [Fact]
+    public void A_cloud_expanded_unit_is_told_by_its_shapes_and_the_origin_metadata()
+    {
+        var cloud = ParagraphUnits.CloudExpanded("knightCount", "count", "plural",
+            new ParagraphUnits.CloudForm("one", "There is # knight here."),
+            new ParagraphUnits.CloudForm("other", "There are # knights here."));
+        Assert.True(ResourceKey.IsCloudExpanded(cloud));
+        Assert.False(ResourceKey.IsExpanded(cloud));
+        Assert.Equal("knightCount", ResourceKey.Of(cloud));
+
+        Assert.False(ResourceKey.IsCloudExpanded(ParagraphUnits.Json("{count, plural, one {# file} other {# files}}", "['files']")));
+        Assert.False(ResourceKey.IsCloudExpanded(ParagraphUnits.WithSegments("There is 1 knight here.")));
+
+        // The shapes alone are not enough: a locked selector without the cloud's facts is somebody's manual lock.
+        var bare = ParagraphUnits.CloudExpanded("knightCount", "count", "plural", new ParagraphUnits.CloudForm("other", "# knights"));
+        foreach (var pair in bare.SegmentPairs) pair.Properties.TranslationOrigin = null;
+        Assert.False(ResourceKey.IsCloudExpanded(bare));
+    }
+
     [Fact]
     public void Filter_tags_fold_their_content_back_into_the_value()
     {

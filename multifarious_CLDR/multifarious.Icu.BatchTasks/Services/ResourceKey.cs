@@ -69,6 +69,44 @@ namespace multifarious.Icu.BatchTasks.Services
             return null;
         }
 
+        private static readonly Regex CloudSelectorOpen =
+            new Regex(@"^\{[^,{}\s]+,\s*(plural|selectordinal|select),", RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// Whether the unit was laid out by the Trados Cloud app and downloaded for offline work
+        /// (19 November 2026, project 6a995f7f): no context of this plugin's, the same three
+        /// locked shapes between the segments, and the cloud's per-segment metadata, which the
+        /// SDLXLIFF export keeps on each segment's translation origin (<c>icu:path</c> and the
+        /// rest) and Studio copies onto the new origin when a segment is edited. The ICU Forms
+        /// window reads such a unit; the tasks leave it alone.
+        /// </summary>
+        public static bool IsCloudExpanded(IParagraphUnit unit)
+        {
+            if (unit == null || unit.Source == null || unit.IsStructure || IcuContextOf(unit) != null) return false;
+
+            var opens = false;
+            for (var i = 0; i < unit.Source.Count; i++)
+            {
+                var item = unit.Source[i];
+                var text = item as IText;
+                if (text != null && string.IsNullOrWhiteSpace(text.Properties.Text)) continue;
+
+                var locked = item as ILockedContent;
+                if (locked == null) return false;
+                opens = CloudSelectorOpen.IsMatch(RawValueReconstruction.Reconstruct(locked.Content).RawValue);
+                break;
+            }
+            if (!opens) return false;
+
+            foreach (var pair in unit.SegmentPairs)
+            {
+                var origin = pair != null && pair.Properties != null ? pair.Properties.TranslationOrigin : null;
+                if (origin != null && origin.MetaDataContainsKey("icu:path")) return true;
+            }
+
+            return false;
+        }
+
         /// <summary>The plugin's own context on the unit, or null where the unit has never been expanded.</summary>
         public static IContextInfo IcuContextOf(IParagraphUnit unit)
         {
