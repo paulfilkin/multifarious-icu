@@ -1,5 +1,22 @@
 # multifariousICU Support for Trados Studio - Changelog
 
+## 2.1.1.0 (November 2026)
+
+### Added
+
+- The ICU Forms window reads a file downloaded from Trados Cloud. The cloud app lays its
+  messages out with the same locked syntax and keeps the facts about each form on the
+  segment, which the download preserves and Studio keeps through an edit. The window shows
+  the forms, their counts and the reassembled message for such a file as it does for its
+  own, so a translator working offline can see which form a segment is for.
+
+### Changed
+
+- On a project downloaded from Trados Cloud, Expand ICU and Restore ICU change nothing and
+  say so in Task Results. The cloud app's own tasks lay those messages out and put them
+  back; Expand ICU used to expand them a second time. Studio lists the tasks on every
+  project, and a plugin task cannot be greyed out for one kind of project.
+
 ## 2.1.0.0 (October 2026)
 
 ### Changed

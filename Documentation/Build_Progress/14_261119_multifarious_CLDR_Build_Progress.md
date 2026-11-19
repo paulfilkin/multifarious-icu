@@ -4,30 +4,31 @@ Fourteenth session, the first after 2.1.0.0 went live.  Started from an RWS supp
 Trados Cloud project's SDLXLIFF opened offline in Studio shows the plural forms with no
 context.  The ICU Forms window now reads such a file, both tasks leave cloud work alone and
 say so, and the day's evidence on what the cloud export keeps is recorded.  1,679 tests.
-Nothing committed yet; the commit is proposed below.
+Committed as `0c8a469` on `release/2.1` after Paul's run, and released as **2.1.1.0** the
+same evening; see the release section.
 
 ## Kickoff prompt for the next session (paste this)
 
 > Read `CLAUDE.md`, then
 > `Documentation\Build_Progress\14_261119_multifarious_CLDR_Build_Progress.md`.
 >
-> 2.1.0.0 is live on the AppStore (25 October 2026); `main` and `release/2.1` are level at
-> `4a69421`.  Work on 19 November, uncommitted unless this handover says otherwise: the ICU
-> Forms window reads a unit laid out by the Trados Cloud app and downloaded for offline work
+> 2.1.1.0 was released from `release/2.1` on 19 November 2026 (the release section of
+> handover 14 records the tag, the merge into `main` and the upload): the ICU Forms window
+> reads a unit laid out by the Trados Cloud app and downloaded for offline work
 > (`ResourceKey.IsCloudExpanded`, a reader fallback that takes the per-segment facts from the
 > translation origins), the survey counts such units as expanded, Expand ICU skips such a
-> unit, and both tasks process nothing on a cloud project and say so in Task Results.  One
-> new string in nine resource files, four new tests (1,679).  A copy of the cloud file is at
+> unit, and both tasks process nothing on a cloud project and say so in Task Results.
+> Studio cannot grey a plugin task per project: its menu refuses two of its own tasks on a
+> cloud project from a hard-coded list and asks a template nothing else.  One new string in
+> nine resource files, four new tests (1,679).  A copy of the cloud file is at
 > `test-corpus\probes\cloud-less_simple-ru-RU.sdlxliff` (local).
 >
-> Open: Paul's Studio run on the downloaded project `6a995f7f` (the window on `knightCount`,
-> the tasks' message, and which `ProjectType` the diagnostics log reports for a downloaded
-> project); the reply to the customer's case, and whether the cloud app gets an option to write
-> the note as a comment for offline work; the version for a 2.1.1 or 2.2; the website
-> guide's SSML section and screenshots; the native read of the thirteen strings added
-> since 14 October that are still unread; the reference project's `Hoister.cs` and design
-> 5.9; the uncommitted `tools\plan-file.ps1`.  The source material under
-> `Documentation\CustomDictionaries` is local and must not be named in anything published.
+> Open: the reply to the customer's case, and whether the cloud app gets an option to write the
+> note as a comment for offline work; the website guide's SSML section and screenshots;
+> the native read of the thirteen strings added since 14 October that are still unread;
+> the reference project's `Hoister.cs` and design 5.9; the uncommitted
+> `tools\plan-file.ps1`.  The source material under `Documentation\CustomDictionaries` is
+> local and must not be named in anything published.
 >
 > Follow the working conventions in `CLAUDE.md`: agree a plan before coding, British English,
 > no em-dashes, never commit or push without being asked, propose the commit message first.
@@ -103,10 +104,12 @@ what she compared against.  The Studio plugin could not read the file either: no
   (recognition, the reader, the window on the customer's fr-CA shape, the processor leaving it
   alone).  1,679.  Deployed at 19:39 with Studio closed.
 
-## Proposed commit
+## The commit
 
-Stage: `Services\ResourceKey.cs`, `Services\IcuFormsReader.cs`, `Services\IcuExpandProcessor.cs`,
-`Services\CloudProjects.cs`, `BatchTasks\IcuExpandTask.cs`, `BatchTasks\IcuRestoreTask.cs`,
+Made as `0c8a469` on `release/2.1` after Paul's run (the window on `knightCount` worked,
+both tasks showed the message).  Staged: `Services\ResourceKey.cs`,
+`Services\IcuFormsReader.cs`, `Services\IcuExpandProcessor.cs`, `Services\CloudProjects.cs`,
+`BatchTasks\IcuExpandTask.cs`, `BatchTasks\IcuRestoreTask.cs`,
 `Editor\IcuFormsViewPartController.cs`, the nine resx and `UIStrings.cs`, the five test
 files, this handover.  Not the probe copy (gitignored) or Paul's untracked files.
 
@@ -127,20 +130,44 @@ One new string in nine languages, four new tests (1,679).
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
 ```
 
+## Why the tasks cannot be greyed out (decompiled Studio, Paul's copy under
+`multifariousStudio\research\decomp`)
+
+Paul saw Studio's own tasks greyed on the cloud project and asked for the same.  The menu
+asks one static method per template, `BatchProcessingAvailabilityCondition.IsAllowed` in
+`Sdl.TranslationStudio.Common.BatchProcessing`: on an `IsLCProject` project it refuses the
+ids in a hard-coded list, Generate Target Translations and Finalize, plus Generate Target
+File LC when not signed in, and allows everything else.  A plugin task reaches Studio as
+`IntegrationAutomaticTaskInfo`, built from the `AutomaticTask`,
+`AutomaticTaskSupportedFileType` and `RequiresSettings` attributes and nothing more; even the
+per-file filter (`ITaskTemplateFileFilter.SupportsFile` on `AutomaticTaskTemplate`) reads
+`SupportedFileExtension`, which the integration info fixes at null.  So neither greying per
+project nor filtering per file is reachable from a plugin, and the refusal with a message is
+the available form of "disabled".  Reflection into the menu's private code was not
+considered worth building.
+
+## Release 2.1.1.0 (19 November 2026, evening)
+
+Paul's call: a 2.1.x fix on `release/2.1`.  The version in `AssemblyInfo.cs` and
+`pluginpackage.manifest.xml` went to 2.1.1.0, the changelog gained a 2.1.1.0 entry (the
+window reading a cloud file under Added, the tasks refusing a cloud project under Changed,
+with the sentence that a plugin task cannot be greyed out), and the Release build, the
+tests on its output, the package copied to `Documentation\appstore\IcuSupport.sdlplugin`,
+the commit "Release 2.1.1.0", the tag `v2.1.1.0`, the pushes and the fast-forward of
+`main` followed.  Done in the session: the Release build clean with the 1,679 tests passing
+on its output, the package 1,140,349 bytes at 2.1.1.0 and deployed to Studio's Packages
+folder as well, the release commit on `release/2.1` with `v2.1.1.0` on it, branch and tag
+pushed, `main` fast-forwarded and pushed.  The AppStore upload is Paul's, with the changelog.
+
 ## Open items
 
-- **Paul's Studio run on `6a995f7f`**: open `less_simple.json.sdlxliff` for ru-RU and move
-  through `knightCount` (six rows, the active one marked, the count box live); run Expand ICU
-  and Restore ICU on the project and read the Task Results message; read
-  `%TEMP%\multifarious-icu-diagnostics.log` for `type=` on the project line, which says
-  which `ProjectType` a downloaded project reports.  If it is `Standard`, the project guard
-  never fires and the unit guard is all there is.
-- **The reply to the customer**: the Studio plugin's window answers the offline case once this is
-  released; the cloud app's own preview page answers the online case; and a cloud option to
-  write the note as a comment for offline teams is a switch, since the writer existed until
+- **The reply to the customer**: the Studio plugin's window answers the offline case with 2.1.1.0;
+  the cloud app's own preview page answers the online case; and a cloud option to write the
+  note as a comment for offline teams is a switch, since the writer existed until
   26 October.  Paul's call on which to offer.
-- **A release for this**: 2.1.1 as a fix on `release/2.1`, or 2.2; the version numbers are
-  still 2.1.0.0.
+- **Which `ProjectType` a downloaded project reports** was not captured: the diagnostics log
+  has no project line from today's build for `6a995f7f`.  The guard fired, so it is one of
+  the four cloud values; the next logged run on a cloud project will name it.
 - The website guide's SSML section and screenshots, the native read of the thirteen strings
   added since 14 October that are still unread, the reference project's `Hoister.cs` and
   design section 5.9, and `tools\plan-file.ps1` (handover 13).
