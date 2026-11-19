@@ -157,7 +157,10 @@ the commit "Release 2.1.1.0", the tag `v2.1.1.0`, the pushes and the fast-forwar
 `main` followed.  Done in the session: the Release build clean with the 1,679 tests passing
 on its output, the package 1,140,349 bytes at 2.1.1.0 and deployed to Studio's Packages
 folder as well, the release commit on `release/2.1` with `v2.1.1.0` on it, branch and tag
-pushed, `main` fast-forwarded and pushed.  The AppStore upload is Paul's, with the changelog.
+pushed, `main` fast-forwarded and pushed.  **Paul uploaded the package and 2.1.1.0 went
+live on the AppStore late on 19 November 2026.**  The package stays in
+`Documentation\appstore\` beside the earlier zips; a versioned `Releases\` folder was
+proposed and declined for now.
 
 ## Open items
 
