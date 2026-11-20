@@ -206,7 +206,8 @@ filters.  One test.  Deployed, Paul opened the file again and the window showed 
 committed as `558d08a`, then released as **2.1.2.0** (version in `AssemblyInfo.cs` and the
 manifest, a Fixed entry in the changelog, the Release build with the tests on its output,
 the package to `Documentation\appstore\IcuSupport.sdlplugin`, the commit "Release 2.1.2.0",
-the tag `v2.1.2.0`, both branches and the tag pushed, `main` fast-forwarded).
+the tag `v2.1.2.0`, both branches and the tag pushed, `main` fast-forwarded).  **Paul uploaded
+the package and 2.1.2.0 went live on the AppStore on the morning of 20 November 2026.**
 
 ## History rewritten (20 November 2026)
 
