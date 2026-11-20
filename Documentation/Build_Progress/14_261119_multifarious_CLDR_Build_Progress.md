@@ -194,6 +194,16 @@ tooltip, the folded tag, the parity check and the projection all hold; the key i
 Passed first time, 1,680.  Paul's Studio run on the fr-CA file from the corpus is the
 boundary check still to do.
 
+## A bare SDLXLIFF (20 November 2026)
+
+Paul opened the customer's fr-CA file on its own, outside a project, and the window said
+"Not available for this file": Studio reports an SDLXLIFF opened that way as
+"SDL XLIFF 1.0 v 1.0.0.0", and the window's allowlist knew the two filters only.  In the
+downloaded cloud project the project file still carried "JSON v 1.0.0.0", which is why the
+same shape worked there.  `Constants.SdlxliffFileTypeId` is now accepted by the window's
+survey, the content deciding as it does for the filters; the tasks keep to the two
+filters.  One test.  Deployed for Paul to open the file again.
+
 ## History rewritten (20 November 2026)
 
 The four commits from the cloud work on were rebuilt without the customer's name, the

@@ -62,6 +62,14 @@ namespace multifarious.Icu.BatchTasks
             "Java Resources v 2.0.0.0",
         };
 
+        /// <summary>
+        /// The type Studio reports for an SDLXLIFF opened on its own, such as a file downloaded
+        /// from Trados Cloud and opened outside its project (Paul, 20 November 2026). The ICU
+        /// Forms window accepts it and lets the content decide, since the units carry the layout
+        /// whatever the project says; the tasks keep to the two filters above.
+        /// </summary>
+        public const string SdlxliffFileTypeId = "SDL XLIFF 1.0 v 1.0.0.0";
+
         /// <summary>The author name on the comments the tasks write.</summary>
         public const string CommentAuthor = "multifariousICU Support";
 

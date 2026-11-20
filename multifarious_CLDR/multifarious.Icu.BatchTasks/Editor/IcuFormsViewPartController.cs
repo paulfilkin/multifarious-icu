@@ -126,8 +126,11 @@ namespace multifarious.Icu.BatchTasks.Editor
             {
                 var file = document.ActiveFile;
                 var fileTypeId = file != null ? file.FileTypeId : null;
+                // The two filters the tasks run on, and an SDLXLIFF opened on its own, whose
+                // units say for themselves whether they carry a layout.
                 _documentSupported = Constants.DefaultFileTypeIds.Any(id =>
-                    string.Equals(fileTypeId, id, StringComparison.OrdinalIgnoreCase));
+                        string.Equals(fileTypeId, id, StringComparison.OrdinalIgnoreCase))
+                    || string.Equals(fileTypeId, Constants.SdlxliffFileTypeId, StringComparison.OrdinalIgnoreCase);
                 if (!_documentSupported)
                 {
                     Diagnostics.Write("forms: file type " + (fileTypeId ?? "<null>") + " not supported");

@@ -480,6 +480,31 @@ public class IcuFormsViewTests
         Assert.True(viewModel.ShowsCountBox);
     }
 
+    /// <summary>
+    /// An SDLXLIFF opened on its own reports Studio's SDL XLIFF type, not the filter's (Paul,
+    /// 20 November 2026, a cloud file outside its project): the window accepts that type and
+    /// lets the content decide, while the tasks keep to the two filters.
+    /// </summary>
+    [Fact]
+    public void The_window_accepts_a_bare_sdlxliff_where_the_tasks_do_not()
+    {
+        Assert.Equal("SDL XLIFF 1.0 v 1.0.0.0", Constants.SdlxliffFileTypeId);
+        Assert.DoesNotContain(Constants.SdlxliffFileTypeId, Constants.DefaultFileTypeIds);
+        Assert.Contains("Constants.SdlxliffFileTypeId",
+            File.ReadAllText(Path.Combine(CodeRoot(), "multifarious.Icu.BatchTasks", "Editor", "IcuFormsViewPartController.cs")));
+    }
+
+    private static string CodeRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "multifarious.Icu.sln")))
+        {
+            directory = directory.Parent;
+        }
+        Assert.NotNull(directory);
+        return directory!.FullName;
+    }
+
     [Fact]
     public void The_view_keeps_the_active_row_in_view_through_named_parts()
     {
