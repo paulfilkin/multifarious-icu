@@ -202,7 +202,11 @@ Paul opened the customer's fr-CA file on its own, outside a project, and the win
 downloaded cloud project the project file still carried "JSON v 1.0.0.0", which is why the
 same shape worked there.  `Constants.SdlxliffFileTypeId` is now accepted by the window's
 survey, the content deciding as it does for the filters; the tasks keep to the two
-filters.  One test.  Deployed for Paul to open the file again.
+filters.  One test.  Deployed, Paul opened the file again and the window showed the forms:
+committed as `558d08a`, then released as **2.1.2.0** (version in `AssemblyInfo.cs` and the
+manifest, a Fixed entry in the changelog, the Release build with the tests on its output,
+the package to `Documentation\appstore\IcuSupport.sdlplugin`, the commit "Release 2.1.2.0",
+the tag `v2.1.2.0`, both branches and the tag pushed, `main` fast-forwarded).
 
 ## History rewritten (20 November 2026)
 

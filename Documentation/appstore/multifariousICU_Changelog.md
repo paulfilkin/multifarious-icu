@@ -1,5 +1,15 @@
 # multifariousICU Support for Trados Studio - Changelog
 
+## 2.1.2.0 (November 2026)
+
+### Fixed
+
+- The ICU Forms window works for an SDLXLIFF opened on its own, outside a project, such as
+  a file downloaded from Trados Cloud and opened directly. Studio reports such a file as
+  SDL XLIFF rather than JSON or Java Resources, and the window said it was not available
+  for the file. The window now looks at the file's content instead.
+- The batch tasks are unchanged.
+
 ## 2.1.1.0 (November 2026)
 
 ### Added
