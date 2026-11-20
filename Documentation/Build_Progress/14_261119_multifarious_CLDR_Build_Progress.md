@@ -4,7 +4,7 @@ Fourteenth session, the first after 2.1.0.0 went live.  Started from an RWS supp
 Trados Cloud project's SDLXLIFF opened offline in Studio shows the plural forms with no
 context.  The ICU Forms window now reads such a file, both tasks leave cloud work alone and
 say so, and the day's evidence on what the cloud export keeps is recorded.  1,679 tests.
-Committed as `0c8a469` on `release/2.1` after Paul's run, and released as **2.1.1.0** the
+Committed as `b417eec` on `release/2.1` after Paul's run, and released as **2.1.1.0** the
 same evening; see the release section.
 
 ## Kickoff prompt for the next session (paste this)
@@ -106,7 +106,7 @@ what she compared against.  The Studio plugin could not read the file either: no
 
 ## The commit
 
-Made as `0c8a469` on `release/2.1` after Paul's run (the window on `knightCount` worked,
+Made as `b417eec` on `release/2.1` after Paul's run (the window on `knightCount` worked,
 both tasks showed the message).  Staged: `Services\ResourceKey.cs`,
 `Services\IcuFormsReader.cs`, `Services\IcuExpandProcessor.cs`, `Services\CloudProjects.cs`,
 `BatchTasks\IcuExpandTask.cs`, `BatchTasks\IcuRestoreTask.cs`,
@@ -193,6 +193,16 @@ shape with placeholder tags and no `JsonPath`.  The rows, the fr-CA counts, the 
 tooltip, the folded tag, the parity check and the projection all hold; the key is empty.
 Passed first time, 1,680.  Paul's Studio run on the fr-CA file from the corpus is the
 boundary check still to do.
+
+## History rewritten (20 November 2026)
+
+The four commits from the cloud work on were rebuilt without the customer's name, the
+person's name and the support case, which the first version of this handover carried, and
+`main`, `release/2.1` and `v2.1.1.0` were force-pushed (Paul: the repository is public and
+these are a client's files).  The hashes in this handover are the rebuilt ones: the cloud
+work `b417eec`, the release `221d195` (where `v2.1.1.0` now points), the close `b5618d1`.
+The client's files live under `test-corpusoud-client`, ignored by name.  The old
+commits remain reachable on GitHub by hash until GitHub purges them.
 
 ## Open items
 
