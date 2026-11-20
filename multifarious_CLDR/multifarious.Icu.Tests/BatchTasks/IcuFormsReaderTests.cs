@@ -60,6 +60,40 @@ public class IcuFormsReaderTests
         Assert.True(model.TargetParses);
     }
 
+    /// <summary>
+    /// The cloud customer's shape (test-corpus\cloud-client, a fr-CA file of 18 November 2026): the
+    /// JSON file type runs the Plain Text embedded content processor, so {number} is a filter
+    /// placeholder tag cloned into every form and the key is on a structure unit the editor
+    /// never hands the window. The rows, the counts, the folded tag and the parity check all
+    /// hold; the key comes back empty, which is the one gap on record.
+    /// </summary>
+    [Fact]
+    public void A_cloud_client_shaped_unit_reads_with_its_placeholder_tags_and_no_key()
+    {
+        var unit = ParagraphUnits.CloudExpandedWithTags("number", "plural",
+            new ParagraphUnits.CloudForm("one", "({number} billing account)",
+                Note: "CLDR category: one\nUsed when the count is: 0, 1"),
+            new ParagraphUnits.CloudForm("many", "({number} billing accounts)", SeededFrom: "other"),
+            new ParagraphUnits.CloudForm("other", "({number} billing accounts)"));
+        ParagraphUnits.CopySourceToTargets(unit);
+        Assert.True(ResourceKey.IsCloudExpanded(unit));
+        Assert.Null(ResourceKey.Of(unit));
+
+        var model = new IcuFormsReader().Read(unit, "fr-CA");
+
+        Assert.NotNull(model);
+        Assert.Equal(string.Empty, model!.Key);
+        Assert.Equal(["number:one", "number:many", "number:other"], model.Rows.Select(r => r.Path));
+        Assert.Contains("1000000", model.Rows[1].Counts);
+        Assert.Equal("CLDR category: one\nUsed when the count is: 0, 1", model.Rows[0].Comment);
+        Assert.All(model.Rows, r => Assert.Null(r.PlaceholderWarning));
+        Assert.All(model.Rows, r => Assert.False(r.TargetEmpty));
+        Assert.Contains("billing accounts", model.Rows[1].SourceRendered);
+        Assert.DoesNotContain("{number}", model.Rows[1].SourceRendered);
+        Assert.True(model.TargetParses);
+        Assert.StartsWith("{number, plural, one {({number} billing account)}", model.TargetProjection);
+    }
+
     [Fact]
     public void The_rows_and_their_tooltips_come_from_the_layout_cldr_and_the_unit_context()
     {

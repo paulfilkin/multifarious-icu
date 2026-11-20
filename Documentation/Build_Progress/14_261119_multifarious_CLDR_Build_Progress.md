@@ -162,6 +162,38 @@ live on the AppStore late on 19 November 2026.**  The package stays in
 `Documentation\appstore\` beside the earlier zips; a versioned `Releases\` folder was
 proposed and declined for now.
 
+## After the release: the customer's files (20 November 2026)
+
+Paul put the customer project's files under `test-corpus\cloud-client` (local): the source JSON of
+19 values and the cloud's SDLXLIFF for 19 target languages, made on 18 November by the cloud
+app.  Against our September probe they differ in the project's file type configuration and
+the app build, not in the expansion:
+
+- **The JSON file type runs the Plain Text embedded content processor** with a placeholder
+  rule for `{argument}`: every value is a sub-content `<file>`, each argument a filter
+  placeholder tag cloned into every form (the customer's purple `{number}`), `#` still the app's
+  locked span.  The key is `StructureParagraphPath` on a structure unit ahead of the
+  sub-content; there is no `JsonPath` on the unit.  This is the route the cloud design
+  probed on 26 October after the JSON writer dropped the app's own tags.
+- **The app build is newer**: `icu:note` (the full tooltip text) and `icu:needs` (empty on
+  all 48) on every ICU segment beside the nine keys; no comments at all.  Targets are
+  Language Weaver "EngRus" output.
+- **The layout is the same three locked shapes**, hoisting puts the selector first even for
+  a mid-sentence plural, and `cabinet{…, one {} other {s}}` is four whole sentences.
+  The customer's fr-CA unit is `one`, `many`, `other` with the facts on each origin.
+
+**The gap**: the window will show such a unit with no key, since the key is on a structure
+unit the editor's document model does not hand out and the cloud's `icu:key` is unit
+metadata the export drops.  The fix is the cloud app writing `icu:key` onto the segment
+metadata beside `icu:note`, then one line in the reader.
+
+**Test**: `A_cloud_client_shaped_unit_reads_with_its_placeholder_tags_and_no_key` in
+`IcuFormsReaderTests`, on `ParagraphUnits.CloudExpandedWithTags`, which builds the customer's
+shape with placeholder tags and no `JsonPath`.  The rows, the fr-CA counts, the note as
+tooltip, the folded tag, the parity check and the projection all hold; the key is empty.
+Passed first time, 1,680.  Paul's Studio run on the fr-CA file from the corpus is the
+boundary check still to do.
+
 ## Open items
 
 - **The reply to the customer**: the Studio plugin's window answers the offline case with 2.1.1.0;

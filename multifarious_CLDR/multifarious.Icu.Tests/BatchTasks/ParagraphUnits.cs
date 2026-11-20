@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
 using Sdl.FileTypeSupport.Framework.Core.Utilities.BilingualApi;
 using Sdl.FileTypeSupport.Framework.NativeApi;
@@ -240,7 +241,19 @@ internal static class ParagraphUnits
     /// key on the paragraph context, and the cloud's per-segment facts on each segment pair's
     /// translation origin, where Studio keeps them through an edit.
     /// </summary>
-    public static IParagraphUnit CloudExpanded(string jsonPath, string argument, string kind, params CloudForm[] forms)
+    public static IParagraphUnit CloudExpanded(string jsonPath, string argument, string kind, params CloudForm[] forms) =>
+        BuildCloudExpanded(jsonPath, argument, kind, argumentsAsTags: false, forms);
+
+    /// <summary>
+    /// The same unit as a customer's cloud project delivers it (test-corpus\cloud-client, 18 November 2026):
+    /// the JSON file type runs the Plain Text embedded content processor with a placeholder
+    /// rule, so each {argument} in a form is a filter placeholder tag cloned into every form,
+    /// and the key sits on a structure unit ahead of the sub-content, not on the unit.
+    /// </summary>
+    public static IParagraphUnit CloudExpandedWithTags(string argument, string kind, params CloudForm[] forms) =>
+        BuildCloudExpanded(null, argument, kind, argumentsAsTags: true, forms);
+
+    private static IParagraphUnit BuildCloudExpanded(string? jsonPath, string argument, string kind, bool argumentsAsTags, CloudForm[] forms)
     {
         var unit = ItemFactory.CreateParagraphUnit(LockTypeFlags.Unlocked);
         unit.Source.Add(Locked("{" + argument + ", " + kind + ","));
@@ -263,10 +276,13 @@ internal static class ParagraphUnits
 
             unit.Source.Add(Locked(" " + form.Key + " {"));
             var source = ItemFactory.CreateSegment(properties);
-            foreach (var piece in form.Text.Split('#'))
+            // '#' is the cloud's locked span; a {name} is a filter placeholder tag where the
+            // project's file type tags arguments, and plain text otherwise.
+            foreach (Match piece in Regex.Matches(form.Text, @"#|\{[A-Za-z_][A-Za-z0-9_]*\}|[^#{]+"))
             {
-                if (source.Count > 0) source.Add(Locked("#"));
-                if (piece.Length > 0) source.Add(Text(piece));
+                if (piece.Value == "#") source.Add(Locked("#"));
+                else if (argumentsAsTags && piece.Value.StartsWith("{")) source.Add(Placeholder(piece.Value));
+                else source.Add(Text(piece.Value));
             }
             unit.Source.Add(source);
             unit.Source.Add(Locked("}"));
@@ -278,9 +294,12 @@ internal static class ParagraphUnits
         unit.Source.Add(Locked("}"));
         unit.Target.Add(Locked("}"));
 
-        var context = PropertiesFactory.CreateContextInfo("sdl:paragraph");
-        context.SetMetaData("JsonPath", jsonPath);
-        AddContext(unit, context);
+        if (jsonPath != null)
+        {
+            var context = PropertiesFactory.CreateContextInfo("sdl:paragraph");
+            context.SetMetaData("JsonPath", jsonPath);
+            AddContext(unit, context);
+        }
         return unit;
     }
 

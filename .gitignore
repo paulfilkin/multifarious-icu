@@ -81,3 +81,6 @@ $RECYCLE.BIN/
 *.orig
 *~
 ~$*
+
+# A customer's cloud project files, kept locally for the ICU Forms window checks; never published.
+multifarious_CLDR/test-corpus/cloud-client/
